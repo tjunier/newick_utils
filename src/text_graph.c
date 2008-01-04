@@ -199,8 +199,6 @@ void display_tree(struct rooted_tree *tree, int width)
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* create canvas and draw nodes on it */
-	printf ("width: %d, l_max: %d, ROOT_SPACE: %d, LBL_SPACE: %d, d_max: %g\n",
-			width, hd.l_max, ROOT_SPACE, LBL_SPACE, hd.d_max);
 	scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	canvasp = create_canvas(width, 2 * num_leaves);
 	write_to_canvas(canvasp, tree, scale);

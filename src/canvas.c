@@ -44,7 +44,6 @@ void canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop
 {
 	int col;
 
-	printf ("drawing hline at %d, (%d - %d)\n", line, start_col, stop_col);
 	/* <= is intentional (stop position is included in line) */
 	for (col = start_col; col <= stop_col; col++) 
 		if ('|' == canvasp->lines[line][col])
