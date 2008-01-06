@@ -1,7 +1,7 @@
 
 TESTS = check_rnode check_redge
 
-check_PROGRAMS = check_rnode check_redge check_list
+check_PROGRAMS = check_rnode check_redge check_llist
 
 SRC = $(top_builddir)/src
 

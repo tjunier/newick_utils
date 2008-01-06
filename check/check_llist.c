@@ -88,49 +88,22 @@ START_TEST (test_append_five)
 	append_element(list_p, "three");
 	append_element(list_p, "four");
 	append_element(list_p, "five");
-
 	elem = list_p->head;
-	if (strcmp(elem->data, "one") != 0) {
-		printf ("%s: expected 'one', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
+	fail_if (strcmp((char *) elem->data, "one"), "wrong data");
 	elem = elem->next;
-	if (strcmp(elem->data, "two") != 0) {
-		printf ("%s: expected 'two', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
+	fail_if (strcmp((char *) elem->data, "two"), "wrong data");
 	elem = elem->next;
-	if (strcmp(elem->data, "three") != 0) {
-		printf ("%s: expected 'three', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
+	fail_if (strcmp((char *) elem->data, "three"), "wrong data");
 	elem = elem->next;
-	if (strcmp(elem->data, "four") != 0) {
-		printf ("%s: expected 'four', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
+	fail_if (strcmp((char *) elem->data, "four"), "wrong data");
 	elem = elem->next;
-	if (strcmp(elem->data, "five") != 0) {
-		printf ("%s: expected 'five', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
-	if(list_p->count != 5) {
-		printf ("%s: count should be 5.\n", test_name);
-		return 1;
-	}
-	printf("%s ok.\n", test_name);
-	return 0;
+	fail_if (strcmp((char *) elem->data, "five"), "wrong data");
+	fail_if (5 != list_p->count, "wrong count");
 }
 END_TEST
 
 START_TEST (test_reverse)
 {
-	char *test_name = "test_reverse";
 	struct llist *list_p, *revlist_p;
 	struct list_elem *elem;
 
@@ -141,49 +114,18 @@ START_TEST (test_reverse)
 	append_element(list_p, "four");
 	append_element(list_p, "five");
 
+	elem = list_p->head;
+	fail_if (strcmp((char *) elem->data, "five"), "wrong data");
+	elem = elem->next;
+	fail_if (strcmp((char *) elem->data, "four"), "wrong data");
+	elem = elem->next;
+	fail_if (strcmp((char *) elem->data, "three"), "wrong data");
+	elem = elem->next;
+	fail_if (strcmp((char *) elem->data, "two"), "wrong data");
+	elem = elem->next;
+	fail_if (strcmp((char *) elem->data, "one"), "wrong data");
+	fail_if (5 != list_p->count, "wrong count");
 	revlist_p = llist_reverse(list_p);
-
-	elem = revlist_p->head;
-	if (strcmp(elem->data, "five") != 0) {
-		printf ("%s: expected 'five', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
-	elem = elem->next;
-	if (strcmp(elem->data, "four") != 0) {
-		printf ("%s: expected 'four', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
-	elem = elem->next;
-	if (strcmp(elem->data, "three") != 0) {
-		printf ("%s: expected 'three', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
-	elem = elem->next;
-	if (strcmp(elem->data, "two") != 0) {
-		printf ("%s: expected 'two', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
-	elem = elem->next;
-	if (strcmp(elem->data, "one") != 0) {
-		printf ("%s: expected 'one', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
-	if (NULL != elem->next) {
-		printf ("%s: elem->next shoudl be NULL.\n", test_name);
-		return 1;
-	}
-	if(list_p->count != 5) {
-		printf ("%s: count should be 5.\n", test_name);
-		return 1;
-	}
-
-	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -197,18 +139,13 @@ START_TEST (test_add_many)
 
 	for (i = 0; i < num_elements; i++)
 		prepend_element(list_p, &i);
-	if (list_p->count != num_elements) {
-		printf("count wrong: %d, expected %d.\n", list_p->count, num_elements);
-		return 1;
-	}
-	printf("test_add_many ok.\n");
-	return 0;
+	fail_if (list_p->count != num_elements, "wrong number of elements");
 }
 END_TEST	
 
 START_TEST (test_add_struct)
 {
-	const int num_edges = 10;
+	const int num_data = 10;
 	struct llist *list_p;
 	int i;
 	struct test_data *datap;
@@ -217,7 +154,7 @@ START_TEST (test_add_struct)
 	list_p = create_llist();
 
 	/* populate list */
-	for (i = 0; i < num_edges; i++) {
+	for (i = 0; i < num_data; i++) {
 		if (NULL == (datap = malloc(sizeof(struct test_data)))) {
 			perror(NULL);
 			return 1;
@@ -231,20 +168,13 @@ START_TEST (test_add_struct)
 	/* check elements */
 	for (elem_p=list_p->head, i=9; NULL != elem_p; elem_p = elem_p->next, i--) {
 		datap = (struct test_data *) elem_p->data;
-		if (datap->length != (double) i) {
-			printf ("Expected edge length %.2f, got %.2f.",
-					(double) i, datap->length);
-			return 1;
-		}
+		fail_if (datap->length != (double) i, "wrong edge length");
 	}
-	printf("test_add_struct ok.\n");
-	return 0;
 }
 END_TEST
 
 START_TEST (test_shallow_copy)
 {
-	char *test_name = "test_shallow_copy";
 	struct llist *list_p, *list_copy_p;
 	struct list_elem *elem;
 	char label_two[] = {'t', 'w', 'o', '\0'};
@@ -260,39 +190,17 @@ START_TEST (test_shallow_copy)
 
 	/* test list membership and count */
 	elem = list_copy_p->head;
-	if (strcmp(elem->data, "one") != 0) {
-		printf ("%s: expected 'one', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
+	fail_if (strcmp((char *) elem->data, "one"), "wrong data");
 	elem = elem->next;
-	if (strcmp(elem->data, "two") != 0) {
-		printf ("%s: expected 'two', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
+	fail_if (strcmp((char *) elem->data, "two"), "wrong data");
 	elem = elem->next;
-	if (strcmp(elem->data, "three") != 0) {
-		printf ("%s: expected 'three', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
+	fail_if (strcmp((char *) elem->data, "three"), "wrong data");
 	elem = elem->next;
-	if (strcmp(elem->data, "four") != 0) {
-		printf ("%s: expected 'four', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
+	fail_if (strcmp((char *) elem->data, "four"), "wrong data");
 	elem = elem->next;
-	if (strcmp(elem->data, "five") != 0) {
-		printf ("%s: expected 'five', got %s.\n", test_name,
-				(char *) elem->data);
-		return 1;
-	}
-	if(list_p->count != 5) {
-		printf ("%s: count should be 5.\n", test_name);
-		return 1;
-	}
+	fail_if (strcmp((char *) elem->data, "five"), "wrong data");
+	fail_if (5 != list_p->count, "wrong count");
+	fail_if (5 != list_copy_p->count, "wrong count");
 
 	/* Check that copy is shallow, i.e., original list members are the
 	 * same a s copy members */
@@ -302,19 +210,12 @@ START_TEST (test_shallow_copy)
 	elem = list_p->head->next; /* should work with any of them */
 	label_two[0] = 'z';
 	elem = list_copy_p->head->next;
-	if (strcmp(elem->data, "zwo") != 0) {
-		printf ("%s: expected element in copy to be 'zwo' (got '%s').\n", test_name, (char *) elem->data);
-		return 1;
-	}
-
-	printf("%s ok.\n", test_name);
-	return 0;
+	fail_if (strcmp(elem->data, "zwo") != 0, "shallow copy failed");
 }
 END_TEST
 
 START_TEST (test_shift)
 {
-	char *test_name = "test_shift";
 	struct llist *list_p;
 	struct list_elem *elem;
 
@@ -353,7 +254,6 @@ START_TEST (test_shift)
 	}
 
 	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -393,7 +293,6 @@ START_TEST (test_reduce)
 	}
 
 	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -497,7 +396,6 @@ START_TEST (test_insert)
 	}
 
 	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -601,7 +499,6 @@ START_TEST (test_insert_at_head)
 		return 1;
 	}
 	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -705,7 +602,6 @@ START_TEST (test_insert_at_tail)
 	}
 
 	printf ("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -824,7 +720,6 @@ START_TEST (test_delete)
 	}
 
 	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -943,7 +838,6 @@ START_TEST (test_delete_at_head)
 	}
 
 	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -980,7 +874,6 @@ START_TEST (test_index)
 		return 1;
 	}
 	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -1098,7 +991,6 @@ START_TEST (test_delete_at_tail)
 	}
 
 	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
 
@@ -1117,8 +1009,37 @@ START_TEST (test_destroy)
 	destroy_llist(list_p);
 
 	printf("%s ok.\n", test_name);
-	return 0;
 }
 END_TEST
+
+
+Suite * llist_suite (void)
+{
+	Suite *s = suite_create ("llist");
+
+	TCase *tc_creat_destr = tcase_create ("creation-destruction");
+	tcase_add_test (tc_creat_destr, test_create);
+	suite_add_tcase (s, tc_creat_destr);
+
+	TCase *tc_insert = tcase_create ("insertion");
+	tcase_add_test (tc_insert, test_prepend_1_element);
+	tcase_add_test (tc_insert, test_prepend_five);
+	tcase_add_test (tc_insert, test_append_1_element);
+	tcase_add_test (tc_insert, test_append_five);
+	suite_add_tcase (s, tc_insert);
+
+	return s;
+}
+
+int main (void)
+{
+   	int number_failed;
+       Suite *s = llist_suite ();
+       SRunner *sr = srunner_create (s);
+       srunner_run_all (sr, CK_ENV);
+       number_failed = srunner_ntests_failed (sr);
+       srunner_free (sr);
+       return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+}
 
 
