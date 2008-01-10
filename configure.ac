@@ -16,6 +16,7 @@ AM_PROG_LEX
 
 # Unit testing
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
+#AM_PATH_CHECK
 AM_PROG_CC_C_O	# got msg from autoreconf saying this is req'd :)
 
 # Checks for libraries.
@@ -34,7 +35,7 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([rint strdup strpbrk strspn])
+AC_CHECK_FUNCS([rint strdup strpbrk strspn snprintf])
 
 AC_CONFIG_FILES([Makefile src/Makefile check/Makefile])
 AC_OUTPUT

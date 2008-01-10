@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "rnode.h"
 #include "list.h"
@@ -19,8 +20,9 @@ struct rnode *create_rnode(char *label)
 		label = "";
 	}
 	node_p->label = strdup(label);
-
 	node_p->children = create_llist();	
+	node_p->parent_edge = NULL;
+
 	return node_p;
 }
 
