@@ -1,9 +1,11 @@
 
 TESTS = check_rnode check_redge check_llist check_link \
-	check_canvas check_concat check_hash check_lca
+	check_canvas check_concat check_hash check_lca \
+	check_nodemap check_to_newick check_tree
 
 check_PROGRAMS = check_rnode check_redge check_llist check_link \
-		 check_canvas check_concat check_hash check_lca
+		 check_canvas check_concat check_hash check_lca \
+		 check_nodemap check_to_newick check_tree
 
 SRC = $(top_builddir)/src
 
@@ -37,7 +39,25 @@ check_hash_SOURCES = check_hash.c $(SRC)/hash.c $(SRC)/list.c
 check_hash_CFLAGS = @CHECK_CFLAGS@
 check_hash_LDADD = @CHECK_LIBS@
 
-check_lca_SOURCES = check_lca.c $(SRC)/lca.c $(SRC)/list.c $(SRC)/nodemap.c $(SRC)/link.c \
-		    $(SRC)/rnode.c $(SRC)/redge.c tree_stubs.c
+check_lca_SOURCES = check_lca.c $(SRC)/lca.c $(SRC)/list.c $(SRC)/nodemap.c \
+		    $(SRC)/link.c $(SRC)/rnode.c $(SRC)/redge.c tree_stubs.c
 check_lca_CFLAGS = @CHECK_CFLAGS@
 check_lca_LDADD = @CHECK_LIBS@
+
+check_nodemap_SOURCES = check_nodemap.c $(SRC)/nodemap.c \
+		$(SRC)/rnode.c $(SRC)/list.c
+check_nodemap_CFLAGS = @CHECK_CFLAGS@
+check_nodemap_LDADD = @CHECK_LIBS@
+
+check_to_newick_SOURCES = check_to_newick.c $(SRC)/to_newick.c \
+	$(SRC)/redge.c $(SRC)/rnode.c $(SRC)/link.c $(SRC)/concat.c \
+	$(SRC)/list.c
+check_to_newick_CFLAGS = @CHECK_CFLAGS@
+check_to_newick_LDADD = @CHECK_LIBS@
+
+check_tree_SOURCES = check_tree.c $(SRC)/tree.c $(SRC)/rnode.c $(SRC)/list.c \
+	$(SRC)/to_newick.c $(SRC)/nodemap.c $(SRC)/link.c $(SRC)/concat.c \
+	$(SRC)/redge.c tree_stubs.c
+check_tree_CFLAGS = @CHECK_CFLAGS@
+check_tree_LDADD = @CHECK_LIBS@
+
