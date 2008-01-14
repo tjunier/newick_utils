@@ -1,11 +1,10 @@
 #! /bin/sh
 
-echo "testing: $0"
 
 prog=${0%.sh}	# derive tested program's name from own name
 prog=${prog#*_}
 
-echo "program: $prog"
+echo "Testing program: $prog"
 pass=TRUE
 while IFS=':' read name args ; do
 	echo -n "test: $name - "
@@ -19,7 +18,7 @@ while IFS=':' read name args ; do
 done < test_${prog}_args
 
 if test $pass = FALSE ; then
-	return 1
+	exit 1
 else
-	return 0
+	exit 0
 fi
