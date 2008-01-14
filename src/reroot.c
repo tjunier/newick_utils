@@ -66,21 +66,16 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-int main(int argc, char *argv[])
+void reroot(struct rooted_tree *tree, struct llist *labels)
 {
-	struct rooted_tree *tree;	
 	struct node_map *map;
-	struct rnode *outgroup_root;
-	struct parameters params;
 	struct llist *descendants;
 	struct list_elem *el;
-	
-	params = get_params(argc, argv);
+	struct rnode *outgroup_root;
 
-	tree = parse_tree();
 	map = create_node_map(tree->nodes_in_order);	
 	descendants = create_llist();
-	for (el = params.labels->head; NULL != el; el = el->next) {
+	for (el = labels->head; NULL != el; el = el->next) {
 		struct rnode *desc;
 		desc = get_node_with_label(map, (char *) el->data);
 		if (NULL == desc) {
@@ -94,6 +89,18 @@ int main(int argc, char *argv[])
 	if (NULL != outgroup_root) {
 		reroot_tree (tree, outgroup_root);
 		printf ("%s\n", to_newick(tree->root));
+	}
+}
+
+int main(int argc, char *argv[])
+{
+	struct rooted_tree *tree;	
+	struct parameters params;
+	
+	params = get_params(argc, argv);
+
+	while (NULL != (tree = parse_tree())) {
+		reroot(tree, params.labels);
 	}
 
 	return 0;
