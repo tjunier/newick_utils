@@ -23,8 +23,7 @@ struct redge *create_redge(char *length_s)
 	 * of zero or a negative length (which can happen with NJ trees) */
 
 	if (NULL == length_s) {
-		redgep->length_as_string = "";
-		return redgep;
+		length_s = "";
 	}
 
 	l = strlen(length_s) + 1;

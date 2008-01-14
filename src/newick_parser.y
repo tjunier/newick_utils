@@ -121,6 +121,7 @@ leaf: LABEL {
 		ep = create_redge(NULL);
 		np = create_rnode($1);
 		set_parent_edge(np, ep);
+		free(yylval.sval);
 		$$ = ep;
 	}
     | LABEL COLON LABEL {
@@ -129,6 +130,7 @@ leaf: LABEL {
 		ep = create_redge($3);
 		np = create_rnode($1);
 		set_parent_edge(np, ep);
+		free(yylval.sval);
 		$$ = ep;
 	}
     ;

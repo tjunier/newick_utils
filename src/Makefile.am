@@ -1,6 +1,6 @@
 BUILT_SOURCES = newick_parser.h
 
-bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename nw_collapse
+bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename nw_collapse 
 
 nw_indent_SOURCES = indent.c indent_lex.l
 nw_indent_LDADD = @LEXLIB@

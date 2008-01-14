@@ -107,6 +107,7 @@ void destroy_tree(struct rooted_tree *tree)
 	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
 		struct rnode *current = e->data;
 		destroy_llist(current->children);
+		free(current->parent_edge->length_as_string);
 		free(current->parent_edge);
 		free(current);
 	}

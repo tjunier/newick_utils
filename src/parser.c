@@ -30,7 +30,9 @@ struct rooted_tree *parse_tree()
 		tree->root = root;
 		tree->nodes_in_order = nodes_in_order;
 		return tree;
-	} else
+	} else {
+		free(tree);
 		return NULL;
+	}
 }
 
