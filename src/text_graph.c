@@ -143,6 +143,7 @@ struct h_data set_node_depth(struct rooted_tree *tree)
 			}
 		}
 	}
+	destroy_llist(nodes_in_reverse_order);
 
 	result.l_max = max_label_len;
 	result.d_max = max_leaf_depth;
