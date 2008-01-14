@@ -109,6 +109,7 @@ void destroy_tree(struct rooted_tree *tree)
 		destroy_llist(current->children);
 		free(current->parent_edge->length_as_string);
 		free(current->parent_edge);
+		free(current->label);
 		free(current);
 	}
 

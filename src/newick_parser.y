@@ -69,6 +69,7 @@ inner_node: O_PAREN nodelist C_PAREN {
 		struct rnode *np;
 		struct redge *ep;
 		np = create_rnode($4);
+		free($4);
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child_edge(np, (struct redge*) lep->data);
 		}
@@ -81,11 +82,13 @@ inner_node: O_PAREN nodelist C_PAREN {
 		struct rnode *np;
 		struct redge *ep;
 		np = create_rnode($4);
+		free($4);
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child_edge(np, (struct redge*) lep->data);
 		}
 		ep = create_redge($6);
 		set_parent_edge(np, ep);
+		free($6);
 		$$ = ep;
     }	
     | O_PAREN nodelist C_PAREN COLON LABEL {
@@ -98,6 +101,7 @@ inner_node: O_PAREN nodelist C_PAREN {
 		}
 		ep = create_redge($5);
 		set_parent_edge(np, ep);
+		free($5);
 		$$ = ep;
     }
     ;
@@ -120,17 +124,18 @@ leaf: LABEL {
 		struct rnode *np;
 		ep = create_redge(NULL);
 		np = create_rnode($1);
+		free($1);
 		set_parent_edge(np, ep);
-		free(yylval.sval);
 		$$ = ep;
 	}
     | LABEL COLON LABEL {
 		struct redge *ep;
 		struct rnode *np;
 		ep = create_redge($3);
+		free($3);
 		np = create_rnode($1);
+		free($1);
 		set_parent_edge(np, ep);
-		free(yylval.sval);
 		$$ = ep;
 	}
     ;
