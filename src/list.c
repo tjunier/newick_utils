@@ -238,9 +238,11 @@ int llist_index_of(struct llist *list, void *data)
 		
 void destroy_llist(struct llist *l) 
 {
-	/* Nothing to do IFF list is empty */
-	if (0 == l->count) 
+	/* IFF list is empty, just free itself */
+	if (0 == l->count) {
+		free(l);
 		return;
+	}
 
 	/* NOTE: in general this does not work (e referred to after being freed!) */
 	/*
@@ -272,4 +274,3 @@ void destroy_llist(struct llist *l)
 	free(delenda);
 	free(l);
 }
-

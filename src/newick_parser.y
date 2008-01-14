@@ -60,6 +60,7 @@ inner_node: O_PAREN nodelist C_PAREN {
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child_edge(np, (struct redge*) lep->data);
 		}
+		destroy_llist($2);
 		ep = create_redge(NULL);
 		set_parent_edge(np, ep);
 		$$ = ep;
@@ -73,6 +74,7 @@ inner_node: O_PAREN nodelist C_PAREN {
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child_edge(np, (struct redge*) lep->data);
 		}
+		destroy_llist($2);
 		ep = create_redge(NULL);
 		set_parent_edge(np, ep);
 		$$ = ep;
@@ -86,6 +88,7 @@ inner_node: O_PAREN nodelist C_PAREN {
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child_edge(np, (struct redge*) lep->data);
 		}
+		destroy_llist($2);
 		ep = create_redge($6);
 		set_parent_edge(np, ep);
 		free($6);
@@ -99,6 +102,7 @@ inner_node: O_PAREN nodelist C_PAREN {
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child_edge(np, (struct redge*) lep->data);
 		}
+		destroy_llist($2);
 		ep = create_redge($5);
 		set_parent_edge(np, ep);
 		free($5);
