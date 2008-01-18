@@ -21,6 +21,7 @@ char *eol = "\n";
 	indent_level--;
 	indent(indent_level, indent_string);
 	printf("%s%s", yytext, eol);
+	if (0 == indent_level) cap_tree(eol);
 }
 \[[^]]*]	/* ignore comments */ ;
 [\t\n ]+ ;
@@ -32,4 +33,11 @@ void indent(const int level, const char *indent_string)
 	int i;
 	for (i = 0; i < level; i++)
 		printf("%s", indent_string);
+}
+
+/* we may peform additional operations just after printing a tree */
+void cap_tree(char *eol)
+{
+	if (0 == strcmp(eol, "")) 	/* compact tree */
+		printf("\n");	
 }

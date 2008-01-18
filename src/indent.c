@@ -57,5 +57,4 @@ int main(int argc, char* argv[])
 	struct parameters params = get_params(argc, argv);
 
 	yylex();
-	if (params.compact) putchar('\n');
 }
