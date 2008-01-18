@@ -34,9 +34,12 @@ struct parameters get_params(int argc, char *argv[])
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "l")) != -1) {
 		switch (opt_char) {
-		case 'i':
+		case 'l':
 			params.try_ingroup = 1;
 			break;
+		default:
+			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
+			exit (EXIT_FAILURE);
 		}
 	}
 
@@ -66,7 +69,8 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-/* given the labels of the outgroup nodes, returns the nodes themselves, as a llist. */
+/* given the labels of the outgroup nodes, returns the nodes themselves, as a
+ * llist. */
 
 struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels)
 {
@@ -90,6 +94,10 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 	return outgroup_nodes;
 }
 
+/* Performs the rerooting itself. 'outgroup_nodes' usually means just that,
+ * but may also mean ingroup nodes, if option -l was passed and rerooting on
+ * outgroup failed. */
+
 int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 {
 	struct rnode *outgroup_root;
@@ -97,7 +105,6 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 	outgroup_root = lca(tree, outgroup_nodes);
 	if (NULL != outgroup_root) {
 		if (tree->root == outgroup_root) {
-			fprintf (stderr, "Outgroup's LCA is tree's root - cannot reroot. Try -l.\n");
 			return LCA_IS_TREE_ROOT;
 		}
 		reroot_tree (tree, outgroup_root);
@@ -109,6 +116,60 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 	}
 }
 
+/* Return a list of leaves whose labels are NOT found in
+ * 'excluded_labels' */ 
+
+struct llist *get_ingroup_leaves(struct rooted_tree *tree,
+		struct llist *excluded_labels)
+{
+	struct llist *result = create_llist();
+	struct list_elem *el;
+
+	/* add nodes to result iff i) node is a leaf, ii) node's label is not among
+	 * 'excluded_labels' */ 
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = (struct rnode *) el->data;
+		if (is_leaf(current)) {
+			printf ("considering %s... ", current->label);
+			printf ("index is %d - ", llist_index_of(excluded_labels, current->label));
+			/* TODO: can't use llist_index_of, because it compares the 'data'
+			 * members of elements. We must compare the strings with strcmp().
+			 * */
+			if (llist_index_of(excluded_labels, current->label) == -1) {
+				printf ("adding %s\n", current->label);
+				append_element(result, current);
+			}
+		}
+	}
+
+	return result;
+}
+
+/* Tries to reroot 'directly', i.e. using outgroup. If this fails (because the
+ * outgroup's LCA is the tree's root) and 'try_ingroup' is true (option -l),
+ * tries with the ingroup */
+
+void process_tree(struct rooted_tree *tree, struct parameters params)
+{
+	struct llist *outgroup_nodes = get_outgroup_nodes(tree, params.labels);
+	int result = reroot(tree, outgroup_nodes);
+	if (LCA_IS_TREE_ROOT == result) {
+		if (params.try_ingroup) {
+			/* we will try to insert the root above the
+			 * ingroup - for this we'll need all leaves
+			 * that are NOT in the outgroup. */
+			struct llist *ingroup_leaves;
+			ingroup_leaves = get_ingroup_leaves(tree, params.labels);
+			reroot(tree, ingroup_leaves);
+			destroy_llist(ingroup_leaves);
+		}
+		else {
+			fprintf (stderr, "Outgroup's LCA is tree's root - cannot reroot. Try -l.\n");
+		}
+	}
+	destroy_llist(outgroup_nodes);
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
@@ -117,13 +178,7 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		struct llist *outgroup_nodes = get_outgroup_nodes(tree, params.labels);
-		int result = reroot(tree, outgroup_nodes);
-		if (LCA_IS_TREE_ROOT == result && params.try_ingroup) {
-			struct llist ingroup_nodes = get_ingroup_nodes(tree, params.labels);
-			reroot(tree, ingroup_nodes);
-		}
-		/* TODO: free outgroup_nodes */
+		process_tree(tree, params);
 	}
 
 	return 0;
