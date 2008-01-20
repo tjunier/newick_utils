@@ -1006,6 +1006,7 @@ int test_index()
 {
 	const char *test_name = "test_index";
 	struct llist *list1;
+	char *s;
 
 	list1 = create_llist();
 	append_element(list1, "yksi");
@@ -1034,8 +1035,66 @@ int test_index()
 				test_name, llist_index_of(list1, "roku"));
 		return 1;
 	}
+
+	/* NOTE: In general, looking for strings will NOT work! This has worked
+	 * because we're using constants. But look at this: */
+	s = malloc(6 * sizeof(char));
+	if (NULL == s) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
+	strncpy(s, "kuusi", 6);
+	if (-1 != llist_index_of(list1, s)) {
+			printf ("%s: something very weird happened.\n");
+			return 1;
+	}
+	/* See test_llist_index_of_f(). */
+
 	printf("%s ok.\n", test_name);
 	return 0;
+}
+
+int test_llist_index_of_f()
+{
+	const char *test_name = "test_index_of_f";
+	struct llist *list1;
+	char *s;
+
+	list1 = create_llist();
+	append_element(list1, "yksi");
+	append_element(list1, "kaksi");
+	append_element(list1, "kolme");
+	append_element(list1, "neljä"); 
+	append_element(list1, "viisi"); 
+	append_element(list1, "kuusi"); 
+	append_element(list1, "seitsemän"); 
+	append_element(list1, "kahdeksan"); 
+	append_element(list1, "yhdeksän");
+	append_element(list1, "kymmenen");
+
+	s = malloc(6 * sizeof(char));
+	if (NULL == s) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
+	strcpy(s, "yksi");
+
+	if (0 != llist_index_of_f(list1, func, "yksi")) {
+		printf ("%s: expected index 0 for 'yksi', got %d.\n",
+				test_name, llist_index_of(list1, "yksi"));
+		return 1;
+	}
+	if (9 != llist_index_of(list1, "kymmenen")) {
+		printf ("%s: expected index 9 for 'kymmenen', got %d.\n",
+				test_name, llist_index_of(list1, "yksi"));
+		return 1;
+	}
+	if (-1 != llist_index_of(list1, "roku")) {
+		printf ("%s: expected index -1 (not found) for 'roku', got %d.\n",
+				test_name, llist_index_of(list1, "roku"));
+		return 1;
+	}
+	return 1;
 }
 
 int test_delete_at_tail()
@@ -1196,6 +1255,7 @@ int main()
 	failures += test_delete_at_tail();
 	failures += test_index();
 	failures += test_destroy();
+	failures += test_llist_index_of_f();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

@@ -60,10 +60,18 @@ void insert_after(struct llist *target, int pos, struct llist *insert);
 
 struct llist *delete_after(struct llist *target, int pos, int length);
 
-/* Returns the index of element whose data is 'data'. This does not compare
- * data, just their addresses. Returns -1 if data is not in list. */
+/* Returns the index of the 1st element whose data is 'data'. This does not
+ * compare data, just their addresses (see llist_index_of_f() for that).
+ * Returns -1 if data is not in list. */
 
 int llist_index_of(struct llist *list, void *data);
+
+/* Applies function 'func()' on list elements until 'func()' returns true. The
+ * index of that element is returned. One use of this is to look for
+ * strings, which cannot be found by comparing addresses (because the same
+ * string may be stored ad different addresses, so you need to use strcmp() */
+
+int llist_index_of_f(struct llist *list, int (*func)(void*,void*), void*);
 
 /* Destroys list and releases memory. List data are NOT destroyed or released,
  * only the data structure (i.e., the llist itself and the list_elements). */
