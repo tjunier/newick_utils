@@ -66,12 +66,14 @@ struct llist *delete_after(struct llist *target, int pos, int length);
 
 int llist_index_of(struct llist *list, void *data);
 
-/* Applies function 'func()' on list elements until 'func()' returns true. The
- * index of that element is returned. One use of this is to look for
- * strings, which cannot be found by comparing addresses (because the same
- * string may be stored ad different addresses, so you need to use strcmp() */
+/* Looks for target 'tgt' in a list. Applies function 'func()' to the elements
+ * of the list, until 'func()' returns true. The list element's data is passed
+ * as the first argument, and the second argument is always 'tgt'. One use of
+ * this is to look for strings, which cannot be done with llist_index_of()
+ * because it only compares addresses (whereas this function calls an arbitrary
+ * function) */
 
-int llist_index_of_f(struct llist *list, int (*func)(void*,void*), void*);
+int llist_index_of_f(struct llist *list, int (*func)(void*,void*), void *tgt);
 
 /* Destroys list and releases memory. List data are NOT destroyed or released,
  * only the data structure (i.e., the llist itself and the list_elements). */

@@ -1045,13 +1045,20 @@ int test_index()
 	}
 	strncpy(s, "kuusi", 6);
 	if (-1 != llist_index_of(list1, s)) {
-			printf ("%s: something very weird happened.\n");
+			printf ("%s: something very weird happened.\n", test_name);
 			return 1;
 	}
 	/* See test_llist_index_of_f(). */
 
 	printf("%s ok.\n", test_name);
 	return 0;
+}
+
+/* used in the next test, to check string equality */
+
+int string_eql(void *list_data, void *target)
+{
+	return (strcmp((char *) list_data, (char *) target) == 0);
 }
 
 int test_llist_index_of_f()
@@ -1072,29 +1079,32 @@ int test_llist_index_of_f()
 	append_element(list1, "yhdeksän");
 	append_element(list1, "kymmenen");
 
-	s = malloc(6 * sizeof(char));
+	s = malloc(10 * sizeof(char));
 	if (NULL == s) {
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}
-	strcpy(s, "yksi");
 
-	if (0 != llist_index_of_f(list1, func, "yksi")) {
+	strcpy(s, "yksi");
+	if (0 != llist_index_of_f(list1, string_eql, s)) {
 		printf ("%s: expected index 0 for 'yksi', got %d.\n",
 				test_name, llist_index_of(list1, "yksi"));
 		return 1;
 	}
-	if (9 != llist_index_of(list1, "kymmenen")) {
+	strcpy(s, "kuusi");
+	if (5 != llist_index_of_f(list1, string_eql, s)) {
 		printf ("%s: expected index 9 for 'kymmenen', got %d.\n",
 				test_name, llist_index_of(list1, "yksi"));
 		return 1;
 	}
-	if (-1 != llist_index_of(list1, "roku")) {
+	strcpy(s, "taseot");
+	if (-1 != llist_index_of_f(list1, string_eql, s)) {
 		printf ("%s: expected index -1 (not found) for 'roku', got %d.\n",
 				test_name, llist_index_of(list1, "roku"));
 		return 1;
 	}
-	return 1;
+	printf("%s ok.\n", test_name);
+	return 0;
 }
 
 int test_delete_at_tail()

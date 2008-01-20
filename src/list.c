@@ -236,6 +236,18 @@ int llist_index_of(struct llist *list, void *data)
 	return -1;
 }
 		
+int llist_index_of_f(struct llist *list, int (*func)(void*,void*), void * tgt)
+{
+	struct list_elem *el;
+	int n;
+
+	for (n = 0, el = list->head; NULL != el; n++, el = el->next) {
+		if (func(el->data, tgt))
+			return n;
+	}
+	return -1;
+}
+
 void destroy_llist(struct llist *l) 
 {
 	/* IFF list is empty, just free itself */

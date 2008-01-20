@@ -116,6 +116,14 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 	}
 }
 
+/* Returns true IFF arguments (cast to char*) are equal - IOW, the negation
+ * of strcmp(). See llist_index_of() in list.h */
+
+int string_eq(void *list_data, void *target)
+{
+	return (strcmp((char *) list_data, (char *) target) == 0);
+}
+
 /* Return a list of leaves whose labels are NOT found in
  * 'excluded_labels' */ 
 
@@ -130,13 +138,12 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = (struct rnode *) el->data;
 		if (is_leaf(current)) {
-			printf ("considering %s... ", current->label);
-			printf ("index is %d - ", llist_index_of(excluded_labels, current->label));
-			/* TODO: can't use llist_index_of, because it compares the 'data'
-			 * members of elements. We must compare the strings with strcmp().
-			 * */
-			if (llist_index_of(excluded_labels, current->label) == -1) {
-				printf ("adding %s\n", current->label);
+			/* Can't use llist_index_of(), because it compares the addresses of
+			 * the 'data' members of elements. Instead we must check string
+			 * equality, which is why we use llist_index_of_f(), and pass it
+			 * string_eq(). */
+			if (llist_index_of_f(excluded_labels, string_eq,
+						current->label) == -1) {
 				append_element(result, current);
 			}
 		}
