@@ -73,18 +73,13 @@ int process_tree(struct rooted_tree *tree, struct hash *name2num)
 		if (hash_build_result != OK)
 			return hash_build_result;
 	}
-	dump_hash(name2num, bin_elem_dump);
-	if 
-	/* attribute a number to all leaf nodes, so that numbering is conserved
-	 * across trees, i.e. the same leaf will have the same number */
-	attribute_number_to_leaves(tree, name2num);
+	// dump_hash(name2num, bin_elem_dump);
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = (struct rnode *) el->data;
-		if (is_leaf(current)) {
-			printf ("%s -> %d\n", current->label,
-				*((int *) current->data));
-		}
+		if (is_leaf(current)) { continue; }
+		number_bitfield_list = make_number_bitfield_list(current);
 	}
+
 }
 
 void get_params(int argc, char *argv[])
