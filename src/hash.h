@@ -7,6 +7,11 @@ struct hash {
 	int size;
 };
 
+struct key_val_pair {
+	char *key;
+	void *value;
+};
+
 /* Creates a hash with n bins. If memory allocation fails, exits program. */
 
 struct hash * create_hash(int n);
@@ -15,7 +20,7 @@ struct hash * create_hash(int n);
 
 void hash_set(struct hash *, char *key, void *value);
 
-/* Retrieves a value from a hash */
+/* Retrieves a value from a hash. Returns the value, or NULL if not present. */
 
 void *hash_get(struct hash *, char *key);
 

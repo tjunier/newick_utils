@@ -10,7 +10,6 @@
 #include "to_newick.h"
 #include "list.h"
 #include "lca.h"
-
 #include "rnode.h"
 
 /* return values for reroot() */

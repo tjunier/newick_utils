@@ -9,11 +9,6 @@
 #include "hash.h"
 #include "list.h"
 
-struct key_val_pair {
-	char *key;
-	void *value;
-};
-
 struct hash *create_hash(int n)
 {
 	struct hash *h;
@@ -89,7 +84,7 @@ void dump_hash(struct hash *h, void (*dump_func)())
 {
 	int i;
 
-	printf ("Dump of hash at %p:\n", h);
+	printf ("Dump of hash at %p: (%d bins):\n", h, h->size);
 	for (i = 0; i < h->size; i++) {
 		struct list_elem *el = h->bins[i]->head;
 		if (NULL == el) continue;
