@@ -1,20 +1,18 @@
+/* bipart.c: compute bipartitions */
 
-/* reroot: reroot tree above specified node */
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
 #include "tree.h"
 #include "parser.h"
-#include "nodemap.h"
-#include "to_newick.h"
 #include "list.h"
 #include "hash.h"
 #include "rnode.h"
-
-enum bn2m_return {OK, DUP_LABEL, EMPTY_LABEL};
+#include "node_set.h"
 
 /* for dumping the hash. Called on each element of the bins, passed the 'value'
  * member of the key-value pair */
@@ -28,39 +26,6 @@ void bin_elem_dump(void *bin_data)
  * (such as a leaf without a label, or a non-unique label; returns 1 otherwise
  * */
 
-int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
-{
-	/* If the tree is dichotomous and has N nodes, then it has L = (N+1)/2
-	 * leaves. But for highly polytomous trees, L is higher, and can
-	 * approach N in some cases (e.g. when most leaves are attached to the
-	 * root due to low bootstrap support). So we allocate N bins. */
-	struct hash *n2n = create_hash(tree->nodes_in_order->count);
-	struct list_elem *el;
-	int ord_number = 0;
-
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *current = (struct rnode *) el->data;
-		if (is_leaf(current)) {
-			int *nump;
-			if (strcmp("", current->label) == 0)
-				return EMPTY_LABEL;
-			if (NULL != hash_get(n2n, current->label)) 
-				return DUP_LABEL;
-			nump = malloc(sizeof(int));
-			if (NULL == nump) {
-				perror(NULL);
-				exit(EXIT_FAILURE);
-			}
-			*nump = ord_number;
-			hash_set(n2n, current->label, nump);
-			ord_number++;
-		}
-	}	
-	*name2num_ptr = n2n;
-
-	return OK;
-}
-
 int process_tree(struct rooted_tree *tree, struct hash *name2num)
 {
 	struct list_elem *el;
@@ -70,16 +35,18 @@ int process_tree(struct rooted_tree *tree, struct hash *name2num)
 	 * reference. */
 	if (NULL == name2num) {
 		hash_build_result = build_name2num(tree, &name2num);
-		if (hash_build_result != OK)
+		if (hash_build_result != NS_OK)
 			return hash_build_result;
 	}
 	// dump_hash(name2num, bin_elem_dump);
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = (struct rnode *) el->data;
+		struct llist* nodeset_list;
 		if (is_leaf(current)) { continue; }
-		number_bitfield_list = make_number_bitfield_list(current);
+		nodeset_list = children_node_set_list(current, name2num,
+				tree->nodes_in_order->count);
 	}
-
+	return NS_OK;
 }
 
 void get_params(int argc, char *argv[])
@@ -131,18 +98,19 @@ int main(int argc, char *argv[])
 	while (NULL != (tree = parse_tree())) {
 		int result = process_tree(tree, name2num);
 		switch (result) {
-			case OK:
+			case NS_OK:
 				break;
-			case DUP_LABEL:
+			case NS_DUP_LABEL:
 				fprintf (stderr,
 					"Labels are not unique\n");
 				exit (EXIT_FAILURE);
 				break;
-			case EMPTY_LABEL:
+			case NS_EMPTY_LABEL:
 				fprintf (stderr, "Found empty label");
 				exit (EXIT_FAILURE);
 				break;
 			default:
+				/* programmer error, not user error */
 				assert(0);
 		}
 	}

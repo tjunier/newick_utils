@@ -27,5 +27,5 @@ nw_rename_LDADD = @LEXLIB@ -lm
 nw_collapse_SOURCES = $(NW_CORE) $(NW_OUT) collapse.c
 nw_collapse_LDADD = @LEXLIB@ -lm
 
-nw_bipart_SOURCES = $(NW_CORE) $(NW_OUT) bipart.c hash.c
+nw_bipart_SOURCES = $(NW_CORE) $(NW_OUT) bipart.c hash.c node_set.c
 nw_bipart_LDADD = @LEXLIB@

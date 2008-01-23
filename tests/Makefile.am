@@ -2,13 +2,13 @@ AM_CFLAGS = -I ../src
 
 TESTS = test_rnode test_redge test_list test_link \
 	test_canvas test_concat test_hash test_lca \
-	test_nodemap test_to_newick test_tree \
+	test_nodemap test_to_newick test_tree test_node_set \
 	test_nw_reroot.sh test_nw_rename.sh test_nw_collapse.sh \
 	test_nw_display.sh test_nw_indent.sh
 
 check_PROGRAMS = test_rnode test_redge test_list test_link \
 		 test_canvas test_concat test_hash test_lca \
-		 test_nodemap test_to_newick test_tree
+		 test_nodemap test_to_newick test_tree test_node_set
 
 SRC = $(top_builddir)/src
 
@@ -42,3 +42,5 @@ test_tree_SOURCES = test_tree.c $(SRC)/tree.c $(SRC)/rnode.c $(SRC)/list.c \
 	$(SRC)/to_newick.c $(SRC)/nodemap.c $(SRC)/link.c $(SRC)/concat.c \
 	$(SRC)/redge.c tree_stubs.c
 
+test_node_set_SOURCES = test_node_set.c $(SRC)/node_set.c $(SRC)/hash.c \
+	$(SRC)/rnode.c $(SRC)/list.c
