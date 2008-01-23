@@ -42,5 +42,6 @@ test_tree_SOURCES = test_tree.c $(SRC)/tree.c $(SRC)/rnode.c $(SRC)/list.c \
 	$(SRC)/to_newick.c $(SRC)/nodemap.c $(SRC)/link.c $(SRC)/concat.c \
 	$(SRC)/redge.c tree_stubs.c
 
-test_node_set_SOURCES = test_node_set.c $(SRC)/node_set.c $(SRC)/hash.c \
-	$(SRC)/rnode.c $(SRC)/list.c
+test_node_set_SOURCES = test_node_set.c tree_stubs.c $(SRC)/node_set.c \
+	 $(SRC)/hash.c $(SRC)/rnode.c $(SRC)/list.c $(SRC)/link.c \
+	 $(SRC)/redge.c

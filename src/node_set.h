@@ -16,6 +16,14 @@ typedef char* node_set;
 
 node_set create_node_set(int node_number, int node_count);
 
+/* returns true iff 'set' contains node number 'node_number' */
+
+int is_set(node_set set, int node_number);
+
+/* returns the union of two sets */
+
+node_set node_set_union(node_set set1, node_set set2, int node_count);
+
 /* Creates the list of node sets for all of this node's children. Second arg
  * 'lbl2num' maps the node's label to a number (see build_name2num() below);
  * 'c' is the total number of nodes in the tree. Assumes this node is NOT a

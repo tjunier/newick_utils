@@ -58,6 +58,17 @@ int is_set(node_set set, int n)
 	return set[node_byte] & (1 << node_bit);
 }
 
+node_set test_set_union(node_set set1, node_set set2, int node_number)
+{
+	node_set result;
+
+	/* TODO: it is now impossible to create an empty nodeset. Separate
+	 * creation from setting by creating a new function node_set_add().
+	 * Also, rename is_set() to set_contains() - too much confusion from
+	 * using 'set' in two different meanings (as in "setting a bit to 1"
+	 * and a "set of nodes"). */
+}
+
 int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
 {
 	/* If the tree is dichotomous and has N nodes, then it has L = (N+1)/2
