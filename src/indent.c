@@ -5,19 +5,12 @@
 extern char *indent_string;
 extern char *eol;
 
-struct parameters {
-	int compact;
-	};
-
-struct parameters get_params(int argc, char* argv[])
+void get_params(int argc, char* argv[])
 {
 	char c;
-	struct parameters params;
-
-
-	indent_string = "  ";
 	eol = "\n";
-	params.compact = 0;
+	indent_string = "  ";
+	int compact = 0;
 
 	while ((c = getopt (argc, argv, "ct:")) != -1) {
 		switch (c) {
@@ -25,11 +18,11 @@ struct parameters get_params(int argc, char* argv[])
 			 indent_string = optarg;
 			 break;
 		case 'c':
-			 params.compact = 1;
+			 compact = 1;
 			 break;
 		}
 	}
-	if (params.compact) {
+	if (compact) {
 		eol = "";
 		indent_string = "";
 	}
@@ -47,14 +40,12 @@ struct parameters get_params(int argc, char* argv[])
 		fprintf(stderr, "Usage: %s [-ct:] <filename|->\n", argv[0]);
 		exit(EXIT_FAILURE);
         }
-
-	return params;
 }
 
 
 int main(int argc, char* argv[])
 {
-	struct parameters params = get_params(argc, argv);
+	get_params(argc, argv);
 
 	yylex();
 }

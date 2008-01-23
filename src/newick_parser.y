@@ -4,6 +4,7 @@
 #include "rnode.h"
 #include "redge.h"
 #include "list.h"
+#include "link.h"
 #include "to_newick.h"
 
 /* in the (admittedly artificial) case of trees with lots of nesting on the
