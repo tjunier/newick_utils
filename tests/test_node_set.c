@@ -1,62 +1,36 @@
 #include <stdio.h>
 
-#include "node_set.h"
 #include "tree_stubs.h"
 #include "../src/hash.h"
 #include "../src/tree.h"
+#include "../src/node_set.h"
 
-int test_create()
+int test_membership()
 {
-	const char *test_name = "test_create";
-	node_set set;
-
-	set = create_node_set(0, 10);
-	if (NULL == set) {
-		printf ("%s: should not return NULL vith valid params\n", test_name);
-		return 1;
-	}
-	set = create_node_set(-1, 10);
-	if (NULL != set) {
-		printf ("%s: wrong node number -1, should have returned NULL\n", test_name);
-		return 1;
-	}
-	set = create_node_set(10, 10);
-	if (NULL != set) {
-		printf ("%s: wrong node number 10, should have returned NULL\n", test_name);
-		return 1;
-	}
-
-	printf("%s ok.\n", test_name);
-	return 0;
-}
-
-int test_is_set()
-{
-	const char *test_name = "test_is_set";
+	const char *test_name = "test_membership";
 	int i;
 
-	node_set set = create_node_set(0, 10);
-	if (! is_set(set, 0)) {
+	node_set set = create_node_set(10);
+	node_set_add(set, 0, 10);
+	node_set_add(set, 9, 10);
+
+	if (! node_set_contains(set, 0, 10)) {
 		printf ("%s: 0 should be set\n", test_name);
 		return 1;
 	}
-	for (i = 1; i <= 10; i++) {
-		if (is_set(set, i)) {
+	for (i = 1; i < 9; i++) {
+	  	if (node_set_contains(set, i, 10)) {
 			printf ("%s: %d should not be set.\n", test_name, i);
 			return 1;
 		}
 	}
-	set = create_node_set(9, 10);
-	for (i = 0; i < 9; i++) {
-		if (is_set(set, i)) {
-			printf ("%s: %d should not be set.\n", test_name, i);
-			return 1;
-		}
-	}
-	if (! is_set(set, 9)) {
+	if (! node_set_contains(set, 9, 10)) {
 		printf ("%s: 9 should be set.\n", test_name);
 		return 1;
 	}
+
+	/* nonsense meberships (-1, 10, etc) are caught by assertions */
+
 	printf("%s ok.\n", test_name);
 	return 0;
 }
@@ -110,46 +84,49 @@ int test_set_union()
 	node_set result;
 	int i;
 
-	set1 = create_node_set(3, 10);
-	set2 = create_node_set(6, 10);
+	set1 = create_node_set(10);
+	set2 = create_node_set(10);
+	node_set_add(set1, 3, 10);
+	node_set_add(set2, 6, 10);
 
 	result = node_set_union(set1, set2, 10);
-	for (i = 0; i < 3; i++)	{
-     		if (is_set(result, i)) {
+
+	for (i = 0; i < 3; i++) {
+		if (node_set_contains(result, i, 10)) {
 			printf ("%s: %d should not be set.\n", test_name, i);
 			return 1;
 		}
 	}
-	if (! is_set(result, 3)) {
+	if (! node_set_contains(result, 3, 10)) {
 		printf ("%s: 3 should be set.\n", test_name);
 		return 1;
 	}
-	for (i = 4; i < 6; i++)	{
-     		if (is_set(result, i)) {
+	for (i = 4; i < 6; i++) {
+		if (node_set_contains(result, i, 10)) {
 			printf ("%s: %d should not be set.\n", test_name, i);
 			return 1;
 		}
 	}
-	if (! is_set(result, 6)) {
+	if (! node_set_contains(result, 6, 10)) {
 		printf ("%s: 6 should be set.\n", test_name);
 		return 1;
 	}
-	for (i = 7; i < 9; i++)	{
-     		if (is_set(result, i)) {
+	for (i = 7; i < 10; i++) {
+		if (node_set_contains(result, i, 10)) {
 			printf ("%s: %d should not be set.\n", test_name, i);
 			return 1;
 		}
 	}
 
-	return 1;
+	printf("%s ok.\n", test_name);
+	return 0;
 }
 
 int main()
 {
 	int failures = 0;
 	printf("Starting node set test...\n");
-	failures += test_create();
-	failures += test_is_set();
+	failures += test_membership();
 	failures += test_name2num();
 	failures += test_set_union();
 	if (0 == failures) {

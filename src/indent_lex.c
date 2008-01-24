@@ -477,7 +477,14 @@ char *indent_string;
 void indent(const int, const char*);
 char *eol = "\n";
 
-#line 481 "indent_lex.c"
+/* we may peform additional operations just after printing a tree */
+void cap_tree(char *eol)
+{
+	if (0 == strcmp(eol, "")) 	/* compact tree */
+		printf("\n");	
+}
+
+#line 488 "indent_lex.c"
 
 #define INITIAL 0
 
@@ -630,10 +637,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 10 "indent_lex.l"
+#line 17 "indent_lex.l"
 
 
-#line 637 "indent_lex.c"
+#line 644 "indent_lex.c"
 
 	if ( !(yy_init) )
 		{
@@ -719,7 +726,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 12 "indent_lex.l"
+#line 19 "indent_lex.l"
 {
 	indent(indent_level, indent_string);
 	printf("%s%s", yytext, eol);
@@ -727,7 +734,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 16 "indent_lex.l"
+#line 23 "indent_lex.l"
 {
 	indent(indent_level, indent_string);
 	printf("(%s", eol); indent_level++;
@@ -736,7 +743,7 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 20 "indent_lex.l"
+#line 27 "indent_lex.l"
 {
 	indent_level--;
 	indent(indent_level, indent_string);
@@ -747,21 +754,21 @@ YY_RULE_SETUP
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 26 "indent_lex.l"
+#line 33 "indent_lex.l"
 /* ignore comments */ ;
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 27 "indent_lex.l"
+#line 34 "indent_lex.l"
 ;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 29 "indent_lex.l"
+#line 36 "indent_lex.l"
 ECHO;
 	YY_BREAK
-#line 765 "indent_lex.c"
+#line 772 "indent_lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1747,7 +1754,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 29 "indent_lex.l"
+#line 36 "indent_lex.l"
 
 
 
@@ -1756,12 +1763,5 @@ void indent(const int level, const char *indent_string)
 	int i;
 	for (i = 0; i < level; i++)
 		printf("%s", indent_string);
-}
-
-/* we may peform additional operations just after printing a tree */
-void cap_tree(char *eol)
-{
-	if (0 == strcmp(eol, "")) 	/* compact tree */
-		printf("\n");	
 }
 

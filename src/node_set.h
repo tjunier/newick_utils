@@ -11,14 +11,17 @@ enum ns_return {NS_OK, NS_DUP_LABEL, NS_EMPTY_LABEL};
 
 typedef char* node_set;
 
-/* Creates a node set that contains a single node (number 'node_number') among
- * 'node_count' possible nodes. */
+/* Creates a node_set for 'node_count' nodes. */
 
-node_set create_node_set(int node_number, int node_count);
+node_set create_node_set(int node_count);
+
+/* Adds node 'node_number' to set */
+
+void node_set_add(node_set set, int node_number, int node_count);
 
 /* returns true iff 'set' contains node number 'node_number' */
 
-int is_set(node_set set, int node_number);
+int node_set_contains(node_set set, int node_number, int node_count);
 
 /* returns the union of two sets */
 

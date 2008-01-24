@@ -12,21 +12,19 @@
 const int BYTE_SIZE = 8;
 
 /* We implement a node set as a bit field. Since there can be thousands of
- * nodes, we need to allocate a contiguous array of bits. Fails if char is more
- * than 1 byte long (very unlikely, but who knows?) 'node_count' is the total
- * number of nodes, and hence of bits in the field; 'node_number' is the number
- * of the bit which must be set (the others must be zero). This represence the
- * presence of that particular node. */
+ * nodes, we need to allocate a contiguous array of bits. Argument 'node_count'
+ * is the total number of nodes in the tree, and hence of bits in the field.
+ * Since it is constant for any given tree, we do not store it within the
+ * node_set, but pass it to the functions. This requires less storage, and
+ * allows us to free the node_sets directly, since they are not structures. */
 
-node_set create_node_set(int node_number, int node_count)
+
+/* Fails if the tree has 0 nodes */
+
+node_set create_node_set(int node_count)
 {
 	node_set set;
-	int node_byte;	/* which byte contains the bit for the node*/
-	int node_bit;	/* which bit represents the node */
-
-	/* sanity checks */
-	if (node_number < 0 || (node_number >= node_count)) { return NULL; }
-
+	
 	/* First, we need to see how many bytes we will need. */
 	int num_bytes = node_count / BYTE_SIZE;
        	/* if the remainder is not null, add one char */
@@ -41,32 +39,57 @@ node_set create_node_set(int node_number, int node_count)
 	}
 	memset(set, 0, num_bytes);
 
+	return set;
+}
+
+void node_set_add(node_set set, int node_number, int node_count)
+{
+	int node_byte;	/* which byte contains the bit for the node*/
+	int node_bit;	/* which bit represents the node */
+
+	/* sanity checks */
+	assert(node_count > 0);
+	assert(node_number >= 0);
+	assert(node_number < node_count);
+
 	/* Now we need to find which bit to set, in which byte */
 	node_byte = node_number / BYTE_SIZE;
 	node_bit = node_number % BYTE_SIZE;
 
 	set[node_byte] = (1 << node_bit);
-
-	return set;
 }
 
-int is_set(node_set set, int n)
+int node_set_contains(node_set set, int node_number, int node_count)
 {
-	int node_byte = n / BYTE_SIZE;
-	int node_bit = n % BYTE_SIZE;
+	int node_byte = node_number / BYTE_SIZE;
+	int node_bit = node_number % BYTE_SIZE;
+
+	/* sanity checks */
+	assert(node_count > 0);
+	assert(node_number >= 0);
+	assert(node_number < node_count);
 	
 	return set[node_byte] & (1 << node_bit);
 }
 
-node_set test_set_union(node_set set1, node_set set2, int node_number)
+node_set node_set_union(node_set set1, node_set set2, int node_count)
 {
 	node_set result;
+	int num_bytes;
+	int i;
 
-	/* TODO: it is now impossible to create an empty nodeset. Separate
-	 * creation from setting by creating a new function node_set_add().
-	 * Also, rename is_set() to set_contains() - too much confusion from
-	 * using 'set' in two different meanings (as in "setting a bit to 1"
-	 * and a "set of nodes"). */
+	assert(node_count > 0);
+	result = create_node_set(node_count);
+
+	num_bytes = node_count / BYTE_SIZE;
+	if (node_count % BYTE_SIZE != 0) { num_bytes++; }
+
+	for (i = 0; i < num_bytes; i++) {
+		result[i] = set1[i] | set2[i];
+	}
+
+	return result;
+
 }
 
 int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
