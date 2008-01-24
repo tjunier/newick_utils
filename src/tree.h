@@ -20,3 +20,7 @@ void collapse_pure_clades(struct rooted_tree *tree);
 /* Destroys a tree, releasing memory. */
 
 void destroy_tree(struct rooted_tree *);
+
+/* Returns the number of leaves of this tree */
+
+int leaf_count(struct rooted_tree *);

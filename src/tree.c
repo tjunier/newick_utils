@@ -118,3 +118,17 @@ void destroy_tree(struct rooted_tree *tree)
 	destroy_llist(tree->nodes_in_order);
 	free(tree);
 }
+
+int leaf_count(struct rooted_tree * tree)
+{
+	struct list_elem *el;
+	int n = 0;
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		if (is_leaf((struct rnode *) el->data)) {
+			n++;
+		}
+	}
+
+	return n;
+}

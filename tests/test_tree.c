@@ -52,12 +52,28 @@ int test_collapse_pure_clades()
 	return 0;
 }
 
+int test_leaf_count()
+{
+	const char *test_name = "test_leaf_count";
+	struct rooted_tree tree = tree_3();	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
+
+	if (leaf_count(&tree) != 5) {
+		printf ("%s: leaf count should be 4, not\n", test_name,
+				leaf_count(&tree));
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
 	printf("Starting tree test...\n");
 	failures += test_reroot();
 	failures += test_collapse_pure_clades();
+	failures += test_leaf_count();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

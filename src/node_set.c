@@ -125,8 +125,27 @@ int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
 	return NS_OK;
 }
 
-struct llist *children_node_set_list(struct rnode *node, struct hash *name2num,
-		int count)
+char *node_set_to_s(node_set set, int node_count)
 {
-	return NULL;
+	char *result;
+	int i;
+
+	result = malloc ((node_count + 1) * sizeof(char));
+	if (NULL == result) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
+
+	for (i = 0; i < node_count; i++) {
+		int node_byte = i / BYTE_SIZE;
+		int node_bit = i % BYTE_SIZE;
+		if (set[node_byte] & (1 << node_bit)) {
+			result[i] = '*';
+		} else {
+			result[i] = '.';
+		}
+	}
+	result[i] = '\0';
+
+	return result;
 }
