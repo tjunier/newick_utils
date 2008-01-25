@@ -53,29 +53,55 @@ struct llist *children_node_set_list(struct rnode* current,
 	return result;	
 }
 
-int process_tree(struct rooted_tree *tree, struct hash *name2num)
+void increment_count (struct hash *h, char *key)
 {
+	int * count = hash_get(h, key);
+	if (NULL == count) {
+		int * init = malloc(sizeof(int));
+		if (NULL == init) {
+			perror(NULL);
+			exit (EXIT_FAILURE);
+		}
+		*init = 1;
+		hash_set(h, key, init);
+	} else {
+		(*count)++;
+		free(key);
+	}
+}
+
+int process_tree(struct rooted_tree *tree, struct hash **name2num_ptr,
+		struct hash **bipart_count_ptr)
+{
+	static int node_count; /* set on first tree */
 	int hash_build_result;
 	struct list_elem *el;
 
-	/* create name->number map if it does not exist - i.e., first tree is
-	 * reference. */
-	if (NULL == name2num) {
-		hash_build_result = build_name2num(tree, &name2num);
+	/* First tree serves as reference for label->num map. All other trees
+	 * use the same map so the same label always maps to the same node
+	 * number. The bipartition counts hash is also created on the first
+	 * iteration. */
+	if (NULL == *name2num_ptr) {
+		node_count = leaf_count(tree);
+		/* the number of bipartitions is not larger than the number of
+		 * leaves. */
+		*bipart_count_ptr = create_hash(node_count);
+		hash_build_result = build_name2num(tree, name2num_ptr);
 		if (hash_build_result != NS_OK)
 			return hash_build_result;
 	}
-	// dump_hash(name2num, bin_elem_dump);
+
+	/* The main meat. Visits nodes in order, and for each node computes the
+	 * union of the descendant leaves. */
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct list_elem *el2;
 		struct llist* nodeset_list;
-		int node_count;
 		node_set all_desc_leaves;
+		char * string_rep;
 
 		struct rnode *current = (struct rnode *) el->data;
 		if (is_leaf(current)) { continue; }
-		node_count = leaf_count(tree);
-		nodeset_list = children_node_set_list(current, name2num,
+		nodeset_list = children_node_set_list(current, *name2num_ptr,
 				node_count);
 		all_desc_leaves = create_node_set(node_count);
 		for (el2 = nodeset_list->head; NULL != el2; el2 = el2->next) {
@@ -83,8 +109,8 @@ int process_tree(struct rooted_tree *tree, struct hash *name2num)
 			all_desc_leaves = node_set_union(
 					all_desc_leaves, set, node_count);
 		}
-		printf("%s\n", node_set_to_s(all_desc_leaves, node_count));
-
+		string_rep = node_set_to_s(all_desc_leaves, node_count);
+		increment_count (*bipart_count_ptr, string_rep);
 		/* now set this node's descendant leaf set to the union */
 		current->data = all_desc_leaves;
 	}
@@ -130,15 +156,28 @@ void get_params(int argc, char *argv[])
 	}
 }
 
+void show_bipart_counts(struct hash *bipart_count) 
+{
+	struct llist *keys = hash_keys(bipart_count);
+	struct list_elem *el;
+
+	for (el = keys->head; NULL != el; el = el->next) {
+		char *key = (char *) el->data;
+		int *count = (int *) hash_get (bipart_count, key);
+		printf ("%d\t%s\n", *count, key);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct hash *name2num = NULL;
+	struct hash *bipart_count = NULL;
 
 	get_params(argc, argv);
 	
 	while (NULL != (tree = parse_tree())) {
-		int result = process_tree(tree, name2num);
+		int result = process_tree(tree, &name2num, &bipart_count);
 		switch (result) {
 			case NS_OK:
 				break;
@@ -156,6 +195,8 @@ int main(int argc, char *argv[])
 				assert(0);
 		}
 	}
+
+	show_bipart_counts(bipart_count);
 
 	return 0;
 }
