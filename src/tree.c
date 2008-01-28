@@ -119,6 +119,29 @@ void destroy_tree(struct rooted_tree *tree)
 	free(tree);
 }
 
+/* TODO: refactor. This f() is almost a clone of the previous one. Make
+ * wrappers, or something. */
+
+void destroy_tree_except_data(struct rooted_tree *tree)
+{
+	struct list_elem *e;
+
+	/* Traversing in parse order ensures that children list's data are
+	 * already empty when we destroy the list (since the lists contain
+	 * children edges) */
+	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
+		struct rnode *current = e->data;
+		destroy_llist(current->children);
+		free(current->parent_edge->length_as_string);
+		free(current->parent_edge);
+		free(current->label);
+		free(current);
+	}
+
+	destroy_llist(tree->nodes_in_order);
+	free(tree);
+}
+
 int leaf_count(struct rooted_tree * tree)
 {
 	struct list_elem *el;

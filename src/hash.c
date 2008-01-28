@@ -114,3 +114,24 @@ struct llist *hash_keys(struct hash *h)
 
 	return list;
 }
+
+void hash_destroy(struct hash *h)
+{
+	int i;
+
+	/* free internal structure */
+	for (i = 0; i < h->size; i++) {
+		/* free list, including key-val pairs */
+		struct llist *list;
+		struct list_elem *el;
+		list = (h->bins)[i];
+		for (el = list->head; NULL != el; el = el -> next) {
+			struct key_val_pair *kvp = (struct key_val_pair *) el->data;
+			free(kvp); /* we do NOT free key and value */
+		}
+		destroy_llist(list);
+	}
+	free(h->bins);
+	/* free self */
+	free(h);
+}

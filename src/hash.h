@@ -32,3 +32,7 @@ void dump_hash(struct hash *, void (*)());
 /* Returns a struct llist* with all hash keys. Order is not specified. */
 
 struct llist *hash_keys(struct hash *);
+
+/* Destroys a hash (but does NOT destroy its contents - iterate on keys for that) */
+
+void hash_destroy(struct hash *);

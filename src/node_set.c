@@ -38,6 +38,7 @@ node_set create_node_set(int node_count)
 		exit(EXIT_FAILURE);
 	}
 	memset(set, 0, num_bytes);
+	// printf ("[cns] created node set %p\n", set);
 
 	return set;
 }
@@ -89,7 +90,6 @@ node_set node_set_union(node_set set1, node_set set2, int node_count)
 	}
 
 	return result;
-
 }
 
 int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)

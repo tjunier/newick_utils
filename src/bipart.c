@@ -20,7 +20,7 @@
 
 void bin_elem_dump(void *bin_data)
 {
-	printf ("Value: %d\n", *((int *) bin_data));
+	// printf ("Value: %d\n", *((int *) bin_data));
 }
 
 /*
@@ -43,6 +43,7 @@ struct llist *children_node_set_list(struct rnode* current,
 		if (is_leaf(child)) {
 			int *num = (int *) hash_get(lbl2num, child->label);
 			node_set set = create_node_set(node_count);
+			// printf ("created node set %p for leaf %d\n", set, *num);
 			node_set_add(set, *num, node_count);
 			append_element(result, set);
 		} else {
@@ -70,12 +71,32 @@ void increment_count (struct hash *h, char *key)
 	}
 }
 
+/* computes the union of children nodesets, also frees any unneeded ones */
+
+node_set children_node_set_union(struct llist *children_node_set_list, int node_count) {
+	node_set result = (node_set) children_node_set_list->head->data;
+	struct list_elem *el;
+
+	for (el=children_node_set_list->head->next; NULL!=el; el=el->next) {
+		node_set old_result = result;
+		node_set set = (node_set) el->data;
+		result = node_set_union(result, set, node_count);
+		// printf ("freeing old node set %p\n", old_result);
+		free(old_result);
+		// printf ("freeing node set %p\n", result);
+		free(set);
+	}
+
+	return result;
+}
+
 int process_tree(struct rooted_tree *tree, struct hash **name2num_ptr,
 		struct hash **bipart_count_ptr)
 {
 	static int node_count; /* set on first tree */
 	int hash_build_result;
 	struct list_elem *el;
+	node_set all_desc_leaves;
 
 	/* First tree serves as reference for label->num map. All other trees
 	 * use the same map so the same label always maps to the same node
@@ -94,26 +115,22 @@ int process_tree(struct rooted_tree *tree, struct hash **name2num_ptr,
 	/* The main meat. Visits nodes in order, and for each node computes the
 	 * union of the descendant leaves. */
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct list_elem *el2;
 		struct llist* nodeset_list;
-		node_set all_desc_leaves;
 		char * string_rep;
 
 		struct rnode *current = (struct rnode *) el->data;
 		if (is_leaf(current)) { continue; }
 		nodeset_list = children_node_set_list(current, *name2num_ptr,
 				node_count);
-		all_desc_leaves = create_node_set(node_count);
-		for (el2 = nodeset_list->head; NULL != el2; el2 = el2->next) {
-			node_set set = (node_set) el2->data;
-			all_desc_leaves = node_set_union(
-					all_desc_leaves, set, node_count);
-		}
+		all_desc_leaves = children_node_set_union(nodeset_list, node_count);
 		string_rep = node_set_to_s(all_desc_leaves, node_count);
 		increment_count (*bipart_count_ptr, string_rep);
 		/* now set this node's descendant leaf set to the union */
 		current->data = all_desc_leaves;
 	}
+	free(all_desc_leaves);
+	// printf("freeing %p\n", all_desc_leaves);
+
 	return NS_OK;
 }
 
@@ -168,6 +185,20 @@ void show_bipart_counts(struct hash *bipart_count)
 	}
 }
 
+void free_counts(struct hash *bipart_count)
+{
+	struct llist *keys = hash_keys(bipart_count);
+	struct list_elem *el;
+
+	for (el = keys->head; NULL != el; el = el->next) {
+		char *key = (char *) el->data;
+		int *count = (int *) hash_get (bipart_count, key);
+		free(key);
+		free(count);
+	}
+	hash_destroy(bipart_count);
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
@@ -194,9 +225,12 @@ int main(int argc, char *argv[])
 				/* programmer error, not user error */
 				assert(0);
 		}
+		destroy_tree(tree);
 	}
 
 	show_bipart_counts(bipart_count);
+
+	free_counts(bipart_count);
 
 	return 0;
 }

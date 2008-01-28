@@ -83,6 +83,27 @@ int test_keys()
 	return 0;
 }
 
+int test_destroy()
+{
+	char *test_name = "test_destroy";
+	int i;
+	/* Do this several times in a row: it's more likely that any error will
+	 * cause a problem. */
+	for (i = 0; i < 100; i++) {
+		struct hash *h = create_hash(4);
+		hash_set(h, "one", "uno");
+		hash_set(h, "two", "dos");
+		hash_set(h, "three", "tres");
+		hash_set(h, "four", "cuatro");
+		/* one more elem than hash size - forces clash */
+		hash_set(h, "five", "cinco"); 	
+		hash_destroy(h);
+		/* would be nce to check memory, but I don't know how to do this. */
+	}
+
+	printf ("%s ok.\n", test_name);
+	return 0;
+}
 
 int main()
 {
@@ -90,6 +111,7 @@ int main()
 	printf("Starting hash test...\n");
 	failures += test_simple();
 	failures += test_keys();
+	failures += test_destroy();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
