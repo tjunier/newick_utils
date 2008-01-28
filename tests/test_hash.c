@@ -40,6 +40,11 @@ int test_simple()
 	return 0;
 }
 
+int llist_find_string(void *s1, void *s2)
+{
+	return (! strcmp((char *) s1, (char *) s2));
+}
+
 int test_keys()
 {
 	char *test_name = "test_keys";
@@ -58,23 +63,23 @@ int test_keys()
 		printf ("%s: expected 5 keys, got %d.\n", test_name, keys->count);
 		return 1;
 	}
-	if (-1 == llist_index_of(keys, "one")) {
+	if (-1 == llist_index_of_f(keys, llist_find_string, "one")) {
 		printf ("%s: 'one' should be among the keys.\n", test_name);
 		return 1;
 	}
-	if (-1 == llist_index_of(keys, "two")) {
+	if (-1 == llist_index_of_f(keys, llist_find_string, "two")) {
 		printf ("%s: 'two' should be among the keys.\n", test_name);
 		return 1;
 	}
-	if (-1 == llist_index_of(keys, "three")) {
+	if (-1 == llist_index_of_f(keys, llist_find_string, "three")) {
 		printf ("%s: 'three' should be among the keys.\n", test_name);
 		return 1;
 	}
-	if (-1 == llist_index_of(keys, "four")) {
+	if (-1 == llist_index_of_f(keys, llist_find_string, "four")) {
 		printf ("%s: 'four' should be among the keys.\n", test_name);
 		return 1;
 	}
-	if (-1 == llist_index_of(keys, "five")) {
+	if (-1 == llist_index_of_f(keys, llist_find_string, "five")) {
 		printf ("%s: 'five' should be among the keys.\n", test_name);
 		return 1;
 	}

@@ -18,11 +18,11 @@ struct hash * create_hash(int n);
 
 /* Inserts a (key, value) pair into a hash */
 
-void hash_set(struct hash *, char *key, void *value);
+void hash_set(struct hash *, const char *key, void *value);
 
 /* Retrieves a value from a hash. Returns the value, or NULL if not present. */
 
-void *hash_get(struct hash *, char *key);
+void *hash_get(struct hash *, const char *key);
 
 /* Dumps a hash on stdout. Hash bins will be dumped via dump_llist(), which
  * will be passed dump_func to dump the list contents. */

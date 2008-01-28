@@ -27,6 +27,10 @@ int node_set_contains(node_set set, int node_number, int node_count);
 
 node_set node_set_union(node_set set1, node_set set2, int node_count);
 
+/* adds set2 to set1 (which is modified) */
+
+void node_set_add_set(node_set set1, node_set set2, int node_count);
+
 /* Creates a label -> ordinal number map.  Returns 0 if there was a problem
  * (such as a leaf without a label, or a non-unique label; returns 1 otherwise
  * */

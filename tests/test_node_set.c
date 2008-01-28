@@ -122,6 +122,52 @@ int test_set_union()
 	return 0;
 }
 
+int test_add_set()
+{
+	const char *test_name = "test_add_set";
+	node_set set1;
+	node_set set2;
+	node_set result;
+	int i;
+
+	set1 = create_node_set(10);
+	set2 = create_node_set(10);
+	node_set_add(set1, 3, 10);
+	node_set_add(set2, 6, 10);
+
+	node_set_add_set(set1, set2, 10);
+
+	for (i = 0; i < 3; i++) {
+		if (node_set_contains(set1, i, 10)) {
+			printf ("%s: %d should not be set.\n", test_name, i);
+			return 1;
+		}
+	}
+	if (! node_set_contains(set1, 3, 10)) {
+		printf ("%s: 3 should be set.\n", test_name);
+		return 1;
+	}
+	for (i = 4; i < 6; i++) {
+		if (node_set_contains(set1, i, 10)) {
+			printf ("%s: %d should not be set.\n", test_name, i);
+			return 1;
+		}
+	}
+	if (! node_set_contains(set1, 6, 10)) {
+		printf ("%s: 6 should be set.\n", test_name);
+		return 1;
+	}
+	for (i = 7; i < 10; i++) {
+		if (node_set_contains(set1, i, 10)) {
+			printf ("%s: %d should not be set.\n", test_name, i);
+			return 1;
+		}
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -129,6 +175,7 @@ int main()
 	failures += test_membership();
 	failures += test_name2num();
 	failures += test_set_union();
+	failures += test_add_set();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

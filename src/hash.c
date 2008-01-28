@@ -45,25 +45,37 @@ unsigned int hash_func (const char *key)
 	return h;
 }
 
-void hash_set(struct hash *h, char *key, void *value)
+void hash_set(struct hash *h, const char *key, void *value)
 {
 	int hash_code = hash_func(key) % h->size;
 	struct llist *bin;
 	struct key_val_pair *kvp;
 
+	bin = (h->bins)[hash_code];
+
+	/* First, see if key is already in bin. If so, just replace value. */
+	struct list_elem *le;
+	for (le = bin->head; NULL != le; le = le->next) {
+		kvp = (struct key_val_pair *) le->data;
+		if (0 == strcmp(key, kvp->key)) {
+			kvp->value = value;
+			return;
+		}
+	}
+	/* Key not found - create new key_val_pair, fill it with key and val,
+	 * and append to bin. */
 	kvp = (struct key_val_pair *) malloc (sizeof (struct key_val_pair));
 	if (NULL == kvp) {
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}
-	kvp->key = key;
+	kvp->key = strdup(key);
 	kvp->value = value;
 
-	bin = (h->bins)[hash_code];
 	append_element(bin, kvp);
 }
 
-void *hash_get(struct hash *h, char *key)
+void *hash_get(struct hash *h, const char *key)
 {
 	int hash_code = hash_func(key) % h->size;
 	struct llist *bin;

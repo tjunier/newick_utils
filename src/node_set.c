@@ -92,6 +92,21 @@ node_set node_set_union(node_set set1, node_set set2, int node_count)
 	return result;
 }
 
+void node_set_add_set(node_set set1, node_set set2, int node_count)
+{
+	int num_bytes;
+	int i;
+
+	assert(node_count > 0);
+
+	num_bytes = node_count / BYTE_SIZE;
+	if (node_count % BYTE_SIZE != 0) { num_bytes++; }
+
+	for (i = 0; i < num_bytes; i++) {
+		set1[i] |= set2[i];
+	}
+}
+
 int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
 {
 	/* If the tree is dichotomous and has N nodes, then it has L = (N+1)/2
