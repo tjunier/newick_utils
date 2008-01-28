@@ -51,7 +51,7 @@ void hash_set(struct hash *h, char *key, void *value)
 	struct llist *bin;
 	struct key_val_pair *kvp;
 
-	kvp = (struct key_val_pair *) malloc (sizeof (kvp));
+	kvp = (struct key_val_pair *) malloc (sizeof (struct key_val_pair));
 	if (NULL == kvp) {
 		perror(NULL);
 		exit(EXIT_FAILURE);

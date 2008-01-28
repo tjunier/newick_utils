@@ -17,7 +17,8 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
 
 void collapse_pure_clades(struct rooted_tree *tree);
 
-/* Destroys a tree, releasing memory. */
+/* Destroys a tree, releasing memory. Node data is freed (but any dynamically
+ * allocated memory pointed to by node data is NOT freed) */
 
 void destroy_tree(struct rooted_tree *);
 
