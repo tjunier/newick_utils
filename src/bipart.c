@@ -74,6 +74,22 @@ node_set union_of_child_node_sets(struct rnode *node)
 	return result;
 }
 
+void add_bipart_count(const char *node_set_string)
+{
+	int *count = hash_get(bipart_counts, node_set_string);
+	if (NULL == count) {
+		int *num = malloc(sizeof(int));
+		if (NULL == num) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+		*num = 1;
+		hash_set(bipart_counts, node_set_string, num);
+	} else {
+		(*count)++;
+	}
+}
+
 void compute_bipartitions(struct rooted_tree *tree)
 {
 	struct list_elem *el;
@@ -88,6 +104,9 @@ void compute_bipartitions(struct rooted_tree *tree)
 			node_set_add(set, *num, num_leaves);
 		} else {
 			set = union_of_child_node_sets(current);
+			char *node_set_string = node_set_to_s(set, num_leaves);
+			add_bipart_count(node_set_string);
+			free(node_set_string);
 		}
 		current->data = set;
 	}
@@ -115,6 +134,36 @@ void process_tree(struct rooted_tree *tree)
 	destroy_tree_except_data(tree);
 }
 
+void show_bipartition_counts()
+{
+	struct llist *keys = hash_keys(bipart_counts);
+	struct list_elem *el;
+	assert(NULL != keys);
+
+	for (el = keys->head; NULL != el; el = el->next) {
+		char * key = (char *) el->data;
+		int * value = (int *) hash_get(bipart_counts, key);
+		printf ("%2d\t%s\n", *value, key);
+	}
+
+	destroy_llist(keys);
+}
+
+void show_label_numbers()
+{
+	struct llist *keys = hash_keys(lbl2num);
+	struct list_elem *el;
+	assert(NULL != keys);
+
+	for (el = keys->head; NULL != el; el = el->next) {
+		char * key = (char *) el->data;
+		int * value = (int *) hash_get(lbl2num, key);
+		printf ("%2d\t%s\n", *value, key);
+	}
+
+	destroy_llist(keys);
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
@@ -124,5 +173,9 @@ int main(int argc, char *argv[])
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree);
 	}
+
+	show_bipartition_counts();
+	show_label_numbers();
+
 	return 0;
 }
