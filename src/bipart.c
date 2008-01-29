@@ -149,19 +149,38 @@ void show_bipartition_counts()
 	destroy_llist(keys);
 }
 
+/* A wrapper around strcmp() for passing to qsort() */
+
+int qsort_strcmp(const void *s1, const void *s2)
+{
+	int i = strcmp((char *) *s1, (char *) *s2);
+	printf ("%s @ %p <-> %s @ %p: %d\n", (char *) *s1, *s1, (char *) *s2, *s2, i);
+	return i;
+}
+
 void show_label_numbers()
 {
 	struct llist *keys = hash_keys(lbl2num);
 	struct list_elem *el;
+	int i = 0;
 	assert(NULL != keys);
+	assert(0 != keys->count);
 
+	char **labels = malloc(keys->count * sizeof(char *));
+	if (NULL == labels) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
 	for (el = keys->head; NULL != el; el = el->next) {
 		char * key = (char *) el->data;
-		int * value = (int *) hash_get(lbl2num, key);
-		printf ("%2d\t%s\n", *value, key);
+		labels[i++] = key;
 	}
-
+	qsort(labels[0], 2, sizeof(char *), qsort_strcmp);
+	for (i = 0; i < keys->count; i++) {
+		printf ("%s @ %p\n", labels[i], labels[i]);
+	}
 	destroy_llist(keys);
+	free(labels);
 }
 
 int main(int argc, char *argv[])
