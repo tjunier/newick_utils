@@ -256,7 +256,9 @@ int main(int argc, char *argv[])
 
 	tree = parse_target_tree(params.target_tree_filename);
 	attribute_support_to_target_tree(tree);
-	printf ("%s\n", to_newick(tree->root));
+	char *newick = to_newick(tree->root);
+	printf ("%s\n", newick);
+	free(newick);
 
 	destroy_tree(tree);
 

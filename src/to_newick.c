@@ -11,13 +11,18 @@
 
 char *length(struct rnode *node)
 {
-	char *result = "";
+	char * result = malloc(sizeof(char));
+	if (NULL == result) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
+	*result = '\0';
 
 	if (NULL != node->parent_edge) {
 		if (NULL != node->parent_edge->length_as_string) {
 			if (strlen(node->parent_edge->length_as_string) > 0) {
-				result = concat(result, ":");
-				result = concat(result,
+				result = append_to(result, ":");
+				result = append_to(result,
 					       node->parent_edge->length_as_string);	
 			}
 		}
@@ -26,44 +31,48 @@ char *length(struct rnode *node)
 	return result;
 }
 
-char *indent_string(char *tab, const int n)
-{
-	char *result = "";
-	int i;
-
-	for (i = 0; i < n; i++) 
-		result = concat(result, tab);
-	
-	return result;
-}
-
 char *subtree(struct rnode *node)
 {
-	char * result;
+	char * result = malloc(sizeof(char));
+	if (NULL == result) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
+	*result = '\0';
 
 	if (is_leaf(node)) {
-		result = concat("", node->label);
-		result = concat(result, length(node));
+		result = append_to(result, node->label);
+		char *length_s = length(node);
+		result = append_to(result, length_s);
+		free(length_s);
 	} else {
 		struct list_elem *elem;
 		struct redge *edge;
+		char * child_node_s;
 
-		//result = concat(result, "(");
-		result = "(";
+		result = append_to(result, "(");
 
 		/* first child */
 		elem = node->children->head;
 		edge = (struct redge *) elem->data;
-		result = concat(result, subtree(edge->child_node));
+		child_node_s = subtree(edge->child_node);
+		result = append_to(result, child_node_s);
+		free(child_node_s);
 		/* other children, comma-separated */
 		for (elem=elem->next; elem!=NULL; elem=elem->next) {
-			result = concat(result, ",");
+			result = append_to(result, ",");
 			edge = (struct redge *) elem->data;
-			result = concat(result, subtree(edge->child_node));
+			child_node_s = subtree(edge->child_node);
+			result = append_to(result, child_node_s);
+			free(child_node_s);
 		}
-		result = concat(result, ")");
-		if (NULL != node->label) { result = concat(result, node->label); }
-		result = concat(result, length(node));
+		result = append_to(result, ")");
+		if (NULL != node->label) {
+			result = append_to(result, node->label);
+		}
+		char *length_s = length(node);
+		result = append_to(result, length_s);
+		free(length_s);
 	}
 	return result;
 }
@@ -72,6 +81,6 @@ char *to_newick(struct rnode *node)
 {
 	char *result;
 	result = subtree(node);
-	result = concat(result, ";");
+	result = append_to(result, ";");
 	return result;
 }

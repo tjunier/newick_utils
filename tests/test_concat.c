@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -22,10 +23,13 @@ int test_concat()
 int test_append()
 {
 	char *test_name = "test_append";
-	char *s1 = "brobd";
+	char *s1;
 	char *s2 = "urumq";
 
-	append(s1, s2);
+	s1 = malloc(6 * sizeof(char));
+	strcpy(s1, "brobd");
+
+	s1 = append_to(s1, s2);
 
 	if (strcmp(s1, "brobdurumq") != 0) {
 		printf ("%s: expected 'brobdurumq', got %s\n",
