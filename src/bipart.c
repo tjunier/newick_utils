@@ -14,29 +14,39 @@
 #include "rnode.h"
 #include "redge.h"
 #include "node_set.h"
+#include "to_newick.h"
+
+extern FILE *yyin;
 
 static struct hash *lbl2num = NULL;
 static struct hash *bipart_counts = NULL;
 static int num_leaves;
 
-void get_params(int argc, char *argv[])
+struct parameters {
+	char * target_tree_filename;
+};
+
+struct parameters get_params(int argc, char *argv[])
 {
+	struct parameters params;
+
 	/* check arguments */
-	if (1 == (argc - optind))	{
+	if (2 == (argc - optind))	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
-			extern FILE *yyin;
 			if (NULL == fin) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
 			yyin = fin;
 		}
+		params.target_tree_filename = argv[optind+1];
 	} else {
-		fprintf(stderr, "Usage: %s <filename|->\n",
-				argv[0]);
+		fprintf(stderr, "Usage: %s <replicates filename|-> <target tree filename>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
+
+	return params;
 }
 
 void init_lbl2num(struct rooted_tree *tree)
@@ -153,8 +163,8 @@ void show_bipartition_counts()
 
 int qsort_strcmp(const void *s1, const void *s2)
 {
-	int i = strcmp((char *) *s1, (char *) *s2);
-	printf ("%s @ %p <-> %s @ %p: %d\n", (char *) *s1, *s1, (char *) *s2, *s2, i);
+	int i = strcmp((char *) s1, (char *) s2);
+	printf ("%s @ %p <-> %s @ %p: %d\n", (char *) s1, s1, (char *) s2, s2, i);
 	return i;
 }
 
@@ -175,7 +185,7 @@ void show_label_numbers()
 		char * key = (char *) el->data;
 		labels[i++] = key;
 	}
-	qsort(labels[0], 2, sizeof(char *), qsort_strcmp);
+	// qsort(labels[0], 2, sizeof(char *), qsort_strcmp);
 	for (i = 0; i < keys->count; i++) {
 		printf ("%s @ %p\n", labels[i], labels[i]);
 	}
@@ -183,18 +193,78 @@ void show_label_numbers()
 	free(labels);
 }
 
+struct rooted_tree *parse_target_tree(const char *tgt_fn)
+{
+	struct rooted_tree *tree;
+
+	/* change the lexer's input to the target tree file */
+	FILE *fin = fopen(tgt_fn, "r");
+	if (NULL == fin) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
+	yyin = fin;
+
+	tree =  parse_tree();
+	if (NULL == tree) {
+		fprintf (stderr, "Could not parse target tree.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return tree;
+}
+
+void attribute_support_to_target_tree(struct rooted_tree *tree)
+{
+	struct list_elem *el;
+	
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = (struct rnode *) el->data;
+		node_set set;
+		if (is_leaf(current)) {
+			int *num = (int *) hash_get(lbl2num, current->label);
+			assert (NULL != num);
+			set = create_node_set(num_leaves);
+			node_set_add(set, *num, num_leaves);
+		} else {
+			set = union_of_child_node_sets(current);
+			char *node_set_string = node_set_to_s(set, num_leaves);
+			int * count = hash_get(bipart_counts, node_set_string);
+			assert(NULL != count);
+			char * lbl = malloc(3 * sizeof(char));
+			if (NULL == lbl) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
+			sprintf (lbl, "%d", *count);
+			current->label = lbl;
+			free(node_set_string);
+		}
+		current->data = set;
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
-
-	get_params(argc, argv);
+	struct parameters params = get_params(argc, argv);
 	
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree);
 	}
 
+	tree = parse_target_tree(params.target_tree_filename);
+	attribute_support_to_target_tree(tree);
+	printf ("%s\n", to_newick(tree->root));
+
+	// empty_data(tree);
+	destroy_tree(tree);
+
+	/* TODO: make this optional */
+	/*
 	show_bipartition_counts();
 	show_label_numbers();
+	*/
 
 	return 0;
 }
