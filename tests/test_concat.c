@@ -19,11 +19,31 @@ int test_concat()
 	return 0;
 }
 
+int test_append()
+{
+	char *test_name = "test_append";
+	char *s1 = "brobd";
+	char *s2 = "urumq";
+
+	append(s1, s2);
+
+	if (strcmp(s1, "brobdurumq") != 0) {
+		printf ("%s: expected 'brobdurumq', got %s\n",
+				test_name, s1);
+		return 1;
+	}
+
+	printf ("%s ok.\n", test_name);
+	return 0;
+}
+
+
 int main()
 {
 	int failures = 0;
 	printf("Starting concat test...\n");
 	failures += test_concat();
+	failures += test_append();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

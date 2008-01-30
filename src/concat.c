@@ -18,3 +18,17 @@ char *concat(char *s1, char *s2)
 
 	return result;
 }
+
+char *append_to(char *s1, char *s2)
+{
+	size_t l1 = strlen(s1);
+	size_t l2 = strlen(s2);
+
+	char * result = realloc(l1, (l1+l2+1) * sizeof(char));
+	if (NULL == result) {
+		return NULL;
+	}
+	strcpy(result[l1], s2);
+
+	return result;
+}
