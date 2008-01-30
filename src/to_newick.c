@@ -39,16 +39,17 @@ char *indent_string(char *tab, const int n)
 
 char *subtree(struct rnode *node)
 {
-	char * result = "";
+	char * result;
 
 	if (is_leaf(node)) {
-		result = concat(result, node->label);
+		result = concat("", node->label);
 		result = concat(result, length(node));
 	} else {
 		struct list_elem *elem;
 		struct redge *edge;
 
-		result = concat(result, "(");
+		//result = concat(result, "(");
+		result = "(";
 
 		/* first child */
 		elem = node->children->head;

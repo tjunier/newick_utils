@@ -236,6 +236,7 @@ void attribute_support_to_target_tree(struct rooted_tree *tree)
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
+			free(current->label);
 			sprintf (lbl, "%d", *count);
 			current->label = lbl;
 			free(node_set_string);
@@ -257,7 +258,6 @@ int main(int argc, char *argv[])
 	attribute_support_to_target_tree(tree);
 	printf ("%s\n", to_newick(tree->root));
 
-	// empty_data(tree);
 	destroy_tree(tree);
 
 	/* TODO: make this optional */

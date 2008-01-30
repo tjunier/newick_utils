@@ -32,6 +32,7 @@ struct rooted_tree *parse_tree()
 		return tree;
 	} else {
 		free(tree);
+		destroy_llist(nodes_in_order);
 		return NULL;
 	}
 }

@@ -9,7 +9,7 @@ char *concat(char *s1, char *s2)
 
 	l1 = strlen(s1);
 	l2 = strlen(s2);
-
+	
 	if (NULL == (result = malloc((l1+l2+1) * sizeof(char)))) {
 		return NULL;
 	}
