@@ -24,12 +24,24 @@ static int num_leaves;
 
 struct parameters {
 	char * target_tree_filename;
+	int show_label_numbers;
 };
 
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
+	char opt_char;
 
+	params.show_label_numbers = 0;
+
+	/* parse options and switches */
+	while ((opt_char = getopt(argc, argv, "l")) != -1) {
+		switch (opt_char) {
+		case 'l':
+			params.show_label_numbers = 1;
+			break;
+		}
+	}
 	/* check arguments */
 	if (2 == (argc - optind))	{
 		if (0 != strcmp("-", argv[optind])) {
@@ -163,9 +175,7 @@ void show_bipartition_counts()
 
 int qsort_strcmp(const void *s1, const void *s2)
 {
-	int i = strcmp((char *) s1, (char *) s2);
-	printf ("%s @ %p <-> %s @ %p: %d\n", (char *) s1, s1, (char *) s2, s2, i);
-	return i;
+	return strcmp(* (char **) s1, * (char **) s2);
 }
 
 void show_label_numbers()
@@ -185,9 +195,9 @@ void show_label_numbers()
 		char * key = (char *) el->data;
 		labels[i++] = key;
 	}
-	// qsort(labels[0], 2, sizeof(char *), qsort_strcmp);
+	qsort(labels, keys->count, sizeof(char *), qsort_strcmp);
 	for (i = 0; i < keys->count; i++) {
-		printf ("%s @ %p\n", labels[i], labels[i]);
+		printf ("%d: %s\n", i, labels[i]);
 	}
 	destroy_llist(keys);
 	free(labels);
@@ -259,14 +269,13 @@ int main(int argc, char *argv[])
 	char *newick = to_newick(tree->root);
 	printf ("%s\n", newick);
 	free(newick);
-
 	destroy_tree(tree);
 
 	/* TODO: make this optional */
 	/*
 	show_bipartition_counts();
-	show_label_numbers();
 	*/
+	if (params.show_label_numbers) show_label_numbers();
 
 	return 0;
 }

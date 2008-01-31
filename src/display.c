@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <sys/resource.h>
-
 #include "parser.h"
 #include "tree.h"
 #include "text_graph.h"
