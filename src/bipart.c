@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
 	free(newick);
 	destroy_tree(tree);
 
-	/* TODO: make this optional */
+	/* Not sure if this is really useful */
 	/*
 	show_bipartition_counts();
 	*/
