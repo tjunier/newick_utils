@@ -38,6 +38,11 @@ struct enode *create_enode_op(int type, struct enode *left, struct enode *right)
 	return create_enode(type, left, right, 0, 0);
 }
 
+struct enode *create_enode_not(struct enode *node)
+{
+	return create_enode(ENODE_NOT, node, NULL, 0, 0);
+}
+
 float eval_enode(struct enode *node)
 {
 	switch (node->type) {
@@ -51,6 +56,16 @@ float eval_enode(struct enode *node)
 		return eval_enode(node->left) < eval_enode(node->right);
 	case ENODE_LTE:
 		return eval_enode(node->left) <= eval_enode(node->right);
+	case ENODE_EQ:
+		return eval_enode(node->left) == eval_enode(node->right);
+	case ENODE_NEQ:
+		return eval_enode(node->left) != eval_enode(node->right);
+	case ENODE_OR:
+		return eval_enode(node->left) || eval_enode(node->right);
+	case ENODE_AND:
+		return eval_enode(node->left) && eval_enode(node->right);
+	case ENODE_NOT:
+		return ! eval_enode(node->left);
 	default:
 		fprintf (stderr, "Unknown enode type %d\n", node->type);
 		exit(EXIT_FAILURE);

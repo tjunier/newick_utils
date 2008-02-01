@@ -5,6 +5,11 @@ enum enode_type {
 	ENODE_GTE,
 	ENODE_LT,
 	ENODE_LTE,
+	ENODE_EQ,
+	ENODE_NEQ,
+	ENODE_OR,
+	ENODE_AND,
+	ENODE_NOT,
 	ENODE_FUNC
 };
 
@@ -25,6 +30,10 @@ struct enode *create_enode_constant(float value);
 
 struct enode *create_enode_op(int type, struct enode *left,
 		struct enode *right);
+
+/* Creates a node that negates the argument */
+
+struct enode *create_enode_not(struct enode *node);
 
 /* Evaluates an enode. If the enode is an operator, evaluates its operands
  * first.*/
