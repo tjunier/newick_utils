@@ -1,4 +1,4 @@
-BUILT_SOURCES = newick_parser.h
+BUILT_SOURCES = newick_parser.h newick_scanner.c newick_parser.c
 
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 	       nw_collapse nw_bipart
@@ -10,7 +10,10 @@ NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c link.c tree.c
 
 NW_OUT = to_newick.c concat.c
 
-AM_YFLAGS = -d
+AM_YFLAGS = -d -p nws
+
+newick_scanner.c: newick_scanner.l
+	flex -P nws -o newick_scanner.c newick_scanner.l 
 
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c 
 nw_display_LDADD = @LEXLIB@ -lm

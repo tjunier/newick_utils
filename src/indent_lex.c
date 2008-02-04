@@ -133,7 +133,7 @@ typedef unsigned int flex_uint32_t;
 #define YY_STATE_EOF(state) (YY_END_OF_BUFFER + state + 1)
 
 /* Special action meaning "start processing a new file". */
-#define YY_NEW_FILE yyrestart(yyin  )
+#define YY_NEW_FILE yyrestart(nwsin  )
 
 #define YY_END_OF_BUFFER_CHAR 0
 
@@ -153,7 +153,7 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 
 extern int yyleng;
 
-extern FILE *yyin, *yyout;
+extern FILE *nwsin, *yyout;
 
 #define EOB_ACT_CONTINUE_SCAN 0
 #define EOB_ACT_END_OF_FILE 1
@@ -245,7 +245,7 @@ struct yy_buffer_state
 	 *
 	 * When we actually see the EOF, we change the status to "new"
 	 * (via yyrestart()), so that the user can continue scanning by
-	 * just pointing yyin at a new input file.
+	 * just pointing nwsin at a new input file.
 	 */
 #define YY_BUFFER_EOF_PENDING 2
 
@@ -283,7 +283,7 @@ static int yy_init = 0;		/* whether we need to initialize */
 static int yy_start = 0;	/* start state number */
 
 /* Flag which is used to allow yywrap()'s to do buffer switches
- * instead of setting up a fresh yyin.  A bit of a hack ...
+ * instead of setting up a fresh nwsin.  A bit of a hack ...
  */
 static int yy_did_buffer_switch_on_eof;
 
@@ -316,7 +316,7 @@ void yyfree (void *  );
 	if ( ! YY_CURRENT_BUFFER ){ \
         yyensure_buffer_stack (); \
 		YY_CURRENT_BUFFER_LVALUE =    \
-            yy_create_buffer(yyin,YY_BUF_SIZE ); \
+            yy_create_buffer(nwsin,YY_BUF_SIZE ); \
 	} \
 	YY_CURRENT_BUFFER_LVALUE->yy_is_interactive = is_interactive; \
 	}
@@ -326,7 +326,7 @@ void yyfree (void *  );
 	if ( ! YY_CURRENT_BUFFER ){\
         yyensure_buffer_stack (); \
 		YY_CURRENT_BUFFER_LVALUE =    \
-            yy_create_buffer(yyin,YY_BUF_SIZE ); \
+            yy_create_buffer(nwsin,YY_BUF_SIZE ); \
 	} \
 	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = at_bol; \
 	}
@@ -337,7 +337,7 @@ void yyfree (void *  );
 
 typedef unsigned char YY_CHAR;
 
-FILE *yyin = (FILE *) 0, *yyout = (FILE *) 0;
+FILE *nwsin = (FILE *) 0, *yyout = (FILE *) 0;
 
 typedef int yy_state_type;
 
@@ -527,7 +527,7 @@ static int yy_flex_strlen (yyconst char * );
 #ifndef YY_NO_INPUT
 
 #ifdef __cplusplus
-static int yyinput (void );
+static int nwsinput (void );
 #else
 static int input (void );
 #endif
@@ -557,18 +557,18 @@ static int input (void );
 		int c = '*'; \
 		size_t n; \
 		for ( n = 0; n < max_size && \
-			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
+			     (c = getc( nwsin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
 		if ( c == '\n' ) \
 			buf[n++] = (char) c; \
-		if ( c == EOF && ferror( yyin ) ) \
+		if ( c == EOF && ferror( nwsin ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
 		result = n; \
 		} \
 	else \
 		{ \
 		errno=0; \
-		while ( (result = fread(buf, 1, max_size, yyin))==0 && ferror(yyin)) \
+		while ( (result = fread(buf, 1, max_size, nwsin))==0 && ferror(nwsin)) \
 			{ \
 			if( errno != EINTR) \
 				{ \
@@ -576,7 +576,7 @@ static int input (void );
 				break; \
 				} \
 			errno=0; \
-			clearerr(yyin); \
+			clearerr(nwsin); \
 			} \
 		}\
 \
@@ -653,8 +653,8 @@ YY_DECL
 		if ( ! (yy_start) )
 			(yy_start) = 1;	/* first start state */
 
-		if ( ! yyin )
-			yyin = stdin;
+		if ( ! nwsin )
+			nwsin = stdin;
 
 		if ( ! yyout )
 			yyout = stdout;
@@ -662,7 +662,7 @@ YY_DECL
 		if ( ! YY_CURRENT_BUFFER ) {
 			yyensure_buffer_stack ();
 			YY_CURRENT_BUFFER_LVALUE =
-				yy_create_buffer(yyin,YY_BUF_SIZE );
+				yy_create_buffer(nwsin,YY_BUF_SIZE );
 		}
 
 		yy_load_buffer_state( );
@@ -785,7 +785,7 @@ case YY_STATE_EOF(INITIAL):
 			{
 			/* We're scanning a new file or input source.  It's
 			 * possible that this happened because the user
-			 * just pointed yyin at a new source and called
+			 * just pointed nwsin at a new source and called
 			 * yylex().  If so, then we have to assure
 			 * consistency between YY_CURRENT_BUFFER and our
 			 * globals.  Here is the right place to do so, because
@@ -793,7 +793,7 @@ case YY_STATE_EOF(INITIAL):
 			 * back-up) that will match for the new input source.
 			 */
 			(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
-			YY_CURRENT_BUFFER_LVALUE->yy_input_file = yyin;
+			YY_CURRENT_BUFFER_LVALUE->yy_input_file = nwsin;
 			YY_CURRENT_BUFFER_LVALUE->yy_buffer_status = YY_BUFFER_NORMAL;
 			}
 
@@ -1009,7 +1009,7 @@ static int yy_get_next_buffer (void)
 		if ( number_to_move == YY_MORE_ADJ )
 			{
 			ret_val = EOB_ACT_END_OF_FILE;
-			yyrestart(yyin  );
+			yyrestart(nwsin  );
 			}
 
 		else
@@ -1128,7 +1128,7 @@ static int yy_get_next_buffer (void)
 
 #ifndef YY_NO_INPUT
 #ifdef __cplusplus
-    static int yyinput (void)
+    static int nwsinput (void)
 #else
     static int input  (void)
 #endif
@@ -1167,7 +1167,7 @@ static int yy_get_next_buffer (void)
 					 */
 
 					/* Reset buffer status. */
-					yyrestart(yyin );
+					yyrestart(nwsin );
 
 					/*FALLTHROUGH*/
 
@@ -1179,7 +1179,7 @@ static int yy_get_next_buffer (void)
 					if ( ! (yy_did_buffer_switch_on_eof) )
 						YY_NEW_FILE;
 #ifdef __cplusplus
-					return yyinput();
+					return nwsinput();
 #else
 					return input();
 #endif
@@ -1211,7 +1211,7 @@ static int yy_get_next_buffer (void)
 	if ( ! YY_CURRENT_BUFFER ){
         yyensure_buffer_stack ();
 		YY_CURRENT_BUFFER_LVALUE =
-            yy_create_buffer(yyin,YY_BUF_SIZE );
+            yy_create_buffer(nwsin,YY_BUF_SIZE );
 	}
 
 	yy_init_buffer(YY_CURRENT_BUFFER,input_file );
@@ -1257,7 +1257,7 @@ static void yy_load_buffer_state  (void)
 {
     	(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
 	(yytext_ptr) = (yy_c_buf_p) = YY_CURRENT_BUFFER_LVALUE->yy_buf_pos;
-	yyin = YY_CURRENT_BUFFER_LVALUE->yy_input_file;
+	nwsin = YY_CURRENT_BUFFER_LVALUE->yy_input_file;
 	(yy_hold_char) = *(yy_c_buf_p);
 }
 
@@ -1592,7 +1592,7 @@ int yyget_lineno  (void)
  */
 FILE *yyget_in  (void)
 {
-        return yyin;
+        return nwsin;
 }
 
 /** Get the output stream.
@@ -1638,7 +1638,7 @@ void yyset_lineno (int  line_number )
  */
 void yyset_in (FILE *  in_str )
 {
-        yyin = in_str ;
+        nwsin = in_str ;
 }
 
 void yyset_out (FILE *  out_str )
@@ -1671,10 +1671,10 @@ static int yy_init_globals (void)
 
 /* Defined in main.c */
 #ifdef YY_STDINIT
-    yyin = stdin;
+    nwsin = stdin;
     yyout = stdout;
 #else
-    yyin = (FILE *) 0;
+    nwsin = (FILE *) 0;
     yyout = (FILE *) 0;
 #endif
 

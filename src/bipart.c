@@ -16,7 +16,7 @@
 #include "node_set.h"
 #include "to_newick.h"
 
-extern FILE *yyin;
+extern FILE *nwsin;
 
 static struct hash *lbl2num = NULL;
 static struct hash *bipart_counts = NULL;
@@ -50,7 +50,7 @@ struct parameters get_params(int argc, char *argv[])
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
-			yyin = fin;
+			nwsin = fin;
 		}
 		params.target_tree_filename = argv[optind+1];
 	} else {
@@ -213,7 +213,7 @@ struct rooted_tree *parse_target_tree(const char *tgt_fn)
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}
-	yyin = fin;
+	nwsin = fin;
 
 	tree =  parse_tree();
 	if (NULL == tree) {

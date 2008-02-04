@@ -1,16 +1,26 @@
+%option prefix = "nws"
 %{
 #include <string.h>
 #include "newick_parser.h"
+
+/* Since we use our own prefix 'nws' instead of 'yy', we have to supply
+ * nwswrap() (yywrap() was available in libfl) */
+
+int nwswrap(void)
+{
+	return 1;
+}
+
 %}
 
 %%
 
 '[^']*'	{
-	yylval.sval = (char *) strdup(yytext);
+	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
 [a-zA-Z0-9_.-]+	{
-	yylval.sval = (char *) strdup(yytext);
+	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
 "("	{ return O_PAREN; }

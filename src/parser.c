@@ -8,11 +8,6 @@
 struct llist *nodes_in_order;
 struct rnode *root;
 
-/* I was under the impression that #including "newick.tab.h" should declare
- * this function, but if I don't declare it here I get a warning. */
-
-void yyparse();
-
 struct rooted_tree *parse_tree()
 {
 	struct rooted_tree *tree;
@@ -24,7 +19,7 @@ struct rooted_tree *parse_tree()
 	}
 
 	nodes_in_order = create_llist();
-	yyparse();
+	nwsparse();
 	
 	if (NULL != root) {
 		tree->root = root;

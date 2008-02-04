@@ -41,12 +41,12 @@ struct parameters get_params(int argc, char *argv[])
 	if (1 == (argc - optind))	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
-			extern FILE *yyin;
+			extern FILE *nwsin;
 			if (NULL == fin) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
-			yyin = fin;
+			nwsin = fin;
 		}
 	} else {
 		fprintf(stderr, "Usage: %s [-w] <filename|->\n",

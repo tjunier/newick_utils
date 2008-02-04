@@ -122,12 +122,12 @@ struct parameters get_params(int argc, char *argv[])
 	if ((argc - optind) == 2)	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
-			extern FILE *yyin;
+			extern FILE *nwsin;
 			if (NULL == fin) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
-			yyin = fin;
+			nwsin = fin;
 		}
 		params.map_filename = argv[2];
 	} else {
