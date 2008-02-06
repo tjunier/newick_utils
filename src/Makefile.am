@@ -14,10 +14,10 @@ NW_OUT = to_newick.c concat.c
 AM_YFLAGS = -d
 
 newick_scanner.c: newick_scanner.l
-	flex -o newick_scanner.c newick_scanner.l 
+	flex -onewick_scanner.c newick_scanner.l 
 
 address_scanner.c: address_scanner.l
-	flex -o address_scanner.c address_scanner.l 
+	flex -oaddress_scanner.c address_scanner.l 
 
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c 
 nw_display_LDADD = @LEXLIB@ -lm
