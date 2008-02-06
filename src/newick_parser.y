@@ -13,7 +13,7 @@
 
 #define YYMAXDEPTH 100000
 
-void yyerror(char *s)
+void nwserror(char *s)
 {
 	printf ("goof!\n");
 }
@@ -24,6 +24,8 @@ extern struct rnode *root;
 %}
 
 /* %error-verbose */
+
+%name-prefix="nws"
 
 %union {
 	char *sval;
