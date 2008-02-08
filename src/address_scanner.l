@@ -17,14 +17,26 @@ int adswrap(void)
 
 "("	{ return(OPEN_PAREN); }
 ")"	{ return(CLOSE_PAREN); }
-[db]	{ return(NUM_FUNC); }
-[irl]	{ return(BOOL_FUNC); }
-[0-9]+(\.[0-9]+)?	{ return(CONST); }
+[db]	{
+		adslval.cval = yytext[0];
+	  	return(NUM_FUNC);
+        }
+[irl]	{
+		adslval.cval = yytext[0];
+		return(BOOL_FUNC);
+	}
+[0-9]+(\.[0-9]+)?	{
+		adslval.fval = atof(yytext);
+		return(CONST);
+	}
 [<>] |
 "==" |
 "!=" |
 "<=" |
-">="  	{ return(COMPARATOR); }
+">="  	{
+		adslval.sval = strdup(yytext);
+		return(COMPARATOR);
+	}
 "&"	{ return(OP_AND); }
 "|"	{ return(OP_OR); }
 "!"	{ return(OP_NOT); }

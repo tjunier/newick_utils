@@ -9,7 +9,17 @@ void adserror(char *s)
 %}
 
 %name-prefix="ads"
-%token OPEN_PAREN CLOSE_PAREN CONST NUM_FUNC COMPARATOR BOOL_FUNC OP_AND OP_OR OP_NOT
+
+%union {
+	char cval;
+	char *sval;
+	float fval;
+}
+
+%token OPEN_PAREN CLOSE_PAREN NUM_FUNC COMPARATOR BOOL_FUNC OP_AND OP_OR OP_NOT
+%token <fval> CONST
+
+%type <fval> comparand
 
 %%
 
@@ -24,10 +34,13 @@ term: factor
 
 factor: comparison
       | BOOL_FUNC
+      | OPEN_PAREN expression CLOSE_PAREN
 
 comparison: comparand COMPARATOR comparand
 
-comparand: CONST
+comparand: CONST {
+	 	printf ("const: %f\n", $1); 
+	 }
 	 | NUM_FUNC
 
 %%
