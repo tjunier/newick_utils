@@ -38,5 +38,5 @@ nw_bipart_SOURCES = $(NW_CORE) $(NW_OUT) bipart.c hash.c node_set.c
 nw_bipart_LDADD = @LEXLIB@
 
 nw_ed_SOURCES = $(NW_CORE) $(NW_OUT) address_scanner.l address_parser.y \
-	tree_editor.c 
+	tree_editor.c enode.c
 nw_ed_LDADD = @LEXLIB@
