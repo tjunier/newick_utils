@@ -2,6 +2,8 @@
 #include <string.h>
 
 #include "enode.h"
+#include "rnode.h"
+#include "link.h"
 
 int test_constant()
 {
@@ -273,8 +275,6 @@ int test_not()
 	struct enode * const_2 = create_enode_constant(7.8);
 	struct enode * gt = create_enode_op(ENODE_GT, const_1, const_2);
 	struct enode * lte = create_enode_op(ENODE_LTE, const_1, const_2);
-	struct enode * eq = create_enode_op(ENODE_EQ, const_1, const_1);
-	struct enode * lt = create_enode_op(ENODE_LT, const_1, const_2);
 
 	/* both false */
 	struct enode * and = create_enode_op(ENODE_AND, gt, lte);
@@ -296,6 +296,105 @@ int test_not()
 	return 0;
 }
 
+int test_is_leaf()
+{
+	const char *test_name = "test_is_leaf";
+
+	struct rnode *root = create_rnode("root");
+	struct rnode *inner = create_rnode("inner");
+	struct rnode *leaf = create_rnode("leaf");
+
+	struct enode *is_leaf = create_enode_func(ENODE_IS_LEAF);
+
+	link_p2c(root, inner, NULL);
+	link_p2c(inner, leaf, NULL);
+
+	enode_eval_set_current_rnode(root);
+	if (eval_enode(is_leaf)) {
+		printf ("%s: function 'f' expected to return false on root\n", test_name);
+		return 1;
+	}
+	enode_eval_set_current_rnode(inner);
+	if (eval_enode(is_leaf)) {
+		printf ("%s: function 'f' expected to return false on inner node\n", test_name);
+		return 1;
+	}
+	enode_eval_set_current_rnode(leaf);
+	if (! eval_enode(is_leaf)) {
+		printf ("%s: function 'f' expected to return true on leaf\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_is_inner()
+{
+	const char *test_name = "test_is_inner";
+
+	struct rnode *root = create_rnode("root");
+	struct rnode *inner = create_rnode("inner");
+	struct rnode *leaf = create_rnode("leaf");
+
+	struct enode *is_inner_func = create_enode_func(ENODE_IS_INNER);
+
+	link_p2c(root, inner, NULL);
+	link_p2c(inner, leaf, NULL);
+
+	enode_eval_set_current_rnode(root);
+	if (eval_enode(is_inner_func)) {
+		printf ("%s: function 'i' expected to return false on root\n", test_name);
+		return 1;
+	}
+	enode_eval_set_current_rnode(inner);
+	if (! eval_enode(is_inner_func)) {
+		printf ("%s: function 'i' expected to return true on inner node\n", test_name);
+		return 1;
+	}
+	enode_eval_set_current_rnode(leaf);
+	if (eval_enode(is_inner_func)) {
+		printf ("%s: function 'i' expected to return false on leaf\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_is_root()
+{
+	const char *test_name = "test_is_root";
+
+	struct rnode *root = create_rnode("root");
+	struct rnode *inner = create_rnode("inner");
+	struct rnode *leaf = create_rnode("leaf");
+
+	struct enode *is_root_func = create_enode_func(ENODE_IS_ROOT);
+
+	link_p2c(root, inner, NULL);
+	link_p2c(inner, leaf, NULL);
+
+	enode_eval_set_current_rnode(root);
+	if (!eval_enode(is_root_func)) {
+		printf ("%s: function 'r' expected to return true on root\n", test_name);
+		return 1;
+	}
+	enode_eval_set_current_rnode(inner);
+	if (eval_enode(is_root_func)) {
+		printf ("%s: function 'r' expected to return false on inner node\n", test_name);
+		return 1;
+	}
+	enode_eval_set_current_rnode(leaf);
+	if (eval_enode(is_root_func)) {
+		printf ("%s: function 'r' expected to return false on leaf\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -310,6 +409,9 @@ int main()
 	failures += test_or();
 	failures += test_and();
 	failures += test_not();
+	failures += test_is_root();
+	failures += test_is_inner();
+	failures += test_is_leaf();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

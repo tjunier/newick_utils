@@ -7,7 +7,7 @@ extern struct enode *expression_root;
 
 void adserror(char *s)
 {
-	printf ("syntax error in expr.\n");
+	printf ("syntax error in expr (%s).\n", s);
 }
 
 %}

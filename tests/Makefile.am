@@ -44,7 +44,8 @@ test_tree_SOURCES = test_tree.c $(SRC)/tree.c $(SRC)/rnode.c $(SRC)/list.c \
 	$(SRC)/redge.c tree_stubs.c
 
 test_node_set_SOURCES = test_node_set.c tree_stubs.c $(SRC)/node_set.c \
-	 $(SRC)/hash.c $(SRC)/rnode.c $(SRC)/list.c $(SRC)/link.c \
-	 $(SRC)/redge.c
+	$(SRC)/hash.c $(SRC)/rnode.c $(SRC)/list.c $(SRC)/link.c \
+	$(SRC)/redge.c
 
-test_enode_SOURCES = test_enode.c $(SRC)/enode.c
+test_enode_SOURCES = test_enode.c $(SRC)/enode.c $(SRC)/rnode.c \
+	$(SRC)/link.c $(SRC)/list.c $(SRC)/redge.c 
