@@ -43,6 +43,6 @@ int adswrap(void)
 "|"	{ return(OP_OR); }
 "!"	{ return(OP_NOT); }
 
-[\t ]+	/* ignore whitespace */
+[\t \n]+	/* ignore whitespace */
 
 %%
