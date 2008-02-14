@@ -8,21 +8,27 @@
 #include "rnode.h"
 #include "list.h"
 
+/* 'outgroup' is te node which will be the outgroup after rerooting. */
+
 void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 {
 	struct rnode *old_root = tree->root;
 
-	/* Insert node (new root) above outgroup */
+	/* Insert node (will be the new root) above outgroup */
 	insert_node_above(outgroup, "");
 	struct rnode *new_root = outgroup->parent_edge->parent_node;
 	
 	/* Invert edges from old root to new root (i.e., the tree is always in
 	 * a consistent state) */
-	/* First, we go from the new root to the old, prepending edges to a list */
+	/* First, we make a list of the edges we need to revert, by visiting
+	 * the tree from the soon-to-be new root to the old (which is still the
+	 * root) */
 	struct llist *revert_list = create_llist();
 	struct rnode *node;
-	for (node = new_root; ! is_root(node); node = node->parent_edge->parent_node) {
+	for (node = new_root; ! is_root(node);
+	node = node->parent_edge->parent_node) {
 		struct redge *edge = node->parent_edge;
+		/* order of reversals is important: tree is always consistent */
 		prepend_element(revert_list, edge);
 	}
 	/* Then, we reverse the edges in the list. */
@@ -32,7 +38,8 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 		reverse_redge(edge);
 	}
 
-	splice_out_rnode(old_root);
+	if (children_count(old_root) == 1)
+		splice_out_rnode(old_root);
 
 	tree->root = new_root;
 }

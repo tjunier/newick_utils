@@ -33,6 +33,31 @@ int test_reroot()
 	return 0;
 }
 
+int test_reroot_2()
+{
+	const char *test_name = "test_reroot_2";
+
+	/* A tree whose root has 3 children: (A:3,B:3,(C:2,(D:1,E:1)f)g)h; */
+
+	struct rooted_tree tree = tree_5();	
+	struct node_map *map = create_node_map(tree.nodes_in_order);	
+	struct rnode *node_f = get_node_with_label(map, "f");
+	const char *exp = "((D:1,E:1)f:0.5,(C:2,(A:3,B:3)h:1)g:0.5);";
+
+	reroot_tree(&tree, node_f);
+
+	const char *obt = to_newick(tree.root);
+	
+	if (strcmp (exp, obt) != 0) {
+		printf ("%s: expected '%s', got '%s'.\n", test_name, 
+				exp, obt);
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
 int test_collapse_pure_clades()
 {
 	char *test_name = "test_collapse_pure_clade";
@@ -72,6 +97,7 @@ int main()
 	int failures = 0;
 	printf("Starting tree test...\n");
 	failures += test_reroot();
+	failures += test_reroot_2();
 	failures += test_collapse_pure_clades();
 	failures += test_leaf_count();
 	if (0 == failures) {

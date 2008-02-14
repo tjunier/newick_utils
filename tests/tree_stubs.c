@@ -124,6 +124,8 @@ struct rooted_tree tree_3()
 	return result;
 }
 
+/* A tree with a redundant label */
+
 /* ((A:1,B:1.0)f:2.0,(C:1,(C:1,C:1)g:2)h:3)i; */
 struct rooted_tree tree_4()
 {
@@ -163,6 +165,47 @@ struct rooted_tree tree_4()
 	append_element(nodes_in_order, node_i);
 
 	result.root = node_i;
+	result.nodes_in_order = nodes_in_order;
+
+	return result;
+}
+
+/* A tree whose root has 3 children: (A:3,B:3,(C:2,(D:1,E:1)f)g)h; */
+struct rooted_tree tree_5()
+{
+	struct rnode *node_A, *node_B, *node_C, *node_D, *node_E;
+	struct rnode *node_f, *node_g, *node_h;
+	struct llist *nodes_in_order;
+	struct rooted_tree result;
+	
+	node_A = create_rnode("A");
+	node_B = create_rnode("B");
+	node_C = create_rnode("C");
+	node_D = create_rnode("D");
+	node_E = create_rnode("E");
+	node_f = create_rnode("f");
+	node_g = create_rnode("g");
+	node_h = create_rnode("h");
+
+	link_p2c(node_f, node_D, "1");
+	link_p2c(node_f, node_E, "1");
+	link_p2c(node_g, node_C, "2");
+	link_p2c(node_g, node_f, "1");
+	link_p2c(node_h, node_A, "3");
+	link_p2c(node_h, node_B, "3");
+	link_p2c(node_h, node_g, "1");
+
+	nodes_in_order = create_llist();
+	append_element(nodes_in_order, node_A);
+	append_element(nodes_in_order, node_B);
+	append_element(nodes_in_order, node_C);
+	append_element(nodes_in_order, node_D);
+	append_element(nodes_in_order, node_E);
+	append_element(nodes_in_order, node_f);
+	append_element(nodes_in_order, node_g);
+	append_element(nodes_in_order, node_h);
+
+	result.root = node_h;
 	result.nodes_in_order = nodes_in_order;
 
 	return result;
