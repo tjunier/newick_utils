@@ -12,6 +12,18 @@ int adswrap(void)
 	return 1;
 }
 
+YY_BUFFER_STATE buf_state;
+
+void address_scanner_set_input(char *input)
+{
+	buf_state = yy_scan_string(input);
+}
+
+void address_scanner_clear_input(char *input)
+{
+	yy_delete_buffer(buf_state);
+}
+
 %}
 
 %%

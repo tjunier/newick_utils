@@ -56,8 +56,9 @@ int main(int argc, char* argv[])
 
 	struct parameters params = get_params(argc, argv);
 
-	YY_BUFFER_STATE buf_state = yy_scan_string(params.address);
+	address_scanner_set_input(params.address);
 	adsparse(); /* sets 'expression_root' */
+	address_scanner_clear_input();
 
 	enode_eval_set_current_rnode(nodeA);
 	printf ("%g\n", eval_enode(expression_root));
