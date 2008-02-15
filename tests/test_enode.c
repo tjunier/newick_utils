@@ -395,6 +395,16 @@ int test_is_root()
 	return 0;
 }
 
+int test_support()
+{
+	const char *test_name = "test_support";
+
+	struct rnode *node = create_rnode("any");
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -412,6 +422,7 @@ int main()
 	failures += test_is_root();
 	failures += test_is_inner();
 	failures += test_is_leaf();
+	failures += test_support();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
