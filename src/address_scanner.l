@@ -19,7 +19,7 @@ void address_scanner_set_input(char *input)
 	buf_state = yy_scan_string(input);
 }
 
-void address_scanner_clear_input(char *input)
+void address_scanner_clear_input()
 {
 	yy_delete_buffer(buf_state);
 }
@@ -31,14 +31,12 @@ void address_scanner_clear_input(char *input)
 "("	{ return(OPEN_PAREN); }
 ")"	{ return(CLOSE_PAREN); }
 
-[db]	{
-		adslval.cval = yytext[0];
-	  	return(NUM_FUNC);
-        }
-[irl]	{
-		adslval.cval = yytext[0];
-		return(BOOL_FUNC);
-	}
+"d"	{ adslval.ival = ENODE_DEPTH; return(NUM_FUNC); }
+"b"	{ adslval.ival = ENODE_SUPPORT; return(NUM_FUNC); }
+"i"	{ adslval.ival = ENODE_IS_INNER; return(BOOL_FUNC); }
+"r"	{ adslval.ival = ENODE_IS_ROOT; return(BOOL_FUNC); }
+"l"	{ adslval.ival = ENODE_IS_LEAF; return(BOOL_FUNC); }
+
 [0-9]+(\.[0-9]+)?	{
 		adslval.fval = atof(yytext);
 		return(CONST);

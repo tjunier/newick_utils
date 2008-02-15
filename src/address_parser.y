@@ -1,4 +1,5 @@
 %{
+#define YYDEBUG 1
 #include <stdio.h>
 
 #include "enode.h"
@@ -15,16 +16,17 @@ void adserror(char *s)
 %name-prefix="ads"
 
 %union {
-	char cval;
 	char ival;
 	float fval;
 	struct enode *enode_p;
 }
 
-%token OPEN_PAREN CLOSE_PAREN BOOL_FUNC OP_AND OP_OR OP_NOT
+%token OPEN_PAREN CLOSE_PAREN OP_AND OP_OR OP_NOT
+
+%token <ival> BOOL_FUNC 
 %token <fval> CONST
 %token <ival> COMPARATOR
-%token <cval> NUM_FUNC 
+%token <ival> NUM_FUNC 
 
 %type <enode_p> comparand
 %type <enode_p> comparison
@@ -35,15 +37,29 @@ void adserror(char *s)
 
 /* I use the words 'term' and 'factor' by analogy with arithmetic operators */
 
-expression: term { expression_root = $1; YYACCEPT; }
-	| expression OP_OR term
+/* TODO: add error-reporting code, so that malformed expressions like 'i
+ * l r' are no longer accepted by discarding lookahead tokens. */
+
+expression: /* empty */ { expression_root = NULL; YYACCEPT; }
+	| term { expression_root = $1; YYACCEPT; }
+	| expression OP_OR term 
 
 term: factor
-	| term OP_AND factor
+	| term OP_AND factor {
+		struct enode *and = create_enode_op(ENODE_AND, $1, $3);
+		$$ = and;
+	}
 
 factor: comparison 
-      	| BOOL_FUNC
-	| OP_NOT BOOL_FUNC
+      	| BOOL_FUNC {
+		struct enode *bf = create_enode_func($1);
+		$$ = bf;
+	}
+	| OP_NOT BOOL_FUNC {
+		struct enode *bf = create_enode_func($2);
+		struct enode *not = create_enode_not(bf);
+		$$ = not;	
+	}
       	| OPEN_PAREN expression CLOSE_PAREN
       	| OP_NOT OPEN_PAREN expression CLOSE_PAREN
 

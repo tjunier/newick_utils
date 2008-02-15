@@ -56,6 +56,7 @@ int main(int argc, char* argv[])
 
 	struct parameters params = get_params(argc, argv);
 
+	adsdebug = 0;
 	address_scanner_set_input(params.address);
 	adsparse(); /* sets 'expression_root' */
 	address_scanner_clear_input();
