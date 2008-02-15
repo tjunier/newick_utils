@@ -62,17 +62,26 @@ factor: comparison
 		struct enode *not = create_enode_not(bf);
 		$$ = not;	
 	}
-      	| OPEN_PAREN expression CLOSE_PAREN
-      	| OP_NOT OPEN_PAREN expression CLOSE_PAREN
+      	| OPEN_PAREN expression CLOSE_PAREN {
+		$$ = $2;
+	}
+      	| OP_NOT OPEN_PAREN expression CLOSE_PAREN {
+		struct enode *not = create_enode_not($3);
+		$$ = not;
+	}
 
 comparison: comparand COMPARATOR comparand {
 		struct enode *c = create_enode_op($2, $1, $3);
-		// printf ("%s - comparison\n", $2);
 		$$ = c;
+	}
+	| comparand COMPARATOR comparand COMPARATOR comparand {
+		struct enode *c1 = create_enode_op($2, $1, $3);
+		struct enode *c2 = create_enode_op($4, $3, $5);
+		struct enode *res = create_enode_op(ENODE_AND, c1, c2);
+		$$ = res;
 	}
 
 comparand: CONST {
-	 	// printf ("const: %f\n", $1); 
 		struct enode *n = create_enode_constant($1);
 		$$ = n;
 	}
