@@ -32,17 +32,19 @@ void adserror(char *s)
 %type <enode_p> comparison
 %type <enode_p> term
 %type <enode_p> factor
+%type <enode_p> expression
 
 %%
 
 /* I use the words 'term' and 'factor' by analogy with arithmetic operators */
 
-/* TODO: add error-reporting code, so that malformed expressions like 'i
- * l r' are no longer accepted by discarding lookahead tokens. */
-
-expression: /* empty */ { expression_root = NULL; YYACCEPT; }
-	| term { expression_root = $1; YYACCEPT; }
-	| expression OP_OR term 
+expression: /* empty */ { expression_root = NULL; }
+	| term { expression_root = $1; }
+	| expression OP_OR term {
+		struct enode *or = create_enode_op(ENODE_OR, $1, $3);
+		expression_root = or;
+		$$ = or;	/* might not be the root */
+	}
 
 term: factor
 	| term OP_AND factor {
