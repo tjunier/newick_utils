@@ -9,4 +9,4 @@ struct rnode_data {
 	float depth;	/* from root; normally root's depth == 0 */
 	int nb_ancestors;	/* root has 0 */
 	int mark;	/* allows arbitrary marking of nodes */
-}
+};

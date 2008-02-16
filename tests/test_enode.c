@@ -4,6 +4,7 @@
 #include "enode.h"
 #include "rnode.h"
 #include "link.h"
+#include "tree_editor_rnode_data.h"
 
 int test_constant()
 {
@@ -399,7 +400,18 @@ int test_support()
 {
 	const char *test_name = "test_support";
 
+	struct enode *expr = create_enode_func(ENODE_SUPPORT);
 	struct rnode *node = create_rnode("any");
+	struct rnode_data data;
+	data.support = 2.345;
+	node->data = &data;
+	
+	enode_eval_set_current_rnode(node);
+	if (eval_enode(expr) != 2.345) {
+		printf ("%s: expected support value of 2.345, got %g.\n",
+				test_name, eval_enode(expr));
+		return 1;
+	}
 
 	printf("%s ok.\n", test_name);
 	return 0;

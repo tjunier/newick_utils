@@ -3,6 +3,7 @@
 
 #include "enode.h"
 #include "rnode.h"
+#include "tree_editor_rnode_data.h"
 
 /* Functions that operate on a tree node (e.g., to return whether or not it is
  * a leaf, or its depth in the tree, etc) operate on this external variable. It
@@ -69,6 +70,8 @@ void enode_eval_set_current_rnode(struct rnode *tree_node)
 
 float eval_enode(struct enode *node)
 {
+	struct rnode_data *data;
+
 	switch (node->type) {
 	case ENODE_CONSTANT:
 		return node->value;
@@ -96,6 +99,10 @@ float eval_enode(struct enode *node)
 		return is_root(current_tree_node);
 	case ENODE_IS_LEAF:
 		return is_leaf(current_tree_node);
+	case ENODE_SUPPORT:
+		data = (struct rnode_data *) current_tree_node->data;
+		return data->support;
+
 	default:
 		fprintf (stderr, "Unknown enode type %d\n", node->type);
 		exit(EXIT_FAILURE);
