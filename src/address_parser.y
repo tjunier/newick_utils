@@ -86,7 +86,8 @@ comparand: CONST {
 		$$ = n;
 	}
 	| NUM_FUNC {
-		printf ("nfunc: %c\n", $1);
+		struct enode *f = create_enode_func($1);
+		$$ = f;
 	}
 
 %%
