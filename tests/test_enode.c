@@ -6,11 +6,27 @@
 #include "link.h"
 #include "tree_editor_rnode_data.h"
 
+static const float SUPPORT = 2.345;
+static const float DEPTH = 3.456;
+static const int NB_ANCESTORS = 3;
+
+void setup_current_rnode()
+{
+	struct rnode *node = create_rnode("any");
+	struct rnode_data data;
+	data.nb_ancestors = NB_ANCESTORS;
+	data.depth = DEPTH;
+	data.support = SUPPORT;
+	node->data = &data;
+	enode_eval_set_current_rnode(node);
+}
+
 int test_constant()
 {
 	const char *test_name = "test_constant";
 
 	struct enode * const_num = create_enode_constant(5.5);
+	setup_current_rnode();
 
 	if (5.5 != eval_enode(const_num)) {
 		printf ("%s: expected 5.5, got %g\n", test_name,
@@ -28,6 +44,8 @@ int test_gt()
 	
 	struct enode * const_1 = create_enode_constant(4.5);
 	struct enode * const_2 = create_enode_constant(2);
+
+	setup_current_rnode();
 
 	struct enode * gt = create_enode_op(ENODE_GT, const_1, const_2);
 	if (! eval_enode(gt)) {
@@ -52,6 +70,7 @@ int test_gte()
 	struct enode * const_1 = create_enode_constant(4.5);
 	struct enode * const_2 = create_enode_constant(2);
 	struct enode * const_3 = create_enode_constant(2.0);
+	setup_current_rnode();
 
 	struct enode * gte = create_enode_op(ENODE_GTE, const_1, const_2);
 	if (! eval_enode(gte)) {
@@ -86,6 +105,7 @@ int test_lt()
 	
 	struct enode * const_1 = create_enode_constant(4.5);
 	struct enode * const_2 = create_enode_constant(2);
+	setup_current_rnode();
 
 	struct enode * lt = create_enode_op(ENODE_LT, const_1, const_2);
 	if (eval_enode(lt)) {
@@ -110,6 +130,7 @@ int test_lte()
 	struct enode * const_1 = create_enode_constant(4.5);
 	struct enode * const_2 = create_enode_constant(2);
 	struct enode * const_3 = create_enode_constant(2.0);
+	setup_current_rnode();
 
 	struct enode * lte = create_enode_op(ENODE_LTE, const_1, const_2);
 	if (eval_enode(lte)) {
@@ -144,6 +165,7 @@ int test_eq()
 	
 	struct enode * const_1 = create_enode_constant(4.5);
 	struct enode * const_2 = create_enode_constant(2);
+	setup_current_rnode();
 
 	struct enode * eq = create_enode_op(ENODE_EQ, const_1, const_2);
 	if (eval_enode(eq)) {
@@ -167,6 +189,7 @@ int test_neq()
 	
 	struct enode * const_1 = create_enode_constant(4.5);
 	struct enode * const_2 = create_enode_constant(2);
+	setup_current_rnode();
 
 	struct enode * neq = create_enode_op(ENODE_NEQ, const_1, const_2);
 	if (! eval_enode(neq)) {
@@ -194,6 +217,7 @@ int test_or()
 	struct enode * lte = create_enode_op(ENODE_LTE, const_1, const_2);
 	struct enode * eq = create_enode_op(ENODE_EQ, const_1, const_2);
 	struct enode * lt = create_enode_op(ENODE_LT, const_1, const_1);
+	setup_current_rnode();
 
 	struct enode * or = create_enode_op(ENODE_OR, gt, lte);
 	if (! eval_enode(or)) {
@@ -231,6 +255,7 @@ int test_and()
 	struct enode * lte = create_enode_op(ENODE_LTE, const_1, const_2);
 	struct enode * eq = create_enode_op(ENODE_EQ, const_1, const_1);
 	struct enode * lt = create_enode_op(ENODE_LT, const_1, const_2);
+	setup_current_rnode();
 
 	/* both false */
 	struct enode * and = create_enode_op(ENODE_AND, gt, lte);
@@ -276,6 +301,7 @@ int test_not()
 	struct enode * const_2 = create_enode_constant(7.8);
 	struct enode * gt = create_enode_op(ENODE_GT, const_1, const_2);
 	struct enode * lte = create_enode_op(ENODE_LTE, const_1, const_2);
+	setup_current_rnode();
 
 	/* both false */
 	struct enode * and = create_enode_op(ENODE_AND, gt, lte);
@@ -401,15 +427,45 @@ int test_support()
 	const char *test_name = "test_support";
 
 	struct enode *expr = create_enode_func(ENODE_SUPPORT);
-	struct rnode *node = create_rnode("any");
-	struct rnode_data data;
-	data.support = 2.345;
-	node->data = &data;
-	
-	enode_eval_set_current_rnode(node);
-	if (eval_enode(expr) != 2.345) {
-		printf ("%s: expected support value of 2.345, got %g.\n",
-				test_name, eval_enode(expr));
+	setup_current_rnode();
+
+	if (eval_enode(expr) != SUPPORT) {
+		printf ("%s: expected support value of %f, got %f.\n",
+				test_name, SUPPORT, eval_enode(expr));
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_depth()
+{
+	const char *test_name = "test_depth";
+
+	struct enode *expr = create_enode_func(ENODE_DEPTH);
+	setup_current_rnode();
+
+	if (eval_enode(expr) != DEPTH) {
+		printf ("%s: expected depth value of %g, got %g.\n",
+				test_name, DEPTH, eval_enode(expr));
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_nb_ancestors()
+{
+	const char *test_name = "test_nb_ancestors";
+
+	struct enode *expr = create_enode_func(ENODE_NB_ANCESTORS);
+	setup_current_rnode();
+
+	if (eval_enode(expr) != NB_ANCESTORS) {
+		printf ("%s: expected support value of %d, got %g.\n",
+				test_name, NB_ANCESTORS, eval_enode(expr));
 		return 1;
 	}
 
@@ -420,7 +476,7 @@ int test_support()
 int main()
 {
 	int failures = 0;
-	printf("Starting canvas test...\n");
+	printf("Starting enode test...\n");
 	failures += test_constant();
 	failures += test_gt();
 	failures += test_gte();
@@ -435,6 +491,8 @@ int main()
 	failures += test_is_inner();
 	failures += test_is_leaf();
 	failures += test_support();
+	failures += test_depth();
+	failures += test_nb_ancestors();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

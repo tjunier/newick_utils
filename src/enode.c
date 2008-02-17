@@ -71,6 +71,7 @@ void enode_eval_set_current_rnode(struct rnode *tree_node)
 float eval_enode(struct enode *node)
 {
 	struct rnode_data *data;
+	data = (struct rnode_data *) current_tree_node->data;
 
 	switch (node->type) {
 	case ENODE_CONSTANT:
@@ -100,9 +101,11 @@ float eval_enode(struct enode *node)
 	case ENODE_IS_LEAF:
 		return is_leaf(current_tree_node);
 	case ENODE_SUPPORT:
-		data = (struct rnode_data *) current_tree_node->data;
 		return data->support;
-
+	case ENODE_DEPTH:
+		return data->depth;
+	case ENODE_NB_ANCESTORS:
+		return data->nb_ancestors;
 	default:
 		fprintf (stderr, "Unknown enode type %d\n", node->type);
 		exit(EXIT_FAILURE);
