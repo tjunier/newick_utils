@@ -68,11 +68,14 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 	for (el = rev_nodes->head->next; NULL != el; el = el -> next) {
 		node = (struct rnode *) el->data;
 		struct rnode *parent = node->parent_edge->parent_node;
+		struct rnode_data *parent_data = (struct rnode_data *) parent->data;
 		rndata = malloc(sizeof(struct rnode_data));
 		if (NULL == rndata) { perror(NULL); exit (EXIT_FAILURE); }
-		rndata->nb_ancestors = parent->data->nb_ancestors + 1;
-		rndata->depth = parent->data->depth +
+		rndata->nb_ancestors = parent_data->nb_ancestors + 1;
+		rndata->depth = parent_data->depth +
 			atof(node->parent_edge->length_as_string);
+
+		node->data = rndata;
 	}
 
 	destroy_llist(rev_nodes);
@@ -80,9 +83,21 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
+	struct list_elem *el;
+
 	/* these two traversals fill the node data. */
 	// parse_order_traversal();
 	reverse_parse_order_traversal(tree);
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el -> next) {
+		struct rnode *current = (struct rnode *) el->data;
+		enode_eval_set_current_rnode(current);
+		printf ("%p %s ", current, current->label);
+		if (eval_enode(expression_root)) {
+			printf("match");
+		}	
+		printf ("\n");
+	}
 }
 
 int main(int argc, char* argv[])
