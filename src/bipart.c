@@ -242,7 +242,7 @@ void attribute_support_to_target_tree(struct rooted_tree *tree)
 			set = union_of_child_node_sets(current);
 			char *node_set_string = node_set_to_s(set, num_leaves);
 			int * count_p = hash_get(bipart_counts, node_set_string);
-			int * count;
+			int count;
 			if (NULL == count_p) {
 				fprintf(stderr, "WARNING: zero bipart count for %s\n",
 						node_set_string);

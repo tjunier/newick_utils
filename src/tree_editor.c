@@ -19,7 +19,7 @@ void address_scanner_set_input(char *);
 void address_scanner_clear_input();
 int adsparse();
 
-enum action { ACTION_SUBTREE, ACTION_SPLICE_OUT };
+enum action { ACTION_DELETE, ACTION_SUBTREE, ACTION_SPLICE_OUT };
 
 struct enode *expression_root;
 
@@ -65,6 +65,8 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'o': params.action = ACTION_SPLICE_OUT;
 			break;
+		case 'd': params.action = ACTION_DELETE;
+		  	break;
 		default: fprintf(stderr, 
 			"Action '%c' is unknown.\n", action);
 			 exit(EXIT_FAILURE);
@@ -132,6 +134,16 @@ void parse_order_traversal(struct rooted_tree *tree)
 	}
 }
 
+/* Deletes a node from the tree, by just removing the corresponding child from
+ * the parent node. No data is freed. */
+
+void delete_from_tree(struct rnode *node)
+{
+	struct rnode *parent = node->parent_edge->parent_node;
+	int index = llist_index_of(parent->children, node->parent_edge);
+	struct llist *del = delete_after(parent->children, index, 1);
+}
+
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct list_elem *el;
@@ -156,7 +168,8 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				}
 				break;
 			case ACTION_DELETE:
-
+				delete_from_tree(current);
+				break;
 			default: fprintf (stderr,
 				"Unknown action %d.\n", params.action);
 				 exit(EXIT_FAILURE);
