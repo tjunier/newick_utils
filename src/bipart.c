@@ -226,6 +226,8 @@ struct rooted_tree *parse_target_tree(const char *tgt_fn)
 
 void attribute_support_to_target_tree(struct rooted_tree *tree)
 {
+	/* TODO: use log10(number of biparts) instead of MAX_COUNT_LENGTH */
+	static const int MAX_COUNT_LENGTH = 4;	/* up to 9999, should be enough */
 	struct list_elem *el;
 	
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
@@ -239,15 +241,23 @@ void attribute_support_to_target_tree(struct rooted_tree *tree)
 		} else {
 			set = union_of_child_node_sets(current);
 			char *node_set_string = node_set_to_s(set, num_leaves);
-			int * count = hash_get(bipart_counts, node_set_string);
-			assert(NULL != count);
-			char * lbl = malloc(3 * sizeof(char));
+			int * count_p = hash_get(bipart_counts, node_set_string);
+			int * count;
+			if (NULL == count_p) {
+				fprintf(stderr, "WARNING: zero bipart count for %s\n",
+						node_set_string);
+				count = 0;
+			}
+			else {
+				count = *count_p;
+			}
+			char * lbl = malloc(MAX_COUNT_LENGTH * sizeof(char));
 			if (NULL == lbl) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
 			free(current->label);
-			sprintf (lbl, "%d", *count);
+			sprintf (lbl, "%d", count);
 			current->label = lbl;
 			free(node_set_string);
 		}
