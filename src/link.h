@@ -24,9 +24,11 @@ void insert_node_above(struct rnode *node, char *label);
 
 void replace_child_edge(struct rnode *node, struct redge *old, struct redge *new);
 
-/* Splices out node 'node'. Any children are linked directly to 'node''s
- * parent. New edges have edges such that the children nodes' depth is
- * unchanged. */
+/* Splices out node 'node' (which must be inner). Children are linked directly
+ * to 'node''s parent. New edges have edges such that the children nodes'
+ * depth is unchanged. */
+
+/* Should NOT be used for deleting ("pruning") nodes! (will segfault) */
 
 void splice_out_rnode(struct rnode *this);
 

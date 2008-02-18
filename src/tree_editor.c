@@ -19,15 +19,33 @@ void address_scanner_set_input(char *);
 void address_scanner_clear_input();
 int adsparse();
 
+enum action { ACTION_SUBTREE, ACTION_SPLICE_OUT };
+
 struct enode *expression_root;
 
 struct parameters {
 	char * address;
+	int action;
+	int show_tree;
 };
 
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
+
+	params.show_tree = 1;
+
+	int opt_char;
+	while ((opt_char = getopt(argc, argv, "m")) != -1) {
+		switch (opt_char) {
+		case 'm':
+			params.show_tree = 0;
+			break;
+		default:
+			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
+			exit (EXIT_FAILURE);
+		}
+	}
 
 	/* check arguments */
 	if (3 == (argc - optind))	{
@@ -41,6 +59,16 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 		params.address = argv[optind+1];
+		char action = argv[optind+2][0];
+		switch (action) {
+		case 's': params.action = ACTION_SUBTREE;
+			break;
+		case 'o': params.action = ACTION_SPLICE_OUT;
+			break;
+		default: fprintf(stderr, 
+			"Action '%c' is unknown.\n", action);
+			 exit(EXIT_FAILURE);
+		}
 	} else {
 		fprintf(stderr, "Usage: %s <filename|-> <addr> <act>\n",
 				argv[0]);
@@ -49,6 +77,10 @@ struct parameters get_params(int argc, char *argv[])
 
 	return params;
 }
+
+/* This allocates the rnode_data structure for each node, and fills it with
+ * "top-down" data,  i.e. data for which the parent's value needs to be known.
+ * */
 
 void reverse_parse_order_traversal(struct rooted_tree *tree)
 {
@@ -81,22 +113,55 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 	destroy_llist(rev_nodes);
 }
 
+/* This fills bottom-up data. Note that it relies on rnode_data being already
+ * allocated, which is done in reverse_parse_order_traversal(). Data that does
+ * not depend on order is also filled in here. */
+
+void parse_order_traversal(struct rooted_tree *tree)
+{
+	struct list_elem *el;
+	struct rnode *node;
+	struct rnode_data *rndata;
+
+	/* NOTE: for now there is no bottom-up data, but this is where it will
+	 * be set (e.g., number of descendants, etc) */
+	for (el = tree->nodes_in_order->head; NULL != el; el = el -> next) {
+		node = (struct rnode *) el->data;
+		rndata = (struct rnode_data *) node->data;
+		rndata->support = atof(node->label);	
+	}
+}
+
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct list_elem *el;
 
 	/* these two traversals fill the node data. */
-	// parse_order_traversal();
 	reverse_parse_order_traversal(tree);
+	parse_order_traversal(tree);
 
 	for (el = tree->nodes_in_order->head; NULL != el; el = el -> next) {
 		struct rnode *current = (struct rnode *) el->data;
 		enode_eval_set_current_rnode(current);
-		printf ("%p %s ", current, current->label);
 		if (eval_enode(expression_root)) {
-			printf("match");
+			switch (params.action) {
+			case ACTION_SUBTREE:
+				printf("%s\n", to_newick(current));
+				break;
+			case ACTION_SPLICE_OUT:
+				if (is_inner_node(current)) {
+					splice_out_rnode(current);
+				} else {
+					fprintf (stderr, "Warning: tried to splice out non-inner node ('%s')\n", current->label);
+				}
+				break;
+			case ACTION_DELETE:
+
+			default: fprintf (stderr,
+				"Unknown action %d.\n", params.action);
+				 exit(EXIT_FAILURE);
+			}
 		}	
-		printf ("\n");
 	}
 }
 
@@ -112,6 +177,8 @@ int main(int argc, char* argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, params);
+		if (params.show_tree)
+			printf("%s\n", to_newick(tree->root));
 	}
 
 	return 0;

@@ -120,9 +120,10 @@ void splice_out_rnode(struct rnode *this)
 	struct rnode *parent = parent_edge->parent_node;
 	struct list_elem *elem;
 
-	/* replace each child's parent edge with an edge to the child's grandparent */
-	/* collect new edges into a list */
+	/* replace each child's parent edge with an edge to the child's
+	 * grandparent */
 
+	/* collect new edges into a list */
 	struct llist *new_edges_list = create_llist();
 	for (elem = this->children->head; NULL != elem; elem = elem->next) {
 		struct redge *child_edge = (struct redge *) elem->data;
