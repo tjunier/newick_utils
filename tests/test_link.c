@@ -635,6 +635,30 @@ int test_reverse_edge()
 
 }
 
+int test_unlink_node()
+{
+	const char *test_name = "test_unlink_node()";
+	struct node_map *map;
+	struct rnode *node_A;
+	struct rooted_tree t = tree_3();
+
+	map = create_node_map(t.nodes_in_order);
+	node_A = get_node_with_label(map, "A");
+
+	unlink_node(node_A);
+	
+	char * exp = "(B:3(C:1(D:1,E:1)g:2)h:3)i;";
+	char * obt = to_newick(t.root);
+
+	if (strcmp(exp, obt) != 0) {
+		printf ("%s: expected %s, got %s\n", test_name, exp, obt);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -655,6 +679,7 @@ int main()
 	failures += test_splice_out();
 	failures += test_splice_out_wlen();
 	failures += test_reverse_edge();
+	failures += test_unlink_node();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

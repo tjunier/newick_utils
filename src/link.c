@@ -175,3 +175,16 @@ void reverse_redge(struct redge *edge)
 	reverse_edge->parent_node = child;
 	child->parent_edge = NULL;	
 }
+
+void unlink_node(struct rnode *node)
+{
+	struct redge *parent_edge = node->parent_edge;
+	struct rnode *parent = parent_edge->parent_node;
+	struct llist *siblings = parent->children; 	/* includes 'node'! */
+	int index = llist_index_of(siblings, parent_edge);
+	struct llist *del = delete_after(siblings, index, 1);
+	if (1 == siblings->count) {
+		splice_out_rnode(parent);
+	}
+	destroy_llist(del);
+}

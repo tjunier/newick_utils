@@ -134,16 +134,6 @@ void parse_order_traversal(struct rooted_tree *tree)
 	}
 }
 
-/* Deletes a node from the tree, by just removing the corresponding child from
- * the parent node. No data is freed. */
-
-void delete_from_tree(struct rnode *node)
-{
-	struct rnode *parent = node->parent_edge->parent_node;
-	int index = llist_index_of(parent->children, node->parent_edge);
-	struct llist *del = delete_after(parent->children, index, 1);
-}
-
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct list_elem *el;
@@ -168,7 +158,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				}
 				break;
 			case ACTION_DELETE:
-				delete_from_tree(current);
+				unlink_node(current);
 				break;
 			default: fprintf (stderr,
 				"Unknown action %d.\n", params.action);

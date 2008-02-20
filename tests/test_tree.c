@@ -83,7 +83,7 @@ int test_leaf_count()
 	struct rooted_tree tree = tree_3();	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 
 	if (leaf_count(&tree) != 5) {
-		printf ("%s: leaf count should be 4, not\n", test_name,
+		printf ("%s: leaf count should be 4, not %d\n", test_name,
 				leaf_count(&tree));
 		return 1;
 	}
