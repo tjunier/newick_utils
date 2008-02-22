@@ -137,6 +137,7 @@ void parse_order_traversal(struct rooted_tree *tree)
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct list_elem *el;
+	struct rnode *r;
 
 	/* these two traversals fill the node data. */
 	reverse_parse_order_traversal(tree);
@@ -158,7 +159,11 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				}
 				break;
 			case ACTION_DELETE:
-				unlink_node(current);
+				r = unlink_node(current);
+				if (NULL != r) {
+					r->parent_edge = NULL;
+					tree->root = r;
+				} 
 				break;
 			default: fprintf (stderr,
 				"Unknown action %d.\n", params.action);
@@ -182,6 +187,7 @@ int main(int argc, char* argv[])
 		process_tree(tree, params);
 		if (params.show_tree)
 			printf("%s\n", to_newick(tree->root));
+		destroy_tree(tree);
 	}
 
 	return 0;

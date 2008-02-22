@@ -693,6 +693,37 @@ int test_unlink_node_rad_leaf()
 	return 0;
 }
 
+int test_unlink_node_3sibs()
+{
+	const char *test_name = "test_unlink_node_3sibs";
+
+	struct node_map *map;
+	struct rnode *node_B;
+	/*  ((A:1,B:1,C:1)e:1,D:2)f */
+	struct rooted_tree t = tree_6();
+
+	map = create_node_map(t.nodes_in_order);
+	node_B = get_node_with_label(map, "B");
+
+	struct rnode *r = unlink_node(node_B);
+	if (NULL != r) {
+		r->parent_edge = NULL;
+		t.root = r;
+	}
+	
+	char * exp = "((A:1,C:1)e:1,D:2)f;";
+	char * obt = to_newick(t.root);
+
+	if (strcmp(exp, obt) != 0) {
+		printf ("%s: expected %s, got %s\n", test_name, exp, obt);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+
+}
+
 int main()
 {
 	int failures = 0;
@@ -715,6 +746,7 @@ int main()
 	failures += test_reverse_edge();
 	failures += test_unlink_node();
 	failures += test_unlink_node_rad_leaf();
+	failures += test_unlink_node_3sibs();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
