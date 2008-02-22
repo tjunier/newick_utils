@@ -19,18 +19,25 @@ AM_PROG_LEX
 AC_CHECK_LIB([m], [main])
 
 # Checks for header files.
+AC_FUNC_ALLOCA
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stddef.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT8_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([memset roundfmemset roundf  rint strdup strpbrk strspn snprintf])
+AC_CHECK_FUNCS([memset rint strdup strpbrk strspn])
 
 AC_CONFIG_FILES([Makefile src/Makefile tests/Makefile])
 AC_OUTPUT

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "enode.h"
 #include "rnode.h"
@@ -13,11 +14,12 @@ static const int NB_ANCESTORS = 3;
 void setup_current_rnode()
 {
 	struct rnode *node = create_rnode("any");
-	struct rnode_data data;
-	data.nb_ancestors = NB_ANCESTORS;
-	data.depth = DEPTH;
-	data.support = SUPPORT;
-	node->data = &data;
+	struct rnode_data *data = malloc(sizeof(struct rnode_data));
+	if (NULL == data) { perror(NULL); exit(EXIT_FAILURE); }
+	data->nb_ancestors = NB_ANCESTORS;
+	data->depth = DEPTH;
+	data->support = SUPPORT;
+	node->data = data;
 	enode_eval_set_current_rnode(node);
 }
 
