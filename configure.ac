@@ -14,11 +14,6 @@ AC_PROG_CC
 AC_PROG_YACC
 AM_PROG_LEX
 
-# Unit testing
-#PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
-#AM_PATH_CHECK
-#AM_PROG_CC_C_O	# got msg from autoreconf saying this is req'd :)
-
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':
 AC_CHECK_LIB([m], [main])
@@ -35,7 +30,7 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([rint strdup strpbrk strspn snprintf])
+AC_CHECK_FUNCS([memset roundfmemset roundf  rint strdup strpbrk strspn snprintf])
 
 AC_CONFIG_FILES([Makefile src/Makefile tests/Makefile])
 AC_OUTPUT

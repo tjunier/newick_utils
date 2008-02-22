@@ -170,7 +170,7 @@ struct rooted_tree tree_4()
 	return result;
 }
 
-/* A tree whose root has 3 children: (A:3,B:3,(C:2,(D:1,E:1)f)g)h; */
+/* A tree whose root has 3 children: (A:3,B:3,(C:2,(D:1,E:1)f:1)g:1)h; */
 struct rooted_tree tree_5()
 {
 	struct rnode *node_A, *node_B, *node_C, *node_D, *node_E;
@@ -206,6 +206,42 @@ struct rooted_tree tree_5()
 	append_element(nodes_in_order, node_h);
 
 	result.root = node_h;
+	result.nodes_in_order = nodes_in_order;
+
+	return result;
+}
+
+/* A tree with an inner node that has three children:
+ *  ((A:1,B:1,C:1)e:1,D:2)f */
+struct rooted_tree tree_6()
+{
+	struct rnode *node_A, *node_B, *node_C, *node_D;
+	struct rnode *node_e, *node_f;
+	struct llist *nodes_in_order;
+	struct rooted_tree result;
+	
+	node_A = create_rnode("A");
+	node_B = create_rnode("B");
+	node_C = create_rnode("C");
+	node_D = create_rnode("D");
+	node_e = create_rnode("e");
+	node_f = create_rnode("f");
+
+	link_p2c(node_e, node_A, "1");
+	link_p2c(node_e, node_B, "1");
+	link_p2c(node_e, node_C, "1");
+	link_p2c(node_f, node_e, "1");
+	link_p2c(node_f, node_D, "2");
+
+	nodes_in_order = create_llist();
+	append_element(nodes_in_order, node_A);
+	append_element(nodes_in_order, node_B);
+	append_element(nodes_in_order, node_C);
+	append_element(nodes_in_order, node_e);
+	append_element(nodes_in_order, node_D);
+	append_element(nodes_in_order, node_f);
+
+	result.root = node_f;
 	result.nodes_in_order = nodes_in_order;
 
 	return result;

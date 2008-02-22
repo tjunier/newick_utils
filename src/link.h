@@ -48,8 +48,16 @@ void splice_out_rnode(struct rnode *node);
 
 void reverse_redge(struct redge *edge);
 
-/* Unlinks a node from the tree. This will only affect. Does NOT free any memory, apart from
- * elements in the children list. In particular, nodes are still available in
- * the original tree's nodes_in_order list. */ 
+/* Removes a node from its parent's children list (more precisely, remove the
+ * node's parent_edge from the children list). The edge and node are not freed.
+ * If the removed node had more than one sibling, the tree is in a coherent
+ * state and the function stops here. If not, the tree is incoherent because
+ * the parent has only one child. There are two possibilities: i) the parent is
+ * the root - the function stops there and returns the root's (only) child so
+ * that it may become the tree's root (we cannot do this here, since we're
+ * working at node level, not tree level); ii) the parent is an inner node - it
+ * gets spliced out.
+ * RETURN VALUE: the root's remaining child if the removed node's parent is
+ * root AND the root has only one remaining child; NULL otherwise. */
 
-void unlink_node(struct rnode *);
+struct rnode * unlink_node(struct rnode *);

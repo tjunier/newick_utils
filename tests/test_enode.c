@@ -464,7 +464,7 @@ int test_nb_ancestors()
 	setup_current_rnode();
 
 	if (eval_enode(expr) != NB_ANCESTORS) {
-		printf ("%s: expected support value of %d, got %g.\n",
+		printf ("%s: expected %d ancestors, got %g.\n",
 				test_name, NB_ANCESTORS, eval_enode(expr));
 		return 1;
 	}

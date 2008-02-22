@@ -105,7 +105,7 @@ float eval_enode(struct enode *node)
 	case ENODE_DEPTH:
 		return data->depth;
 	case ENODE_NB_ANCESTORS:
-		return data->nb_ancestors;
+		return roundf(data->nb_ancestors);
 	default:
 		fprintf (stderr, "Unknown enode type %d\n", node->type);
 		exit(EXIT_FAILURE);

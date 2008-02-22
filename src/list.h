@@ -55,9 +55,8 @@ void dump_llist(struct llist *list, void (*dump_func)(void *));
 
 void insert_after(struct llist *target, int pos, struct llist *insert);
 
-/* Removes 'length' elements from 'target', starting at 'pos'. Returns a list
- * made from the removed elements. TODO: should it not be called
- * 'delete_at()'?*/
+/* Removes 'length' elements from 'target', starting at 'pos' + 1. Returns a
+ * list made from the removed elements. */
 
 struct llist *delete_after(struct llist *target, int pos, int length);
 

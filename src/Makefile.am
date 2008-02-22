@@ -20,23 +20,23 @@ address_scanner.c: address_scanner.l
 	flex -oaddress_scanner.c address_scanner.l 
 
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c 
-nw_display_LDADD = @LEXLIB@ -lm
+nw_display_LDADD = @LEXLIB@
 
 nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c nodemap.c
-nw_clade_LDADD = @LEXLIB@ -lm
+nw_clade_LDADD = @LEXLIB@ 
 
 nw_reroot_SOURCES = $(NW_CORE) $(NW_OUT) reroot.c lca.c nodemap.c
-nw_reroot_LDADD = @LEXLIB@ -lm
+nw_reroot_LDADD = @LEXLIB@
 
 nw_rename_SOURCES = $(NW_CORE) $(NW_OUT) rename.c hash.c
-nw_rename_LDADD = @LEXLIB@ -lm
+nw_rename_LDADD = @LEXLIB@
 
 nw_collapse_SOURCES = $(NW_CORE) $(NW_OUT) collapse.c
-nw_collapse_LDADD = @LEXLIB@ -lm
+nw_collapse_LDADD = @LEXLIB@
 
 nw_bipart_SOURCES = $(NW_CORE) $(NW_OUT) bipart.c hash.c node_set.c
 nw_bipart_LDADD = @LEXLIB@
 
 nw_ed_SOURCES = $(NW_CORE) $(NW_OUT) address_scanner.l address_parser.y \
 	tree_editor.c enode.c
-nw_ed_LDADD = @LEXLIB@
+nw_ed_LDADD = @LEXLIB@ -lm

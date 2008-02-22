@@ -176,15 +176,23 @@ void reverse_redge(struct redge *edge)
 	child->parent_edge = NULL;	
 }
 
-void unlink_node(struct rnode *node)
+struct rnode * unlink_node(struct rnode *node)
 {
 	struct redge *parent_edge = node->parent_edge;
 	struct rnode *parent = parent_edge->parent_node;
 	struct llist *siblings = parent->children; 	/* includes 'node'! */
+	struct list_elem *el;
 	int index = llist_index_of(siblings, parent_edge);
-	struct llist *del = delete_after(siblings, index, 1);
-	if (1 == siblings->count) {
-		splice_out_rnode(parent);
-	}
+	struct llist *del = delete_after(siblings, index-1, 1);
 	destroy_llist(del);
+	if (1 == siblings->count) {
+		if (is_root(parent)) {
+			return ((struct redge *) siblings->head->data)->child_node;
+		}
+		else {
+			splice_out_rnode(parent);
+			return NULL;
+		}
+	}
+	return NULL;
 }

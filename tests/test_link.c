@@ -640,14 +640,48 @@ int test_unlink_node()
 	const char *test_name = "test_unlink_node()";
 	struct node_map *map;
 	struct rnode *node_A;
+	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 	struct rooted_tree t = tree_3();
 
 	map = create_node_map(t.nodes_in_order);
 	node_A = get_node_with_label(map, "A");
 
-	unlink_node(node_A);
+	struct rnode *r = unlink_node(node_A);
+	if (NULL != r) {
+		r->parent_edge = NULL;
+		t.root = r;
+	}
 	
-	char * exp = "(B:3(C:1(D:1,E:1)g:2)h:3)i;";
+	char * exp = "(B:3,(C:1,(D:1,E:1)g:2)h:3)i;";
+	char * obt = to_newick(t.root);
+
+	if (strcmp(exp, obt) != 0) {
+		printf ("%s: expected %s, got %s\n", test_name, exp, obt);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_unlink_node_rad_leaf()
+{
+	const char *test_name = "test_unlink_node_rad_leaf()";
+	struct node_map *map;
+	struct rnode *node_D;
+	/*  ((A:1,B:1,C:1)e:1,D:2)f */
+	struct rooted_tree t = tree_6();
+
+	map = create_node_map(t.nodes_in_order);
+	node_D = get_node_with_label(map, "D");
+
+	struct rnode *r = unlink_node(node_D);
+	if (NULL != r) {
+		r->parent_edge = NULL;
+		t.root = r;
+	}
+	
+	char * exp = "(A:1,B:1,C:1)e;";
 	char * obt = to_newick(t.root);
 
 	if (strcmp(exp, obt) != 0) {
@@ -680,6 +714,7 @@ int main()
 	failures += test_splice_out_wlen();
 	failures += test_reverse_edge();
 	failures += test_unlink_node();
+	failures += test_unlink_node_rad_leaf();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
