@@ -113,45 +113,41 @@ char *add_len_strings(char *ls1, char *ls2)
 	return result;
 }
 
+/* 'this' node is the one that is to be spliced out. All nodes and edges are
+ * relative to this one. */
+
 void splice_out_rnode(struct rnode *this)
 {
-	/* get parent edge and its length */
+	/* get this node parent edge and its length */
 	struct redge *parent_edge = this->parent_edge;
 	struct rnode *parent = parent_edge->parent_node;
 	struct list_elem *elem;
 
-	/* replace each child's parent edge with an edge to the child's
-	 * grandparent */
+	/* change the children's parent edges: they must now point to their
+	 * 'grandparent', and the length from their parent to their grandparent
+	 * must be added. */
 
-	/* collect new edges into a list */
-	struct llist *new_edges_list = create_llist();
 	for (elem = this->children->head; NULL != elem; elem = elem->next) {
 		struct redge *child_edge = (struct redge *) elem->data;
 		struct rnode *child = child_edge->child_node;
-		char *new_edge_len_s = add_len_strings(parent_edge->length_as_string,
-				child_edge->length_as_string);
-		struct redge *new_edge = create_redge(new_edge_len_s);
-		new_edge->parent_node = parent;	/* instead of this node */
-		set_parent_edge(child, new_edge);
-		append_element(new_edges_list, new_edge);
+		char *new_edge_len_s = add_len_strings(
+			parent_edge->length_as_string,
+			child_edge->length_as_string);
+		free(child_edge->length_as_string);
+		child_edge->length_as_string = new_edge_len_s;
+		child_edge->parent_node = parent;  /* instead of this node */
 	}
 
 	/* find where this node's parent edge is in parent */
-	int i = 0;
-	for (elem = parent->children->head; NULL != elem; elem = elem->next) {
-		struct redge *sibling_edge = (struct redge *) elem->data;
-		if (sibling_edge == parent_edge) 
-			break;
-		else
-			i++;
-	}
+	int i = llist_index_of(parent->children, parent_edge);
 
 	/* delete old edge from parent's children list */
 	delete_after(parent->children, i-1, 1);
 
 	/* insert list of new edges in parent's children list */
-	insert_after(parent->children, i-1, new_edges_list);
+	insert_after(parent->children, i-1, this->children);
 
+	// TODO: free 'this' ?
 }
 
 void reverse_redge(struct redge *edge)
@@ -184,6 +180,7 @@ struct rnode * unlink_node(struct rnode *node)
 	struct list_elem *el;
 	int index = llist_index_of(siblings, parent_edge);
 	struct llist *del = delete_after(siblings, index-1, 1);
+	printf("freeing del elem\n");
 	destroy_llist(del);
 	if (1 == siblings->count) {
 		if (is_root(parent)) {

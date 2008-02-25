@@ -138,6 +138,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct list_elem *el;
 	struct rnode *r;
+	char *newick;
 
 	/* these two traversals fill the node data. */
 	reverse_parse_order_traversal(tree);
@@ -149,7 +150,9 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		if (eval_enode(expression_root)) {
 			switch (params.action) {
 			case ACTION_SUBTREE:
-				printf("%s\n", to_newick(current));
+				newick = to_newick(current);
+				printf("%s\n", newick);
+				free(newick);
 				break;
 			case ACTION_SPLICE_OUT:
 				if (is_inner_node(current)) {

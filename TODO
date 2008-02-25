@@ -1,7 +1,1 @@
-nw_reroot has problems with branch length when using -l.
-
-The problem happens when the root has more than 2 children, as in:
-
-echo '(a:3,A:3,(B:2,(C:1,D:1):1):1);' | ./src/nw_reroot -l - a A B 
-
-nu_reroot gets this right, but nw_reroot doesn't.
+nw_ed has problems when deleting a node (try valgrind nw_ed data/HRV_bs.nw 'i & b == 13' d). The illegal write happens when destroying a list that is apparently not correctly terminated, i.e. l->count == 1 but l->head->next is not NULL as it should be. I'm not sure exactly when this occurs yet (destroy_llist() is used frequently).
