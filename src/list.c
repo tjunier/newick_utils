@@ -268,7 +268,6 @@ void destroy_llist(struct llist *l)
 	 * dereferencing a freed pointer. */
 
 	struct list_elem **delenda;
-	printf("count: %d\n", l->count);
 	delenda = malloc((l->count) * sizeof(struct list_elem*));
 	if (NULL == delenda) {
 		perror(NULL);
@@ -276,9 +275,7 @@ void destroy_llist(struct llist *l)
 	}
 	struct list_elem *e;
 	int i = 0;
-	printf("head->next = %p\n", l->head->next);
 	for (e = l->head; NULL != e; e = e->next) {
-		printf("Adding element %d.\n", i);
 		delenda[i] = e;
 		i++;
 	}

@@ -144,10 +144,11 @@ void splice_out_rnode(struct rnode *this)
 	/* delete old edge from parent's children list */
 	delete_after(parent->children, i-1, 1);
 
+	// This caused a nasty memory bug. I will delete it altogether when I'm
+	// sure it did nothing useful (besides obviously doing something
+	// wrong).
 	/* insert list of new edges in parent's children list */
-	insert_after(parent->children, i-1, this->children);
-
-	// TODO: free 'this' ?
+	// insert_after(parent->children, i-1, this->children);
 }
 
 void reverse_redge(struct redge *edge)
@@ -180,7 +181,6 @@ struct rnode * unlink_node(struct rnode *node)
 	struct list_elem *el;
 	int index = llist_index_of(siblings, parent_edge);
 	struct llist *del = delete_after(siblings, index-1, 1);
-	printf("freeing del elem\n");
 	destroy_llist(del);
 	if (1 == siblings->count) {
 		if (is_root(parent)) {
