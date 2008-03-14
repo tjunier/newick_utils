@@ -144,11 +144,8 @@ void splice_out_rnode(struct rnode *this)
 	/* delete old edge from parent's children list */
 	delete_after(parent->children, i-1, 1);
 
-	// This caused a nasty memory bug. I will delete it altogether when I'm
-	// sure it did nothing useful (besides obviously doing something
-	// wrong).
-	/* insert list of new edges in parent's children list */
-	// insert_after(parent->children, i-1, this->children);
+	/* insert list of modified edges in parent's children list */
+	insert_after(parent->children, i-1, this->children);
 }
 
 void reverse_redge(struct redge *edge)
