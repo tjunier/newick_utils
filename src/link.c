@@ -137,6 +137,7 @@ void splice_out_rnode(struct rnode *this)
 		child_edge->length_as_string = new_edge_len_s;
 		child_edge->parent_node = parent;  /* instead of this node */
 	}
+	struct llist *kids_copy = shallow_copy(this->children);
 
 	/* find where this node's parent edge is in parent */
 	int i = llist_index_of(parent->children, parent_edge);
@@ -145,7 +146,8 @@ void splice_out_rnode(struct rnode *this)
 	delete_after(parent->children, i-1, 1);
 
 	/* insert list of modified edges in parent's children list */
-	insert_after(parent->children, i-1, this->children);
+	insert_after(parent->children, i-1, kids_copy);
+	//destroy_llist(kids_copy);
 }
 
 void reverse_redge(struct redge *edge)
