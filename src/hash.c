@@ -127,7 +127,7 @@ struct llist *hash_keys(struct hash *h)
 	return list;
 }
 
-void hash_destroy(struct hash *h)
+void destroy_hash(struct hash *h)
 {
 	int i;
 
@@ -139,7 +139,9 @@ void hash_destroy(struct hash *h)
 		list = (h->bins)[i];
 		for (el = list->head; NULL != el; el = el -> next) {
 			struct key_val_pair *kvp = (struct key_val_pair *) el->data;
-			free(kvp); /* we do NOT free key and value */
+			char * key = kvp->key;
+			free(key); /* key is a strdup()licate: free() it */
+			free(kvp); /* we do NOT free value */
 		}
 		destroy_llist(list);
 	}

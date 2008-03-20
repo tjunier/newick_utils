@@ -93,7 +93,8 @@ struct hash *read_map(const char *filename)
 		p++;				
 		int skip = (int) strspn(p, " \t"); /* next non-whitespace */
 		value = p + skip;		/* no need for \0 (fgets()) */
-		hash_set(map, line, (void *) value);
+		hash_set(map, line, (void *) strdup(value));
+		free(line);
 	}
 
 	return map;
@@ -147,7 +148,7 @@ void process_tree(struct rooted_tree *tree, struct hash *rename_map,
 		char *label = current->label;
 		char *new_label = hash_get(rename_map, label);
 		if (NULL != new_label) {
-			current->label = new_label;
+			current->label = strdup(new_label);
 		}
 	}
 
@@ -166,7 +167,18 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, rename_map, params);
+		destroy_tree_except_data(tree);
 	}
+
+	struct llist *keys = hash_keys(rename_map);
+	struct list_elem *e;
+	for (e = keys->head; NULL != e; e = e->next) {
+		char *key = (char *) e->data;
+		char *val = hash_get(rename_map, key);
+		free(val);
+	}
+	destroy_llist(keys);
+	destroy_hash(rename_map);
 
 	return 0;
 }

@@ -102,7 +102,7 @@ int test_destroy()
 		hash_set(h, "four", "cuatro");
 		/* one more elem than hash size - forces clash */
 		hash_set(h, "five", "cinco"); 	
-		hash_destroy(h);
+		destroy_hash(h);
 		/* would be nce to check memory, but I don't know how to do this. */
 	}
 
