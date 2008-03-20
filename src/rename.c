@@ -149,10 +149,13 @@ void process_tree(struct rooted_tree *tree, struct hash *rename_map,
 		char *new_label = hash_get(rename_map, label);
 		if (NULL != new_label) {
 			current->label = strdup(new_label);
+			free(label);
 		}
 	}
 
-	printf ("%s\n", to_newick(tree->root));
+	char *newick = to_newick(tree->root);
+	printf ("%s\n", newick);
+	free(newick);
 }
 
 int main(int argc, char *argv[])
