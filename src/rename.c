@@ -15,6 +15,7 @@
 
 struct parameters {
 	char  *map_filename;
+	int only_leaves;
 };
 
 /* Returns a line from a file, as a pointer to an allocated buffer */
@@ -79,10 +80,15 @@ struct hash *read_map(const char *filename)
 	struct hash *map = create_hash(HASH_SIZE);
 	char *line;
 	while (NULL != (line = readline(map_file))) {
-		/* Start of line is start of key, we just need to find key'end
+		/* Start of line is start of key, we just need to find key's end
 		 * and start of value. */
 		char *p, *value;
 		p = strpbrk(line, " \t");	/* find first whitespace */
+		if (NULL == p) {
+			fprintf (stderr, "Invalid line format in map file %s: '%s'\n",
+					filename, line);
+			exit(EXIT_FAILURE);
+		}
 		*p = '\0';			/* terminate key */
 		p++;				
 		int skip = (int) strspn(p, " \t"); /* next non-whitespace */
@@ -98,25 +104,16 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	/* TODO: uncomment this when we add switches and options */
-	/* parse options and switches */
-	/*
+	params.only_leaves = 0;	/* default: rename all nodes */
+
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "dw:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "l")) != -1) {
 		switch (opt_char) {
-		case 'w':
-			params.width = strtod(optarg, NULL);
-			if (0 == params.width) {
-				fprintf(stderr,
-			"Argument to -w must be a positive integer.\n");
-				exit(EXIT_FAILURE);
-			}
+		case 'l':
+			params.only_leaves = 1;
 			break;
-		case 'd':
-			params.debug = 1;
 		}
 	}
-	*/
 
 	/* check arguments */
 	if ((argc - optind) == 2)	{
@@ -129,7 +126,7 @@ struct parameters get_params(int argc, char *argv[])
 			}
 			nwsin = fin;
 		}
-		params.map_filename = argv[2];
+		params.map_filename = argv[optind+1];
 	} else {
 		fprintf(stderr, "Usage: %s <filename|-> <map_filename>\n",
 				argv[0]);
@@ -137,6 +134,24 @@ struct parameters get_params(int argc, char *argv[])
 	}
 
 	return params;
+}
+
+void process_tree(struct rooted_tree *tree, struct hash *rename_map,
+		struct parameters params)
+{
+	/* visit each node, and change name if needed */
+	struct list_elem *elem;
+	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
+		struct rnode *current = (struct rnode *) elem->data;
+		if (params.only_leaves && ! is_leaf(current)) { continue; }
+		char *label = current->label;
+		char *new_label = hash_get(rename_map, label);
+		if (NULL != new_label) {
+			current->label = new_label;
+		}
+	}
+
+	printf ("%s\n", to_newick(tree->root));
 }
 
 int main(int argc, char *argv[])
@@ -148,20 +163,10 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	rename_map = read_map(params.map_filename);
-	tree = parse_tree();
 
-	/* visit each node, and change name if needed */
-	struct list_elem *elem;
-	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
-		struct rnode *current = (struct rnode *) elem->data;
-		char *label = current->label;
-		char *new_label = hash_get(rename_map, label);
-		if (NULL != new_label) {
-			current->label = new_label;
-		}
+	while (NULL != (tree = parse_tree())) {
+		process_tree(tree, rename_map, params);
 	}
-
-	printf ("%s\n", to_newick(tree->root));
 
 	return 0;
 }
