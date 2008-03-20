@@ -105,8 +105,8 @@ char *add_len_strings(char *ls1, char *ls2)
 	/* if ls1 and ls2 are not both "" */
 	if (	strcmp("", ls1) != 0 ||
 		strcmp("", ls2) != 0)	{
-		double l1 = atoi(ls1);
-		double l2 = atoi(ls2);
+		double l1 = atof(ls1);
+		double l2 = atof(ls2);
 		asprintf(&result, "%g", l1 + l2);
 	}
 
@@ -143,11 +143,12 @@ void splice_out_rnode(struct rnode *this)
 	int i = llist_index_of(parent->children, parent_edge);
 
 	/* delete old edge from parent's children list */
-	delete_after(parent->children, i-1, 1);
+	struct llist *del = delete_after(parent->children, i-1, 1);
+	destroy_llist(del);
 
 	/* insert list of modified edges in parent's children list */
 	insert_after(parent->children, i-1, kids_copy);
-	//destroy_llist(kids_copy);
+	free(kids_copy);
 }
 
 void reverse_redge(struct redge *edge)

@@ -1,5 +1,10 @@
 #! /bin/sh
 
+# All app test scripts are links to this one. Exactly what binary to test will
+# be derived from the link's name. The test cases themselves are in a file
+# whose name is derived in the same way.
+
+shopt -s -o nounset
 
 prog=${0%.sh}	# derive tested program's name from own name
 prog=${prog#*_}
@@ -16,6 +21,10 @@ if [ ! -r $args_file ] ; then
 	echo "can't find arguments file $args_file"
 	exit 1
 fi
+
+# Each test case in on one line. Line structure is <case name>:<prog
+# arguments>. Th eexpected result is in a file named test_<prog name>_<case
+# name>.exp .
 
 pass=TRUE
 while IFS=':' read name args ; do

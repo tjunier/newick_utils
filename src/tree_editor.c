@@ -36,9 +36,9 @@ struct parameters get_params(int argc, char *argv[])
 	params.show_tree = 1;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "m")) != -1) {
+	while ((opt_char = getopt(argc, argv, "n")) != -1) {
 		switch (opt_char) {
-		case 'm':
+		case 'n':
 			params.show_tree = 0;
 			break;
 		default:
@@ -188,8 +188,11 @@ int main(int argc, char* argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, params);
-		if (params.show_tree)
-			printf("%s\n", to_newick(tree->root));
+		if (params.show_tree) {
+			char *newick = to_newick(tree->root);
+			printf("%s\n", newick);
+			free(newick);
+		}
 		destroy_tree(tree);
 	}
 
