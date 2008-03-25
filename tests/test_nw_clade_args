@@ -1,0 +1,3 @@
+multiple:catarrhini_wrong_mult.nw Cebus Papio
+monop:-m catarrhini_wrong.nw Simias Papio Macaca Cercopithecus
+monop_f:-m catarrhini_wrong.nw Simias Papio Cercopithecus
