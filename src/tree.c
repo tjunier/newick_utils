@@ -118,7 +118,10 @@ void destroy_tree(struct rooted_tree *tree)
 		free(current->parent_edge->length_as_string);
 		free(current->parent_edge);
 		free(current->label);
-		free(current->data);	/* only works if data has no pointer to allocated space! */
+		/* only works if data can be free()d, i.e. has no pointer to
+		 * allocated storage. In that case, use
+		 * destroy_tree_except_data(), and free the data "manually". */
+		free(current->data);	
 		free(current);
 	}
 

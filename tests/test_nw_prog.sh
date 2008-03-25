@@ -23,7 +23,7 @@ if [ ! -r $args_file ] ; then
 fi
 
 # Each test case in on one line. Line structure is <case name>:<prog
-# arguments>. Th eexpected result is in a file named test_<prog name>_<case
+# arguments>. Th expected result is in a file named test_<prog name>_<case
 # name>.exp .
 
 pass=TRUE

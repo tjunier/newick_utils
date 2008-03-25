@@ -23,6 +23,8 @@ struct rnode *create_rnode(char *label)
 	node_p->children = create_llist();	
 	node_p->parent_edge = NULL;
 
+	node_p->data = NULL;
+
 	return node_p;
 }
 

@@ -2,12 +2,13 @@ BUILT_SOURCES = newick_parser.h newick_scanner.c newick_parser.c \
 		address_scanner.c address_parser.c
 
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
-	       nw_collapse nw_bipart nw_ed
+	       nw_collapse nw_bipart nw_ed nw_topology
 
 nw_indent_SOURCES = indent.c indent_lex.l
 nw_indent_LDADD = @LEXLIB@
 
-NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c link.c tree.c redge.c
+NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
+	  link.c tree.c redge.c
 
 NW_OUT = to_newick.c concat.c
 
@@ -40,3 +41,7 @@ nw_bipart_LDADD = @LEXLIB@
 nw_ed_SOURCES = $(NW_CORE) $(NW_OUT) address_scanner.l address_parser.y \
 	tree_editor.c enode.c
 nw_ed_LDADD = @LEXLIB@ -lm
+
+nw_topology_SOURCES = $(NW_CORE) $(NW_OUT) topology.c
+nw_topology_LDADD = @LEXLIB@
+

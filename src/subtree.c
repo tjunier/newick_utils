@@ -15,6 +15,7 @@
 
 struct parameters {
 	struct llist *labels;
+	int monophyletic;
 };
 
 struct parameters get_params(int argc, char *argv[])
@@ -22,25 +23,18 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	/* TODO: uncomment this when we add switches and options */
-	/* parse options and switches */
-	/*
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "dw:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "m")) != -1) {
 		switch (opt_char) {
-		case 'w':
-			params.width = strtod(optarg, NULL);
-			if (0 == params.width) {
-				fprintf(stderr,
-			"Argument to -w must be a positive integer.\n");
-				exit(EXIT_FAILURE);
-			}
+		case 'm':
+			params.monophyletic = 1;
 			break;
-		case 'd':
-			params.debug = 1;
+		default:
+			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
+			exit(EXIT_FAILURE);
+			break; /* ok, not very useful... but I might later decide to ignore the bad option rather than fail. */
 		}
 	}
-	*/
 
 	/* check arguments */
 	if ((argc - optind) >= 2)	{
