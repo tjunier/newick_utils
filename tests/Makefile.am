@@ -3,6 +3,7 @@ AM_CFLAGS = -I ../src
 TESTS = test_rnode test_redge test_list test_link \
 	test_canvas test_concat test_hash test_lca test_enode \
 	test_nodemap test_to_newick test_tree test_node_set \
+	test_rnode_iterator \
 	test_nw_reroot.sh test_nw_rename.sh test_nw_collapse.sh \
 	test_nw_display.sh test_nw_indent.sh test_nw_bipart.sh \
 	test_nw_ed.sh test_nw_topology.sh test_nw_clade.sh
@@ -10,7 +11,7 @@ TESTS = test_rnode test_redge test_list test_link \
 check_PROGRAMS = test_rnode test_redge test_list test_link \
 		 test_canvas test_concat test_hash test_lca \
 		 test_nodemap test_to_newick test_tree test_node_set \
-		 test_enode
+		 test_enode test_rnode_iterator
 
 SRC = $(top_builddir)/src
 
@@ -51,3 +52,5 @@ test_node_set_SOURCES = test_node_set.c tree_stubs.c $(SRC)/node_set.c \
 
 test_enode_SOURCES = test_enode.c $(SRC)/enode.c $(SRC)/rnode.c \
 	$(SRC)/link.c $(SRC)/list.c $(SRC)/redge.c 
+
+test_rnode_iterator_SOURCES = test_rnode_iterator.c $(SRC)/rnode_iterator.c 
