@@ -7,6 +7,7 @@
 #include "tree.h"
 #include "parser.h"
 #include "nodemap.h"
+#include "hash.h"
 #include "to_newick.h"
 #include "list.h"
 #include "lca.h"
@@ -65,7 +66,7 @@ struct parameters get_params(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
-	struct node_map *map;
+	struct hash *map;
 	struct rnode *subtree_root;
 	struct parameters params;
 	struct llist *descendants;
@@ -78,7 +79,7 @@ int main(int argc, char *argv[])
 	descendants = create_llist();
 	for (el = params.labels->head; NULL != el; el = el->next) {
 		struct rnode *desc;
-		desc = get_node_with_label(map, (char *) el->data);
+		desc = hash_get(map, (char *) el->data);
 		if (NULL == desc) {
 			fprintf (stderr, "WARNING: label '%s' does not occur in tree\n",
 					(char *) el->data);
@@ -89,6 +90,8 @@ int main(int argc, char *argv[])
 	subtree_root = lca(tree, descendants);
 	if (NULL != subtree_root)
 		printf ("%s\n", to_newick(subtree_root));
+
+	destroy_llist(params.labels);
 
 	return 0;
 }

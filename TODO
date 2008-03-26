@@ -4,6 +4,8 @@ list that is apparently not correctly terminated, i.e. l->count == 1 but
 l->head->next is not NULL as it should be. I'm not sure exactly when this
 occurs yet (destroy_llist() is used frequently).
 
+Use a struct hash instead of a struct node_map. Eventually remove nodemap.[ch]
+
 Valgrind nw_clade
 
 Add functionality for monophyly in nw_clade. This means that we'll have to be

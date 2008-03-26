@@ -11,6 +11,7 @@
 #include "list.h"
 #include "lca.h"
 #include "rnode.h"
+#include "hash.h"
 
 /* return values for reroot() */
 
@@ -73,7 +74,7 @@ struct parameters get_params(int argc, char *argv[])
 
 struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels)
 {
-	struct node_map *map;
+	struct hash *map;
 	struct llist *outgroup_nodes;
 	struct list_elem *el;
 
@@ -81,7 +82,7 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 	outgroup_nodes = create_llist();
 	for (el = labels->head; NULL != el; el = el->next) {
 		struct rnode *desc;
-		desc = get_node_with_label(map, (char *) el->data);
+		desc = hash_get(map, (char *) el->data);
 		if (NULL == desc) {
 			fprintf (stderr, "WARNING: label '%s' does not occur in tree\n",
 					(char *) el->data);

@@ -4,6 +4,7 @@
 #include "nodemap.h"
 #include "rnode.h"
 #include "list.h"
+#include "hash.h"
 
 int test_create_and_retrieve()
 {
@@ -11,7 +12,7 @@ int test_create_and_retrieve()
 
 	struct rnode *n1, *n2, *n3;
 	struct llist *node_list;
-	struct node_map *map;
+	struct hash *map;
 
 	n1 = create_rnode("n1");
 	n2 = create_rnode("n2");
@@ -26,24 +27,24 @@ int test_create_and_retrieve()
 		printf ("%s: map must not be NULL.\n", test_name);
 		return 1;
 	}
-	if (NULL != get_node_with_label(map, "not there")) {
+	if (NULL != hash_get(map, "not there")) {
 		printf ("%s: inexistent label should return NULL.\n",
 				test_name);
 		return 1;
 	}
-	if (n1 != get_node_with_label(map, "n1")) {
+	if (n1 != hash_get(map, "n1")) {
 		printf ("%s: node with label 'n1' should be %p, not %p.\n",
-			test_name, n1, get_node_with_label(map, "n1")); 
+			test_name, n1, hash_get(map, "n1")); 
 		return 1;
 	}
-	if (n2 != get_node_with_label(map, "n2")) {
+	if (n2 != hash_get(map, "n2")) {
 		printf ("%s: node with label 'n2' should be %p, not %p.\n",
-			test_name, n2, get_node_with_label(map, "n2")); 
+			test_name, n2, hash_get(map, "n2")); 
 		return 1;
 	}
-	if (n3 != get_node_with_label(map, "n3")) {
+	if (n3 != hash_get(map, "n3")) {
 		printf ("%s: node with label 'n3' should be %p, not %p.\n",
-			test_name, n3, get_node_with_label(map, "n3")); 
+			test_name, n3, hash_get(map, "n3")); 
 		return 1;
 	}
 

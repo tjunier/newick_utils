@@ -8,6 +8,7 @@
 #include "nodemap.h"
 #include "list.h"
 #include "tree.h"
+#include "hash.h"
 
 int test_lca2()
 {
@@ -16,19 +17,19 @@ int test_lca2()
 	struct rooted_tree tree;
 	struct rnode *lca, *desc_A, *desc_B, *desc_C, *desc_D, *desc_E;
 	struct rnode *desc_f, *desc_g, *desc_h, *desc_i;
-	struct node_map *map;
+	struct hash *map;
 
 	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
 	map = create_node_map(tree.nodes_in_order);
-	desc_A = get_node_with_label(map, "A");
-	desc_B = get_node_with_label(map, "B");
-	desc_C = get_node_with_label(map, "C");
-	desc_D = get_node_with_label(map, "D");
-	desc_E = get_node_with_label(map, "E");
-	desc_f = get_node_with_label(map, "f");
-	desc_g = get_node_with_label(map, "g");
-	desc_h = get_node_with_label(map, "h");
-	desc_i = get_node_with_label(map, "i");
+	desc_A = hash_get(map, "A");
+	desc_B = hash_get(map, "B");
+	desc_C = hash_get(map, "C");
+	desc_D = hash_get(map, "D");
+	desc_E = hash_get(map, "E");
+	desc_f = hash_get(map, "f");
+	desc_g = hash_get(map, "g");
+	desc_h = hash_get(map, "h");
+	desc_i = hash_get(map, "i");
 
 	lca = lca2(&tree, desc_A, desc_B);
 	if (desc_f != lca) {
@@ -85,20 +86,20 @@ int test_lca()
 	struct rnode *ancestor, *desc_A, *desc_B;
 	struct rnode *desc_C, *desc_D, *desc_E;
 	struct rnode *desc_f, *desc_g, *desc_h, *desc_i;
-	struct node_map *map;
+	struct hash *map;
 	struct llist *descendants;
 
 	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
 	map = create_node_map(tree.nodes_in_order);
-	desc_A = get_node_with_label(map, "A");
-	desc_B = get_node_with_label(map, "B");
-	desc_C = get_node_with_label(map, "C");
-	desc_D = get_node_with_label(map, "D");
-	desc_E = get_node_with_label(map, "E");
-	desc_f = get_node_with_label(map, "f");
-	desc_g = get_node_with_label(map, "g");
-	desc_h = get_node_with_label(map, "h");
-	desc_i = get_node_with_label(map, "i");
+	desc_A = hash_get(map, "A");
+	desc_B = hash_get(map, "B");
+	desc_C = hash_get(map, "C");
+	desc_D = hash_get(map, "D");
+	desc_E = hash_get(map, "E");
+	desc_f = hash_get(map, "f");
+	desc_g = hash_get(map, "g");
+	desc_h = hash_get(map, "h");
+	desc_i = hash_get(map, "i");
 
 	descendants = create_llist();
 	append_element(descendants, desc_A);
