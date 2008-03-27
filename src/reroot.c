@@ -167,7 +167,10 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			 * that are NOT in the outgroup. */
 			struct llist *ingroup_leaves;
 			ingroup_leaves = get_ingroup_leaves(tree, params.labels);
-			reroot(tree, ingroup_leaves);
+			result = reroot(tree, ingroup_leaves);
+			if (LCA_IS_TREE_ROOT == result) {
+				fprintf (stderr, "LCA is still tree's root - be sure to include ALL ougroup leaves with -l");
+			}
 			destroy_llist(ingroup_leaves);
 		}
 		else {
