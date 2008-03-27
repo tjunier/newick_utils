@@ -4,6 +4,10 @@ list that is apparently not correctly terminated, i.e. l->count == 1 but
 l->head->next is not NULL as it should be. I'm not sure exactly when this
 occurs yet (destroy_llist() is used frequently).
 
+bug in nw_reroot: try nw_reroot -l data/reroot_l_prob.nw
+CL-CAUBET22_3DCL-1243049_3D. It should work, or at least print a message. WAIT
+- might be due to the '-' in the name.
+
 Use a struct hash instead of a struct node_map. Eventually remove nodemap.[ch]
 
 Valgrind nw_clade
