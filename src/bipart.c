@@ -25,6 +25,7 @@ static int num_leaves;
 struct parameters {
 	char * target_tree_filename;
 	int show_label_numbers;
+	int use_percent;
 };
 
 struct parameters get_params(int argc, char *argv[])
@@ -33,13 +34,16 @@ struct parameters get_params(int argc, char *argv[])
 	char opt_char;
 
 	params.show_label_numbers = 0;
+	params.use_percent = 0;
 
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "l")) != -1) {
+	while ((opt_char = getopt(argc, argv, "lp")) != -1) {
 		switch (opt_char) {
 		case 'l':
 			params.show_label_numbers = 1;
 			break;
+		case 'p':
+			params.use_percent = 1;
 		}
 	}
 	/* check arguments */
@@ -224,7 +228,11 @@ struct rooted_tree *parse_target_tree(const char *tgt_fn)
 	return tree;
 }
 
-void attribute_support_to_target_tree(struct rooted_tree *tree)
+/* Attributes support values to inner nodes. Argument is the tree, and the
+ * number of replicates. If this number is > 0, the counts will be expressed as
+ * percentages of it. Otherwise, the counts will be absolute. */
+
+void attribute_support_to_target_tree(struct rooted_tree *tree, int rep_count)
 {
 	/* TODO: use log10(number of biparts) instead of MAX_COUNT_LENGTH */
 	static const int MAX_COUNT_LENGTH = 4;	/* up to 9999, should be enough */
@@ -257,7 +265,11 @@ void attribute_support_to_target_tree(struct rooted_tree *tree)
 				exit(EXIT_FAILURE);
 			}
 			free(current->label);
-			sprintf (lbl, "%d", count);
+			if (rep_count > 0) {
+				sprintf (lbl, "%d", 100 * count / rep_count);
+			} else {
+				sprintf (lbl, "%d", count);
+			}
 			current->label = lbl;
 			free(node_set_string);
 		}
@@ -270,12 +282,18 @@ int main(int argc, char *argv[])
 	struct rooted_tree *tree;	
 	struct parameters params = get_params(argc, argv);
 	
+	/* Builds the bipartition counts hash, and counts the number of
+	 * replicates. */
+	int rep_count = 0;
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree);
+		rep_count++;
 	}
 
+	if (! params.use_percent) { rep_count = 0; }
+
 	tree = parse_target_tree(params.target_tree_filename);
-	attribute_support_to_target_tree(tree);
+	attribute_support_to_target_tree(tree, rep_count);
 	char *newick = to_newick(tree->root);
 	printf ("%s\n", newick);
 	free(newick);
