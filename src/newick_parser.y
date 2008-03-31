@@ -145,6 +145,14 @@ leaf: LABEL {
 		set_parent_edge(np, ep);
 		$$ = ep;
 	}
+    | COLON LABEL {
+	}
+    | /* empty */ {
+		struct redge *ep = create_redge(NULL);
+		struct rnode *np = create_rnode("");
+		set_parent_edge(np, ep);
+		$$ = ep;
+	}
     ;
 
 %%

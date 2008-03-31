@@ -85,6 +85,12 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				label[0] = '\0';
 			}
 		}
+		if (! params.show_leaf_labels) {
+			if (is_leaf(current)) {
+				char *label = current->label;
+				label[0] = '\0';
+			}
+		}
 	}
 }
 
