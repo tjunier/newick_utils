@@ -66,6 +66,8 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+void dump_label(void * arg) {}
+
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct hash *map;
@@ -96,6 +98,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 
 	if (params.check_monophyly) {
 		struct hash *leaf_map = get_leaf_label_map(subtree_root);
+		dump_hash(leaf_map, dump_label);
 		if (leaf_map->count != descendants->count) {
 			return;
 		}
@@ -121,7 +124,7 @@ int main(int argc, char *argv[])
 	
 	params = get_params(argc, argv);
 
-	while (tree = parse_tree()) {
+	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params);
 		destroy_tree_except_data(tree);
 	}
