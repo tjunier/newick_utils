@@ -15,6 +15,7 @@ static const int INIT_HASH_SIZE = 1000;
 
 struct rnode_iterator
 {
+	struct rnode *root;	/* starting point */
 	struct rnode *current;
 	struct hash *seen;
 };
@@ -28,7 +29,7 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 		exit(EXIT_FAILURE);
 	}
 
-	iter->current = root;
+	iter->root = iter->current = root;
 	iter->seen = create_hash(INIT_HASH_SIZE);
 
 	return iter;
@@ -83,7 +84,7 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 			return iter->current;
 		} else {
 			hash_set(iter->seen, current_node_hash_key, SEEN);
-			if (is_root(iter->current)) {
+			if (iter->current == iter->root) {
 				return NULL;
 			} else {
 				iter->current=iter->current->parent_edge->parent_node;

@@ -53,7 +53,7 @@ void * lca2w(void *a, void *b)
 }
 
 /* Returns the LCA of any number of nodes, by applying lca2 to a
- * list of descendants. */
+ * list of descendants. THIS USES UP THE LIST!*/
 
 struct rnode *lca (struct rooted_tree *tree,
 		struct llist *descendants)

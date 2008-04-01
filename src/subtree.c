@@ -11,12 +11,13 @@
 #include "to_newick.h"
 #include "list.h"
 #include "lca.h"
+#include "rnode_iterator.h"
 
 /* only one param for now, but who knows? */
 
 struct parameters {
 	struct llist *labels;
-	int monophyletic;
+	int check_monophyly;
 };
 
 struct parameters get_params(int argc, char *argv[])
@@ -24,11 +25,13 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
+	params.check_monophyly = 0;
+
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "m")) != -1) {
 		switch (opt_char) {
 		case 'm':
-			params.monophyletic = 1;
+			params.check_monophyly = 1;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -63,20 +66,13 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-int main(int argc, char *argv[])
+void process_tree(struct rooted_tree *tree, struct parameters params)
 {
-	struct rooted_tree *tree;	
 	struct hash *map;
-	struct rnode *subtree_root;
-	struct parameters params;
-	struct llist *descendants;
 	struct list_elem *el;
-	
-	params = get_params(argc, argv);
 
-	tree = parse_tree();
 	map = create_node_map(tree->nodes_in_order);	
-	descendants = create_llist();
+	struct llist *descendants = create_llist();
 	for (el = params.labels->head; NULL != el; el = el->next) {
 		struct rnode *desc;
 		desc = hash_get(map, (char *) el->data);
@@ -87,9 +83,40 @@ int main(int argc, char *argv[])
 			append_element(descendants, desc);
 		}
 	}
-	subtree_root = lca(tree, descendants);
-	if (NULL != subtree_root)
-		printf ("%s\n", to_newick(subtree_root));
+	int valid_desc_count = descendants->count; /* list gets modified by lca() */
+	struct rnode *subtree_root = lca(tree, descendants);
+
+	if (NULL == subtree_root) {
+		fprintf (stderr, "WARNING: LCA not found\n");
+		return;
+	}
+
+	if (params.check_monophyly) {
+		struct hash *leaf_map = get_leaf_label_map(subtree_root);
+		if (leaf_map->count != valid_desc_count) {
+			return;
+		}
+		for (el = descendants->head; NULL != el; el = el->next) {
+			if (NULL == hash_get(leaf_map, (char *) el->data)) {
+				return;
+			}
+		}
+	}
+
+	/* monophyly of input labels is verified or not requested */
+	printf ("%s\n", to_newick(subtree_root));
+}
+
+int main(int argc, char *argv[])
+{
+	struct rooted_tree *tree;	
+	struct parameters params;
+	
+	params = get_params(argc, argv);
+
+	while (tree = parse_tree()) {
+		process_tree(tree, params);
+	}
 
 	destroy_llist(params.labels);
 

@@ -9,6 +9,7 @@
 #include "tree.h"
 #include "nodemap.h"
 #include "to_newick.h"
+#include "hash.h"
 
 int test_add_child_edge()
 {
