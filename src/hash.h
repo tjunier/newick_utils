@@ -4,7 +4,8 @@ struct llist;
 
 struct hash {
 	struct llist **bins;
-	int size;
+	int size;	/* the number of bins */
+	int count;	/* the number of data elements - initially 0 */
 };
 
 struct key_val_pair {
@@ -16,7 +17,7 @@ struct key_val_pair {
 
 struct hash * create_hash(int n);
 
-/* Inserts a (key, value) pair into a hash */
+/* Inserts a (key, value) pair into a hash. Increments count. */
 
 void hash_set(struct hash *, const char *key, void *value);
 

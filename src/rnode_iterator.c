@@ -7,6 +7,8 @@
 #include "rnode.h"
 #include "redge.h"
 
+#define _GNU_SOURCE	/* needed for asprintf() */
+
 #define SEEN "SEEN"
 
 static const int INIT_HASH_SIZE = 1000;
@@ -81,9 +83,53 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 			return iter->current;
 		} else {
 			hash_set(iter->seen, current_node_hash_key, SEEN);
-			iter->current=iter->current->parent_edge->parent_node;
-			return iter->current;
+			if (is_root(iter->current)) {
+				return NULL;
+			} else {
+				iter->current=iter->current->parent_edge->parent_node;
+				return iter->current;
+			}
 		}
 	}
 }
 
+struct llist *get_nodes_in_order(struct rnode *root)
+{
+	struct rnode_iterator *it = create_rnode_iterator(root);
+	struct hash *seen = create_hash(INIT_HASH_SIZE);
+	struct rnode *current;
+	struct llist *nodes_in_order = create_llist();
+	char *node_hash_key;
+
+       	node_hash_key = make_hash_key(root);
+	hash_set(seen, node_hash_key, SEEN);
+	prepend_element(nodes_in_order, root);
+	while ((current = rnode_iterator_next(it)) != NULL) {
+		char *node_hash_key = make_hash_key(current);
+		printf ("current node: %s\n", current->label);
+		if (NULL == hash_get(seen, node_hash_key)) {
+			printf ("appending %s\n", current->label);
+			prepend_element(nodes_in_order, current);
+			hash_set(seen, node_hash_key, SEEN);
+		}
+	}
+
+	return nodes_in_order;
+}
+
+struct hash *get_leaf_label_map(struct rnode *root)
+{
+	struct rnode_iterator *it = create_rnode_iterator(root);
+	struct rnode *current;
+	struct hash *result = create_hash(INIT_HASH_SIZE);
+
+	while ((current = rnode_iterator_next(it)) != NULL) {
+		if (is_leaf(current)) {
+			if (strcmp("", current->label) != 0) {
+				hash_set(result, current->label, current);
+			}
+		}
+	}
+
+	return result;
+}

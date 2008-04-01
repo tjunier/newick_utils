@@ -21,6 +21,12 @@ int test_simple()
 	hash_set(h, "one", test_value);
 	hash_set(h, "td1", &td1);
 
+	if (2 != h->count) {
+		printf ("%s: expected hash count to be 2, got %d.\n", test_name,
+				h->count);
+		return 1;
+	}
+
 	char *str = (char *) hash_get(h, "one");
 	if (0 != strcmp(str, test_value)) {
 		printf ("%s: expected %s, got %s.\n", test_name, test_value,
@@ -59,6 +65,11 @@ int test_keys()
 
 	struct llist *keys = hash_keys(h);
 
+	if (h->count != keys->count) {
+		printf ("%s: hash count and hash key count do not match.\n",
+				test_name);
+		return 1;
+	}
 	if (5 != keys->count) {
 		printf ("%s: expected 5 keys, got %d.\n", test_name, keys->count);
 		return 1;

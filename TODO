@@ -1,16 +1,3 @@
-[done] nw_ed has problems when deleting a node (try valgrind nw_ed
-data/HRV_bs.nw 'i & b == 13' d). The illegal write happens when destroying a
-list that is apparently not correctly terminated, i.e. l->count == 1 but
-l->head->next is not NULL as it should be. I'm not sure exactly when this
-occurs yet (destroy_llist() is used frequently).
-
-[done] bug in nw_reroot: try nw_reroot -l data/reroot_l_prob.nw
-CL-CAUBET22_3DCL-1243049_3D. It should work, or at least print a message.  
-
-Add an option (-p) to nw_bipart so it prints out percentages instead of
-absolute frequencies. 
-
-Use a struct hash instead of a struct node_map. Eventually remove nodemap.[ch]
 
 Valgrind nw_clade
 
@@ -21,12 +8,26 @@ depth-first traversal of the tree, given a root. This may also be used for
 creating a struct rooted_tree (rather than just a root node): the depth-first
 traversal can be used to generate an ordered nodes list.
 
-Although a tree without labels like '((,),);' is valid Newick, the parser
-rejects it.
-
 SVG for nw_display. The concept of color maps for LCA's (cf Ruby version)
 should be integrated from the start.
 
 nw_ed should be able to visit the tree in reverse order, and to flag nodes for
 no further processing (if they meet the condition or if their parent is
 flagged), like in the Ruby version.
+
+[done] Although a tree without labels like '((,),);' is valid Newick, the parser
+rejects it.
+
+[done] nw_ed has problems when deleting a node (try valgrind nw_ed
+data/HRV_bs.nw 'i & b == 13' d). The illegal write happens when destroying a
+list that is apparently not correctly terminated, i.e. l->count == 1 but
+l->head->next is not NULL as it should be. I'm not sure exactly when this
+occurs yet (destroy_llist() is used frequently).
+
+[done] bug in nw_reroot: try nw_reroot -l data/reroot_l_prob.nw
+CL-CAUBET22_3DCL-1243049_3D. It should work, or at least print a message.  
+
+[done] Add an option (-p) to nw_bipart so it prints out percentages instead of
+absolute frequencies. 
+
+[done] Use a struct hash instead of a struct node_map. Eventually remove nodemap.[ch]

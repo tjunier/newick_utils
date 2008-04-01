@@ -73,6 +73,7 @@ void hash_set(struct hash *h, const char *key, void *value)
 	kvp->value = value;
 
 	append_element(bin, kvp);
+	h->count++;
 }
 
 void *hash_get(struct hash *h, const char *key)
