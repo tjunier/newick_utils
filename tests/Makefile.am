@@ -53,4 +53,6 @@ test_node_set_SOURCES = test_node_set.c tree_stubs.c $(SRC)/node_set.c \
 test_enode_SOURCES = test_enode.c $(SRC)/enode.c $(SRC)/rnode.c \
 	$(SRC)/link.c $(SRC)/list.c $(SRC)/redge.c 
 
-test_rnode_iterator_SOURCES = test_rnode_iterator.c $(SRC)/rnode_iterator.c 
+test_rnode_iterator_SOURCES = test_rnode_iterator.c $(SRC)/rnode_iterator.c \
+       	$(SRC)/list.c $(SRC)/link.c $(SRC)/rnode.c $(SRC)/redge.c \
+       	$(SRC)/hash.c $(SRC)/nodemap.c tree_stubs.c	
