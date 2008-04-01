@@ -83,8 +83,11 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			append_element(descendants, desc);
 		}
 	}
-	int valid_desc_count = descendants->count; /* list gets modified by lca() */
-	struct rnode *subtree_root = lca(tree, descendants);
+	destroy_hash(map);
+
+	struct llist *desc_clone = shallow_copy(descendants);
+	struct rnode *subtree_root = lca(tree, desc_clone);
+	free(desc_clone); /* elems freed in lca() */
 
 	if (NULL == subtree_root) {
 		fprintf (stderr, "WARNING: LCA not found\n");
@@ -93,18 +96,22 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 
 	if (params.check_monophyly) {
 		struct hash *leaf_map = get_leaf_label_map(subtree_root);
-		if (leaf_map->count != valid_desc_count) {
+		if (leaf_map->count != descendants->count) {
 			return;
 		}
 		for (el = descendants->head; NULL != el; el = el->next) {
+			printf ("key: %s\n", (char *) el->data);
 			if (NULL == hash_get(leaf_map, (char *) el->data)) {
 				return;
 			}
 		}
 	}
+	destroy_llist(descendants);
 
 	/* monophyly of input labels is verified or not requested */
-	printf ("%s\n", to_newick(subtree_root));
+	char *newick = to_newick(subtree_root);
+	printf ("%s\n", newick);
+	free(newick);
 }
 
 int main(int argc, char *argv[])
@@ -116,6 +123,7 @@ int main(int argc, char *argv[])
 
 	while (tree = parse_tree()) {
 		process_tree(tree, params);
+		destroy_tree_except_data(tree);
 	}
 
 	destroy_llist(params.labels);

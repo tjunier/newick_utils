@@ -1,13 +1,6 @@
 
 Valgrind nw_clade
 
-Add functionality for monophyly in nw_clade. This means that we'll have to be
-able to list the (leaf) descendants of an LCA, and compare this set to the list
-of labels passed as arguments on the command line. For this, I'll implement a
-depth-first traversal of the tree, given a root. This may also be used for
-creating a struct rooted_tree (rather than just a root node): the depth-first
-traversal can be used to generate an ordered nodes list.
-
 SVG for nw_display. The concept of color maps for LCA's (cf Ruby version)
 should be integrated from the start.
 
@@ -31,3 +24,10 @@ CL-CAUBET22_3DCL-1243049_3D. It should work, or at least print a message.
 absolute frequencies. 
 
 [done] Use a struct hash instead of a struct node_map. Eventually remove nodemap.[ch]
+
+[done] Add functionality for monophyly in nw_clade. This means that we'll have to be
+able to list the (leaf) descendants of an LCA, and compare this set to the list
+of labels passed as arguments on the command line. For this, I'll implement a
+depth-first traversal of the tree, given a root. This may also be used for
+creating a struct rooted_tree (rather than just a root node): the depth-first
+traversal can be used to generate an ordered nodes list.

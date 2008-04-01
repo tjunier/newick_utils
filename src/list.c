@@ -96,8 +96,11 @@ void *shift(struct llist *list)
 	result = list->head;
 	list->head = list->head->next;
 	list->count -= 1;
+	
+	void *data = result->data;
+	free(result);
 
-	return result->data;
+	return data;
 }
 
 void *reduce(struct llist *list, void* (*func)(void *, void*))
