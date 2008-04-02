@@ -12,6 +12,7 @@
 #include "list.h"
 #include "lca.h"
 #include "rnode_iterator.h"
+#include "rnode.h"
 
 /* only one param for now, but who knows? */
 
@@ -66,7 +67,27 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-void dump_label(void * arg) {}
+int is_monophyletic(struct llist *descendants, struct rnode *subtree_root)
+{
+	int result = 1;
+
+	struct hash *leaf_map = get_leaf_label_map(subtree_root);
+	if (leaf_map->count != descendants->count) {
+		result = 0;
+	}
+	struct list_elem *el;
+	for (el = descendants->head; NULL != el; el = el->next) {
+		char *label = ((struct rnode *) el->data)->label;
+		if (NULL == hash_get(leaf_map, label)) {
+			result = 0;
+			break;
+		}
+	}
+
+	destroy_hash(leaf_map);
+
+	return result;
+}
 
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
@@ -91,30 +112,20 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct rnode *subtree_root = lca(tree, desc_clone);
 	free(desc_clone); /* elems freed in lca() */
 
-	if (NULL == subtree_root) {
+	if (NULL != subtree_root) {
+		if ((! params.check_monophyly) ||
+		    (is_monophyletic(descendants, subtree_root))) {
+			/* monophyly of input labels is verified or not requested */
+			char *newick = to_newick(subtree_root);
+			printf ("%s\n", newick);
+			free(newick);
+		}
+	} else {
 		fprintf (stderr, "WARNING: LCA not found\n");
-		return;
 	}
 
-	if (params.check_monophyly) {
-		struct hash *leaf_map = get_leaf_label_map(subtree_root);
-		dump_hash(leaf_map, dump_label);
-		if (leaf_map->count != descendants->count) {
-			return;
-		}
-		for (el = descendants->head; NULL != el; el = el->next) {
-			printf ("key: %s\n", (char *) el->data);
-			if (NULL == hash_get(leaf_map, (char *) el->data)) {
-				return;
-			}
-		}
-	}
 	destroy_llist(descendants);
 
-	/* monophyly of input labels is verified or not requested */
-	char *newick = to_newick(subtree_root);
-	printf ("%s\n", newick);
-	free(newick);
 }
 
 int main(int argc, char *argv[])

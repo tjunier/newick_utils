@@ -1,5 +1,8 @@
 
-Valgrind nw_clade
+nw_labels: output labels, in columns or on a line, in parse order. Options for
+omitting leaves or inners.
+
+nw_distance: output distances from root or LCA as a table, or between leaves as a matrix.
 
 SVG for nw_display. The concept of color maps for LCA's (cf Ruby version)
 should be integrated from the start.
@@ -7,6 +10,8 @@ should be integrated from the start.
 nw_ed should be able to visit the tree in reverse order, and to flag nodes for
 no further processing (if they meet the condition or if their parent is
 flagged), like in the Ruby version.
+
+[done] Valgrind nw_clade
 
 [done] Although a tree without labels like '((,),);' is valid Newick, the parser
 rejects it.

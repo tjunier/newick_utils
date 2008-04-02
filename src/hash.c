@@ -32,7 +32,7 @@ struct hash *create_hash(int n)
 	for (i = 0; i < n; i++) {
 		(h->bins)[i] = create_llist();
 	}
-
+	h->count = 0; 	/* no key-value paits yet */
 	return h;
 }
 
@@ -97,18 +97,21 @@ void dump_hash(struct hash *h, void (*dump_func)())
 {
 	int i;
 
-	printf ("Dump of hash at %p: (%d bins):\n", h, h->size);
+	printf ("Dump of hash at %p: (%d bins, %d pairs):\n", h, h->size,
+			h->count);
 	for (i = 0; i < h->size; i++) {
 		struct list_elem *el = h->bins[i]->head;
 		if (NULL == el) continue;
-		printf ("Hash code: %d\n", i);
+		printf ("Hash code: %d (%d pairs)\n", i, h->bins[i]->count);
 		for (; NULL != el; el = el->next) {
 			struct key_val_pair *kp;
 			kp = (struct key_val_pair *) el->data;
 			printf("key: %s\n", kp->key);
-			dump_func(kp->value);
+			if (NULL != dump_func) dump_func(kp->value);
 		}
 	}	
+
+	printf ("Dump done.\n");
 }
 
 struct llist *hash_keys(struct hash *h)

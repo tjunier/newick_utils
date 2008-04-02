@@ -35,6 +35,12 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 	return iter;
 }
 
+void destroy_rnode_iterator (struct rnode_iterator *it)
+{
+	destroy_hash(it->seen);
+	free(it);
+}
+
 /* Returns a unique string for the node, suitable for a hash key. */
 
 static char * make_hash_key(struct rnode *node)
@@ -75,15 +81,18 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	if (is_leaf(iter->current)) {
 		hash_set(iter->seen, current_node_hash_key, SEEN);
 		iter->current = iter->current->parent_edge->parent_node;
+		free(current_node_hash_key);
 		return iter->current;
 	} else {
 		struct rnode *next_child = get_next_unvisited_child(iter);
 		if (NULL != next_child) {
 			/* proceed to next child */
 			iter->current = next_child;
+			free(current_node_hash_key);
 			return iter->current;
 		} else {
 			hash_set(iter->seen, current_node_hash_key, SEEN);
+			free(current_node_hash_key);
 			if (iter->current == iter->root) {
 				return NULL;
 			} else {
@@ -131,6 +140,8 @@ struct hash *get_leaf_label_map(struct rnode *root)
 			}
 		}
 	}
+
+	destroy_rnode_iterator(it);
 
 	return result;
 }

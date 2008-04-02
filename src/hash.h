@@ -25,10 +25,10 @@ void hash_set(struct hash *, const char *key, void *value);
 
 void *hash_get(struct hash *, const char *key);
 
-/* Dumps a hash on stdout. Hash bins will be dumped via dump_llist(), which
- * will be passed dump_func to dump the list contents. */
+/* Dumps a hash on stdout. if 'dump_func' is not NULL, it will be used to
+ * display the value of each key-value pair. */
 
-void dump_hash(struct hash *, void (*)());
+void dump_hash(struct hash *, void (*dump_func)());
 
 /* Returns a struct llist* with all hash keys. Order is not specified. */
 
