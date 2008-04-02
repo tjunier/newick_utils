@@ -1,4 +1,5 @@
 %{
+#include <string.h>
 
 int indent_level = 0;
 char *indent_string;

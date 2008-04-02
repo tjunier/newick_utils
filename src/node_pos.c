@@ -1,5 +1,7 @@
 /* text_graph.c - functions for drawing trees on a text canvas. */
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "redge.h"
 #include "rnode.h"

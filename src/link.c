@@ -129,7 +129,6 @@ void splice_out_rnode(struct rnode *this)
 
 	for (elem = this->children->head; NULL != elem; elem = elem->next) {
 		struct redge *child_edge = (struct redge *) elem->data;
-		struct rnode *child = child_edge->child_node;
 		char *new_edge_len_s = add_len_strings(
 			parent_edge->length_as_string,
 			child_edge->length_as_string);
@@ -178,7 +177,6 @@ struct rnode * unlink_node(struct rnode *node)
 	struct redge *parent_edge = node->parent_edge;
 	struct rnode *parent = parent_edge->parent_node;
 	struct llist *siblings = parent->children; 	/* includes 'node'! */
-	struct list_elem *el;
 	int index = llist_index_of(siblings, parent_edge);
 	struct llist *del = delete_after(siblings, index-1, 1);
 	destroy_llist(del);

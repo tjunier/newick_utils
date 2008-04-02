@@ -15,7 +15,7 @@
 
 void nwserror(char *s)
 {
-	printf ("goof!\n");
+	printf ("Parse error: %s\n", s);
 }
 
 extern struct llist *nodes_in_order;
