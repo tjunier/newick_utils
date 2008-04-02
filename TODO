@@ -1,4 +1,11 @@
 
+Add functionality for directly counting a bipartition from a set of replicates.
+This would look like: $ nw_bipart <reps> leaf1 ... leafn where a bipartition
+will be computed from the leaf labels, and its frequency printed out as output.
+
+Although a tree without labels like '((,),);' is valid Newick, the parser
+rejects it.
+
 nw_labels: output labels, in columns or on a line, in parse order. Options for
 omitting leaves or inners.
 
@@ -25,9 +32,6 @@ occurs yet (destroy_llist() is used frequently).
 [done] bug in nw_reroot: try nw_reroot -l data/reroot_l_prob.nw
 CL-CAUBET22_3DCL-1243049_3D. It should work, or at least print a message.  
 
-[done] Add an option (-p) to nw_bipart so it prints out percentages instead of
-absolute frequencies. 
-
 [done] Use a struct hash instead of a struct node_map. Eventually remove nodemap.[ch]
 
 [done] Add functionality for monophyly in nw_clade. This means that we'll have to be
@@ -36,3 +40,6 @@ of labels passed as arguments on the command line. For this, I'll implement a
 depth-first traversal of the tree, given a root. This may also be used for
 creating a struct rooted_tree (rather than just a root node): the depth-first
 traversal can be used to generate an ordered nodes list.
+
+[done] Add an option (-p) to nw_bipart so it prints out percentages instead of
+absolute frequencies. 
