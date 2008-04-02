@@ -146,6 +146,11 @@ leaf: LABEL {
 		$$ = ep;
 	}
     | COLON LABEL {
+		struct redge *ep = create_redge($2);
+		free($2);
+		struct rnode *np = create_rnode("");
+		set_parent_edge(np, ep);
+		$$ = ep;
 	}
     | /* empty */ {
 		struct redge *ep = create_redge(NULL);
