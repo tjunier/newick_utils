@@ -8,4 +8,5 @@ struct llist;
  * cause a crash, but may cause unexpected results as the "map" will not be
  * one-to-one. */
 
+/* TODO rename to create_label2node_map() */
 struct hash *create_node_map(const struct llist *);

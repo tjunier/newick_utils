@@ -10,6 +10,8 @@
 #include "hash.h"
 #include "list.h"
 #include "lca.h"
+#include "node_pos.h"
+#include "rnode.h"
 
 enum {FROM_ROOT, FROM_LCA, MATRIX};
 
@@ -67,9 +69,63 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+/* TODO: maybe this should be moved to lca.c, as it can be resued. */
+
+struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
+{
+	struct hash *node_map = create_node_map(tree->nodes_in_order);
+	struct llist *descendant_nodes = create_llist();
+	struct list_elem *el;
+
+	for (el = labels->head; NULL != el; el = el->next) {
+		char *label = (char *) el->data;
+		if (0 == strcmp("", label)) {
+			fprintf(stderr, "WARNING: empty label.\n");
+			continue;
+		}
+		struct rnode *desc = hash_get(node_map, label);
+		if (NULL == desc) {
+			fprintf(stderr, "WARNING: no node with label '%s'.\n",
+					label);
+			continue;
+		}
+		append_element(descendant_nodes, desc);
+	}
+
+	struct rnode *result = lca(tree, descendant_nodes);
+
+	destroy_hash(node_map);
+	destroy_llist(descendant_nodes);
+
+	return result;
+}
+
 void distance_list (struct rooted_tree *tree, struct rnode *origin,
 		struct parameters params)
 {
+	/* fill in length data*/
+	alloc_node_pos(tree);
+	set_node_depth(tree);
+
+	double origin_depth = ((struct node_pos *) origin->data)->depth;
+
+	struct hash *node_map = create_node_map(tree->nodes_in_order);
+	struct list_elem *el;
+	for (el = params.labels->head; NULL != el; el = el->next) {
+		char *label = (char *) el->data;
+		if (0 == strcmp("", label)) {
+			fprintf(stderr, "WARNING: empty label.\n");
+			continue;
+		}
+		struct rnode *node = hash_get(node_map, label);
+		if (NULL == node) {
+			fprintf(stderr, "WARNING: no node with label '%s'.\n",
+					label);
+			continue;
+		}
+		double node_depth = ((struct node_pos *) node->data)->depth;
+		printf ("%g\n", node_depth - origin_depth);
+	}
 }
 
 void distance_matrix (struct rooted_tree *tree, struct parameters params)
@@ -92,7 +148,7 @@ int main(int argc, char *argv[])
 			distance_list(tree, tree->root, params);
 			break;
 		case FROM_LCA:
-			// get lca
+			lca = lca_from_labels(tree, params.labels);
 			distance_list(tree, lca, params);
 			break;
 		case MATRIX:

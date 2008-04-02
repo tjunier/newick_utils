@@ -47,6 +47,7 @@ nw_ed_LDADD = @LEXLIB@ -lm
 nw_topology_SOURCES = $(NW_CORE) $(NW_OUT) topology.c
 nw_topology_LDADD = @LEXLIB@
 
-nw_distance_SOURCES = $(NW_CORE) distance.c
+nw_distance_SOURCES = $(NW_CORE) distance.c node_pos.c nodemap.c \
+		hash.c lca.c
 nw_distance_LDADD = @LEXLIB@
 
