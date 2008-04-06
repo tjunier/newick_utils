@@ -10,7 +10,7 @@
 
 struct parameters {
 	int width;
-	int debug;
+	int svg;
 };
 
 struct parameters get_params(int argc, char *argv[])
@@ -20,10 +20,10 @@ struct parameters get_params(int argc, char *argv[])
 
 	/* set defaults */
 	params.width = 80; 
-	params.debug = 0;
+	params.svg = 0;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "dw:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "sw:")) != -1) {
 		switch (opt_char) {
 		case 'w':
 			params.width = strtod(optarg, NULL);
@@ -33,8 +33,9 @@ struct parameters get_params(int argc, char *argv[])
 				exit(EXIT_FAILURE);
 			}
 			break;
-		case 'd':
-			params.debug = 1;
+		case 's':
+			params.svg = 1;
+			break;
 		}
 	}
 	/* check arguments */
@@ -63,6 +64,15 @@ int main(int argc, char *argv[])
 	struct parameters params;
 
 	params = get_params(argc, argv);
+
+	/* for now, SVG can only handle one tree */
+	if (params.svg) {
+		tree = parse_tree();
+		svg_header();
+		display_svg_tree(tree, params);
+		svg_footer();
+		exit(EXIT_SUCCESS);
+	}
 
 	while (NULL != (tree = parse_tree())) {
 		display_tree(tree, params.width);

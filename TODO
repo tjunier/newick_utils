@@ -3,9 +3,6 @@ Add functionality for directly counting a bipartition from a set of replicates.
 This would look like: $ nw_bipart <reps> leaf1 ... leafn where a bipartition
 will be computed from the leaf labels, and its frequency printed out as output.
 
-Although a tree without labels like '((,),);' is valid Newick, the parser
-rejects it.
-
 nw_labels: output labels, in columns or on a line, in parse order. Options for
 omitting leaves or inners.
 
