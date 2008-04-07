@@ -19,7 +19,7 @@ struct parameters get_params(int argc, char *argv[])
 	int opt_char;
 
 	/* set defaults */
-	params.width = 80; 
+	params.width = -1; 
 	params.svg = 0;
 	
 	/* parse options and switches */
@@ -37,6 +37,13 @@ struct parameters get_params(int argc, char *argv[])
 			params.svg = 1;
 			break;
 		}
+	}
+	/* if width not set, use default (depends on whether SVG or not) */
+	if (-1 == params.width) {
+		if (params.svg) 
+			params.width = 300;	/* pixels */
+		else
+			params.width = 80;	/* characters */
 	}
 	/* check arguments */
 	if (1 == (argc - optind))	{
