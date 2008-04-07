@@ -6,7 +6,7 @@
 
 #include "parser.h"
 #include "tree.h"
-#include "text_graph.h"
+#include "svg_graph.h"
 
 struct parameters {
 	int width;
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 	if (params.svg) {
 		tree = parse_tree();
 		svg_header();
-		display_svg_tree(tree, params);
+		display_svg_tree(tree, params.width);
 		svg_footer();
 		exit(EXIT_SUCCESS);
 	}

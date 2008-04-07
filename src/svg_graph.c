@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "tree.h"
 #include "list.h"
@@ -9,16 +10,18 @@
 #include "node_pos.h"
 #include "redge.h"
 
+const int ROOT_SPACE = 10;	/* pixels */
+const int LBL_SPACE = 10;	/* pixels */
 
 void svg_header()
 {
-	printf("<?xml version='1.0' standalone='no'?>
-	    <!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 
-		'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
-	    <svg width='100%%' height='100%%' version='1.1'
-		xmlns='http://www.w3.org/2000/svg'>");
-	printf("<g style='stroke:black;stroke-width:1;
-	    font-size:medium;font-weight:normal;font-family:sans'>");
+	printf( "<?xml version='1.0' standalone='no'?>"
+	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
+		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
+	printf( "<svg width='100%%' height='100%%' version='1.1' "
+		"xmlns='http://www.w3.org/2000/svg'>");
+	printf( "<g style='stroke:black;stroke-width:1;"
+	    	"font-size:medium;font-weight:normal;font-family:sans'>");
 }
 
 /* Prints the nodes to stdout, as SVG, in a <g> element. Assumes that the edges
@@ -33,24 +36,30 @@ void write_nodes_to_g (struct rooted_tree *tree, const double scale)
 		struct rnode *node = (struct rnode *) elem->data;
 		struct node_pos *pos = (struct node_pos *) node->data;
 		/* draw node */
-		canvas_draw_vline(canvas,
+		printf("<line x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				rint(ROOT_SPACE + (scale * pos->depth)),
 				rint(2*pos->top),
+				rint(ROOT_SPACE + (scale * pos->depth)),
 				rint(2*pos->bottom)
 			);
-		canvas_write(canvas,
+		printf("<text style='stroke:none;font-size:%s' x='%.4f y=%.4f'>%s</text>",
+				"medium",
 				rint(ROOT_SPACE + (scale * pos->depth) + LBL_SPACE), 
 				rint(pos->top+pos->bottom),
 				node->label
 				);
 		if (is_root(node)) {
-			canvas_write(canvas, 0, rint(pos->top+pos->bottom), "=");
+			printf("<line x1='0' y1='%.4f' x2='%.4f' y2='%.4f'/>",
+					rint(pos->top+pos->bottom),
+					rint(ROOT_SPACE + (scale * pos->depth)),
+					rint(pos->top+pos->bottom));
+
 		} else {
-			canvas_draw_hline(canvas,
-				 rint(pos->top + pos->bottom), /* (2*top + 2*bottom) / 2 */
+			printf ("<line x1='%.4f' y1='%.4f' x2='%.4f' y2 = '%.4f'/>",
 				 rint(ROOT_SPACE + scale * (pos->depth - node->parent_edge->length)),
-				 rint(ROOT_SPACE + scale * (pos->depth))
-			);
+				 rint(pos->top + pos->bottom), /* (2*top + 2*bottom) / 2 */
+				 rint(ROOT_SPACE + scale * (pos->depth)),
+				 rint(pos->top + pos->bottom));
 		}
 
 	}

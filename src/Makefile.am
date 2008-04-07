@@ -21,7 +21,7 @@ address_scanner.c: address_scanner.l
 	flex -oaddress_scanner.c address_scanner.l 
 
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
-		node_pos.c
+		node_pos.c svg_graph.c
 nw_display_LDADD = @LEXLIB@
 
 nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c nodemap.c hash.c \
