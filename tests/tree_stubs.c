@@ -246,3 +246,48 @@ struct rooted_tree tree_6()
 
 	return result;
 }
+
+/* A tree with some empty labels */
+/* ((A:1,:1.0)f:2.0,(C:1,(D:1,E:1):2)h:3)i; */
+struct rooted_tree tree_7()
+{
+	struct rnode *node_A, *node_B, *node_C, *node_D, *node_E;
+	struct rnode *node_f, *node_g, *node_h, *node_i;
+	struct llist *nodes_in_order;
+	struct rooted_tree result;
+	
+	node_A = create_rnode("A");
+	node_B = create_rnode("");
+	node_C = create_rnode("C");
+	node_D = create_rnode("D");
+	node_E = create_rnode("E");
+	node_f = create_rnode("f");
+	node_g = create_rnode("");
+	node_h = create_rnode("h");
+	node_i = create_rnode("i");
+
+	link_p2c(node_f, node_A, "1");
+	link_p2c(node_f, node_B, "1.0");
+	link_p2c(node_g, node_D, "1");
+	link_p2c(node_g, node_E, "1");
+	link_p2c(node_h, node_C, "1");
+	link_p2c(node_h, node_g, "2");
+	link_p2c(node_i, node_f, "2.0");
+	link_p2c(node_i, node_h, "3");
+
+	nodes_in_order = create_llist();
+	append_element(nodes_in_order, node_A);
+	append_element(nodes_in_order, node_B);
+	append_element(nodes_in_order, node_f);
+	append_element(nodes_in_order, node_C);
+	append_element(nodes_in_order, node_D);
+	append_element(nodes_in_order, node_E);
+	append_element(nodes_in_order, node_g);
+	append_element(nodes_in_order, node_h);
+	append_element(nodes_in_order, node_i);
+
+	result.root = node_i;
+	result.nodes_in_order = nodes_in_order;
+
+	return result;
+}

@@ -9,6 +9,7 @@
 #include "tree.h"
 #include "nodemap.h"
 #include "to_newick.h"
+#include "hash.h"
 
 
 int test_reroot()
@@ -16,7 +17,7 @@ int test_reroot()
 	const char *test_name = "test_reroot";
 	struct rooted_tree tree = tree_3();	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 	struct hash *map = create_node_map(tree.nodes_in_order);	
-	struct rnode *node_g = hash_get(map, "g");
+	struct rnode *node_g = (struct rnode *) hash_get(map, "g");
 	const char *exp = "((D:1,E:1)g:1,(C:1,(A:1,B:1.0)f:5)h:1);";
 
 	reroot_tree(&tree, node_g);
@@ -83,13 +84,100 @@ int test_leaf_count()
 	struct rooted_tree tree = tree_3();	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 
 	if (leaf_count(&tree) != 5) {
-		printf ("%s: leaf count should be 4, not %d\n", test_name,
+		printf ("%s: leaf count should be 5, not %d\n", test_name,
 				leaf_count(&tree));
 		return 1;
 	}
 
 	printf ("%s: ok.\n", test_name);
 	return 0;
+}
+
+int test_get_leaf_labels()
+{
+	const char *test_name = "test_get_leaf_labels";
+	struct rooted_tree tree = tree_7();	/* ((A:1,:1.0)f:2.0,(C:1,(D:1,E:1):2)h:3)i; */
+	struct llist *leaf_labels = get_leaf_labels(&tree);
+	struct list_elem *el = leaf_labels->head;
+	if (strcmp("A", (char *) el->data) != 0) {
+		printf ("%s: expected label 'A', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("C", (char *) el->data) != 0) {
+		printf ("%s: expected label 'C', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("D", (char *) el->data) != 0) {
+		printf ("%s: expected label 'D', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("E", (char *) el->data) != 0) {
+		printf ("%s: expected label 'E', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: expected end of list.\n", test_name);
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+
+}
+
+int test_get_labels()
+{
+	const char *test_name = "test_get_labels";
+	struct rooted_tree tree = tree_7();	/* ((A:1,:1.0)f:2.0,(C:1,(D:1,E:1):2)h:3)i; */
+	struct llist *labels = get_labels(&tree);
+	struct list_elem *el = labels->head;
+	if (strcmp("A", (char *) el->data) != 0) {
+		printf ("%s: expected label 'A', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("f", (char *) el->data) != 0) {
+		printf ("%s: expected label 'f', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("C", (char *) el->data) != 0) {
+		printf ("%s: expected label 'C', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("D", (char *) el->data) != 0) {
+		printf ("%s: expected label 'D', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("E", (char *) el->data) != 0) {
+		printf ("%s: expected label 'E', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("h", (char *) el->data) != 0) {
+		printf ("%s: expected label 'h', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("i", (char *) el->data) != 0) {
+		printf ("%s: expected label 'i', got '%s'.\n", test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: expected end of list.\n", test_name);
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+
 }
 
 int main()
@@ -100,6 +188,8 @@ int main()
 	failures += test_reroot_2();
 	failures += test_collapse_pure_clades();
 	failures += test_leaf_count();
+	failures += test_get_leaf_labels();
+	failures += test_get_labels();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

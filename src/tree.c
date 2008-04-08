@@ -165,3 +165,32 @@ int leaf_count(struct rooted_tree * tree)
 
 	return n;
 }
+
+struct llist *get_leaf_labels(struct rooted_tree *tree)
+{
+	struct llist *labels = create_llist();
+	struct list_elem *el;
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = (struct rnode *) el->data;
+		if (is_leaf(current)) 
+			if (strcmp ("", current->label) != 0)
+				append_element(labels, current->label);
+	}
+
+	return labels;
+}
+
+struct llist *get_labels(struct rooted_tree *tree)
+{
+	struct llist *labels = create_llist();
+	struct list_elem *el;
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = (struct rnode *) el->data;
+		if (strcmp ("", current->label) != 0)
+			append_element(labels, current->label);
+	}
+
+	return labels;
+}

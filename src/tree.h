@@ -31,3 +31,11 @@ void destroy_tree_except_data(struct rooted_tree *tree);
 /* Returns the number of leaves of this tree */
 
 int leaf_count(struct rooted_tree *);
+
+/* Returns a list of nonempty leaf labels, in parse order */
+
+struct llist *get_leaf_labels(struct rooted_tree *);
+
+/* Returns a list of all nonempty labels, in parse order */
+
+struct llist *get_labels(struct rooted_tree *);

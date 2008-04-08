@@ -25,3 +25,7 @@ struct rooted_tree tree_5();
 /* A tree with an inner node that has three children:
  *  ((A:1,B:1,C:1)e:1,D:2)f */
 struct rooted_tree tree_6();
+
+/* A tree with some empty labels */
+/* ((A:1,:1.0)f:2.0,(C:1,(D:1,E:1):2)h:3)i; */
+struct rooted_tree tree_7();
