@@ -13,6 +13,21 @@
 const int ROOT_SPACE = 10;	/* pixels */
 const int LBL_SPACE = 10;	/* pixels */
 
+/* We can't pass all the parameters to write_nodes_to_g() or any other function
+ * - there are too many of them - so we use external variables. */
+
+static char *leaf_label_font_size = "medium";
+static char *inner_label_font_size = "small";
+static int edge_length_v_offset = -4;
+
+/* These are setters for the external variables. This way I can keep them
+ * static. I just don't like variables open to anyone, maybe I did too much
+ * OO... */
+
+void set_edge_length_v_offset(int offset) { edge_length_v_offset = offset; }
+void set_leaf_label_font_size(char *size) { leaf_label_font_size = size; }
+void set_inner_label_font_size(char *size) { inner_label_font_size = size; }
+
 void svg_header()
 {
 	printf( "<?xml version='1.0' standalone='no'?>"
@@ -40,19 +55,23 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
 		struct rnode *node = (struct rnode *) elem->data;
 		struct node_pos *pos = (struct node_pos *) node->data;
-		/* draw node */
+		char *font_size;
+		/* draw node (vertical line) */
 		printf("<line x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				rint(ROOT_SPACE + (h_scale * pos->depth)),
 				rint(2 * v_scale * pos->top),
 				rint(ROOT_SPACE + (h_scale * pos->depth)),
 				rint(2 * v_scale * pos->bottom)
 			);
+		/* draw label */
+		font_size = is_leaf(node) ? leaf_label_font_size : inner_label_font_size ;
 		printf("<text style='stroke:none;font-size:%s' x='%.4f' y='%.4f'>%s</text>",
-				"medium",
+				font_size,
 				rint(ROOT_SPACE + (h_scale * pos->depth) + LBL_SPACE), 
 				rint(v_scale * (pos->top+pos->bottom)),
 				node->label
 				);
+		/* draw horizontal line */
 		if (is_root(node)) {
 			printf("<line x1='0' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 					rint(v_scale * (pos->top+pos->bottom)),
@@ -65,6 +84,12 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 				 rint(v_scale * (pos->top + pos->bottom)), /* (2*top + 2*bottom) / 2 */
 				 rint(ROOT_SPACE + h_scale * (pos->depth)),
 				 rint(v_scale * (pos->top + pos->bottom)));
+			printf ("<text style='stroke:none;font-size:%s' x='%4f' y='%4f'>%s</text>",
+					inner_label_font_size,
+					rint(ROOT_SPACE + h_scale * (pos->depth - 0.5 * node->parent_edge->length)),
+					rint(edge_length_v_offset + v_scale * (pos->top + pos->bottom)),
+					node->parent_edge->length_as_string);
+
 		}
 
 	}

@@ -23,8 +23,20 @@ struct parameters get_params(int argc, char *argv[])
 	params.svg = 0;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "sw:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "e:I:L:sw:")) != -1) {
 		switch (opt_char) {
+		case 'e':
+			set_edge_length_v_offset(-1 * atoi(optarg));
+			break;
+		case 'L':
+			set_leaf_label_font_size(optarg);
+			break;
+		case 'I':
+			set_inner_label_font_size(optarg);
+			break;
+		case 's':
+			params.svg = 1;
+			break;
 		case 'w':
 			params.width = strtod(optarg, NULL);
 			if (0 == params.width) {
@@ -32,9 +44,6 @@ struct parameters get_params(int argc, char *argv[])
 			"Argument to -w must be a positive integer.\n");
 				exit(EXIT_FAILURE);
 			}
-			break;
-		case 's':
-			params.svg = 1;
 			break;
 		}
 	}
