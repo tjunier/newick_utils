@@ -186,7 +186,12 @@ int main(int argc, char *argv[])
 			distance_list(tree, tree->root, labels, params.separator);
 			break;
 		case FROM_LCA:
-			lca = lca_from_labels(tree, params.labels);
+			if (0 == labels->count) {
+				lca = tree->root;
+				labels = get_labels(tree);
+			}
+			else
+				lca = lca_from_labels(tree, labels);
 			distance_list(tree, lca, labels, params.separator);
 			break;
 		case MATRIX:

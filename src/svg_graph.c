@@ -19,6 +19,7 @@ const int LBL_SPACE = 10;	/* pixels */
 static char *leaf_label_font_size = "medium";
 static char *inner_label_font_size = "small";
 static int edge_length_v_offset = -4;
+static int char_width = 1;	/* for estimating string lengths */
 
 /* These are setters for the external variables. This way I can keep them
  * static. I just don't like variables open to anyone, maybe I did too much
@@ -27,6 +28,7 @@ static int edge_length_v_offset = -4;
 void set_edge_length_v_offset(int offset) { edge_length_v_offset = offset; }
 void set_leaf_label_font_size(char *size) { leaf_label_font_size = size; }
 void set_inner_label_font_size(char *size) { inner_label_font_size = size; }
+void set_char_width(int width) { char_width = width; }
 
 void svg_header()
 {
@@ -107,7 +109,7 @@ void display_svg_tree(struct rooted_tree *tree, int width)
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* create canvas and draw nodes on it */
-	h_scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	h_scale = (width - char_width * hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	write_nodes_to_g(tree, h_scale, v_scale);
 }
 
