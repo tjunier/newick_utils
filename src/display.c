@@ -23,7 +23,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.svg = 0;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "e:I:L:sW:w:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "e:I:L:sw:")) != -1) {
 		switch (opt_char) {
 		case 'e':
 			set_edge_length_v_offset(-1 * atoi(optarg));
@@ -36,9 +36,6 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 's':
 			params.svg = 1;
-			break;
-		case 'W':
-			set_char_width(atoi(optarg));
 			break;
 		case 'w':
 			params.width = strtod(optarg, NULL);
