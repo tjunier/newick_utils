@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -19,29 +18,7 @@ enum {FROM_ROOT, FROM_LCA, MATRIX};
 struct parameters {
 	struct llist *labels;
 	int distance_type;
-	char separator;
 };
-
-/* Returns the distance type (root, LCA, or matrix) based on the first characer
- * of 'optarg' */
-
-int get_distance_type()
-{
-	switch (tolower(optarg[0])) {
-	case 'l': /* lca, l, etc */
-		return FROM_LCA;
-	case 'm': /* matrix, m, etc */ 
-		return MATRIX;
-	case 'r': /* root, r, etc - default anyway */ 
-		return FROM_ROOT;
-	default:
-		fprintf (stderr, 
-			"ERROR: unknown distance method '%s'\nvalid values: l(ca), m(atrix), r(oot)", optarg);
-		exit(EXIT_FAILURE);
-	}
-	/* should never get here */
-	return -1;
-}
 
 struct parameters get_params(int argc, char *argv[])
 {
@@ -49,16 +26,15 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	params.distance_type = FROM_ROOT;
-	params.separator = '\n';
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "m:t")) != -1) {
+	while ((opt_char = getopt(argc, argv, "am")) != -1) {
 		switch (opt_char) {
-		case 'm':
-			params.distance_type = get_distance_type();
+		case 'a':
+			params.distance_type = FROM_LCA;
 			break;
-		case 't':
-			params.separator = '\t';
+		case 'm':
+			params.distance_type = MATRIX;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -85,7 +61,7 @@ struct parameters get_params(int argc, char *argv[])
 		}
 		params.labels = lbl_list;
 	} else {
-		fprintf(stderr, "Usage: %s [-d:t] <filename|-> <label> [label+]\n",
+		fprintf(stderr, "Usage: %s [-ma] <filename|-> <label> [label+]\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -148,11 +124,8 @@ void distance_list (struct rooted_tree *tree, struct rnode *origin,
 			continue;
 		}
 		double node_depth = ((struct node_pos *) node->data)->depth;
-		if (el != params.labels->head) printf ("%c", params.separator);
-		printf ("%g", node_depth - origin_depth);
+		printf ("%g\n", node_depth - origin_depth);
 	}
-	printf("\n");
-	destroy_hash(node_map);
 }
 
 void distance_matrix (struct rooted_tree *tree, struct parameters params)

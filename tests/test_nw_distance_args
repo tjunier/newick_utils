@@ -3,3 +3,5 @@ r1_2:dist.nw F
 an_1:-ml dist.nw D E F
 an_2:-m lca dist.nw D F
 tan: -m lca -t dist.nw F E D
+pan: -m p dist.nw F D E B
+paa: -m p dist.nw
