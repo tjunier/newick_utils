@@ -123,25 +123,76 @@ int test_lca()
 				test_name, ancestor->label);
 		return 1;
 	}
-	ancestor = lca2(&tree, desc_A, desc_A);
-	if (desc_A != ancestor) {
-		printf ("%s: expected node 'A' as LCA of 'A' and 'A' (got '%s').\n",
-				test_name, ancestor->label);
-		return 1;
-	}
-	ancestor = lca2(&tree, desc_A, desc_C);
-	if (desc_i != ancestor) {
-		printf ("%s: expected node 'i' as LCA of 'A' and 'C' (got '%s').\n",
-				test_name, ancestor->label);
-		return 1;
-	}
-	ancestor = lca2(&tree, desc_C, desc_A);
-	if (desc_i != ancestor) {
-		printf ("%s: expected node 'i' as LCA of 'C' and 'A' (got '%s').\n",
+
+	descendants = create_llist();
+	append_element(descendants, desc_C);
+	append_element(descendants, desc_g);
+	ancestor = lca(&tree, descendants);
+	if (desc_h != ancestor) {
+		printf ("%s: expected node 'h' as LCA of 'C', 'D' and 'E' (got '%s').\n",
 				test_name, ancestor->label);
 		return 1;
 	}
 	
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_lca_from_labels()
+{
+	const char *test_name = "test_lca_from_labels";
+
+	struct rooted_tree tree;
+	struct rnode *ancestor, *desc_A, *desc_B;
+	struct rnode *desc_C, *desc_D, *desc_E;
+	struct rnode *desc_f, *desc_g, *desc_h, *desc_i;
+	struct hash *map;
+	struct llist *desc_labels;
+
+	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
+	map = create_node_map(tree.nodes_in_order);
+	desc_A = hash_get(map, "A");
+	desc_B = hash_get(map, "B");
+	desc_C = hash_get(map, "C");
+	desc_D = hash_get(map, "D");
+	desc_E = hash_get(map, "E");
+	desc_f = hash_get(map, "f");
+	desc_g = hash_get(map, "g");
+	desc_h = hash_get(map, "h");
+	desc_i = hash_get(map, "i");
+
+	desc_labels = create_llist();
+	append_element(desc_labels, "A");
+	append_element(desc_labels, "B");
+
+	ancestor = lca_from_labels(&tree, desc_labels);
+	if (desc_f != ancestor) {
+		printf ("%s: expected node 'f' as LCA of 'A' and 'B' (got '%s').\n",
+				test_name, ancestor->label);
+		return 1;
+	}
+
+	desc_labels = create_llist();
+	append_element(desc_labels, "C");
+	append_element(desc_labels, "D");
+	append_element(desc_labels, "E");
+	ancestor = lca_from_labels(&tree, desc_labels);
+	if (desc_h != ancestor) {
+		printf ("%s: expected node 'h' as LCA of 'C', 'D' and 'E' (got '%s').\n",
+				test_name, ancestor->label);
+		return 1;
+	}
+
+	desc_labels = create_llist();
+	append_element(desc_labels, "C");
+	append_element(desc_labels, "g");
+	ancestor = lca_from_labels(&tree, desc_labels);
+	if (desc_h != ancestor) {
+		printf ("%s: expected node 'h' as LCA of 'C', 'D' and 'E' (got '%s').\n",
+				test_name, ancestor->label);
+		return 1;
+	}
+
 	printf("%s ok.\n", test_name);
 	return 0;
 }
@@ -152,6 +203,7 @@ int main()
 	printf("Starting lca test...\n");
 	failures += test_lca2();
 	failures += test_lca(); 
+	failures += test_lca_from_labels();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

@@ -15,5 +15,8 @@ struct rnode *lca2(struct rooted_tree *, struct rnode *,
  * assumed to belong to the tree, otherwise behaviour is unspecified
  * and can hang. NOTE: Clobbers node->data. */
 
-
 struct rnode *lca(struct rooted_tree *, struct llist *);
+
+/* Given a tree and a list of labels, return the LCA */
+
+struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels);

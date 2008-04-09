@@ -1,3 +1,4 @@
+nw_prune: remove nodes from a tree. Think of a CLI syntax for removing whole clades by specifying the LCA.
 
 Add functionality for directly counting a bipartition from a set of replicates.
 This would look like: $ nw_bipart <reps> leaf1 ... leafn where a bipartition

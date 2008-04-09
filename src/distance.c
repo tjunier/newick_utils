@@ -95,37 +95,6 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-/* TODO: maybe this should be moved to lca.c, as it can be resued. */
-
-struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
-{
-	struct hash *node_map = create_node_map(tree->nodes_in_order);
-	struct llist *descendant_nodes = create_llist();
-	struct list_elem *el;
-
-	for (el = labels->head; NULL != el; el = el->next) {
-		char *label = (char *) el->data;
-		if (0 == strcmp("", label)) {
-			fprintf(stderr, "WARNING: empty label.\n");
-			continue;
-		}
-		struct rnode *desc = hash_get(node_map, label);
-		if (NULL == desc) {
-			fprintf(stderr, "WARNING: no node with label '%s'.\n",
-					label);
-			continue;
-		}
-		append_element(descendant_nodes, desc);
-	}
-
-	struct rnode *result = lca(tree, descendant_nodes);
-
-	destroy_hash(node_map);
-	destroy_llist(descendant_nodes);
-
-	return result;
-}
-
 void distance_list (struct rooted_tree *tree, struct rnode *origin,
 		struct llist *labels, char separator)
 {
