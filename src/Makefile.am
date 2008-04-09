@@ -2,7 +2,8 @@ BUILT_SOURCES = newick_parser.h newick_scanner.c newick_parser.c \
 		address_scanner.c address_parser.c
 
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
-	       nw_collapse nw_bipart nw_ed nw_topology nw_distance
+	       nw_collapse nw_bipart nw_ed nw_topology nw_distance \
+	       nw_labels
 
 nw_indent_SOURCES = indent.c indent_lex.l
 nw_indent_LDADD = @LEXLIB@
@@ -51,3 +52,5 @@ nw_distance_SOURCES = $(NW_CORE) distance.c node_pos.c nodemap.c \
 		hash.c lca.c
 nw_distance_LDADD = @LEXLIB@
 
+nw_labels_SOURCES = $(NW_CORE) labels.c
+nw_labels_LDADD = @LEXLIB@
