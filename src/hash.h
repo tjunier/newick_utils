@@ -37,3 +37,8 @@ struct llist *hash_keys(struct hash *);
 /* Destroys a hash (but does NOT destroy its contents - iterate on keys for that) */
 
 void destroy_hash(struct hash *);
+
+/* Returns a string representation of an address, suitable for use as a hash
+ * key. */
+
+char *make_hash_key(void *addr);

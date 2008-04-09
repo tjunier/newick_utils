@@ -121,6 +121,23 @@ int test_destroy()
 	return 0;
 }
 
+int test_make_hash_key()
+{
+	char *test_name = "test_make_hash_key";
+	struct llist *list = create_llist();
+	char *list_address;
+       	asprintf(&list_address, "%p", list);
+
+	if (strcmp(list_address, make_hash_key(list)) != 0) {
+		printf ("%s: expected key %s, got %s.\n", test_name,
+				list_address, make_hash_key(list));
+		return 1;
+	}
+
+	printf ("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -128,6 +145,7 @@ int main()
 	failures += test_simple();
 	failures += test_keys();
 	failures += test_destroy();
+	failures += test_make_hash_key();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

@@ -153,3 +153,17 @@ void destroy_hash(struct hash *h)
 	/* free self */
 	free(h);
 }
+
+/* Returns a unique string for the node, suitable for a hash key. Storage is
+ * allocated and must be free()d by the user. */
+
+char * make_hash_key(void *addr)
+{
+	char *key;
+	if (-1 == asprintf(&key, "%p", addr)) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
+	return key;
+}
+

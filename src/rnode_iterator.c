@@ -42,18 +42,6 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
 	free(it);
 }
 
-/* Returns a unique string for the node, suitable for a hash key. */
-
-static char * make_hash_key(struct rnode *node)
-{
-	char *key;
-	if (-1 == asprintf(&key, "%p", node)) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
-	return key;
-}
-
 /* Returns the current node's next un-visited child, or NULL if there is none.
  * Will return NULL if node has no children. */
 

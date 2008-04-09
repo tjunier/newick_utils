@@ -5,11 +5,17 @@
 #include "rnode.h"
 #include "list.h"
 #include "redge.h"
+#include "hash.h"
+#include "nodemap.h"
 
 struct rooted_tree *lca2w_tree;
 
+/* NOTE: these two functions are obsolete, but I keep them in case the new
+ * implementation turns out to be faulty. */
+
 /* marks all nodes of the tree unseen */
 
+/*
 void mark_unseen(struct rooted_tree *tree)
 {
 	struct list_elem *el;
@@ -19,6 +25,34 @@ void mark_unseen(struct rooted_tree *tree)
 		current->data = NULL;
 	}
 }
+*/
+
+/* Old version of lca2(). Used rnode->data to mark nodes, the new version uses
+ * a hash (and thus avoids modifying its arguments) */
+
+/*
+struct rnode *old_lca2(struct rooted_tree *tree, struct rnode *desc_A,
+		struct rnode *desc_B)
+{
+	char *SEEN = "seen";
+	
+	// Makes sure no node accidentally retains 'seen' status. 
+	// mark_unseen(tree);
+
+	// Climb to root, marking nodes as 'seen' 
+	while (! is_root(desc_A)) {
+		desc_A->data = SEEN;
+		desc_A = desc_A->parent_edge->parent_node;
+	}
+	desc_A->data = SEEN;
+
+	while (SEEN != desc_B->data)
+		desc_B = desc_B->parent_edge->parent_node;
+
+	return desc_B;
+}
+*/
+
 
 /* Start from descendant A and climbs to the root, marking each node as 'seen'
  * along the way. Then starts again from descendant B, returning the first
@@ -28,19 +62,32 @@ struct rnode *lca2(struct rooted_tree *tree, struct rnode *desc_A,
 		struct rnode *desc_B)
 {
 	char *SEEN = "seen";
-	
-	/* Makes sure no node accidentally retains 'seen' status. */
-	mark_unseen(tree);
+	char *key;
+
+	/* This hash will remember which nodes have been visited. It need be at
+	 * most as large as the number of nodes in the tree. */
+	struct hash *seen_nodes = create_hash(tree->nodes_in_order->count);
 
 	/* Climb to root, marking nodes as 'seen' */
 	while (! is_root(desc_A)) {
-		desc_A->data = SEEN;
+		key = make_hash_key(desc_A);
+		hash_set(seen_nodes, key, SEEN);
+		free(key);
 		desc_A = desc_A->parent_edge->parent_node;
 	}
-	desc_A->data = SEEN;
+	key = make_hash_key(desc_A);
+	hash_set(seen_nodes, key, SEEN);
+	free(key);
 
-	while (SEEN != desc_B->data)
+	while (1) {
+		key = make_hash_key(desc_B);
+		if (NULL != hash_get(seen_nodes, key)) /* seen */
+			break;
+		free(key);
 		desc_B = desc_B->parent_edge->parent_node;
+	}
+
+	destroy_hash(seen_nodes);
 
 	return desc_B;
 }
