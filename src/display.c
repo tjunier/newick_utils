@@ -11,6 +11,9 @@
 struct parameters {
 	int width;
 	int svg;
+	char *colormap_fname;
+	char *leaf_label_font_size;
+	char *inner_label_font_size;
 };
 
 struct parameters get_params(int argc, char *argv[])
@@ -23,16 +26,16 @@ struct parameters get_params(int argc, char *argv[])
 	params.svg = 0;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "e:I:L:sw:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "c:e:I:L:sw:")) != -1) {
 		switch (opt_char) {
-		case 'e':
-			set_edge_length_v_offset(-1 * atoi(optarg));
+		case 'c':
+			params.colormap_fname = optarg;
 			break;
 		case 'L':
-			set_leaf_label_font_size(optarg);
+			params.leaf_label_font_size = optarg;
 			break;
 		case 'I':
-			set_inner_label_font_size(optarg);
+			params.inner_label_font_size = optarg;
 			break;
 		case 's':
 			params.svg = 1;
@@ -74,6 +77,22 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+/* There are so many parameters to an SVG tree that we cannot pass them all
+ * to display_svg_tree() without loss of readability and clarity. Therefore
+ * svg_graph.c has external variables for those parameters. Since I don't like
+ * the idea of directly changing a variable in another module, those variables
+ * are static and accessed through setters. This is the purpose of the
+ * following function. Note that I could just pass a struct parameters to
+ * display_svg_tree(), but then this would make svg_graph.c dependent on struct
+ * parameters, increasing coupling. I don't like this. */
+
+void set_svg_parameters(struct parameters params)
+{
+	set_svg_width(params.width);
+	set_svg_inner_label_font_size(params.inner_label_font_size);
+	set_svg_leaf_label_font_size(params.leaf_label_font_size);
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;
@@ -83,9 +102,10 @@ int main(int argc, char *argv[])
 
 	/* for now, SVG can only handle one tree */
 	if (params.svg) {
+		set_svg_parameters(params);
 		tree = parse_tree();
 		svg_header();
-		display_svg_tree(tree, params.width);
+		display_svg_tree(tree);
 		svg_footer();
 		exit(EXIT_SUCCESS);
 	}

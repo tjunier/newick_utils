@@ -19,6 +19,8 @@ const int LBL_SPACE = 10;	/* pixels */
 static char *leaf_label_font_size = "medium";
 static char *inner_label_font_size = "small";
 static int edge_length_v_offset = -4;
+static int graph_width = 300;
+
 /* works OK with scale 1 on Ubuntu */
 // static int char_width = 1;	/* for estimating string lengths */
 
@@ -26,9 +28,9 @@ static int edge_length_v_offset = -4;
  * static. I just don't like variables open to anyone, maybe I did too much
  * OO... */
 
-void set_edge_length_v_offset(int offset) { edge_length_v_offset = offset; }
-void set_leaf_label_font_size(char *size) { leaf_label_font_size = size; }
-void set_inner_label_font_size(char *size) { inner_label_font_size = size; }
+void set_svg_leaf_label_font_size(char *size) { leaf_label_font_size = size; }
+void set_svg_inner_label_font_size(char *size) { inner_label_font_size = size; }
+void set_svg_width(int width) { graph_width = width; }
 // void set_char_width(int width) { char_width = width; }
 
 void svg_header()
@@ -99,7 +101,7 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 	printf("</g>");
 }
 
-void display_svg_tree(struct rooted_tree *tree, int width)
+void display_svg_tree(struct rooted_tree *tree)
 {	
 	/* set node positions */
 	alloc_node_pos(tree);
@@ -110,7 +112,7 @@ void display_svg_tree(struct rooted_tree *tree, int width)
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* create canvas and draw nodes on it */
-	h_scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	write_nodes_to_g(tree, h_scale, v_scale);
 }
 
