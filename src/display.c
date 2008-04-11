@@ -24,6 +24,9 @@ struct parameters get_params(int argc, char *argv[])
 	/* set defaults */
 	params.width = -1; 
 	params.svg = 0;
+	params.colormap_fname = NULL;
+	params.leaf_label_font_size = "medium";
+	params.inner_label_font_size = "small";
 	
 	/* parse options and switches */
 	while ((opt_char = getopt(argc, argv, "c:e:I:L:sw:")) != -1) {

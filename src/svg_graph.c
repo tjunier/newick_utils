@@ -17,16 +17,16 @@ struct colormap_pair {
 
 const int ROOT_SPACE = 10;	/* pixels */
 const int LBL_SPACE = 10;	/* pixels */
+const int edge_length_v_offset = -4; /* pixels */
 
 int init_done = 0;
 
 /* We can't pass all the parameters to write_nodes_to_g() or any other function
  * - there are too many of them - so we use external variables. */
 
-static char *leaf_label_font_size = "medium";
-static char *inner_label_font_size = "small";
-static int edge_length_v_offset = -4;
-static int graph_width = 300;
+static char *leaf_label_font_size = NULL;
+static char *inner_label_font_size = NULL;
+static int graph_width = -1;
 static char *colormap_fname = NULL;
 
 static struct llist *colormap = NULL;
@@ -58,6 +58,12 @@ struct llist *read_colormap()
 	if (NULL == colormap_fname) { return NULL; }
 
 	FILE *cmap_file = fopen(colormap_fname, "r");
+
+	char *line;
+	while ((line = read_line(cmap_file)) != NULL) {
+		puts(line);
+	}
+
 	if (NULL == cmap_file) {
 		perror(NULL);
 		exit(EXIT_FAILURE);
