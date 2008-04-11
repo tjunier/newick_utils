@@ -8,6 +8,7 @@ struct rooted_tree;
 void set_svg_width(int);
 void set_svg_inner_label_font_size(char *);
 void set_svg_leaf_label_font_size(char *);
+void set_svg_colormap_file(char *);
 
 /* Writes an SVG header */
 

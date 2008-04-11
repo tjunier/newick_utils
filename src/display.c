@@ -91,6 +91,7 @@ void set_svg_parameters(struct parameters params)
 	set_svg_width(params.width);
 	set_svg_inner_label_font_size(params.inner_label_font_size);
 	set_svg_leaf_label_font_size(params.leaf_label_font_size);
+	set_svg_colormap_file(params.colormap_fname);
 }
 
 int main(int argc, char *argv[])

@@ -22,7 +22,7 @@ address_scanner.c: address_scanner.l
 	flex -oaddress_scanner.c address_scanner.l 
 
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
-		node_pos.c svg_graph.c
+		node_pos.c svg_graph.c readline.c
 nw_display_LDADD = @LEXLIB@
 
 nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c nodemap.c hash.c \
@@ -32,7 +32,7 @@ nw_clade_LDADD = @LEXLIB@
 nw_reroot_SOURCES = $(NW_CORE) $(NW_OUT) reroot.c lca.c nodemap.c hash.c
 nw_reroot_LDADD = @LEXLIB@
 
-nw_rename_SOURCES = $(NW_CORE) $(NW_OUT) rename.c hash.c
+nw_rename_SOURCES = $(NW_CORE) $(NW_OUT) rename.c hash.c readline.c
 nw_rename_LDADD = @LEXLIB@
 
 nw_collapse_SOURCES = $(NW_CORE) $(NW_OUT) collapse.c

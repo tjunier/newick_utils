@@ -28,7 +28,7 @@ void mark_unseen(struct rooted_tree *tree)
 */
 
 /* Old version of lca2(). Used rnode->data to mark nodes, the new version uses
- * a hash (and thus avoids modifying its arguments) */
+ * a hash (and thus avoids modifying its arguments, but may be somewhat slower) */
 
 /*
 struct rnode *old_lca2(struct rooted_tree *tree, struct rnode *desc_A,

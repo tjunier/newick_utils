@@ -10,8 +10,15 @@
 #include "node_pos.h"
 #include "redge.h"
 
+struct colormap_pair {
+	char *color;		/* a valid SVG color string, e.g. 'blue' */
+	struct llist *labels;	/* color whole clade defined by those labels */
+};
+
 const int ROOT_SPACE = 10;	/* pixels */
 const int LBL_SPACE = 10;	/* pixels */
+
+int init_done = 0;
 
 /* We can't pass all the parameters to write_nodes_to_g() or any other function
  * - there are too many of them - so we use external variables. */
@@ -20,6 +27,9 @@ static char *leaf_label_font_size = "medium";
 static char *inner_label_font_size = "small";
 static int edge_length_v_offset = -4;
 static int graph_width = 300;
+static char *colormap_fname = NULL;
+
+static struct llist *colormap = NULL;
 
 /* works OK with scale 1 on Ubuntu */
 // static int char_width = 1;	/* for estimating string lengths */
@@ -31,6 +41,7 @@ static int graph_width = 300;
 void set_svg_leaf_label_font_size(char *size) { leaf_label_font_size = size; }
 void set_svg_inner_label_font_size(char *size) { inner_label_font_size = size; }
 void set_svg_width(int width) { graph_width = width; }
+void set_svg_colormap_file(char *fname) { colormap_fname = fname; }
 // void set_char_width(int width) { char_width = width; }
 
 void svg_header()
@@ -40,6 +51,25 @@ void svg_header()
 		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
 	printf( "<svg width='100%%' height='100%%' version='1.1' "
 		"xmlns='http://www.w3.org/2000/svg'>");
+}
+
+struct llist *read_colormap()
+{
+	if (NULL == colormap_fname) { return NULL; }
+
+	FILE *cmap_file = fopen(colormap_fname, "r");
+	if (NULL == cmap_file) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
+
+
+	fclose(cmap_file);
+}
+
+void init()
+{
+	colormap = read_colormap();
 }
 
 /* Prints the nodes to stdout, as SVG, in a <g> element. Assumes that the edges
@@ -103,6 +133,9 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 
 void display_svg_tree(struct rooted_tree *tree)
 {	
+	/* Ensure that init has been done */
+	if (! init_done) { init(); }
+
 	/* set node positions */
 	alloc_node_pos(tree);
 	int num_leaves = set_node_vpos(tree);

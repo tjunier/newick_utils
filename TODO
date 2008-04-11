@@ -1,11 +1,15 @@
-nw_prune: remove nodes from a tree. Think of a CLI syntax for removing whole clades by specifying the LCA.
+add some error messages in newick parser (better than just "syntax error"). One
+case I encountered was two consecutive labels (in fact there was a spurious
+space between them). Something could be done, such as fusing them with a '_',
+or dropping all but the first; at the very least th eprogram should say what
+the problem was and where it was found.
+
+nw_prune: remove nodes from a tree. Think of a CLI syntax for removing whole
+clades by specifying the LCA.
 
 Add functionality for directly counting a bipartition from a set of replicates.
 This would look like: $ nw_bipart <reps> leaf1 ... leafn where a bipartition
 will be computed from the leaf labels, and its frequency printed out as output.
-
-nw_labels: output labels, in columns or on a line, in parse order. Options for
-omitting leaves or inners.
 
 [started] nw_distance: output distances from root or LCA as a table, or between
 leaves as a matrix.
@@ -44,3 +48,6 @@ traversal can be used to generate an ordered nodes list.
 
 [done] Add an option (-p) to nw_bipart so it prints out percentages instead of
 absolute frequencies. 
+
+[done] nw_labels: output labels, in columns or on a line, in parse order. Options for
+omitting leaves or inners.
