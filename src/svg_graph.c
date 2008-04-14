@@ -66,6 +66,7 @@ struct llist *read_colormap()
 		/* split line into whitespace-separeted "words" */
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		char *color = wt_next(wtok);
+		char *label;
 		while ((label = wt_next(wtok)) != NULL) {
 			// append to list
 		}

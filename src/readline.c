@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "readline.h"
 
@@ -48,3 +49,29 @@ char * read_line(FILE *file)
 
 	return line;
 }
+
+struct word_tokenizer *create_word_tokenizer(const char *string)
+{
+	struct word_tokenizer *wt = malloc(sizeof(struct word_tokenizer));
+	if (NULL == wt) { perror(NULL); exit(EXIT_FAILURE); }
+
+	wt->string = string;
+	wt->word_start = string;
+	wt->word_stop = NULL;
+
+	return wt;
+}
+
+char *wt_next(struct word_tokenizer *wt)
+{
+	size_t sep_len = strspn(wt->word_start, " \t");
+	wt->word_start = wt->word_start + sep_len;
+	wt->word_stop = strpbrk(wt->word_start, " \t");
+	int wlen = wt->word_stop - wt->word_start;
+	char *word = malloc((wlen + 1) * sizeof(char));
+	if (NULL == word) { perror(NULL); exit(EXIT_FAILURE); }
+	strncpy(word, wt->word_start, wlen);
+
+	return word;
+}
+
