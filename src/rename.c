@@ -19,7 +19,6 @@ struct parameters {
 	int only_leaves;
 };
 
-
 struct hash *read_map(const char *filename)
 {
 	const int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
@@ -36,17 +35,16 @@ struct hash *read_map(const char *filename)
 		/* Start of line is start of key, we just need to find key's end
 		 * and start of value. */
 		char *p, *value;
-		p = strpbrk(line, " \t");	/* find first whitespace */
+		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		p = wt_next(wtok);	/* find first whitespace */
 		if (NULL == p) {
 			fprintf (stderr, "Invalid line format in map file %s: '%s'\n",
 					filename, line);
 			exit(EXIT_FAILURE);
 		}
-		*p = '\0';			/* terminate key */
-		p++;				
-		int skip = (int) strspn(p, " \t"); /* next non-whitespace */
-		value = p + skip;		/* no need for \0 (fgets()) */
-		hash_set(map, line, (void *) strdup(value));
+		value = wt_next(wtok);
+		hash_set(map, line, (void *) value);
+		destroy_word_tokenizer(wtok);
 		free(line);
 	}
 

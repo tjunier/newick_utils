@@ -12,7 +12,7 @@ TESTS = test_rnode test_redge test_list test_link \
 check_PROGRAMS = test_rnode test_redge test_list test_link \
 		 test_canvas test_concat test_hash test_lca \
 		 test_nodemap test_to_newick test_tree test_node_set \
-		 test_enode test_rnode_iterator 
+		 test_enode test_rnode_iterator test_readline
 
 SRC = $(top_builddir)/src
 
@@ -57,3 +57,5 @@ test_enode_SOURCES = test_enode.c $(SRC)/enode.c $(SRC)/rnode.c \
 test_rnode_iterator_SOURCES = test_rnode_iterator.c $(SRC)/rnode_iterator.c \
        	$(SRC)/list.c $(SRC)/link.c $(SRC)/rnode.c $(SRC)/redge.c \
        	$(SRC)/hash.c $(SRC)/nodemap.c tree_stubs.c	
+
+test_readline_SOURCES = test_readline.c $(SRC)/readline.c

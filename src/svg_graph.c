@@ -63,7 +63,14 @@ struct llist *read_colormap()
 
 	char *line;
 	while ((line = read_line(cmap_file)) != NULL) {
-		puts(line);
+		/* split line into whitespace-separeted "words" */
+		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		char *color = wt_next(wtok);
+		while ((label = wt_next(wtok)) != NULL) {
+			// append to list
+		}
+		destroy_word_tokenizer(wtok);
+		free(line);
 	}
 
 	if (NULL == cmap_file) {
