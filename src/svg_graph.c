@@ -9,6 +9,8 @@
 #include "rnode.h"
 #include "node_pos.h"
 #include "redge.h"
+#include "assert.h"
+#include "readline.h"
 
 struct colormap_pair {
 	char *color;		/* a valid SVG color string, e.g. 'blue' */
@@ -24,9 +26,9 @@ int init_done = 0;
 /* We can't pass all the parameters to write_nodes_to_g() or any other function
  * - there are too many of them - so we use external variables. */
 
-static char *leaf_label_font_size = NULL;
-static char *inner_label_font_size = NULL;
-static int graph_width = -1;
+static char *leaf_label_font_size = "medium";
+static char *inner_label_font_size = "small";
+static int graph_width = 300;
 static char *colormap_fname = NULL;
 
 static struct llist *colormap = NULL;
@@ -73,9 +75,10 @@ struct llist *read_colormap()
 	fclose(cmap_file);
 }
 
-void init()
+void svg_init()
 {
 	colormap = read_colormap();
+	init_done = 1;
 }
 
 /* Prints the nodes to stdout, as SVG, in a <g> element. Assumes that the edges
@@ -140,7 +143,7 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 void display_svg_tree(struct rooted_tree *tree)
 {	
 	/* Ensure that init has been done */
-	if (! init_done) { init(); }
+	assert(0 != init_done);
 
 	/* set node positions */
 	alloc_node_pos(tree);

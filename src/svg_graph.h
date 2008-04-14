@@ -1,5 +1,6 @@
-/* Functions for displaying a tree as SVG. User should call svg_header(), then
- * display_svg_tree(), then svg_footer(). */
+/* Functions for displaying a tree as SVG. User should call any of the
+ * set_svg_*() functions that are needed, then svg_init(), then svg_header(),
+ * display_svg_tree(), and finally svg_footer(). */
 
 struct rooted_tree;
 
@@ -9,6 +10,12 @@ void set_svg_width(int);
 void set_svg_inner_label_font_size(char *);
 void set_svg_leaf_label_font_size(char *);
 void set_svg_colormap_file(char *);
+
+/* Call this before calling svg_header(), etc, but _after_ the set_svg*()
+ * functions. It will launch the initializations liek reading the color map,
+ * etc. */
+
+void svg_init();
 
 /* Writes an SVG header */
 

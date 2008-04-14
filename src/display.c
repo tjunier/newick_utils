@@ -107,6 +107,7 @@ int main(int argc, char *argv[])
 	/* for now, SVG can only handle one tree */
 	if (params.svg) {
 		set_svg_parameters(params);
+		svg_init();
 		tree = parse_tree();
 		svg_header();
 		display_svg_tree(tree);
