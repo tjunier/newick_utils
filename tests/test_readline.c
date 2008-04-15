@@ -50,7 +50,7 @@ int test_word_tokenizer()
 int main()
 {
 	int failures = 0;
-	printf("Starting canvas test...\n");
+	printf("Starting readline test...\n");
 	failures += test_word_tokenizer();
 	if (0 == failures) {
 		printf("All tests ok.\n");

@@ -1,9 +1,9 @@
 #include <stdio.h>
 
 struct word_tokenizer {
-	char *line;
+	char *string;
 	char *word_start;
-	char *word_end;
+	char *word_stop;
 };
 
 /* Returns a line from a file, as a pointer to an allocated buffer. Returns

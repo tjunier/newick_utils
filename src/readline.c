@@ -55,8 +55,8 @@ struct word_tokenizer *create_word_tokenizer(const char *string)
 	struct word_tokenizer *wt = malloc(sizeof(struct word_tokenizer));
 	if (NULL == wt) { perror(NULL); exit(EXIT_FAILURE); }
 
-	wt->string = string;
-	wt->word_start = string;
+	wt->string = strdup(string);
+	wt->word_start = wt->string;
 	wt->word_stop = NULL;
 
 	return wt;
@@ -64,14 +64,38 @@ struct word_tokenizer *create_word_tokenizer(const char *string)
 
 char *wt_next(struct word_tokenizer *wt)
 {
+	size_t string_len = strlen(wt->string);
+	/* Find the start of the next "word" */
 	size_t sep_len = strspn(wt->word_start, " \t");
+	
 	wt->word_start = wt->word_start + sep_len;
-	wt->word_stop = strpbrk(wt->word_start, " \t");
+	/* Find the end of that word. If the word starts with ' or ", look for
+	 * the next ' or "; otherwise look for whitespace or NULL. */
+	if (*wt->word_start == '\'') {
+		wt->word_stop = 1 + strpbrk(wt->word_start + 1, "'");
+		if (NULL == wt->word_stop) { wt->word_stop = wt->string + string_len; }
+	} else if (*wt->word_start == '"') {
+		wt->word_stop = 1 + strpbrk(wt->word_start + 1, "\"");
+		if (NULL == wt->word_stop) { wt->word_stop = wt->string + string_len; }
+	} else {
+		wt->word_stop = strpbrk(wt->word_start, " \t");
+		if (NULL == wt->word_stop) { wt->word_stop = wt->string + string_len; }
+	}
+	/* Find the word's length, and allocate memory for it */
 	int wlen = wt->word_stop - wt->word_start;
 	char *word = malloc((wlen + 1) * sizeof(char));
 	if (NULL == word) { perror(NULL); exit(EXIT_FAILURE); }
+	/* Copy the word into the allocated space, terminating the string */
 	strncpy(word, wt->word_start, wlen);
+	word[wlen] = '\0';
+	/* Set the next word's start pos to just after the present word's end. */
+	wt->word_start = wt->word_stop + 1;
 
 	return word;
 }
 
+void destroy_word_tokenizer(struct word_tokenizer *wt)
+{
+	free(wt->string);
+	free(wt);
+}
