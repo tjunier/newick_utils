@@ -24,27 +24,26 @@ struct hash *read_map(const char *filename)
 	const int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
 
 	FILE *map_file = fopen(filename, "r");
-	if (NULL == map_file) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == map_file) { perror(NULL); exit(EXIT_FAILURE); }
 
 	struct hash *map = create_hash(HASH_SIZE);
 	char *line;
 	while (NULL != (line = read_line(map_file))) {
-		/* Start of line is start of key, we just need to find key's end
-		 * and start of value. */
-		char *p, *value;
+		char *key, *value;
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
-		p = wt_next(wtok);	/* find first whitespace */
-		if (NULL == p) {
-			fprintf (stderr, "Invalid line format in map file %s: '%s'\n",
-					filename, line);
+		key = wt_next(wtok);	/* find first whitespace */
+		if (NULL == key) {
+			fprintf (stderr, "Invalid line format in map file %s: '%s'\n", filename, line);
 			exit(EXIT_FAILURE);
 		}
 		value = wt_next(wtok);
-		hash_set(map, line, (void *) value);
+		if (NULL == value) {
+			fprintf (stderr, "Invalid line format in map file %s: '%s'\n", filename, line);
+			exit(EXIT_FAILURE);
+		}
+		hash_set(map, key, (void *) value);
 		destroy_word_tokenizer(wtok);
+		free(key); /* copied by hash_set(), so can be free()d now */
 		free(line);
 	}
 

@@ -4,6 +4,7 @@ struct word_tokenizer {
 	char *string;
 	char *word_start;
 	char *word_stop;
+	size_t string_len;
 };
 
 /* Returns a line from a file, as a pointer to an allocated buffer. Returns

@@ -56,7 +56,7 @@ int test_word_tokenizer_2()
 {
 	const char *test_name = "test_word_tokenizer_2";
 
-	char *line = "'word 1' word2 345WORD 'word 8' \"another word\" word_10\n";
+	char *line = "'word 1' word2\t345WORD 'word 8' \"another\tword\" word_10\n";
 	struct word_tokenizer *wt = create_word_tokenizer(line);
 
 	char *word;
@@ -82,7 +82,7 @@ int test_word_tokenizer_2()
 		return 1;
 	}
 	word = wt_next(wt);
-	if (strcmp(word, "\"another word\"") != 0) {
+	if (strcmp(word, "\"another\tword\"") != 0) {
 		printf ("%s: expected \"another word\", got %s\n", test_name, word);
 		return 1;
 	}
