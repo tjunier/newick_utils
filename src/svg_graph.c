@@ -60,32 +60,56 @@ struct llist *read_colormap()
 	if (NULL == colormap_fname) { return NULL; }
 
 	FILE *cmap_file = fopen(colormap_fname, "r");
+	if (NULL == cmap_file) { perror(NULL); exit(EXIT_FAILURE); }
+
+	struct llist *colormap = create_llist();
 
 	char *line;
 	while ((line = read_line(cmap_file)) != NULL) {
 		/* split line into whitespace-separeted "words" */
+		struct colormap_pair *cpair = malloc(sizeof(struct colormap_pair));
+		if (NULL == cpair) { perror(NULL); exit(EXIT_FAILURE); }
+
+		struct llist *label_list = create_llist();
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		char *color = wt_next(wtok);
 		char *label;
 		while ((label = wt_next(wtok)) != NULL) {
-			// append to list
+			append_element(label_list, label);
 		}
 		destroy_word_tokenizer(wtok);
 		free(line);
+		cpair->color = color;
+		cpair->labels = label_list;
+		append_element(colormap, cpair);
 	}
-
-	if (NULL == cmap_file) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
-
 
 	fclose(cmap_file);
+
+	return colormap;
+}
+
+/* A debugging function - dumps the colormap on stdout */
+
+void dump_colormap(struct llist *colormap)
+{
+	struct list_elem *elem;
+
+	for (elem = colormap->head; NULL != elem; elem = elem->next) {
+		struct colormap_pair *cpair;
+	       	cpair = (struct colormap_pair *) elem->data;
+		struct list_elem *el;
+		for (el = cpair->labels->head; NULL!=el; el=el->next) {
+			printf("%s ", (char *) el->data);
+		}
+		printf ("-> %s\n", cpair->color);
+	}
 }
 
 void svg_init()
 {
 	colormap = read_colormap();
+	dump_colormap(colormap);
 	init_done = 1;
 }
 
