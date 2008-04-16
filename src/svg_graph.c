@@ -11,6 +11,8 @@
 #include "redge.h"
 #include "assert.h"
 #include "readline.h"
+#include "lca.h"
+#include "hash.h"
 
 struct colormap_pair {
 	char *color;		/* a valid SVG color string, e.g. 'blue' */
@@ -55,6 +57,11 @@ void svg_header()
 		"xmlns='http://www.w3.org/2000/svg'>");
 }
 
+/* Builds a colormap structure. This maps SVG color strings to lists of labels.
+ * The clade detfined by the labels will be of the specified colors. This
+ * structure's scope is the whole program, therefore it is an external
+ * variable. */
+
 struct llist *read_colormap()
 {
 	if (NULL == colormap_fname) { return NULL; }
@@ -93,8 +100,9 @@ struct llist *read_colormap()
 
 void dump_colormap(struct llist *colormap)
 {
-	struct list_elem *elem;
+	printf ("Dump of colormap at %p:\n", colormap);
 
+	struct list_elem *elem;
 	for (elem = colormap->head; NULL != elem; elem = elem->next) {
 		struct colormap_pair *cpair;
 	       	cpair = (struct colormap_pair *) elem->data;
@@ -109,7 +117,6 @@ void dump_colormap(struct llist *colormap)
 void svg_init()
 {
 	colormap = read_colormap();
-	dump_colormap(colormap);
 	init_done = 1;
 }
 
@@ -118,7 +125,7 @@ void svg_init()
  * done in set_node_depth()). */
 
 void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
-		const double v_scale)
+		const double v_scale, const struct hash *node_colors)
 {
 	printf( "<g"
 	       	" style='stroke:black;stroke-width:1;"
@@ -130,8 +137,13 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 
 	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
 		struct rnode *node = (struct rnode *) elem->data;
+		char *node_key = make_hash_key(node);
 		struct node_pos *pos = (struct node_pos *) node->data;
 		char *font_size;
+		char *color;
+		if ((color = hash_get(node_colors, node_key)) == NULL) {
+			color = "black";
+		}
 		/* draw node (vertical line) */
 		printf("<line x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				rint(ROOT_SPACE + (h_scale * pos->depth)),
@@ -155,7 +167,8 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 					rint(v_scale * (pos->top+pos->bottom)));
 
 		} else {
-			printf ("<line x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
+			printf ("<line style='stroke:%s' x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
+				color,
 				 rint(ROOT_SPACE + h_scale * (pos->depth - node->parent_edge->length)),
 				 rint(v_scale * (pos->top + pos->bottom)), /* (2*top + 2*bottom) / 2 */
 				 rint(ROOT_SPACE + h_scale * (pos->depth)),
@@ -172,6 +185,37 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 	printf("</g>");
 }
 
+/* Passed to dump_llist() for labels */
+void dump_label (void *lbl) { puts((char *) lbl); }
+
+/* Constructs a hash of node colors from the colormap. Key is node's address,
+ * value is a color string. Nodes are specified by their labels or descendant
+ * labels ('labels' member of a colormap_pair structure) NOTE: contrary to the
+ * colormap itself, this structure is dependent on the tree it is passed to,
+ * since the LCA of a list of labels depends on the tree. So it has to be
+ * computed for each tree. */
+
+struct hash *set_node_colors(struct rooted_tree *tree)
+{
+	struct hash *result = create_hash(tree->nodes_in_order->count);
+
+	struct list_elem *elem;
+	for (elem=colormap->head; NULL!=elem; elem=elem->next) {
+		struct colormap_pair *cpair;
+	       	cpair = (struct colormap_pair *) elem->data;
+		struct llist *labels = cpair->labels;
+		/* printf ("Labels:\n");
+		dump_llist(labels, dump_label);
+		printf ("Color: %s\n", cpair->color); */
+		struct rnode *lca = lca_from_labels(tree, labels);
+		char *lca_key = make_hash_key(lca);
+		hash_set(result, lca_key, cpair->color);	
+		// printf ("%s -> %s\n", lca->label, cpair->color);
+	}
+
+	return result;
+}
+
 void display_svg_tree(struct rooted_tree *tree)
 {	
 	/* Ensure that init has been done */
@@ -182,12 +226,15 @@ void display_svg_tree(struct rooted_tree *tree)
 	int num_leaves = set_node_vpos(tree);
 	struct h_data hd = set_node_depth(tree);
 	double h_scale = -1;
-	double v_scale = 20.0;
+	double v_scale = 20.0; // TODO: set as parameter
+
+	struct hash *node_colors = set_node_colors(tree);
+
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* create canvas and draw nodes on it */
 	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
-	write_nodes_to_g(tree, h_scale, v_scale);
+	write_nodes_to_g(tree, h_scale, v_scale, node_colors);
 }
 
 void svg_footer() { printf ("</svg>"); }
