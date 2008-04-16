@@ -125,7 +125,7 @@ void svg_init()
  * done in set_node_depth()). */
 
 void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
-		const double v_scale, const struct hash *node_colors)
+		const double v_scale, struct hash *node_colors)
 {
 	printf( "<g"
 	       	" style='stroke:black;stroke-width:1;"
@@ -139,45 +139,45 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 		struct rnode *node = (struct rnode *) elem->data;
 		char *node_key = make_hash_key(node);
 		struct node_pos *pos = (struct node_pos *) node->data;
-		char *font_size;
+
+		char *font_size = is_leaf(node) ?
+			leaf_label_font_size : inner_label_font_size ;
 		char *color;
 		if ((color = hash_get(node_colors, node_key)) == NULL) {
 			color = "black";
 		}
+		double svg_h_pos = ROOT_SPACE + (h_scale * pos->depth);
+		double svg_top_pos = v_scale * pos->top; 
+		double svg_bottom_pos = v_scale * pos->bottom; 
+		double svg_mid_pos =
+			0.5 * v_scale * (pos->top+pos->bottom);
+		double svg_parent_edge_length =
+			h_scale * node->parent_edge->length;
+
 		/* draw node (vertical line) */
 		printf("<line x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				rint(ROOT_SPACE + (h_scale * pos->depth)),
-				rint(2 * v_scale * pos->top),
-				rint(ROOT_SPACE + (h_scale * pos->depth)),
-				rint(2 * v_scale * pos->bottom)
-			);
+			svg_h_pos, svg_top_pos, svg_h_pos, svg_bottom_pos);
 		/* draw label */
-		font_size = is_leaf(node) ? leaf_label_font_size : inner_label_font_size ;
-		printf("<text style='stroke:none;font-size:%s' x='%.4f' y='%.4f'>%s</text>",
-				font_size,
-				rint(ROOT_SPACE + (h_scale * pos->depth) + LBL_SPACE), 
-				rint(v_scale * (pos->top+pos->bottom)),
-				node->label
-				);
+		printf("<text style='stroke:none;font-size:%s' "
+		       "x='%.4f' y='%.4f'>%s</text>",
+			font_size, svg_h_pos + LBL_SPACE,
+			svg_mid_pos, node->label);
 		/* draw horizontal line */
 		if (is_root(node)) {
 			printf("<line x1='0' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-					rint(v_scale * (pos->top+pos->bottom)),
-					rint(ROOT_SPACE + (h_scale * pos->depth)),
-					rint(v_scale * (pos->top+pos->bottom)));
+				svg_mid_pos, svg_h_pos, svg_mid_pos);
 
 		} else {
-			printf ("<line style='stroke:%s' x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				color,
-				 rint(ROOT_SPACE + h_scale * (pos->depth - node->parent_edge->length)),
-				 rint(v_scale * (pos->top + pos->bottom)), /* (2*top + 2*bottom) / 2 */
-				 rint(ROOT_SPACE + h_scale * (pos->depth)),
-				 rint(v_scale * (pos->top + pos->bottom)));
-			printf ("<text style='stroke:none;font-size:%s' x='%4f' y='%4f'>%s</text>",
-					inner_label_font_size,
-					rint(ROOT_SPACE + h_scale * (pos->depth - 0.5 * node->parent_edge->length)),
-					rint(edge_length_v_offset + v_scale * (pos->top + pos->bottom)),
-					node->parent_edge->length_as_string);
+			printf ("<line style='stroke:%s' "
+				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
+				color, svg_h_pos - svg_parent_edge_length,
+				 svg_mid_pos, svg_h_pos, svg_mid_pos);
+			printf ("<text style='stroke:none;font-size:%s' "
+				"x='%4f' y='%4f'>%s</text>",
+				inner_label_font_size,
+				svg_h_pos - 0.5 * svg_parent_edge_length,
+				edge_length_v_offset + svg_mid_pos,
+				node->parent_edge->length_as_string);
 
 		}
 
@@ -226,7 +226,7 @@ void display_svg_tree(struct rooted_tree *tree)
 	int num_leaves = set_node_vpos(tree);
 	struct h_data hd = set_node_depth(tree);
 	double h_scale = -1;
-	double v_scale = 20.0; // TODO: set as parameter
+	double v_scale = 40.0; // TODO: set as parameter
 
 	struct hash *node_colors = set_node_colors(tree);
 
