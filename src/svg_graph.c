@@ -134,8 +134,7 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 		">");
 
 	struct list_elem *elem;
-
-	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
+	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
 		struct rnode *node = (struct rnode *) elem->data;
 		char *node_key = make_hash_key(node);
 		struct node_pos *pos = (struct node_pos *) node->data;
@@ -155,8 +154,10 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 			h_scale * node->parent_edge->length;
 
 		/* draw node (vertical line) */
-		printf("<line x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-			svg_h_pos, svg_top_pos, svg_h_pos, svg_bottom_pos);
+		printf("<line style='stroke:%s' "
+			"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
+			color, svg_h_pos, svg_top_pos, svg_h_pos,
+			svg_bottom_pos);
 		/* draw label */
 		printf("<text style='stroke:none;font-size:%s' "
 		       "x='%.4f' y='%.4f'>%s</text>",
@@ -197,8 +198,9 @@ void dump_label (void *lbl) { puts((char *) lbl); }
 
 struct hash *set_node_colors(struct rooted_tree *tree)
 {
-	struct hash *result = create_hash(tree->nodes_in_order->count);
+	struct hash *node_colors = create_hash(tree->nodes_in_order->count);
 
+	/* Attribute colors to LCA of labels as specified in the color map */
 	struct list_elem *elem;
 	for (elem=colormap->head; NULL!=elem; elem=elem->next) {
 		struct colormap_pair *cpair;
@@ -209,11 +211,38 @@ struct hash *set_node_colors(struct rooted_tree *tree)
 		printf ("Color: %s\n", cpair->color); */
 		struct rnode *lca = lca_from_labels(tree, labels);
 		char *lca_key = make_hash_key(lca);
-		hash_set(result, lca_key, cpair->color);	
+		hash_set(node_colors, lca_key, cpair->color);	
 		// printf ("%s -> %s\n", lca->label, cpair->color);
 	}
 
-	return result;
+	/* Attribute colors to other nodes according to ancestors */
+	struct llist *nodes_in_reverse_order;
+	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
+	struct list_elem *el;
+	for (el=nodes_in_reverse_order->head; NULL!=el; el=el->next) {
+		struct rnode *node = (struct rnode *) el->data;
+		char *hash_key = make_hash_key(node);
+		if (NULL == hash_get(node_colors, hash_key)) {
+			if (is_root(node)) {
+				hash_set(node_colors, hash_key, "black");
+			} else {
+				struct rnode *parent;
+				parent = node->parent_edge->parent_node;
+				char *parent_hash_key;
+				parent_hash_key = make_hash_key(parent);
+				char *color = (char *) hash_get(node_colors,
+						parent_hash_key);
+				assert(NULL != color);
+				free(parent_hash_key);
+				hash_set(node_colors, hash_key, color);
+			}
+		}
+		/* if not NULL, just leave as is */
+		free(hash_key);
+	}
+	destroy_llist(nodes_in_reverse_order);
+
+	return node_colors;
 }
 
 void display_svg_tree(struct rooted_tree *tree)
