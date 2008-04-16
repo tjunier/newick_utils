@@ -154,7 +154,7 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 			h_scale * node->parent_edge->length;
 
 		/* draw node (vertical line) */
-		printf("<line style='stroke:%s' "
+		printf("<line style='stroke:%s' stroke-linecap='round' "
 			"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 			color, svg_h_pos, svg_top_pos, svg_h_pos,
 			svg_bottom_pos);
@@ -165,11 +165,13 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 			svg_mid_pos, node->label);
 		/* draw horizontal line */
 		if (is_root(node)) {
-			printf("<line x1='0' y1='%.4f' x2='%.4f' y2='%.4f'/>",
+			printf("<line stroke-linecap='round' "
+				"x1='0' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				svg_mid_pos, svg_h_pos, svg_mid_pos);
 
 		} else {
 			printf ("<line style='stroke:%s' "
+				"stroke-linecap='round' "
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				color, svg_h_pos - svg_parent_edge_length,
 				 svg_mid_pos, svg_h_pos, svg_mid_pos);
