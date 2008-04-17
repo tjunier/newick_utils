@@ -1,11 +1,27 @@
+nw_prune: remove nodes from a tree. Think of a CLI syntax for removing whole
+clades by specifying the LCA.
+
+nw_display: SVG mode is now hybrid in the sense that some node data (vertical
+and horizontal position) are stored in a node_pos structure attributed to
+rnode->data, while others (color, for now) are stored in a rnode-indexed hash.
+This hybrid state is not desirable. I need to decide if I want all-hash or
+all-node-data. I think that the latter is best (should be quicker, doesn't need
+the additional data structure and assorted memory management), but then I'll
+have to duplicate the code that fills the data. This is because currently I use
+the same functions (alloc_node_pos(), set_node_vpos(), and set_node_depth()) as
+for the text display and for nw_distance (these two apps don't require anything
+more than positions). If I want to store all node data for SVG display in a
+structure, I'll need a new structure with SVG-specific members in addition to
+horizontal and vertical positions. This structure cannot be passed to the above
+functions, so I'll have to make SVG-specific clones of them. This is where I
+miss OO, where I could have used an abstract class. Let's let this rest for a
+while.
+
 add some error messages in newick parser (better than just "syntax error"). One
 case I encountered was two consecutive labels (in fact there was a spurious
 space between them). Something could be done, such as fusing them with a '_',
 or dropping all but the first; at the very least th eprogram should say what
 the problem was and where it was found.
-
-nw_prune: remove nodes from a tree. Think of a CLI syntax for removing whole
-clades by specifying the LCA.
 
 Add functionality for directly counting a bipartition from a set of replicates.
 This would look like: $ nw_bipart <reps> leaf1 ... leafn where a bipartition
@@ -13,11 +29,6 @@ will be computed from the leaf labels, and its frequency printed out as output.
 
 [started] nw_distance: output distances from root or LCA as a table, or between
 leaves as a matrix.
-
-[started] SVG for nw_display. The concept of color maps for LCA's (cf Ruby version)
-should be integrated from the start. Due to the impossibility of predicting SVG
-text's dimensions, the horizontal space requirements are sometimes
-miscalculated. Add an option to override it.
 
 nw_ed should be able to visit the tree in reverse order, and to flag nodes for
 no further processing (if they meet the condition or if their parent is
@@ -49,5 +60,10 @@ traversal can be used to generate an ordered nodes list.
 [done] Add an option (-p) to nw_bipart so it prints out percentages instead of
 absolute frequencies. 
 
-[done] nw_labels: output labels, in columns or on a line, in parse order. Options for
-omitting leaves or inners.
+[done] nw_labels: output labels, in columns or on a line, in parse order.
+Options for omitting leaves or inners.
+
+[done] SVG for nw_display. The concept of color maps for LCA's (cf Ruby
+version) should be integrated from the start. Due to the impossibility of
+predicting SVG text's dimensions, the horizontal space requirements are
+sometimes miscalculated. Add an option to override it.

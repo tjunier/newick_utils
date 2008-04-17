@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "tree.h"
 #include "list.h"
@@ -17,6 +18,16 @@
 struct colormap_pair {
 	char *color;		/* a valid SVG color string, e.g. 'blue' */
 	struct llist *labels;	/* color whole clade defined by those labels */
+};
+
+/* rnode data for SVG trees */
+
+struct svg_data {
+	double top;
+	double bottom;
+	double depth;
+	char *color;
+	/* ... other node properties ... */
 };
 
 const int ROOT_SPACE = 10;	/* pixels */
@@ -125,7 +136,7 @@ void svg_init()
  * done in set_node_depth()). */
 
 void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
-		const double v_scale, struct hash *node_colors)
+		const double v_scale)
 {
 	printf( "<g"
 	       	" style='stroke:black;stroke-width:1;"
@@ -137,19 +148,16 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
 		struct rnode *node = (struct rnode *) elem->data;
 		char *node_key = make_hash_key(node);
-		struct node_pos *pos = (struct node_pos *) node->data;
+		struct svg_data *node_data = (struct svg_data *) node->data;
 
 		char *font_size = is_leaf(node) ?
 			leaf_label_font_size : inner_label_font_size ;
-		char *color;
-		if ((color = hash_get(node_colors, node_key)) == NULL) {
-			color = "black";
-		}
-		double svg_h_pos = ROOT_SPACE + (h_scale * pos->depth);
-		double svg_top_pos = v_scale * pos->top; 
-		double svg_bottom_pos = v_scale * pos->bottom; 
+		char *color = node_data->color;
+		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
+		double svg_top_pos = v_scale * node_data->top; 
+		double svg_bottom_pos = v_scale * node_data->bottom; 
 		double svg_mid_pos =
-			0.5 * v_scale * (pos->top+pos->bottom);
+			0.5 * v_scale * (node_data->top+node_data->bottom);
 		double svg_parent_edge_length =
 			h_scale * node->parent_edge->length;
 
@@ -198,10 +206,8 @@ void dump_label (void *lbl) { puts((char *) lbl); }
  * since the LCA of a list of labels depends on the tree. So it has to be
  * computed for each tree. */
 
-struct hash *set_node_colors(struct rooted_tree *tree)
+void set_node_colors(struct rooted_tree *tree)
 {
-	struct hash *node_colors = create_hash(tree->nodes_in_order->count);
-
 	/* Attribute colors to LCA of labels as specified in the color map */
 	struct list_elem *elem;
 	for (elem=colormap->head; NULL!=elem; elem=elem->next) {
@@ -212,8 +218,7 @@ struct hash *set_node_colors(struct rooted_tree *tree)
 		dump_llist(labels, dump_label);
 		printf ("Color: %s\n", cpair->color); */
 		struct rnode *lca = lca_from_labels(tree, labels);
-		char *lca_key = make_hash_key(lca);
-		hash_set(node_colors, lca_key, cpair->color);	
+		((struct svg_data *) lca->data)->color = cpair->color;
 		// printf ("%s -> %s\n", lca->label, cpair->color);
 	}
 
@@ -223,49 +228,89 @@ struct hash *set_node_colors(struct rooted_tree *tree)
 	struct list_elem *el;
 	for (el=nodes_in_reverse_order->head; NULL!=el; el=el->next) {
 		struct rnode *node = (struct rnode *) el->data;
-		char *hash_key = make_hash_key(node);
-		if (NULL == hash_get(node_colors, hash_key)) {
+		struct svg_data *node_data = (struct svg_data *) node->data;
+		if (NULL == node_data->color) {
 			if (is_root(node)) {
-				hash_set(node_colors, hash_key, "black");
+				node_data->color = "black";
 			} else {
 				struct rnode *parent;
 				parent = node->parent_edge->parent_node;
-				char *parent_hash_key;
-				parent_hash_key = make_hash_key(parent);
-				char *color = (char *) hash_get(node_colors,
-						parent_hash_key);
-				assert(NULL != color);
-				free(parent_hash_key);
-				hash_set(node_colors, hash_key, color);
+				char *parent_color =
+					((struct svg_data *) parent->data)
+					->color;
+				assert(NULL != parent_color);
+				node_data->color = parent_color;
 			}
 		}
-		/* if not NULL, just leave as is */
-		free(hash_key);
 	}
 	destroy_llist(nodes_in_reverse_order);
+}
 
-	return node_colors;
+void svg_alloc_node_pos(struct rooted_tree *tree) 
+{
+	struct list_elem *le;
+	struct rnode *node;
+
+	for (le = tree->nodes_in_order->head; NULL != le; le = le->next) {
+		node = le->data;
+		struct svg_data *svgd = malloc(sizeof(struct svg_data));
+		if (NULL == svgd) { perror(NULL); exit (EXIT_FAILURE); }
+		svgd->top = svgd->bottom = svgd->depth = -1.0;
+		svgd->color = NULL;
+		node->data = svgd;
+	}
+}
+
+void svg_set_node_top (struct rnode *node, double top)
+{
+	((struct svg_data *) node->data)->top = top;
+}
+
+void svg_set_node_bottom (struct rnode *node, double bottom)
+{
+	((struct svg_data *) node->data)->bottom = bottom;
+}
+
+double svg_get_node_top (struct rnode *node)
+{
+	return ((struct svg_data *) node->data)->top;
+}
+
+double svg_get_node_bottom (struct rnode *node)
+{
+	return ((struct svg_data *) node->data)->bottom;
+}
+
+void svg_set_node_depth (struct rnode *node, double depth)
+{
+	((struct svg_data *) node->data)->depth = depth;
+}
+
+double svg_get_node_depth (struct rnode *node)
+{
+	return ((struct svg_data *) node->data)->depth;
 }
 
 void display_svg_tree(struct rooted_tree *tree)
 {	
-	/* Ensure that init has been done */
-	assert(0 != init_done);
+	assert(init_done);
 
 	/* set node positions */
-	alloc_node_pos(tree);
-	int num_leaves = set_node_vpos(tree);
-	struct h_data hd = set_node_depth(tree);
+ 	svg_alloc_node_pos(tree);
+	int num_leaves = set_node_vpos_cb(tree,
+			svg_set_node_top, svg_set_node_bottom,
+			svg_get_node_top, svg_get_node_bottom);
+	struct h_data hd = set_node_depth_cb(tree,
+			svg_set_node_depth, svg_get_node_depth);
 	double h_scale = -1;
 	double v_scale = 40.0; // TODO: set as parameter
 
-	struct hash *node_colors = set_node_colors(tree);
-
+	if (colormap) set_node_colors(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* create canvas and draw nodes on it */
 	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
-	write_nodes_to_g(tree, h_scale, v_scale, node_colors);
+	write_nodes_to_g(tree, h_scale, v_scale);
 }
 
 void svg_footer() { printf ("</svg>"); }

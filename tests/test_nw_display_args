@@ -1,2 +1,3 @@
 multiple:forest.nw
 pure_topol:tetrapoda_pure_topol.nw
+svg_cmap:-s -c color.map catarrhini.nw
