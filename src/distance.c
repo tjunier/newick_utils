@@ -98,9 +98,6 @@ struct parameters get_params(int argc, char *argv[])
 void distance_list (struct rooted_tree *tree, struct rnode *origin,
 		struct llist *labels, char separator)
 {
-	/* fill in length data*/
-	alloc_node_pos(tree);
-	set_node_depth(tree);
 
 	double origin_depth;
 	if (NULL != origin) 
@@ -131,8 +128,63 @@ void distance_list (struct rooted_tree *tree, struct rnode *origin,
 	putchar('\n');
 }
 
-void distance_matrix (struct rooted_tree *tree, struct parameters params)
+/* NOTE: this function could be made much more efficient. First, the matrix is
+ * symmetric, yet each cell is computed. Second, it should be possible to avoid
+ * all the */
+
+double ** fill_matrix (struct rooted_tree *tree, struct llist *labels)
 {
+	struct list_elem *h_el, *v_el;
+	int i, j;
+	int count = labels->count;
+	struct hash *lbl2node_map = create_node_map(tree->nodes_in_order);
+	
+	double **lines = malloc(count * sizeof(double *));
+	if (NULL == lines) { perror(NULL), exit (EXIT_FAILURE); }
+	
+	for (j=0, v_el=labels->head; NULL != v_el; v_el=v_el->next, j++) {
+
+		lines[j] = malloc(count * sizeof(double));
+		if (NULL == lines[j]) { perror(NULL), exit (EXIT_FAILURE); }
+
+		struct rnode *h_node, *v_node;
+		v_node = hash_get(lbl2node_map, (char *) v_el->data);
+
+		for (i=0,h_el=labels->head; NULL!=h_el; h_el=h_el->next,i++) {
+			h_node = hash_get(lbl2node_map, (char *) h_el->data);
+			if (NULL == v_node || NULL == h_node) {
+				lines[j][i] = -1;
+				break;
+			}
+			struct rnode *lca = lca2(tree, h_node, v_node);
+			lines[j][i] = 
+				((struct node_pos *) h_node->data)->depth
+				+
+				((struct node_pos *) v_node->data)->depth
+				-
+				2 * ((struct node_pos *) lca->data)->depth
+				;
+		}
+	}	
+
+	destroy_hash(lbl2node_map);
+	return lines;
+}
+
+void distance_matrix (struct rooted_tree *tree, struct llist *labels)
+{
+	double **matrix = fill_matrix(tree, labels);
+
+	struct list_elem *h_el, *v_el;
+	int i, j;
+	int count = labels->count;
+	
+	for (j=0, v_el=labels->head; NULL != v_el; v_el=v_el->next, j++) {
+		for (i=0,h_el=labels->head; NULL!=h_el; h_el=h_el->next,i++) {
+			printf("\t%g", matrix[j][i]);
+		}
+		printf ("\n");
+	}	
 }
 
 
@@ -146,6 +198,8 @@ int main(int argc, char *argv[])
 	/* TODO: could take the switch out of the loop, since the distance type
 	 * is fixed for the program's lifetime */
 	while ((tree = parse_tree()) != NULL) {
+		alloc_node_pos(tree);
+		set_node_depth(tree);
 		struct rnode *lca;
 		struct llist *labels = params.labels;
 		switch (params.distance_type) {
@@ -164,7 +218,7 @@ int main(int argc, char *argv[])
 			distance_list(tree, lca, labels, params.separator);
 			break;
 		case MATRIX:
-			distance_matrix(tree, params);
+			distance_matrix(tree, labels);
 			break;
 		case FROM_PARENT:
 			if (0 == labels->count) /* if no lbl given, use all leaves */
