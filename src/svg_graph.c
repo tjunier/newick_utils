@@ -147,7 +147,6 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
 		struct rnode *node = (struct rnode *) elem->data;
-		char *node_key = make_hash_key(node);
 		struct svg_data *node_data = (struct svg_data *) node->data;
 
 		char *font_size = is_leaf(node) ?

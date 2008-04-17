@@ -81,8 +81,10 @@ struct rnode *lca2(struct rooted_tree *tree, struct rnode *desc_A,
 
 	while (1) {
 		key = make_hash_key(desc_B);
-		if (NULL != hash_get(seen_nodes, key)) /* seen */
+		if (NULL != hash_get(seen_nodes, key)) { /* seen */
+			free(key);
 			break;
+		}
 		free(key);
 		desc_B = desc_B->parent_edge->parent_node;
 	}
