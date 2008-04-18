@@ -128,9 +128,30 @@ void distance_list (struct rooted_tree *tree, struct rnode *origin,
 	putchar('\n');
 }
 
-/* NOTE: this function could be made much more efficient. First, the matrix is
- * symmetric, yet each cell is computed. Second, it should be possible to avoid
- * all the */
+/* NOTE: this function could be made more efficient. First, the matrix is
+ * symmetric, yet each cell is computed. It is trivial to halve the job.
+ * Second, for every pait of labels, the LCA is computed from scratch. But
+ * there is a better way, akin to dynamic programming (heck, maybe it *is*
+ * dynamic programming): one can fill a table of LCAs in the following way:
+ *
+ * 1. for each inner node, in parse order:
+ * 	1.1. store its leftmost and rightmost descendants's labels (leftmost
+ * 	descendant is leftmost descendant of its left child, rightmost
+ * 	descendant is rightmost descendant of its right child)
+ * 	1.2. in the matrix, find the cell (L,R), where L is the leftmost
+ * 	descendants's label and R the rightmost descendant's. Set this cell's
+ * 	value to the current inner node - it is the LCA of L and R.
+ * 	1.3 now find all cells "below" this one, i.e. that are to the left or
+ * 	below this one in the upper-right triangle (or to the right and above
+ * 	in the lower-left triangle): these cells are set to the same value,
+ * 	UNLESS they are already set.
+ *
+ * Of course this only works if the matrix is ordered in parse order too.
+ * Moreover it only works when seeking the LCA of two leaves, but if one of the
+ * descendants whose LCA we seek is an inner node, one can always fetch its
+ * leftmost (or rightmost) descendant from the tree, and use this to get the
+ * LCA.
+ */
 
 double ** fill_matrix (struct rooted_tree *tree, struct llist *labels)
 {

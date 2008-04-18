@@ -7,7 +7,7 @@ TESTS = test_rnode test_redge test_list test_link \
 	test_nw_reroot.sh test_nw_rename.sh test_nw_collapse.sh \
 	test_nw_display.sh test_nw_indent.sh test_nw_bipart.sh \
 	test_nw_ed.sh test_nw_topology.sh test_nw_clade.sh \
-	test_nw_distance.sh test_nw_labels.sh
+	test_nw_distance.sh test_nw_labels.sh test_nw_prune.sh
 
 check_PROGRAMS = test_rnode test_redge test_list test_link \
 		 test_canvas test_concat test_hash test_lca \
