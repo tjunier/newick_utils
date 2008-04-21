@@ -1,5 +1,12 @@
-nw_prune: remove nodes from a tree. Think of a CLI syntax for removing whole
-clades by specifying the LCA.
+list.c: add a void * to_array(struct llist *) function. Then use the array form
+when iterating over a tree's nodes. This has the following advantages:
+ o faster
+ o loop easier to read (no need to cast from void*, etc).
+ o no need to compute a reverse list, as long as the array's size is stored
+ o smaller memory footprint (if we can discard the list altogether after converting to the array)
+
+[started] nw_prune: remove nodes from a tree. Think of a CLI syntax for
+removing whole clades by specifying the LCA.
 
 nw_display: SVG mode is now hybrid in the sense that some node data (vertical
 and horizontal position) are stored in a node_pos structure attributed to
