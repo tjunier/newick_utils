@@ -9,9 +9,7 @@
 #include "nodemap.h"
 #include "parser.h"
 #include "to_newick.h"
-/*
-#include "lca.h"
-*/
+#include "redge.h"
 #include "rnode.h"
 #include "link.h"
 #include "hash.h"
@@ -74,12 +72,13 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 	for (elem = labels->head; NULL != elem; elem = elem->next) {
 		char *label = elem->data;
 		struct rnode *goner = hash_get(lbl2node_map, label);
+		struct rnode *parent = goner->parent_edge->parent_node;
 		if (NULL == goner) {
 			fprintf (stderr, "WARNING: label '%s' not found.\n",
 					label);
 			continue;
 		}
-		splice_out_rnode (goner);
+		unlink_node (goner);
 	}
 
 	destroy_hash(lbl2node_map);

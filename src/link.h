@@ -60,4 +60,5 @@ void reverse_redge(struct redge *edge);
  * RETURN VALUE: the root's remaining child if the removed node's parent is
  * root AND the root has only one remaining child; NULL otherwise. */
 
+/* TODO: rename to unlink_rnode(), for consistency. */
 struct rnode * unlink_node(struct rnode *);
