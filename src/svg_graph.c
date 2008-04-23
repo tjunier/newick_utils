@@ -8,12 +8,13 @@
 #include "tree.h"
 #include "list.h"
 #include "rnode.h"
-#include "node_pos.h"
+#include "simple_node_pos.h"
 #include "redge.h"
 #include "assert.h"
 #include "readline.h"
 #include "lca.h"
 #include "hash.h"
+#include "node_pos_alloc.h"
 
 struct colormap_pair {
 	char *color;		/* a valid SVG color string, e.g. 'blue' */
@@ -296,7 +297,7 @@ void display_svg_tree(struct rooted_tree *tree)
 
 	/* set node positions */
  	svg_alloc_node_pos(tree);
-	int num_leaves = set_node_vpos_cb(tree,
+	set_node_vpos_cb(tree,
 			svg_set_node_top, svg_set_node_bottom,
 			svg_get_node_top, svg_get_node_bottom);
 	struct h_data hd = set_node_depth_cb(tree,

@@ -7,6 +7,7 @@
 #include "parser.h"
 #include "tree.h"
 #include "svg_graph.h"
+#include "text_graph.h"
 
 struct parameters {
 	int width;

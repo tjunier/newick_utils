@@ -1,8 +1,10 @@
 /* distance: print distances between nodes, in various ways. */
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -10,9 +12,10 @@
 #include "hash.h"
 #include "list.h"
 #include "lca.h"
-#include "node_pos.h"
+#include "simple_node_pos.h"
 #include "rnode.h"
 #include "redge.h"
+#include "node_pos_alloc.h"
 
 enum {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
 
@@ -101,7 +104,7 @@ void distance_list (struct rooted_tree *tree, struct rnode *origin,
 
 	double origin_depth;
 	if (NULL != origin) 
-		origin_depth = ((struct node_pos *) origin->data)->depth;
+		origin_depth = ((struct simple_node_pos *) origin->data)->depth;
 
 	struct hash *node_map = create_node_map(tree->nodes_in_order);
 	struct list_elem *el;
@@ -117,10 +120,10 @@ void distance_list (struct rooted_tree *tree, struct rnode *origin,
 					label);
 			continue;
 		}
-		double node_depth = ((struct node_pos *) node->data)->depth;
+		double node_depth = ((struct simple_node_pos *) node->data)->depth;
 		if (NULL == origin) {
 			struct rnode *parent = node->parent_edge->parent_node;
-			origin_depth = ((struct node_pos *) parent->data)->depth;
+			origin_depth = ((struct simple_node_pos *) parent->data)->depth;
 		}
 		if (el != labels->head) printf ("%c", separator);
 		printf ("%g", node_depth - origin_depth);
@@ -179,11 +182,11 @@ double ** fill_matrix (struct rooted_tree *tree, struct llist *labels)
 			}
 			struct rnode *lca = lca2(tree, h_node, v_node);
 			lines[j][i] = 
-				((struct node_pos *) h_node->data)->depth
+				((struct simple_node_pos *) h_node->data)->depth
 				+
-				((struct node_pos *) v_node->data)->depth
+				((struct simple_node_pos *) v_node->data)->depth
 				-
-				2 * ((struct node_pos *) lca->data)->depth
+				2 * ((struct simple_node_pos *) lca->data)->depth
 				;
 		}
 	}	
@@ -198,7 +201,6 @@ void distance_matrix (struct rooted_tree *tree, struct llist *labels)
 
 	struct list_elem *h_el, *v_el;
 	int i, j;
-	int count = labels->count;
 	
 	for (j=0, v_el=labels->head; NULL != v_el; v_el=v_el->next, j++) {
 		for (i=0,h_el=labels->head; NULL!=h_el; h_el=h_el->next,i++) {
@@ -219,8 +221,10 @@ int main(int argc, char *argv[])
 	/* TODO: could take the switch out of the loop, since the distance type
 	 * is fixed for the program's lifetime */
 	while ((tree = parse_tree()) != NULL) {
-		alloc_node_pos(tree);
-		set_node_depth(tree);
+		alloc_simple_node_pos(tree);
+		set_node_depth_cb(tree,
+				set_simple_node_pos_depth,
+				get_simple_node_pos_depth);
 		struct rnode *lca;
 		struct llist *labels = params.labels;
 		switch (params.distance_type) {

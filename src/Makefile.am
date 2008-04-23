@@ -22,8 +22,8 @@ address_scanner.c: address_scanner.l
 	flex -oaddress_scanner.c address_scanner.l 
 
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
-		node_pos.c svg_graph.c readline.c lca.c nodemap.c \
-		hash.c
+		simple_node_pos.c svg_graph.c readline.c lca.c nodemap.c \
+		hash.c node_pos_alloc.c
 nw_display_LDADD = @LEXLIB@
 
 nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c nodemap.c hash.c \
@@ -49,8 +49,8 @@ nw_ed_LDADD = @LEXLIB@ -lm
 nw_topology_SOURCES = $(NW_CORE) $(NW_OUT) topology.c
 nw_topology_LDADD = @LEXLIB@
 
-nw_distance_SOURCES = $(NW_CORE) distance.c node_pos.c nodemap.c \
-		hash.c lca.c
+nw_distance_SOURCES = $(NW_CORE) distance.c simple_node_pos.c nodemap.c \
+		hash.c lca.c node_pos_alloc.c
 nw_distance_LDADD = @LEXLIB@
 
 nw_labels_SOURCES = $(NW_CORE) labels.c

@@ -1,14 +1,15 @@
 /* text_graph.c - functions for drawing trees on a text canvas. */
 
-#include <math.h>
 #include <stdlib.h>
+#include <math.h>
 
-#include "tree.h"
 #include "canvas.h"
+#include "tree.h"
 #include "list.h"
+#include "simple_node_pos.h"
 #include "rnode.h"
-#include "node_pos.h"
 #include "redge.h"
+#include "node_pos_alloc.h"
 
 #define LBL_SPACE 2
 #define ROOT_SPACE 1
@@ -23,7 +24,7 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree, const doub
 
 	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
 		struct rnode *node = (struct rnode *) elem->data;
-		struct node_pos *pos = (struct node_pos *) node->data;
+		struct simple_node_pos *pos = (struct simple_node_pos *) node->data;
 		/* draw node */
 		canvas_draw_vline(canvas,
 				rint(ROOT_SPACE + (scale * pos->depth)),
@@ -55,9 +56,15 @@ What's more, we can't assume that the new tree will fit in the old canvas. */
 void display_tree(struct rooted_tree *tree, int width)
 {	
 	/* set node positions */
-	alloc_node_pos(tree);
-	int num_leaves = set_node_vpos(tree);
-	struct h_data hd = set_node_depth(tree);
+	alloc_simple_node_pos(tree);
+	int num_leaves = set_node_vpos_cb(tree,
+			set_simple_node_pos_top,
+			set_simple_node_pos_bottom,
+			get_simple_node_pos_top,
+			get_simple_node_pos_bottom);
+	struct h_data hd = set_node_depth_cb(tree,
+			set_simple_node_pos_depth,
+			get_simple_node_pos_depth);
 	double scale = -1;
 	struct canvas *canvasp;
 
