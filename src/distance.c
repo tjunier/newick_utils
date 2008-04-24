@@ -195,7 +195,8 @@ double ** fill_matrix (struct rooted_tree *tree, struct llist *labels)
 	return lines;
 }
 
-void distance_matrix (struct rooted_tree *tree, struct llist *labels)
+void distance_matrix (struct rooted_tree *tree, struct llist *labels,
+		int show_headers, int shape)
 {
 	double **matrix = fill_matrix(tree, labels);
 
@@ -203,6 +204,7 @@ void distance_matrix (struct rooted_tree *tree, struct llist *labels)
 	int i, j;
 	
 	for (j=0, v_el=labels->head; NULL != v_el; v_el=v_el->next, j++) {
+		if (show_headers) printf ("%s", (char *) v_el->data);
 		for (i=0,h_el=labels->head; NULL!=h_el; h_el=h_el->next,i++) {
 			printf("\t%g", matrix[j][i]);
 		}
@@ -243,7 +245,7 @@ int main(int argc, char *argv[])
 			distance_list(tree, lca, labels, params.separator);
 			break;
 		case MATRIX:
-			distance_matrix(tree, labels);
+			distance_matrix(tree, labels, 1, 1);
 			break;
 		case FROM_PARENT:
 			if (0 == labels->count) /* if no lbl given, use all leaves */

@@ -49,4 +49,6 @@ int main(int argc, char* argv[])
 	get_params(argc, argv);
 
 	yylex();
+
+	return 0;
 }
