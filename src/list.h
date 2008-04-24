@@ -80,3 +80,14 @@ int llist_index_of_f(struct llist *list, int (*func)(void*,void*), void *tgt);
  * only the data structure (i.e., the llist itself and the list_elements). */
 
 void destroy_llist(struct llist *);
+
+/* Returns an array of pointers to all elements in the list, in the list order.
+ * */
+
+void ** llist_to_array(struct llist *);
+
+/* Returns a list based on an array of pointers (which will be attributed to
+ * the data member of the list elements). Second argument is the number of
+ * elements in the array. */
+
+struct llist * array_to_llist(void **, int count);

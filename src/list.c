@@ -289,3 +289,30 @@ void destroy_llist(struct llist *l)
 	free(delenda);
 	free(l);
 }
+
+void ** llist_to_array (struct llist *l)
+{
+	if (0 == l->count) { return NULL; }
+
+	void ** array = malloc(l->count * sizeof(void *));
+	if (NULL == array) { perror(NULL); exit(EXIT_FAILURE); }
+
+	struct list_elem *el;
+	int i;
+	for (i = 0, el = l->head; NULL != el; i++, el = el->next)
+		array[i] = el->data;
+
+	return array;
+}
+
+struct llist *array_to_llist(void **array, int count)
+{
+	struct llist *list = create_llist();
+	int i;
+
+	for (i = 0; i < count; i++) 
+		append_element(list, array[i]);
+
+	return list;
+}
+

@@ -1242,6 +1242,132 @@ int test_destroy()
 	return 0;
 }
 
+int test_to_array()
+{
+	const char *test_name = "test_to_array";
+
+	struct llist *list = create_llist();
+
+	append_element(list, "Archaea");
+	append_element(list, "Bacteria");
+	append_element(list, "Columbiformes");
+	append_element(list, "Diptera");
+	append_element(list, "Eleagnaceae");
+	append_element(list, "Fagales");
+	append_element(list, "Gastropoda");
+
+	char ** list_array = (char **) llist_to_array(list);
+
+	if (strcmp(list_array[0], "Archaea")) {
+		printf ("%s: expected 'Archaea' as element 0 (got '%s')\n",
+				test_name, list_array[0]);
+		return 1;
+	}
+	if (strcmp(list_array[1], "Bacteria")) {
+		printf ("%s: expected 'Bacteria' as element 1 (got '%s')\n",
+				test_name, list_array[1]);
+		return 1;
+	}
+	if (strcmp(list_array[2], "Columbiformes")) {
+		printf ("%s: expected 'Columbiformes' as element 2 (got '%s')\n",
+				test_name, list_array[2]);
+		return 1;
+	}
+	if (strcmp(list_array[3], "Diptera")) {
+		printf ("%s: expected 'Diptera' as element 3 (got '%s')\n",
+				test_name, list_array[3]);
+		return 1;
+	}
+	if (strcmp(list_array[4], "Eleagnaceae")) {
+		printf ("%s: expected 'Eleagnaceae' as element 4 (got '%s')\n",
+				test_name, list_array[4]);
+		return 1;
+	}
+	if (strcmp(list_array[5], "Fagales")) {
+		printf ("%s: expected 'Fagales' as element 5 (got '%s')\n",
+				test_name, list_array[5]);
+		return 1;
+	}
+	if (strcmp(list_array[6], "Gastropoda")) {
+		printf ("%s: expected 'Gastropoda' as element 6 (got '%s')\n",
+				test_name, list_array[6]);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_from_array()
+{
+	const char *test_name = "test_from_array";
+
+	char ** array = malloc(7 * sizeof(char *));
+	// if NULL, test will fail anyway.
+
+	array[0] = "Archaea";
+	array[1] = "Bacteria";
+	array[2] = "Columbiformes";
+	array[3] = "Diptera";
+	array[4] = "Eleagnaceae";
+	array[5] = "Fagales";
+	array[6] = "Gastropoda";
+
+	struct llist *list = array_to_llist((void **) array, 7);
+	struct list_elem *el;
+
+	el = list->head;
+	if (strcmp((char *) el->data, "Archaea")) {
+		printf ("%s: expected 'Archaea' as element 0 (got '%s')\n",
+				test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp((char *) el->data, "Bacteria")) {
+		printf ("%s: expected 'Bacteria' as element 1 (got '%s')\n",
+				test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp((char *) el->data, "Columbiformes")) {
+		printf ("%s: expected 'Columbiformes' as element 2 (got '%s')\n",
+				test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp((char *) el->data, "Diptera")) {
+		printf ("%s: expected 'Diptera' as element 3 (got '%s')\n",
+				test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp((char *) el->data, "Eleagnaceae")) {
+		printf ("%s: expected 'Eleagnaceae' as element 4 (got '%s')\n",
+				test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp((char *) el->data, "Fagales")) {
+		printf ("%s: expected 'Fagales' as element 5 (got '%s')\n",
+				test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp((char *) el->data, "Gastropoda")) {
+		printf ("%s: expected 'Gastropoda' as element 6 (got '%s')\n",
+				test_name, (char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: list not terminated\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -1266,6 +1392,7 @@ int main()
 	failures += test_index();
 	failures += test_destroy();
 	failures += test_llist_index_of_f();
+	failures += test_to_array();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

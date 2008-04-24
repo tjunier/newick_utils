@@ -72,7 +72,6 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 	for (elem = labels->head; NULL != elem; elem = elem->next) {
 		char *label = elem->data;
 		struct rnode *goner = hash_get(lbl2node_map, label);
-		struct rnode *parent = goner->parent_edge->parent_node;
 		if (NULL == goner) {
 			fprintf (stderr, "WARNING: label '%s' not found.\n",
 					label);
@@ -98,6 +97,8 @@ int main(int argc, char *argv[])
 		free(newick);
 		destroy_tree(tree);
 	}
+
+	destroy_llist(params.labels);
 
 	return 0;
 }
