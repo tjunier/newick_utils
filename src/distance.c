@@ -19,12 +19,18 @@
 
 enum {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
 
+enum {HORIZONTAL, VERTICAL};
+
+enum {SQUARE, TRIANGLE};
+
 struct parameters {
 	struct llist *labels;
 	int distance_type;
 	char separator;
 	int only_leaves;
-	int side_header;
+	int header;
+	int orientation;
+	int shape;
 };
 
 /* Returns the distance type (root, LCA, or matrix) based on the first characer
@@ -58,7 +64,9 @@ struct parameters get_params(int argc, char *argv[])
 	params.distance_type = FROM_ROOT;
 	params.separator = '\n';
 	params.only_leaves = 1;
-	params.side_header = 0;
+	params.header = 0;
+	params.orientation = VERTICAL;
+	params.shape = SQUARE;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "him:t")) != -1) {
@@ -67,10 +75,10 @@ struct parameters get_params(int argc, char *argv[])
 			params.distance_type = get_distance_type();
 			break;
 		case 't':
-			params.separator = '\t';
+			params.orientation = HORIZONTAL;
 			break;
 		case 'h':
-			params.side_header = 1;
+			params.header = 1;
 			break;
 		case 'i':
 			params.only_leaves = 0;
@@ -109,7 +117,7 @@ struct parameters get_params(int argc, char *argv[])
 }
 
 struct hash *distance_hash (struct rooted_tree *tree, struct rnode *origin,
-		struct llist *labels, char separator, int side_header)
+		struct llist *labels)
 {
 
 	double origin_depth;
@@ -138,9 +146,52 @@ struct hash *distance_hash (struct rooted_tree *tree, struct rnode *origin,
 		}
 		double *distance = malloc(sizeof(double));
 		if (NULL == distance) { perror(NULL); exit(EXIT_FAILURE); }
-		printf ("%g", node_depth - origin_depth);
+		*distance =  node_depth - origin_depth;
+		hash_set(distances, label, distance);
 	}
-	putchar('\n');
+
+	return distances;
+}
+
+void print_distance_list (struct rooted_tree *tree, struct rnode *origin,
+		struct llist *labels, int orientation, int header)
+{
+	struct hash *lbl2dist = distance_hash(tree, origin, labels);
+
+	struct list_elem *el;
+	char *label;
+	double *distance;
+	if (VERTICAL == orientation) {
+		for (el = labels->head; NULL != el; el = el->next) {
+			label = el->data;
+			distance = hash_get(lbl2dist, label);
+			if (header) { printf("%s\t", label); }
+			printf( "%g\n", *distance);
+		}
+	} else if (HORIZONTAL == orientation) {
+		if (header) {
+			for (el = labels->head; NULL != el; el = el->next) {
+				label = el->data;
+				if (el != labels->head) { putchar ('\t'); }
+				printf( "%s", label);
+			}
+			putchar('\n');
+		}
+		for (el = labels->head; NULL != el; el = el->next) {
+			label = el->data;
+			distance = hash_get(lbl2dist, label);
+			if (el != labels->head) { putchar ('\t'); }
+			printf( "%g", *distance);
+		}
+		putchar('\n');
+	} else {
+		fprintf (stderr, "ERROR: unknown orientation (%d)\n", 
+				orientation);
+		destroy_hash(lbl2dist);
+		exit(EXIT_FAILURE);
+	}
+
+	destroy_hash(lbl2dist);
 }
 
 /* NOTE: this function could be made more efficient. First, the matrix is
@@ -207,8 +258,8 @@ double ** fill_matrix (struct rooted_tree *tree, struct llist *labels)
 	return lines;
 }
 
-void distance_matrix (struct rooted_tree *tree, struct llist *labels,
-		int show_headers, int shape)
+void print_distance_matrix (struct rooted_tree *tree, struct llist *labels,
+		int headers, int shape)
 {
 	double **matrix = fill_matrix(tree, labels);
 
@@ -216,11 +267,14 @@ void distance_matrix (struct rooted_tree *tree, struct llist *labels,
 	int i, j;
 	
 	for (j=0, v_el=labels->head; NULL != v_el; v_el=v_el->next, j++) {
-		if (show_headers) printf ("%s", (char *) v_el->data);
+		if (headers) printf ("%s\t", (char *) v_el->data);
 		for (i=0,h_el=labels->head; NULL!=h_el; h_el=h_el->next,i++) {
-			printf("\t%g", matrix[j][i]);
+			printf("%g", matrix[j][i]);
+			if (h_el == labels->tail) 
+				putchar('\n');
+			else
+				putchar('\t');
 		}
-		printf ("\n");
 	}	
 }
 
@@ -249,8 +303,7 @@ int main(int argc, char *argv[])
 				labels = get_labels(tree);
 		switch (params.distance_type) {
 		case FROM_ROOT:
-			distance_list(tree, tree->root,
-				labels, params.separator);
+			print_distance_list(tree, tree->root, labels, params.orientation, params.header);
 			break;
 		case FROM_LCA:
 			/* if no lbl given, use root as LCA */
@@ -258,13 +311,16 @@ int main(int argc, char *argv[])
 				lca = tree->root;
 			else
 				lca = lca_from_labels(tree, labels);
-			distance_list(tree, lca, labels, params.separator);
+			print_distance_list(tree, lca, labels,
+				params.orientation, params.header);
 			break;
 		case MATRIX:
-			distance_matrix(tree, labels, 1, 1);
+			print_distance_matrix(tree, labels, params.header,
+					params.shape);
 			break;
 		case FROM_PARENT:
-			distance_list(tree, NULL, labels, params.separator);
+			print_distance_list(tree, NULL, labels,
+				params.orientation, params.header);
 			break;
 		default:
 			fprintf (stderr,
