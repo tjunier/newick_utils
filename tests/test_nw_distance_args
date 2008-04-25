@@ -5,3 +5,8 @@ an_2:-m lca dist.nw D F
 tan: -m lca -t dist.nw F E D
 pan: -m p dist.nw F D E B
 paa: -m p dist.nw
+i: -i dist.nw
+rh:-h dist.nw
+rnh: -h dist.nw D F A
+m: -m matrix dist.nw
+mh: -m matrix -h dist.nw

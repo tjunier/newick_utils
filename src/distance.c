@@ -23,6 +23,8 @@ struct parameters {
 	struct llist *labels;
 	int distance_type;
 	char separator;
+	int only_leaves;
+	int side_header;
 };
 
 /* Returns the distance type (root, LCA, or matrix) based on the first characer
@@ -55,15 +57,23 @@ struct parameters get_params(int argc, char *argv[])
 
 	params.distance_type = FROM_ROOT;
 	params.separator = '\n';
+	params.only_leaves = 1;
+	params.side_header = 0;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "m:t")) != -1) {
+	while ((opt_char = getopt(argc, argv, "him:t")) != -1) {
 		switch (opt_char) {
 		case 'm':
 			params.distance_type = get_distance_type();
 			break;
 		case 't':
 			params.separator = '\t';
+			break;
+		case 'h':
+			params.side_header = 1;
+			break;
+		case 'i':
+			params.only_leaves = 0;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -98,8 +108,8 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-void distance_list (struct rooted_tree *tree, struct rnode *origin,
-		struct llist *labels, char separator)
+struct hash *distance_hash (struct rooted_tree *tree, struct rnode *origin,
+		struct llist *labels, char separator, int side_header)
 {
 
 	double origin_depth;
@@ -107,6 +117,7 @@ void distance_list (struct rooted_tree *tree, struct rnode *origin,
 		origin_depth = ((struct simple_node_pos *) origin->data)->depth;
 
 	struct hash *node_map = create_node_map(tree->nodes_in_order);
+	struct hash *distances = create_hash(labels->count);
 	struct list_elem *el;
 	for (el = labels->head; NULL != el; el = el->next) {
 		char *label = (char *) el->data;
@@ -125,7 +136,8 @@ void distance_list (struct rooted_tree *tree, struct rnode *origin,
 			struct rnode *parent = node->parent_edge->parent_node;
 			origin_depth = ((struct simple_node_pos *) parent->data)->depth;
 		}
-		if (el != labels->head) printf ("%c", separator);
+		double *distance = malloc(sizeof(double));
+		if (NULL == distance) { perror(NULL); exit(EXIT_FAILURE); }
 		printf ("%g", node_depth - origin_depth);
 	}
 	putchar('\n');
@@ -229,17 +241,21 @@ int main(int argc, char *argv[])
 				get_simple_node_pos_depth);
 		struct rnode *lca;
 		struct llist *labels = params.labels;
+		/* if no lbl given, use all leaf labels or all labels */
+		if (0 == labels->count) 
+			if (params.only_leaves)
+				labels = get_leaf_labels(tree);
+			else
+				labels = get_labels(tree);
 		switch (params.distance_type) {
 		case FROM_ROOT:
-			if (0 == labels->count) /* if no lbl given, use all labels */
-				labels = get_labels(tree);
-			distance_list(tree, tree->root, labels, params.separator);
+			distance_list(tree, tree->root,
+				labels, params.separator);
 			break;
 		case FROM_LCA:
-			if (0 == labels->count) {
+			/* if no lbl given, use root as LCA */
+			if (0 == labels->count) 
 				lca = tree->root;
-				labels = get_labels(tree);
-			}
 			else
 				lca = lca_from_labels(tree, labels);
 			distance_list(tree, lca, labels, params.separator);
@@ -248,8 +264,6 @@ int main(int argc, char *argv[])
 			distance_matrix(tree, labels, 1, 1);
 			break;
 		case FROM_PARENT:
-			if (0 == labels->count) /* if no lbl given, use all leaves */
-				labels = get_leaf_labels(tree);
 			distance_list(tree, NULL, labels, params.separator);
 			break;
 		default:
