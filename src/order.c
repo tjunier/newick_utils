@@ -55,6 +55,7 @@ int lbl_comparator(const void *a, const void *b)
 	char *b_lbl = (*(struct redge **)b)->child_node->data;
 
 	int cmp = strcmp(a_lbl, b_lbl);
+	// printf ("%s <=> %s: %d\n", a_lbl, b_lbl, cmp);
 
 	return cmp;
 }
@@ -75,10 +76,12 @@ void process_tree(struct rooted_tree *tree)
 			/* Since all children have been visited (because we're
 			 * traversing the tree in parse order), we can just
 			 * order the children on their sort field. */
+
 			struct redge ** kids_array;
 			int count = current->children->count;
 			kids_array = (struct redge **)
 				llist_to_array(current->children);
+			destroy_llist(current->children);
 			qsort(kids_array, count, sizeof(struct redge *),
 					lbl_comparator);
 			struct llist *ordered_kids_list;
@@ -86,7 +89,7 @@ void process_tree(struct rooted_tree *tree)
 				(void **) kids_array, count);
 			current->children = ordered_kids_list;
 
-			current->data = kids_array[0]->child_node->label;
+			current->data = kids_array[0]->child_node->data;
 		}
 	}
 }
