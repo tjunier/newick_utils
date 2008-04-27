@@ -1,6 +1,5 @@
 %{
 #include <stdio.h>
-/*#include "newick.tab.h"*/ /* Does not compile on MacOSX with this in */
 #include "rnode.h"
 #include "redge.h"
 #include "list.h"
@@ -13,13 +12,15 @@
 
 #define YYMAXDEPTH 100000
 
-void nwserror(char *s)
-{
-	printf ("Parse error: %s\n", s);
-}
-
 extern struct llist *nodes_in_order;
 extern struct rnode *root;
+extern int lineno;
+
+void nwserror(char *s)
+{
+	printf ("ERROR: Syntax error at line %d near '%s'\n",
+		lineno, nwsget_text());
+}
 
 %}
 
@@ -48,6 +49,12 @@ tree: /* empty */	{ root = NULL; YYACCEPT; }
     | node SEMICOLON {
     		root = (struct rnode *)$1->child_node; 
 		YYACCEPT;
+    }
+    | node { 	/* WRONG */
+	fprintf (stderr, "ERROR: missing ';' at end of tree, line %d "
+		"near '%s'\n", lineno, nwsget_text());
+	root = NULL;
+	YYACCEPT;
     }
     ;
 

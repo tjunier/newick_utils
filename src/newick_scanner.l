@@ -11,6 +11,8 @@ int nwswrap(void)
 	return 1;
 }
 
+int lineno = 0;
+
 %}
 
 %%
@@ -29,6 +31,7 @@ int nwswrap(void)
 ","	{ return COMMA; }
 ":"	{ return COLON; }
 \[[^]]*]	/* ignore comments */ ;
-[\t\n ]+	/* ignore whitespace */ ;
+[\t ]+	/* ignore whitespace */ ;
+\n 	{ lineno++; }
 
 %%
