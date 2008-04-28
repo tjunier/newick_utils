@@ -1,25 +1,8 @@
-nw_order: sort tree nodes by some criterion. Include at least alphabetical
-sorting of labels. Might include other criteria like tree depth, etc, if these
-are of any use.
-
-list.c: add a void * to_array(struct llist *) function. This can be used for
-sorting the children of a node using qsort(). We should also provide the
-reverse function, array_to_list(). [NOTE: I previously thought that iterating
-over arrays would be faster than over lists, but this turns out not to be the
-case (see src/test_loops)].
-
-add some error messages in newick parser (better than just "syntax error"). One
-case I encountered was two consecutive labels (in fact there was a spurious
-space between them). Something could be done, such as fusing them with a '_',
-or dropping all but the first; at the very least th eprogram should say what
-the problem was and where it was found.
+add a cladogram functionality to nw_topology.
 
 Add functionality for directly counting a bipartition from a set of replicates.
 This would look like: $ nw_bipart <reps> leaf1 ... leafn where a bipartition
 will be computed from the leaf labels, and its frequency printed out as output.
-
-[started] nw_distance: output distances from root or LCA as a table, or between
-leaves as a matrix.
 
 nw_ed should be able to visit the tree in reverse order, and to flag nodes for
 no further processing (if they meet the condition or if their parent is
@@ -60,6 +43,9 @@ version) should be integrated from the start. Due to the impossibility of
 predicting SVG text's dimensions, the horizontal space requirements are
 sometimes miscalculated. Add an option to override it.
 
+[done] nw_distance: output distances from root or LCA as a table, or between
+leaves as a matrix.
+
 [done] nw_prune: remove nodes from a tree. 
 
 [done] nw_display: SVG mode is now hybrid in the sense that some node data
@@ -84,3 +70,18 @@ _computing_ of node positions from the _storage_ of node positions, and allows
 programs to use the same code for computing (no code duplication) while storing
 the info in different ways (no need to use the same structures, etc).
 
+[done] nw_order: sort tree nodes by some criterion. Include at least
+alphabetical sorting of labels. Might include other criteria like tree depth,
+etc, if these are of any use.
+
+[done] list.c: add a void * to_array(struct llist *) function. This can be used
+for sorting the children of a node using qsort(). We should also provide the
+reverse function, array_to_list(). [NOTE: I previously thought that iterating
+over arrays would be faster than over lists, but this turns out not to be the
+case (see src/test_loops)].
+
+[done] add some error messages in newick parser (better than just "syntax
+error"). One case I encountered was two consecutive labels (in fact there was a
+spurious space between them). Something could be done, such as fusing them with
+a '_', or dropping all but the first; at the very least th eprogram should say
+what the problem was and where it was found.
