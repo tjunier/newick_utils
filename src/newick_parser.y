@@ -118,6 +118,12 @@ inner_node: O_PAREN nodelist C_PAREN {
 		free($5);
 		$$ = ep;
     }
+    | O_PAREN nodelist { /* WRONG! */
+	fprintf (stderr, "ERROR: missing ')' at line %d near '%s'\n",
+		lineno, nwsget_text());
+	root = NULL;
+	YYACCEPT;	
+    }
     ;
 
 nodelist: node {
