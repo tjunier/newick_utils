@@ -65,7 +65,6 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 
@@ -74,7 +73,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
 		struct rnode *current = (struct rnode *) elem->data;
 		if (! params.show_branch_lengths) {
-			if (! is_root(current)) {
+			if (NULL != current->parent_edge) {
 				char *length = current->parent_edge->length_as_string;
 				length[0] = '\0';
 			}

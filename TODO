@@ -1,3 +1,6 @@
+nw_topology: also remove length of root's parent edge, if it has one (like when
+it is extracted from another tree).
+
 Modify nw_display so that cladograms can be printed with leaves aligned. Any
 tree with no branch length information will be considered a cladogram,
 otherwise it will be considered a phylogram/phenogranm and lengths will be

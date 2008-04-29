@@ -50,12 +50,17 @@ tree: /* empty */	{ root = NULL; YYACCEPT; }
     		root = (struct rnode *)$1->child_node; 
 		YYACCEPT;
     }
-    | node { 	/* WRONG */
+/* TODO: this warning works, but it produces a reduce/reduce conflict. Turns
+ * out that Bison solves it correctly, but I'd rather not have conflicts in the
+ * grammar. */
+/*
+    | node { 	
 	fprintf (stderr, "ERROR: missing ';' at end of tree, line %d "
 		"near '%s'\n", lineno, nwsget_text());
 	root = NULL;
 	YYACCEPT;
     }
+*/
     ;
 
 node: leaf { append_element(nodes_in_order, (struct rnode*) $1->child_node); }
@@ -118,12 +123,15 @@ inner_node: O_PAREN nodelist C_PAREN {
 		free($5);
 		$$ = ep;
     }
-    | O_PAREN nodelist { /* WRONG! */
+/* warning works, but does a shift/reduce conflict */
+/*
+    | O_PAREN nodelist { 
 	fprintf (stderr, "ERROR: missing ')' at line %d near '%s'\n",
 		lineno, nwsget_text());
 	root = NULL;
 	YYACCEPT;	
     }
+*/
     ;
 
 nodelist: node {

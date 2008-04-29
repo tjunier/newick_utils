@@ -6,3 +6,4 @@ LI:-LI newtree.nw
 bI:-bI newtree.nw
 bL:-bL newtree.nw
 bIL:-bIL newtree.nw
+rootedge: edged_root.nw 
