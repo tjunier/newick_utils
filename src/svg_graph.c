@@ -132,12 +132,12 @@ void svg_init()
 	init_done = 1;
 }
 
-/* Prints the nodes to stdout, as SVG, in a <g> element. Assumes that the edges
- * have been attributed a double value in field 'length' (in this case, it is
- * done in set_node_depth()). */
+/* Prints the nodes to stdout, as SVG, in a <g> element. Nodes must have an
+ * 'svg_data' structure as their 'data' member, and of course this structure
+ * must have been filled (see node_pos_alloc.c) */
 
 void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
-		const double v_scale)
+		const double v_scale, int align_leaves, double dmax)
 {
 	printf( "<g"
 	       	" style='stroke:black;stroke-width:1;"
@@ -147,8 +147,12 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		struct rnode *node = (struct rnode *) elem->data;
+		struct rnode *node = elem->data;
 		struct svg_data *node_data = (struct svg_data *) node->data;
+
+		/* For cladograms */
+		if (align_leaves && is_leaf(node))
+			node_data->depth = dmax;
 
 		char *font_size = is_leaf(node) ?
 			leaf_label_font_size : inner_label_font_size ;
@@ -158,10 +162,9 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 		double svg_bottom_pos = v_scale * node_data->bottom; 
 		double svg_mid_pos =
 			0.5 * v_scale * (node_data->top+node_data->bottom);
-		double svg_parent_edge_length =
-			h_scale * node->parent_edge->length;
 
 		/* draw node (vertical line) */
+		/* TODO: this is not needed for leaves, is it? */
 		printf("<line style='stroke:%s' stroke-linecap='round' "
 			"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 			color, svg_h_pos, svg_top_pos, svg_h_pos,
@@ -178,15 +181,19 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 				svg_mid_pos, svg_h_pos, svg_mid_pos);
 
 		} else {
+			struct rnode *parent = node->parent_edge->parent_node;
+			struct svg_data *parent_data = parent->data;
+			double svg_parent_h_pos = ROOT_SPACE + (
+				h_scale * parent_data->depth);
 			printf ("<line style='stroke:%s' "
 				"stroke-linecap='round' "
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				color, svg_h_pos - svg_parent_edge_length,
+				color, svg_parent_h_pos,
 				 svg_mid_pos, svg_h_pos, svg_mid_pos);
 			printf ("<text style='stroke:none;font-size:%s' "
 				"x='%4f' y='%4f'>%s</text>",
 				inner_label_font_size,
-				svg_h_pos - 0.5 * svg_parent_edge_length,
+				(svg_h_pos + svg_parent_h_pos) / 2.0,
 				edge_length_v_offset + svg_mid_pos,
 				node->parent_edge->length_as_string);
 
@@ -291,7 +298,7 @@ double svg_get_node_depth (struct rnode *node)
 	return ((struct svg_data *) node->data)->depth;
 }
 
-void display_svg_tree(struct rooted_tree *tree)
+void display_svg_tree(struct rooted_tree *tree, int align_leaves)
 {	
 	assert(init_done);
 
@@ -310,7 +317,7 @@ void display_svg_tree(struct rooted_tree *tree)
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* create canvas and draw nodes on it */
 	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
-	write_nodes_to_g(tree, h_scale, v_scale);
+	write_nodes_to_g(tree, h_scale, v_scale, align_leaves, hd.d_max);
 }
 
 void svg_footer() { printf ("</svg>"); }

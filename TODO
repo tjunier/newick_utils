@@ -1,4 +1,9 @@
-add a cladogram functionality to nw_topology.
+Modify nw_display so that cladograms can be printed with leaves aligned. Any
+tree with no branch length information will be considered a cladogram,
+otherwise it will be considered a phylogram/phenogranm and lengths will be
+honored (any missing lengths, in that case, will be set to 1). Note that an
+ultrametric tree such as made by UPGMA will also have leaves aligned, but this
+will be dictated by branch lengths, not by a decision to align leaves. Aligning leaves should be the default behaviour for cladograms.
 
 Add functionality for directly counting a bipartition from a set of replicates.
 This would look like: $ nw_bipart <reps> leaf1 ... leafn where a bipartition

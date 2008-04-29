@@ -110,8 +110,9 @@ int main(int argc, char *argv[])
 		set_svg_parameters(params);
 		svg_init();
 		tree = parse_tree();
+		int align_leaves = is_cladogram(tree);
 		svg_header();
-		display_svg_tree(tree);
+		display_svg_tree(tree, align_leaves);
 		svg_footer();
 		exit(EXIT_SUCCESS);
 	}

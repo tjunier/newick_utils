@@ -39,3 +39,11 @@ struct llist *get_leaf_labels(struct rooted_tree *);
 /* Returns a list of all nonempty labels, in parse order */
 
 struct llist *get_labels(struct rooted_tree *);
+
+/* Returns true iff tree is a cladogram, i.e. doesn't contain any branch length
+ * information. A single nonempty branch length means that the tree is NOT a
+ * cladogram (although I don't think that such a tree is very elegant).
+ * Likewise, a tree with all branch lengths set to zero isn't a cladogram
+ * either (exactly what it is, I don't know :-) ) */
+
+int is_cladogram(struct rooted_tree *tree);

@@ -194,3 +194,17 @@ struct llist *get_labels(struct rooted_tree *tree)
 
 	return labels;
 }
+
+int is_cladogram(struct rooted_tree *tree)
+{
+	struct list_elem *el;
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+		struct redge *parent_edge = current->parent_edge;
+		if (NULL != parent_edge)
+			if (strcmp(parent_edge->length_as_string, "") != 0)
+				return 0;
+	}
+
+	return 1;
+}

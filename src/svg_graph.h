@@ -21,9 +21,10 @@ void svg_init();
 
 void svg_header();
 
-/* Writes a tree into a <g> object */
+/* Writes a tree into a <g> object. if 'align_leaves' is true, the leaves will
+ * be aligned (use this for cladograms). */
 
-void display_svg_tree(struct rooted_tree *);
+void display_svg_tree(struct rooted_tree *, int align_leaves);
 
 /* Writes an SVG footer */
 

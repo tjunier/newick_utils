@@ -180,6 +180,26 @@ int test_get_labels()
 
 }
 
+int test_is_cladogram()
+{
+	const char *test_name = "test_is_cladogram";
+
+	struct rooted_tree cladogram = tree_2();
+	struct rooted_tree phylogram = tree_3();
+
+	if (! is_cladogram(&cladogram)) {
+		printf ("%s: is_cladogram() should return true.\n");
+		return 1;
+	}
+	if (is_cladogram(&phylogram)) {
+		printf ("%s: is_cladogram() should return false.\n");
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -190,6 +210,7 @@ int main()
 	failures += test_leaf_count();
 	failures += test_get_leaf_labels();
 	failures += test_get_labels();
+	failures += test_is_cladogram();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
