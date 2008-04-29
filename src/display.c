@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;
 	struct parameters params;
+	int align_leaves;
 
 	params = get_params(argc, argv);
 
@@ -110,7 +111,7 @@ int main(int argc, char *argv[])
 		set_svg_parameters(params);
 		svg_init();
 		tree = parse_tree();
-		int align_leaves = is_cladogram(tree);
+		align_leaves = is_cladogram(tree);
 		svg_header();
 		display_svg_tree(tree, align_leaves);
 		svg_footer();
@@ -118,9 +119,9 @@ int main(int argc, char *argv[])
 	}
 
 	while (NULL != (tree = parse_tree())) {
-		display_tree(tree, params.width);
+		align_leaves = is_cladogram(tree);
+		display_tree(tree, params.width, align_leaves);
 		destroy_tree(tree);
-		/* showmem(); */
 	}
 
 	return 0;

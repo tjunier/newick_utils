@@ -18,32 +18,35 @@
  * attributed a double value in field 'length' (in this case, it is done in
  * set_node_depth()). */
 
-void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree, const double scale)
+void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
+		const double scale, int align_leaves, double dmax)
 {
 	struct list_elem *elem;
 
-	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
-		struct rnode *node = (struct rnode *) elem->data;
-		struct simple_node_pos *pos = (struct simple_node_pos *) node->data;
+	for (elem = tree->nodes_in_order->head;
+			NULL != elem; elem = elem->next) {
+		struct rnode *node =  elem->data;
+		struct simple_node_pos *pos =  node->data;
+		/* For cladograms */
+		if (align_leaves && is_leaf(node))
+			pos->depth = dmax;
+
+		// TODO: rint() returns double, use a f() that returns int.
+		int h_pos = rint(ROOT_SPACE + (scale * pos->depth));
+		int top = rint(2*pos->top);
+		int bottom = rint(2*pos->bottom);
+		int mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */
+
 		/* draw node */
-		canvas_draw_vline(canvas,
-				rint(ROOT_SPACE + (scale * pos->depth)),
-				rint(2*pos->top),
-				rint(2*pos->bottom)
-			);
-		canvas_write(canvas,
-				rint(ROOT_SPACE + (scale * pos->depth) + LBL_SPACE), 
-				rint(pos->top+pos->bottom),
-				node->label
-				);
+		canvas_draw_vline(canvas, h_pos, top, bottom);
+		canvas_write(canvas, h_pos + LBL_SPACE, mid, node->label);
 		if (is_root(node)) {
-			canvas_write(canvas, 0, rint(pos->top+pos->bottom), "=");
+			canvas_write(canvas, 0, mid, "=");
 		} else {
-			canvas_draw_hline(canvas,
-				 rint(pos->top + pos->bottom), /* (2*top + 2*bottom) / 2 */
-				 rint(ROOT_SPACE + scale * (pos->depth - node->parent_edge->length)),
-				 rint(ROOT_SPACE + scale * (pos->depth))
-			);
+			struct rnode *parent = node->parent_edge->parent_node;
+			struct simple_node_pos *parent_data = parent->data;
+			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
+			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		}
 
 	}
@@ -53,7 +56,7 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree, const doub
 have to be passed, increasing coupling and diminishing implementation hiding.
 What's more, we can't assume that the new tree will fit in the old canvas. */
 
-void display_tree(struct rooted_tree *tree, int width)
+void display_tree(struct rooted_tree *tree, int width, int align_leaves)
 {	
 	/* set node positions */
 	alloc_simple_node_pos(tree);
@@ -72,7 +75,7 @@ void display_tree(struct rooted_tree *tree, int width)
 	/* create canvas and draw nodes on it */
 	scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	canvasp = create_canvas(width, 2 * num_leaves);
-	write_to_canvas(canvasp, tree, scale);
+	write_to_canvas(canvasp, tree, scale, align_leaves, hd.d_max);
 
 	/* output */
 	canvas_dump(canvasp);
