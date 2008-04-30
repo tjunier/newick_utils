@@ -10,6 +10,11 @@
  * left side, the stack can be exhausted. I set this to 100,000, which is
  * enough for a 100,000-leaf, completely unbalanced left-leaning tree. */
 
+/* NOTE: this grammar generates 2 shift/reduce and 1 reduce/reduce conflicts,
+ * but they are all due to the error-reporting code. For a correct tree, the
+ * grammar is unambiguous. According to the test suite, Bison resolves the
+ * conflicts correctly anyway. */
+
 #define YYMAXDEPTH 100000
 
 extern struct llist *nodes_in_order;
@@ -50,17 +55,16 @@ tree: /* empty */	{ root = NULL; YYACCEPT; }
     		root = (struct rnode *)$1->child_node; 
 		YYACCEPT;
     }
-/* TODO: this warning works, but it produces a reduce/reduce conflict. Turns
- * out that Bison solves it correctly, but I'd rather not have conflicts in the
- * grammar. */
-/*
+
+    /* This warning produces a reduce/reduce conflict. Bison solves it
+ * correctly, according to the test suite. */
+
     | node { 	
 	fprintf (stderr, "ERROR: missing ';' at end of tree, line %d "
 		"near '%s'\n", lineno, nwsget_text());
 	root = NULL;
 	YYACCEPT;
     }
-*/
     ;
 
 node: leaf { append_element(nodes_in_order, (struct rnode*) $1->child_node); }
@@ -123,15 +127,12 @@ inner_node: O_PAREN nodelist C_PAREN {
 		free($5);
 		$$ = ep;
     }
-/* warning works, but does a shift/reduce conflict */
-/*
     | O_PAREN nodelist { 
 	fprintf (stderr, "ERROR: missing ')' at line %d near '%s'\n",
 		lineno, nwsget_text());
 	root = NULL;
 	YYACCEPT;	
     }
-*/
     ;
 
 nodelist: node {
