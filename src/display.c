@@ -8,6 +8,8 @@
 #include "tree.h"
 #include "svg_graph.h"
 #include "text_graph.h"
+#include "list.h"
+#include "rnode.h"
 
 struct parameters {
 	int width;
@@ -98,6 +100,18 @@ void set_svg_parameters(struct parameters params)
 	set_svg_colormap_file(params.colormap_fname);
 }
 
+void underscores2spaces(struct rooted_tree *tree)
+{
+	struct list_elem *el;
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+		char *p;
+		for (p = current->label; '\0' != *p; p++)
+			if ('_' == *p)
+				*p = ' ';
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;
@@ -111,6 +125,7 @@ int main(int argc, char *argv[])
 		set_svg_parameters(params);
 		svg_init();
 		tree = parse_tree();
+		underscores2spaces(tree);
 		align_leaves = is_cladogram(tree);
 		svg_header();
 		display_svg_tree(tree, align_leaves);
@@ -120,6 +135,7 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		align_leaves = is_cladogram(tree);
+		underscores2spaces(tree);
 		display_tree(tree, params.width, align_leaves);
 		destroy_tree(tree);
 	}

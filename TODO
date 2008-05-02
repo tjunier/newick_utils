@@ -1,12 +1,3 @@
-nw_topology: also remove length of root's parent edge, if it has one (like when
-it is extracted from another tree).
-
-Modify nw_display so that cladograms can be printed with leaves aligned. Any
-tree with no branch length information will be considered a cladogram,
-otherwise it will be considered a phylogram/phenogranm and lengths will be
-honored (any missing lengths, in that case, will be set to 1). Note that an
-ultrametric tree such as made by UPGMA will also have leaves aligned, but this
-will be dictated by branch lengths, not by a decision to align leaves. Aligning leaves should be the default behaviour for cladograms.
 
 Add functionality for directly counting a bipartition from a set of replicates.
 This would look like: $ nw_bipart <reps> leaf1 ... leafn where a bipartition
@@ -31,7 +22,8 @@ occurs yet (destroy_llist() is used frequently).
 CL-CAUBET22_3DCL-1243049_3D. It should work, or at least print a message.  
 
 [done] Use a struct hash instead of a struct node_map. Eventually remove
-nodemap.[ch]
+nodemap.[ch] -- Note: kept nodemap.c for its functionality, but now it uses a
+hash.
 
 [done] Add functionality for monophyly in nw_clade. This means that we'll have
 to be able to list the (leaf) descendants of an LCA, and compare this set to
@@ -91,5 +83,22 @@ case (see src/test_loops)].
 [done] add some error messages in newick parser (better than just "syntax
 error"). One case I encountered was two consecutive labels (in fact there was a
 spurious space between them). Something could be done, such as fusing them with
-a '_', or dropping all but the first; at the very least th eprogram should say
-what the problem was and where it was found.
+a '_', or dropping all but the first; at the very least the program should say
+what the problem was and where it was found. -- Note: to detect incorrect constructs, I introduced "wrong" cases in the grammar, as suggested in the Lex & Yacc book. This causes conflicts in the grammar, but I decided to keep it that way, since i) Bison solves the conflicts correctly, and ii) the "correct" grammar (the one that only recognizes correct trees) is perfectly non-ambiguous.
+
+[done] nw_topology: also remove length of root's parent edge, if it has one
+(like when it is extracted from another tree).
+
+[done] Modify nw_display so that cladograms can be printed with leaves aligned.
+Any tree with no branch length information will be considered a cladogram,
+otherwise it will be considered a phylogram/phenogranm and lengths will be
+honored (any missing lengths, in that case, will be set to 1). Note that an
+ultrametric tree such as made by UPGMA will also have leaves aligned, but this
+will be dictated by branch lengths, not by a decision to align leaves. Aligning
+leaves should be the default behaviour for cladograms.
+
+[done] Add all examples from the Newick definition page
+(http://evolution.genetics.washington.edu/phylip/newicktree.html) to the test
+suite.
+
+[done] nw_display: replace underscores by spaces, as underscores are a way to introduce spaces where they are normally not allowed. The transformation is only done in nw_display, not in the parser: this way the labels are always valid Newick.

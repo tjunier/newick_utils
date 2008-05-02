@@ -15,7 +15,10 @@ check_PROGRAMS = test_rnode test_redge test_list test_link \
 		 test_nodemap test_to_newick test_tree test_node_set \
 		 test_enode test_rnode_iterator test_readline
 
+check_HEADERS = tree_stubs.h
+
 SRC = $(top_builddir)/src
+
 
 test_rnode_SOURCES = test_rnode.c $(SRC)/rnode.c $(SRC)/redge.c $(SRC)/list.c
 

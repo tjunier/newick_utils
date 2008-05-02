@@ -5,11 +5,18 @@ bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 	       nw_collapse nw_bipart nw_ed nw_topology nw_distance \
 	       nw_labels nw_prune nw_order
 
+HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
+	node_pos_alloc.h node_set.h parser.h readline.h redge.h rnode.h \
+	rnode_iterator.h simple_node_pos.h svg_graph.h text_graph.h \
+	to_newick.h tree.h tree_editor_rnode_data.h
+
 nw_indent_SOURCES = indent.c indent_lex.l
 nw_indent_LDADD = @LEXLIB@
 
+# I mention all headers here, so they're included in the distro (otherwise this
+# is not necessary, it builds just fine)
 NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
-	  link.c tree.c redge.c
+	  link.c tree.c redge.c $(HDR)
 
 NW_OUT = to_newick.c concat.c
 

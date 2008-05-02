@@ -11,8 +11,8 @@
 #include "redge.h"
 #include "node_pos_alloc.h"
 
-#define LBL_SPACE 2
-#define ROOT_SPACE 1
+static const int LBL_SPACE = 2;
+static const int ROOT_SPACE = 1;
 
 /* Writes the nodes to the canvas. Assumes that the edges have been
  * attributed a double value in field 'length' (in this case, it is done in
@@ -71,9 +71,9 @@ void display_tree(struct rooted_tree *tree, int width, int align_leaves)
 	double scale = -1;
 	struct canvas *canvasp;
 
-	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* create canvas and draw nodes on it */
 	scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	if (0.0 == hd.d_max ) { scale = 1; } 	/* one-node trees */
 	canvasp = create_canvas(width, 2 * num_leaves);
 	write_to_canvas(canvasp, tree, scale, align_leaves, hd.d_max);
 
