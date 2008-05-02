@@ -11,8 +11,6 @@
 #include "rnode.h"
 #include "list.h"
 
-extern int FREE_NODE_DATA;
-
 struct parameters {
 	int show_inner_labels;
 	int show_leaf_labels;

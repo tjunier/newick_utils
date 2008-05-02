@@ -18,8 +18,6 @@
 #include "to_newick.h"
 
 extern FILE *nwsin;
-extern int FREE_NODE_DATA;
-extern int DONT_FREE_NODE_DATA;
 
 static struct hash *lbl2num = NULL;
 static struct hash *bipart_counts = NULL;

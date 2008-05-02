@@ -112,8 +112,6 @@ void underscores2spaces(struct rooted_tree *tree)
 	}
 }
 
-extern int FREE_NODE_DATA; 
-
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;

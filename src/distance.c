@@ -17,8 +17,6 @@
 #include "redge.h"
 #include "node_pos_alloc.h"
 
-extern int FREE_NODE_DATA;
-
 enum {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
 enum {HORIZONTAL, VERTICAL};
 enum {SQUARE, TRIANGLE};

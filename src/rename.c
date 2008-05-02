@@ -12,8 +12,6 @@
 #include "rnode.h"
 #include "readline.h"
 
-extern int DONT_FREE_NODE_DATA;
-
 struct parameters {
 	char  *map_filename;
 	int only_leaves;

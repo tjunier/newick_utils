@@ -15,8 +15,6 @@
 #include "hash.h"
 #include "list.h"
 
-extern int FREE_NODE_DATA;
-
 struct parameters {
 	struct llist *labels;
 };

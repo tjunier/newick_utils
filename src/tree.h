@@ -1,6 +1,9 @@
 struct rnode;
 struct llist;
 
+extern const int FREE_NODE_DATA;
+extern const int DONT_FREE_NODE_DATA;
+
 struct rooted_tree {
 	struct rnode *root;
 	struct llist *nodes_in_order;

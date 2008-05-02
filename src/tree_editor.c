@@ -14,7 +14,6 @@
 #include "address_parser.h"
 #include "tree_editor_rnode_data.h"
 
-extern int FREE_NODE_DATA;
 void address_scanner_set_input(char *);
 void address_scanner_clear_input();
 int adsparse();

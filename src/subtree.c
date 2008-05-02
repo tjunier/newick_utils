@@ -14,8 +14,6 @@
 #include "rnode_iterator.h"
 #include "rnode.h"
 
-extern int DONT_FREE_NODE_DATA;
-
 /* only one param for now, but who knows? */
 
 struct parameters {

@@ -12,8 +12,6 @@
 #include "rnode.h"
 #include "redge.h"
 
-extern int DONT_FREE_NODE_DATA;
-
 void get_params(int argc, char *argv[])
 {
 
