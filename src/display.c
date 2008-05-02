@@ -4,12 +4,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "common.h"
+#include "list.h"
 #include "parser.h"
-#include "tree.h"
+#include "rnode.h"
 #include "svg_graph.h"
 #include "text_graph.h"
-#include "list.h"
-#include "rnode.h"
+#include "tree.h"
 
 struct parameters {
 	int width;
@@ -23,10 +24,12 @@ struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 	int opt_char;
+	const int DEFAULT_WIDTH_PIXELS = 300;
+	const int DEFAULT_WIDTH_CHARS = 80;
 
 	/* set defaults */
 	params.width = -1; 
-	params.svg = 0;
+	params.svg = FALSE;
 	params.colormap_fname = NULL;
 	params.leaf_label_font_size = "medium";
 	params.inner_label_font_size = "small";
@@ -44,7 +47,7 @@ struct parameters get_params(int argc, char *argv[])
 			params.inner_label_font_size = optarg;
 			break;
 		case 's':
-			params.svg = 1;
+			params.svg = TRUE;
 			break;
 		case 'w':
 			params.width = strtod(optarg, NULL);
@@ -59,9 +62,9 @@ struct parameters get_params(int argc, char *argv[])
 	/* if width not set, use default (depends on whether SVG or not) */
 	if (-1 == params.width) {
 		if (params.svg) 
-			params.width = 300;	/* pixels */
+			params.width = DEFAULT_WIDTH_PIXELS;
 		else
-			params.width = 80;	/* characters */
+			params.width = DEFAULT_WIDTH_CHARS;
 	}
 	/* check arguments */
 	if (1 == (argc - optind))	{

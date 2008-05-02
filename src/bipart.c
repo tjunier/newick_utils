@@ -16,6 +16,7 @@
 #include "redge.h"
 #include "node_set.h"
 #include "to_newick.h"
+#include "common.h"
 
 extern FILE *nwsin;
 
@@ -34,17 +35,17 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 	char opt_char;
 
-	params.show_label_numbers = 0;
-	params.use_percent = 0;
+	params.show_label_numbers = FALSE;
+	params.use_percent = FALSE;
 
 	/* parse options and switches */
 	while ((opt_char = getopt(argc, argv, "lp")) != -1) {
 		switch (opt_char) {
 		case 'l':
-			params.show_label_numbers = 1;
+			params.show_label_numbers = TRUE;
 			break;
 		case 'p':
-			params.use_percent = 1;
+			params.use_percent = TRUE;
 		}
 	}
 	/* check arguments */
@@ -266,7 +267,7 @@ void attribute_support_to_target_tree(struct rooted_tree *tree, int rep_count)
 				exit(EXIT_FAILURE);
 			}
 			free(current->label);
-			if (rep_count > 0) {
+			if (rep_count > 0) {	/* percent */
 				sprintf (lbl, "%d", 100 * count / rep_count);
 			} else {
 				sprintf (lbl, "%d", count);
