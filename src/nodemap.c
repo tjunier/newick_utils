@@ -6,7 +6,7 @@
 #include "rnode.h"
 #include "hash.h"
 
-struct hash * create_node_map(struct llist *node_list)
+struct hash * create_label2node_map(struct llist *node_list)
 {
 	struct hash *map;
 	struct list_elem *elem;

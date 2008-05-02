@@ -17,16 +17,18 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
 
 void collapse_pure_clades(struct rooted_tree *tree);
 
-/* Destroys a tree, releasing memory. Node data is freed (but any dynamically
- * allocated memory pointed to by node data is NOT freed) */
+/* Destroys a tree, releasing memory. Node data is freed if 'free_node_data' is
+ * tre (but any dynamically allocated memory pointed to by node data is NOT
+ * freed), so 'free_node_data' should be set to true IFF the data can be
+ * free()d directly. Otherwise, it will need to be free()d manually. */
 
-void destroy_tree(struct rooted_tree *);
+void destroy_tree(struct rooted_tree *, int free_node_data);
 
 /* If the tree's node have data that cannot just be free()d (i.e., they have
  * pointers to allocated memory), first free that data by iterating on the
  * nodes (tree->nodes_in_order, etc), then free the tree using this function. */
 
-void destroy_tree_except_data(struct rooted_tree *tree);
+// void destroy_tree_except_data(struct rooted_tree *tree);
 
 /* Returns the number of leaves of this tree */
 

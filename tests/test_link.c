@@ -369,7 +369,7 @@ int test_insert_node_above()
 	char *exp = "(((A,B)f)k,(C,(D,E)g)h)i;";
 
 	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
-	map = create_node_map(tree.nodes_in_order);
+	map = create_label2node_map(tree.nodes_in_order);
 	node_f = hash_get(map, "f");
 	root = hash_get(map, "i");
 	insert_node_above(node_f, "k");
@@ -415,7 +415,7 @@ int test_insert_node_above_wlen()
 
 
 	tree = tree_3();	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; - see tree_stubs.h */
-	map = create_node_map(tree.nodes_in_order);
+	map = create_label2node_map(tree.nodes_in_order);
 	node_f = hash_get(map, "f");
 	root = hash_get(map, "i");
 	insert_node_above(node_f, "k");
@@ -562,7 +562,7 @@ int test_splice_out()
 	char *exp = "((A,B)f,C,(D,E)g)i;";
 
 	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
-	map = create_node_map(tree.nodes_in_order);
+	map = create_label2node_map(tree.nodes_in_order);
 	node_h = hash_get(map, "h");
 	root = hash_get(map, "i");
 
@@ -589,7 +589,7 @@ int test_splice_out_wlen()
 	char *exp = "((A:1,B:1.0)f:2.0,C:4,(D:1,E:1)g:5)i;";
 
 	tree = tree_3();/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; - see tree_stubs.h */
-	map = create_node_map(tree.nodes_in_order);
+	map = create_label2node_map(tree.nodes_in_order);
 	node_h = hash_get(map, "h");
 	root = hash_get(map, "i");
 
@@ -619,7 +619,7 @@ int test_reverse_edge()
 	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; - see tree_stubs.h */
 	tree = tree_3();
 
-	map = create_node_map(tree.nodes_in_order);
+	map = create_label2node_map(tree.nodes_in_order);
 	node_h = hash_get(map, "h");
 	edge = node_h->parent_edge;
 
@@ -636,18 +636,18 @@ int test_reverse_edge()
 
 }
 
-int test_unlink_node()
+int test_unlink_rnode()
 {
-	const char *test_name = "test_unlink_node()";
+	const char *test_name = "test_unlink_rnode()";
 	struct hash *map;
 	struct rnode *node_A;
 	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 	struct rooted_tree t = tree_3();
 
-	map = create_node_map(t.nodes_in_order);
+	map = create_label2node_map(t.nodes_in_order);
 	node_A = hash_get(map, "A");
 
-	struct rnode *r = unlink_node(node_A);
+	struct rnode *r = unlink_rnode(node_A);
 	if (NULL != r) {
 		r->parent_edge = NULL;
 		t.root = r;
@@ -665,18 +665,18 @@ int test_unlink_node()
 	return 0;
 }
 
-int test_unlink_node_rad_leaf()
+int test_unlink_rnode_rad_leaf()
 {
-	const char *test_name = "test_unlink_node_rad_leaf()";
+	const char *test_name = "test_unlink_rnode_rad_leaf()";
 	struct hash *map;
 	struct rnode *node_D;
 	/*  ((A:1,B:1,C:1)e:1,D:2)f */
 	struct rooted_tree t = tree_6();
 
-	map = create_node_map(t.nodes_in_order);
+	map = create_label2node_map(t.nodes_in_order);
 	node_D = hash_get(map, "D");
 
-	struct rnode *r = unlink_node(node_D);
+	struct rnode *r = unlink_rnode(node_D);
 	if (NULL != r) {
 		r->parent_edge = NULL;
 		t.root = r;
@@ -694,19 +694,19 @@ int test_unlink_node_rad_leaf()
 	return 0;
 }
 
-int test_unlink_node_3sibs()
+int test_unlink_rnode_3sibs()
 {
-	const char *test_name = "test_unlink_node_3sibs";
+	const char *test_name = "test_unlink_rnode_3sibs";
 
 	struct hash *map;
 	struct rnode *node_B;
 	/*  ((A:1,B:1,C:1)e:1,D:2)f */
 	struct rooted_tree t = tree_6();
 
-	map = create_node_map(t.nodes_in_order);
+	map = create_label2node_map(t.nodes_in_order);
 	node_B = hash_get(map, "B");
 
-	struct rnode *r = unlink_node(node_B);
+	struct rnode *r = unlink_rnode(node_B);
 	if (NULL != r) {
 		r->parent_edge = NULL;
 		t.root = r;
@@ -745,9 +745,9 @@ int main()
 	failures += test_splice_out();
 	failures += test_splice_out_wlen();
 	failures += test_reverse_edge();
-	failures += test_unlink_node();
-	failures += test_unlink_node_rad_leaf();
-	failures += test_unlink_node_3sibs();
+	failures += test_unlink_rnode();
+	failures += test_unlink_rnode_rad_leaf();
+	failures += test_unlink_rnode_3sibs();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

@@ -4,8 +4,8 @@ struct rnode;
 struct redge {
 	struct rnode * parent_node;
 	struct rnode * child_node;
-	double length; /* TODO: do we use this? */
-	char *length_as_string;
+	char *length_as_string;	/* Most of the time this is enough, but... */
+	double length; 		/* ...use this when numerical value is needed */
 };
 
 /* Creates a redge and returns a pointer to it (checks malloc()) or dies.

@@ -12,6 +12,8 @@
 #include "rnode.h"
 #include "redge.h"
 
+extern int DONT_FREE_NODE_DATA;
+
 void get_params(int argc, char *argv[])
 {
 
@@ -105,7 +107,7 @@ int main(int argc, char *argv[])
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);
-		destroy_tree_except_data(tree);
+		destroy_tree(tree, DONT_FREE_NODE_DATA);
 	}
 
 	return 0;

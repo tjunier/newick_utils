@@ -12,6 +12,8 @@
 #include "rnode.h"
 #include "list.h"
 
+extern int FREE_NODE_DATA;
+
 struct parameters {
 	int show_inner_labels;
 	int show_leaf_labels;
@@ -105,7 +107,7 @@ int main (int argc, char* argv[])
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);
-		destroy_tree(tree);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	return 0;

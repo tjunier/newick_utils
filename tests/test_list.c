@@ -269,6 +269,40 @@ int test_add_many()
 	return 0;
 }	
 
+int test_clear()
+{
+	const char *test_name = "test_clear";
+	const int num_elements = 100000;
+	struct llist *list_p;
+	int i;
+
+	list_p = create_llist();
+
+	for (i = 0; i < num_elements; i++)
+		prepend_element(list_p, &i);
+	if (list_p->count != num_elements) {
+		printf("count wrong: %d, expected %d.\n", list_p->count, num_elements);
+		return 1;
+	}
+	clear_llist(list_p);
+	if (0 != list_p->count ) {
+		printf ("%s: count wrong: expected 0, got %d\n", 
+				test_name, list_p->count);
+		return 1;
+	}
+	if (NULL != list_p->head) {
+		printf ("%s: expected NULL head.\n", test_name);
+		return 1;
+	}
+	if (NULL != list_p->tail) {
+		printf ("%s: expected NULL tail.\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}	
+
 int test_add_struct()
 {
 	const int num_edges = 10;
@@ -1390,6 +1424,7 @@ int main()
 	failures += test_delete_at_tail();
 	failures += test_index();
 	failures += test_destroy();
+	failures += test_clear();
 	failures += test_llist_index_of_f();
 	failures += test_to_array();
 	if (0 == failures) {

@@ -21,7 +21,7 @@ int test_create_and_retrieve()
 	append_element(node_list, n1);
 	append_element(node_list, n2);
 	append_element(node_list, n3);
-	map = create_node_map(node_list);
+	map = create_label2node_map(node_list);
 
 	if (NULL == map) {
 		printf ("%s: map must not be NULL.\n", test_name);

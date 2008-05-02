@@ -14,6 +14,8 @@
 #include "rnode_iterator.h"
 #include "rnode.h"
 
+extern int DONT_FREE_NODE_DATA;
+
 /* only one param for now, but who knows? */
 
 struct parameters {
@@ -94,7 +96,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct hash *map;
 	struct list_elem *el;
 
-	map = create_node_map(tree->nodes_in_order);	
+	map = create_label2node_map(tree->nodes_in_order);	
 	struct llist *descendants = create_llist();
 	for (el = params.labels->head; NULL != el; el = el->next) {
 		struct rnode *desc;
@@ -137,7 +139,7 @@ int main(int argc, char *argv[])
 
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params);
-		destroy_tree_except_data(tree);
+		destroy_tree(tree, DONT_FREE_NODE_DATA);
 	}
 
 	destroy_llist(params.labels);

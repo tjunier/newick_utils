@@ -17,10 +17,10 @@
 #include "redge.h"
 #include "node_pos_alloc.h"
 
+extern int FREE_NODE_DATA;
+
 enum {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
-
 enum {HORIZONTAL, VERTICAL};
-
 enum {SQUARE, TRIANGLE};
 
 struct parameters {
@@ -124,7 +124,7 @@ struct hash *distance_hash (struct rooted_tree *tree, struct rnode *origin,
 	if (NULL != origin) 
 		origin_depth = ((struct simple_node_pos *) origin->data)->depth;
 
-	struct hash *node_map = create_node_map(tree->nodes_in_order);
+	struct hash *node_map = create_label2node_map(tree->nodes_in_order);
 	struct hash *distances = create_hash(labels->count);
 	struct list_elem *el;
 	for (el = labels->head; NULL != el; el = el->next) {
@@ -224,7 +224,7 @@ double ** fill_matrix (struct rooted_tree *tree, struct llist *labels)
 	struct list_elem *h_el, *v_el;
 	int i, j;
 	int count = labels->count;
-	struct hash *lbl2node_map = create_node_map(tree->nodes_in_order);
+	struct hash *lbl2node_map = create_label2node_map(tree->nodes_in_order);
 	
 	double **lines = malloc(count * sizeof(double *));
 	if (NULL == lines) { perror(NULL), exit (EXIT_FAILURE); }
@@ -287,7 +287,10 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	/* TODO: could take the switch out of the loop, since the distance type
-	 * is fixed for the program's lifetime */
+	 * is fixed for the program's lifetime. OTOH the code is easier to
+	 * understand this way, and it's unlikely the switch has a visible
+	 * impact on performance. */
+
 	while ((tree = parse_tree()) != NULL) {
 		alloc_simple_node_pos(tree);
 		set_node_depth_cb(tree,
@@ -329,7 +332,7 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 
-		destroy_tree(tree);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	destroy_llist(params.labels);

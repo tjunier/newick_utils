@@ -20,7 +20,7 @@ int test_lca2()
 	struct hash *map;
 
 	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
-	map = create_node_map(tree.nodes_in_order);
+	map = create_label2node_map(tree.nodes_in_order);
 	desc_A = hash_get(map, "A");
 	desc_B = hash_get(map, "B");
 	desc_C = hash_get(map, "C");
@@ -90,7 +90,7 @@ int test_lca()
 	struct llist *descendants;
 
 	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
-	map = create_node_map(tree.nodes_in_order);
+	map = create_label2node_map(tree.nodes_in_order);
 	desc_A = hash_get(map, "A");
 	desc_B = hash_get(map, "B");
 	desc_C = hash_get(map, "C");
@@ -150,7 +150,7 @@ int test_lca_from_labels()
 	struct llist *desc_labels;
 
 	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
-	map = create_node_map(tree.nodes_in_order);
+	map = create_label2node_map(tree.nodes_in_order);
 	desc_A = hash_get(map, "A");
 	desc_B = hash_get(map, "B");
 	desc_C = hash_get(map, "C");

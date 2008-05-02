@@ -8,6 +8,9 @@
 #include "rnode.h"
 #include "list.h"
 
+const int FREE_NODE_DATA = 1;
+const int DONT_FREE_NODE_DATA = 0;
+
 /* 'outgroup' is te node which will be the outgroup after rerooting. */
 
 void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
@@ -96,16 +99,12 @@ void collapse_pure_clades(struct rooted_tree *tree)
 			/* set own label to children's label */
 			current->label = label;
 			/* remove children */
-			/* TODO: write a function clear(struct llist*) that
-			 * does this (and frees the memory, too) */
-			current->children->head = NULL;
-			current->children->tail = NULL;
-			current->children->count = 0;
+			clear_llist(current->children);
 		}
 	}
 }
 
-void destroy_tree(struct rooted_tree *tree)
+void destroy_tree(struct rooted_tree *tree, int free_node_data)
 {
 	struct list_elem *e;
 
@@ -119,9 +118,9 @@ void destroy_tree(struct rooted_tree *tree)
 		free(current->parent_edge);
 		free(current->label);
 		/* only works if data can be free()d, i.e. has no pointer to
-		 * allocated storage. In that case, use
-		 * destroy_tree_except_data(), and free the data "manually". */
-		free(current->data);	
+		 * allocated storage. Otherwise free the data "manually". */
+		if (free_node_data)
+			free(current->data);	
 		free(current);
 	}
 
@@ -129,16 +128,11 @@ void destroy_tree(struct rooted_tree *tree)
 	free(tree);
 }
 
-/* TODO: refactor. This f() is almost a clone of the previous one. Make
- * wrappers, or something. */
-
+/*
 void destroy_tree_except_data(struct rooted_tree *tree)
 {
 	struct list_elem *e;
 
-	/* Traversing in parse order ensures that children list's data are
-	 * already empty when we destroy the list (since the lists contain
-	 * children edges) */
 	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
 		struct rnode *current = e->data;
 		destroy_llist(current->children);
@@ -151,6 +145,7 @@ void destroy_tree_except_data(struct rooted_tree *tree)
 	destroy_llist(tree->nodes_in_order);
 	free(tree);
 }
+*/
 
 int leaf_count(struct rooted_tree * tree)
 {

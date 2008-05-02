@@ -78,7 +78,7 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 	struct llist *outgroup_nodes;
 	struct list_elem *el;
 
-	map = create_node_map(tree->nodes_in_order);	
+	map = create_label2node_map(tree->nodes_in_order);	
 	outgroup_nodes = create_llist();
 	for (el = labels->head; NULL != el; el = el->next) {
 		struct rnode *desc;

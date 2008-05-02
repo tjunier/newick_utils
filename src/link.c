@@ -172,7 +172,7 @@ void reverse_redge(struct redge *edge)
 	child->parent_edge = NULL;	
 }
 
-struct rnode * unlink_node(struct rnode *node)
+struct rnode * unlink_rnode(struct rnode *node)
 {
 	struct redge *parent_edge = node->parent_edge;
 	struct rnode *parent = parent_edge->parent_node;

@@ -112,6 +112,8 @@ void underscores2spaces(struct rooted_tree *tree)
 	}
 }
 
+extern int FREE_NODE_DATA; 
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;
@@ -137,7 +139,7 @@ int main(int argc, char *argv[])
 		align_leaves = is_cladogram(tree);
 		underscores2spaces(tree);
 		display_tree(tree, params.width, align_leaves);
-		destroy_tree(tree);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	return 0;

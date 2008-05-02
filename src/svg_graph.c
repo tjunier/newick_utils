@@ -44,6 +44,7 @@ static char *leaf_label_font_size = "medium";
 static char *inner_label_font_size = "small";
 static int graph_width = 300;
 static char *colormap_fname = NULL;
+static double leaf_vskip = 40.0; /* Vertical separation of leaves (px) */
 
 static struct llist *colormap = NULL;
 
@@ -163,12 +164,13 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 		double svg_mid_pos =
 			0.5 * v_scale * (node_data->top+node_data->bottom);
 
-		/* draw node (vertical line) */
-		/* TODO: this is not needed for leaves, is it? */
+		/* draw node (vertical line), except for leaves */
+		if (! is_leaf(node)) {
 		printf("<line style='stroke:%s' stroke-linecap='round' "
 			"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 			color, svg_h_pos, svg_top_pos, svg_h_pos,
 			svg_bottom_pos);
+		}
 		/* draw label */
 		printf("<text style='stroke:none;font-size:%s' "
 		       "x='%.4f' y='%.4f'>%s</text>",
@@ -310,7 +312,9 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves)
 	struct h_data hd = set_node_depth_cb(tree,
 			svg_set_node_depth, svg_get_node_depth);
 	double h_scale = -1;
-	double v_scale = 40.0; // TODO: set as parameter
+	/* This could get more complicated if we print many trees with
+	 * different scales. For now, it's fixed. */
+	double v_scale = leaf_vskip;
 
 	if (colormap) set_node_colors(tree);
 

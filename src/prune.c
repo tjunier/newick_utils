@@ -15,6 +15,7 @@
 #include "hash.h"
 #include "list.h"
 
+extern int FREE_NODE_DATA;
 
 struct parameters {
 	struct llist *labels;
@@ -66,7 +67,7 @@ struct parameters get_params(int argc, char *argv[])
 
 void process_tree(struct rooted_tree *tree, struct llist *labels)
 {
-	struct hash *lbl2node_map = create_node_map(tree->nodes_in_order);
+	struct hash *lbl2node_map = create_label2node_map(tree->nodes_in_order);
 	struct list_elem *elem;
 
 	for (elem = labels->head; NULL != elem; elem = elem->next) {
@@ -77,7 +78,7 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 					label);
 			continue;
 		}
-		unlink_node (goner);
+		unlink_rnode (goner);
 	}
 
 	destroy_hash(lbl2node_map);
@@ -95,7 +96,7 @@ int main(int argc, char *argv[])
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);
-		destroy_tree(tree);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	destroy_llist(params.labels);

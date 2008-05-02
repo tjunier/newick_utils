@@ -121,7 +121,7 @@ struct rnode *lca (struct rooted_tree *tree,
 
 struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 {
-	struct hash *node_map = create_node_map(tree->nodes_in_order);
+	struct hash *node_map = create_label2node_map(tree->nodes_in_order);
 	struct llist *descendant_nodes = create_llist();
 	struct list_elem *el;
 

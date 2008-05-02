@@ -1,11 +1,12 @@
 
-Add functionality for directly counting a bipartition from a set of replicates.
-This would look like: $ nw_bipart <reps> leaf1 ... leafn where a bipartition
-will be computed from the leaf labels, and its frequency printed out as output.
+[later] Add functionality for directly counting a bipartition from a set of
+replicates.  This would look like: $ nw_bipart <reps> leaf1 ... leafn where a
+bipartition will be computed from the leaf labels, and its frequency printed
+out as output.
 
-nw_ed should be able to visit the tree in reverse order, and to flag nodes for
-no further processing (if they meet the condition or if their parent is
-flagged), like in the Ruby version.
+[later] nw_ed should be able to visit the tree in reverse order, and to flag
+nodes for no further processing (if they meet the condition or if their parent
+is flagged), like in the Ruby version.
 
 [done] Valgrind nw_clade
 

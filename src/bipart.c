@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -17,6 +18,8 @@
 #include "to_newick.h"
 
 extern FILE *nwsin;
+extern int FREE_NODE_DATA;
+extern int DONT_FREE_NODE_DATA;
 
 static struct hash *lbl2num = NULL;
 static struct hash *bipart_counts = NULL;
@@ -157,7 +160,7 @@ void process_tree(struct rooted_tree *tree)
 	}
 	compute_bipartitions(tree);
 	empty_data(tree);
-	destroy_tree_except_data(tree);
+	destroy_tree(tree, DONT_FREE_NODE_DATA);
 }
 
 void show_bipartition_counts()
@@ -234,8 +237,8 @@ struct rooted_tree *parse_target_tree(const char *tgt_fn)
 
 void attribute_support_to_target_tree(struct rooted_tree *tree, int rep_count)
 {
-	/* TODO: use log10(number of biparts) instead of MAX_COUNT_LENGTH */
-	static const int MAX_COUNT_LENGTH = 4;	/* up to 9999, should be enough */
+	/* # of digits for bipart count - need this to know string length */
+	int max_count_length = rint(log10(bipart_counts->count));	
 	struct list_elem *el;
 	
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
@@ -259,7 +262,7 @@ void attribute_support_to_target_tree(struct rooted_tree *tree, int rep_count)
 			else {
 				count = *count_p;
 			}
-			char * lbl = malloc(MAX_COUNT_LENGTH * sizeof(char));
+			char * lbl = malloc(max_count_length * sizeof(char));
 			if (NULL == lbl) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
@@ -297,7 +300,7 @@ int main(int argc, char *argv[])
 	char *newick = to_newick(tree->root);
 	printf ("%s\n", newick);
 	free(newick);
-	destroy_tree(tree);
+	destroy_tree(tree, FREE_NODE_DATA);
 
 	/* Not sure if this is really useful */
 	/*

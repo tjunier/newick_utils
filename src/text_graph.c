@@ -31,7 +31,8 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 		if (align_leaves && is_leaf(node))
 			pos->depth = dmax;
 
-		// TODO: rint() returns double, use a f() that returns int.
+		/* rint() rounds halfay, better than automatic double->int
+		 * conversion */
 		int h_pos = rint(ROOT_SPACE + (scale * pos->depth));
 		int top = rint(2*pos->top);
 		int bottom = rint(2*pos->bottom);

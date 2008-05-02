@@ -16,7 +16,7 @@ int test_reroot()
 {
 	const char *test_name = "test_reroot";
 	struct rooted_tree tree = tree_3();	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
-	struct hash *map = create_node_map(tree.nodes_in_order);	
+	struct hash *map = create_label2node_map(tree.nodes_in_order);	
 	struct rnode *node_g = (struct rnode *) hash_get(map, "g");
 	const char *exp = "((D:1,E:1)g:1,(C:1,(A:1,B:1.0)f:5)h:1);";
 
@@ -41,7 +41,7 @@ int test_reroot_2()
 	/* A tree whose root has 3 children: (A:3,B:3,(C:2,(D:1,E:1)f)g)h; */
 
 	struct rooted_tree tree = tree_5();	
-	struct hash *map = create_node_map(tree.nodes_in_order);	
+	struct hash *map = create_label2node_map(tree.nodes_in_order);	
 	struct rnode *node_f = hash_get(map, "f");
 	const char *exp = "((D:1,E:1)f:0.5,(C:2,(A:3,B:3)h:1)g:0.5);";
 

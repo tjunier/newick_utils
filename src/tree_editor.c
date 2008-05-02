@@ -10,11 +10,11 @@
 #include "list.h"
 #include "tree.h"
 #include "parser.h"
-#include "to_newick.h"	/* TODO: remove when done */
+#include "to_newick.h"
 #include "address_parser.h"
 #include "tree_editor_rnode_data.h"
 
-extern int adsdebug;
+extern int FREE_NODE_DATA;
 void address_scanner_set_input(char *);
 void address_scanner_clear_input();
 int adsparse();
@@ -162,7 +162,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				}
 				break;
 			case ACTION_DELETE:
-				r = unlink_node(current);
+				r = unlink_rnode(current);
 				if (NULL != r) {
 					r->parent_edge = NULL;
 					tree->root = r;
@@ -181,7 +181,6 @@ int main(int argc, char* argv[])
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
 
-	adsdebug = 0;
 	address_scanner_set_input(params.address);
 	adsparse(); /* sets 'expression_root' */
 	address_scanner_clear_input();
@@ -193,7 +192,7 @@ int main(int argc, char* argv[])
 			printf("%s\n", newick);
 			free(newick);
 		}
-		destroy_tree(tree);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	return 0;

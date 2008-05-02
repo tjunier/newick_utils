@@ -12,7 +12,7 @@
 #include "rnode.h"
 #include "readline.h"
 
-
+extern int DONT_FREE_NODE_DATA;
 
 struct parameters {
 	char  *map_filename;
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, rename_map, params);
-		destroy_tree_except_data(tree);
+		destroy_tree(tree, DONT_FREE_NODE_DATA);
 	}
 
 	struct llist *keys = hash_keys(rename_map);

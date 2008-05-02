@@ -253,40 +253,7 @@ int llist_index_of_f(struct llist *list, int (*func)(void*,void*), void * tgt)
 
 void destroy_llist(struct llist *l) 
 {
-	/* IFF list is empty, just free itself */
-	if (0 == l->count) {
-		free(l);
-		return;
-	}
-
-	/* NOTE: in general this does not work (e referred to after being freed!) */
-	/*
-	for (e = l->head; NULL != e; e = e->next) {
-		free((void *) e);
-	}
-	*/
-
-	/* Instead, we make an array containing the pointers to all nodes in
-	 * the list, and free them from the array, which does not require
-	 * dereferencing a freed pointer. */
-
-	struct list_elem **delenda;
-	delenda = malloc((l->count) * sizeof(struct list_elem*));
-	if (NULL == delenda) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
-	struct list_elem *e;
-	int i = 0;
-	for (e = l->head; NULL != e; e = e->next) {
-		delenda[i] = e;
-		i++;
-	}
-	for (i = 0; i < l->count; i++) {
-		free(delenda[i]);
-	}
-	
-	free(delenda);
+	clear_llist(l);
 	free(l);
 }
 
@@ -316,3 +283,15 @@ struct llist *array_to_llist(void **array, int count)
 	return list;
 }
 
+void clear_llist(struct llist *l)
+{
+	struct list_elem *e, *f;
+	e = l->head;
+	while (NULL != e) {
+		f = e->next;
+		free(e);
+		e = f;
+	}
+	l->head = l->tail = NULL;
+	l->count = 0;
+}

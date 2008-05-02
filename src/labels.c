@@ -11,6 +11,8 @@
 #include "rnode.h"
 #include "list.h"
 
+extern int FREE_NODE_DATA;
+
 struct parameters {
 	int show_inner_labels;
 	int show_leaf_labels;
@@ -106,7 +108,7 @@ int main (int argc, char* argv[])
 
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params);
-		destroy_tree(tree);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	return 0;
