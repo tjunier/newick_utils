@@ -45,6 +45,7 @@ static char *inner_label_font_size = "small";
 static int graph_width = 300;
 static char *colormap_fname = NULL;
 static double leaf_vskip = 40.0; /* Vertical separation of leaves (px) */
+static int svg_whole_v_shift = 20; /* Vertical translation of whole graph */
 
 static struct llist *colormap = NULL;
 
@@ -143,8 +144,8 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 	printf( "<g"
 	       	" style='stroke:black;stroke-width:1;"
 	    	"font-size:medium;font-weight:normal;font-family:sans'"
-		" transform='translate(0,20)'"
-		">");
+		" transform='translate(0,%d)'"
+		">", svg_whole_v_shift);
 
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {

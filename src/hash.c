@@ -36,7 +36,8 @@ struct hash *create_hash(int n)
 	return h;
 }
 
-/* Bernstein's hash function */
+/* Bernstein's hash function. See e.g.
+ * http://www.eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx */
 
 unsigned int hash_func (const char *key)
 {
