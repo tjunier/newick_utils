@@ -1,0 +1,23 @@
+\documentclass[a4paper,10pt]{article}
+
+
+%opening
+\title{UNIX Shell Utilities for Newick Trees}
+\author{Thomas Junier}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The Newick Utilities are a set of UNIX command-line programs for working with Newick trees.
+\end{abstract}
+
+\section{Introduction}
+
+Most programs for manipulating Newick trees [examples here] have an interactive, graphical interface. While this makes them easy to use, it also makes it awkward to perform the same operation (say, rerooting) on large numbers of trees, or to work on very large trees; it also makes it hard or impossible to automate an operation. The programs presented here were designed to perform their task on many trees, including large ones, without interaction other than launching the program.
+
+\subsection*{Example}
+
+\verb|$ nw_reroot vertebrata.nw Gallus Homo Bos|
+\end{document}
