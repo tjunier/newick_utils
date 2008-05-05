@@ -31,6 +31,43 @@ struct parameters {
 	int use_percent;
 };
 
+void help(char* argv[])
+{
+	printf(
+"%s [-ph] <target tree filename|-> <replicate trees filename>\n"
+"\n"
+"Attributes bootstrap support values to a tree.\n"
+"\n"
+"Input:\n"
+"\n"
+"The first argument is the name of the file containing the target tree (to which\n"
+"support values are to be attributed), or '-' (in which case the tree is read on\n"
+"stdin).\n"
+"\n"
+"The second argument is the name of the file containing the replicates.\n"
+"\n"
+"Output:\n"
+"\n"
+"Outputs the target tree, with a bipartition frequencies as inner node labels.\n"
+"\n"
+"Options:\n"
+"\n"
+"    -h: prints this message and exits\n"
+"    -p: prints values as percentages (default: absolute frequencies)\n"
+"\n"
+"Example:\n"
+"\n"
+"$ %s data/HRV.nw data/HRV_20reps.nw\n"
+"\n"
+"Limits & Assumptions:\n"
+"\n"
+"Assumes that the trees have the same number of leaves, and that all trees have\n"
+"the same leaf labels. Behaviour is undefined if this is violated.\n",
+	argv[0],
+	argv[0]
+	      );
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
@@ -40,13 +77,18 @@ struct parameters get_params(int argc, char *argv[])
 	params.use_percent = FALSE;
 
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "lp")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hlp")) != -1) {
 		switch (opt_char) {
+		case 'h':
+			help(argv);
+			exit(0);
+		/* we keep this for debugging, but not documented */
 		case 'l':
 			params.show_label_numbers = TRUE;
 			break;
 		case 'p':
 			params.use_percent = TRUE;
+			break;
 		}
 	}
 	/* get arguments */
