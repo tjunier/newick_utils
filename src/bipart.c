@@ -224,7 +224,12 @@ void show_label_numbers()
 void attribute_support_to_target_tree(struct rooted_tree *tree, int rep_count)
 {
 	/* # of digits for bipart count - need this to know string length */
-	int max_count_length = rint(log10(bipart_counts->count));	
+	/* e.g. if count = 143, need 3 characters */
+	int max_count_length;
+       	if (0 == rep_count)	/* percent: 3 chars or less */
+		max_count_length = 3;
+	else
+		max_count_length = log10(bipart_counts->count) + 1;	
 	struct list_elem *el;
 	
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
@@ -248,7 +253,8 @@ void attribute_support_to_target_tree(struct rooted_tree *tree, int rep_count)
 			else {
 				count = *count_p;
 			}
-			char * lbl = malloc(max_count_length * sizeof(char));
+			/* + 1 for '\0' */
+			char * lbl = malloc(max_count_length * sizeof(char) + 1);
 			if (NULL == lbl) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
