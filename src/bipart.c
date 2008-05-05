@@ -25,7 +25,8 @@ static struct hash *bipart_counts = NULL;
 static int num_leaves;
 
 struct parameters {
-	char * target_tree_filename;
+	FILE * target_tree_file;
+	FILE * rep_trees_file;
 	int show_label_numbers;
 	int use_percent;
 };
@@ -48,19 +49,26 @@ struct parameters get_params(int argc, char *argv[])
 			params.use_percent = TRUE;
 		}
 	}
-	/* check arguments */
+	/* get arguments */
 	if (2 == (argc - optind))	{
 		if (0 != strcmp("-", argv[optind])) {
-			FILE *fin = fopen(argv[optind], "r");
-			if (NULL == fin) {
+			FILE *ttf = fopen(argv[optind], "r");
+			if (NULL == ttf) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
-			nwsin = fin;
+			params.target_tree_file = ttf;
+		} else {
+			params.target_tree_file = stdin;
 		}
-		params.target_tree_filename = argv[optind+1];
+		FILE *rtf = fopen(argv[optind+1], "r");
+		if (NULL == rtf) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+		params.rep_trees_file = rtf;
 	} else {
-		fprintf(stderr, "Usage: %s <replicates filename|-> <target tree filename>\n", argv[0]);
+		fprintf(stderr, "Usage: %s <target tree filename|-> <replicates filename>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
@@ -209,27 +217,6 @@ void show_label_numbers()
 	free(labels);
 }
 
-struct rooted_tree *parse_target_tree(const char *tgt_fn)
-{
-	struct rooted_tree *tree;
-
-	/* change the lexer's input to the target tree file */
-	FILE *fin = fopen(tgt_fn, "r");
-	if (NULL == fin) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
-	nwsin = fin;
-
-	tree =  parse_tree();
-	if (NULL == tree) {
-		fprintf (stderr, "Could not parse target tree.\n");
-		exit(EXIT_FAILURE);
-	}
-
-	return tree;
-}
-
 /* Attributes support values to inner nodes. Argument is the tree, and the
  * number of replicates. If this number is > 0, the counts will be expressed as
  * percentages of it. Otherwise, the counts will be absolute. */
@@ -284,8 +271,9 @@ int main(int argc, char *argv[])
 	struct rooted_tree *tree;	
 	struct parameters params = get_params(argc, argv);
 	
-	/* Builds the bipartition counts hash, and counts the number of
+	/* Build the bipartition counts hash, and counts the number of
 	 * replicates. */
+	nwsin = params.rep_trees_file;
 	int rep_count = 0;
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree);
@@ -294,18 +282,20 @@ int main(int argc, char *argv[])
 
 	if (! params.use_percent) { rep_count = 0; }
 
-	tree = parse_target_tree(params.target_tree_filename);
+	/* Attribute counts to the target tree */
+	nwsin = params.target_tree_file;
+	tree = parse_tree();
 	attribute_support_to_target_tree(tree, rep_count);
+
 	char *newick = to_newick(tree->root);
 	printf ("%s\n", newick);
 	free(newick);
-	destroy_tree(tree, FREE_NODE_DATA);
 
-	/* Not sure if this is really useful */
-	/*
-	show_bipartition_counts();
-	*/
 	if (params.show_label_numbers) show_label_numbers();
+
+	destroy_tree(tree, FREE_NODE_DATA);
+	fclose(params.target_tree_file);
+	fclose(params.rep_trees_file);
 
 	return 0;
 }

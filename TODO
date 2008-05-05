@@ -103,3 +103,5 @@ leaves should be the default behaviour for cladograms.
 suite.
 
 [done] nw_display: replace underscores by spaces, as underscores are a way to introduce spaces where they are normally not allowed. The transformation is only done in nw_display, not in the parser: this way the labels are always valid Newick.
+
+[done] nw_bipart: invert order of arguments: 'target' newick tree mus be first.

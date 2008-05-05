@@ -1,2 +1,2 @@
-simple:HRV_20reps.nw HRV.nw
-percent:-p HRV_20reps.nw HRV.nw
+simple:HRV.nw HRV_20reps.nw 
+percent:-p HRV.nw HRV_20reps.nw 
