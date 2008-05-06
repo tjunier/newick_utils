@@ -14,6 +14,44 @@ struct parameters {
 	int action;	
 };
 
+void help(char *argv[])
+{
+	printf(
+"%s [-sh] <tree|->\n"
+"\n"
+"Simplifies a tree by collapsing certain nodes.\n"
+"\n"
+"Input:\n"
+"\n"
+"Argument is either the name of a file that contains one or more trees, or '-',\n"
+"in which case the trees are read on stdin.\n"
+"\n"
+"Output:\n"
+"\n"
+"The tree(s) with zero or more nodes collapsed. By default, collapses pure\n"
+"clades; with option -s, collapses stair nodes.\n"
+"\n"
+"A pure clade is a clade in which all leaves have the same label, and it is\n"
+"replaced by a leaf of the same label: (A,(B,(B,B))); has a pure clade of B, and\n"
+"will be replaced by (A,B);. The collapsed clade's support value (if any) is\n"
+"preserved, as is its parent edge's length (if specified).\n"
+"\n"
+"A stair node is a node which has one direct child and one grandchild of the\n"
+"same label. The child is removed. E.g. (C,((A,B),B)); has a stair node in B,\n"
+"and will be replaced by (C,(A,B));\n"
+"\n"
+"Options:\n"
+"\n"
+"    -s: collapse stair nodes (default: collapse pure clades)\n"
+"\n"
+"Example:\n"
+"\n"
+"$ %s data/falc_families\n",
+	argv[0],
+	argv[0]
+		);
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 
@@ -23,8 +61,11 @@ struct parameters get_params(int argc, char *argv[])
 
 	/* parse options and switches */
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "s")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hs")) != -1) {
 		switch (opt_char) {
+		case 'h':
+			help(argv);
+			exit(EXIT_SUCCESS);
 		case 's':
 			params.action = STAIR_NODES;
 			break;
@@ -58,11 +99,12 @@ int main(int argc, char *argv[])
 	
 	params = get_params(argc, argv);
 
-	tree = parse_tree();
-
-	collapse_pure_clades(tree);
-
-	printf ("%s\n", to_newick(tree->root));
+	while (NULL != (tree = parse_tree())) {
+		collapse_pure_clades(tree);
+		char *newick = to_newick(tree->root);
+		printf ("%s\n", newick);
+		free(newick);
+	}
 
 	return 0;
 }

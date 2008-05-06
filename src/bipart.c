@@ -81,7 +81,7 @@ struct parameters get_params(int argc, char *argv[])
 		switch (opt_char) {
 		case 'h':
 			help(argv);
-			exit(0);
+			exit(EXIT_SUCCESS);
 		/* we keep this for debugging, but not documented */
 		case 'l':
 			params.show_label_numbers = TRUE;

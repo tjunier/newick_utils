@@ -1,4 +1,3 @@
-#define RNODE_DEF 1
 
 struct redge;
 struct llist;
@@ -37,3 +36,8 @@ int is_inner_node(struct rnode *node);
  * this function can be passed to dump_llist(). */
 
 void dump_rnode(void *arg);
+
+/* Returns true IFF node is a "stair" node */
+
+int is_stair_node(struct rnode *node);
+
