@@ -1,7 +1,7 @@
 SUBDIRS = src tests
 EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/test_nw_clade.sh \
-	tests/test_nw_collapse.sh \
+	tests/test_nw_condense.sh \
 	tests/test_nw_display.sh \
 	tests/test_nw_distance.sh \
 	tests/test_nw_ed.sh \
@@ -15,7 +15,7 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/test_nw_topology.sh \
 	tests/test_nw_bipart_args \
 	tests/test_nw_clade_args \
-	tests/test_nw_collapse_args \
+	tests/test_nw_condense_args \
 	tests/test_nw_display_args \
 	tests/test_nw_distance_args \
 	tests/test_nw_ed_args \
@@ -30,6 +30,7 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/catarrhini_wrong_3og.nw \
 	tests/catarrhini_wrong_mult.nw \
 	tests/catarrhini_wrong.nw \
+	tests/def.nw \
 	tests/dist.nw \
 	tests/edged_root.nw \
 	tests/forest_ind.nw \
@@ -46,7 +47,9 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/test_nw_clade_monop.exp \
 	tests/test_nw_clade_monop_f.exp \
 	tests/test_nw_clade_multiple.exp \
-	tests/test_nw_collapse_simple.exp \
+	tests/test_nw_condense_multi.exp \
+	tests/test_nw_condense_simple.exp \
+	tests/test_nw_display_def.exp \
 	tests/test_nw_display_multiple.exp \
 	tests/test_nw_display_pure_topol.exp \
 	tests/test_nw_display_svg_cldgram.exp \

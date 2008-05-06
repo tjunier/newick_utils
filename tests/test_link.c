@@ -725,10 +725,15 @@ int test_unlink_rnode_3sibs()
 
 }
 
+/* I had second thoughts about condensing stair nodes, as this is a bit a form
+ * of cheating. */
+/*
 int test_is_stair()
 {
 	return 1;
 }
+*/
+
 
 int main()
 {
@@ -753,7 +758,7 @@ int main()
 	failures += test_unlink_rnode();
 	failures += test_unlink_rnode_rad_leaf();
 	failures += test_unlink_rnode_3sibs();
-	failures += test_is_stair();
+	// failures += test_is_stair();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

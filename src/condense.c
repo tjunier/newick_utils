@@ -1,4 +1,4 @@
-/* collapse: simplifies tree */
+/* condense: simplifies tree */
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -8,7 +8,7 @@
 #include "parser.h"
 #include "to_newick.h"
 
-enum actions { PURE_CLADES, STAIR_NODES };
+enum actions { PURE_CLADES, STAIR_NODES }; /* not sure we'll keep stair nodes */
 
 struct parameters {
 	int action;	
@@ -35,14 +35,6 @@ void help(char *argv[])
 "replaced by a leaf of the same label: (A,(B,(B,B))); has a pure clade of B, and\n"
 "will be replaced by (A,B);. The collapsed clade's support value (if any) is\n"
 "preserved, as is its parent edge's length (if specified).\n"
-"\n"
-"A stair node is a node which has one direct child and one grandchild of the\n"
-"same label. The child is removed. E.g. (C,((A,B),B)); has a stair node in B,\n"
-"and will be replaced by (C,(A,B));\n"
-"\n"
-"Options:\n"
-"\n"
-"    -s: collapse stair nodes (default: collapse pure clades)\n"
 "\n"
 "Example:\n"
 "\n"

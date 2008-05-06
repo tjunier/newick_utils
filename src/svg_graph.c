@@ -8,13 +8,14 @@
 #include "tree.h"
 #include "list.h"
 #include "rnode.h"
-#include "simple_node_pos.h"
 #include "redge.h"
 #include "assert.h"
 #include "readline.h"
 #include "lca.h"
 #include "hash.h"
 #include "node_pos_alloc.h"
+
+void underscores2spaces(); /* defined in display.c */
 
 struct colormap_pair {
 	char *color;		/* a valid SVG color string, e.g. 'blue' */
@@ -318,6 +319,7 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves)
 	double v_scale = leaf_vskip;
 
 	if (colormap) set_node_colors(tree);
+ 	underscores2spaces(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* create canvas and draw nodes on it */

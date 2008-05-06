@@ -8,7 +8,7 @@ bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
 	node_pos_alloc.h node_set.h parser.h readline.h redge.h rnode.h \
 	rnode_iterator.h simple_node_pos.h svg_graph.h text_graph.h \
-	to_newick.h tree.h tree_editor_rnode_data.h
+	to_newick.h tree.h tree_editor_rnode_data.h common.h
 
 nw_indent_SOURCES = indent.c indent_lex.l
 nw_indent_LDADD = @LEXLIB@

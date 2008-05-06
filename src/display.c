@@ -128,7 +128,6 @@ int main(int argc, char *argv[])
 		set_svg_parameters(params);
 		svg_init();
 		tree = parse_tree();
-		underscores2spaces(tree);
 		align_leaves = is_cladogram(tree);
 		svg_header();
 		display_svg_tree(tree, align_leaves);
