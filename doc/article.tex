@@ -1,5 +1,5 @@
 \documentclass[a4paper,10pt]{article}
-
+\usepackage{url}
 
 %opening
 \title{UNIX Shell Utilities for Newick Trees}
@@ -15,9 +15,13 @@ The Newick Utilities are a set of UNIX command-line programs for working with Ne
 
 \section{Introduction}
 
-Most programs for manipulating Newick trees [examples here] have an interactive, graphical interface. While this makes them easy to use, it also makes it awkward to perform the same operation (say, rerooting) on large numbers of trees, or to work on very large trees; it also makes it hard or impossible to automate an operation. The programs presented here were designed to perform their task on many trees, including large ones, without interaction other than launching the program.
+There is a vast choice of programs for manipulating phylogenetic trees (see for example \url{ http://evolution.genetics.washington.edu/phylip/software.html}), allowing operations like (re)rooting, reordering nodes, editing labels, extracting subtrees, etc). Virtually all of these applications have an interactive, graphical interface. While this makes the tools user-friendly, it also makes it awkward to work on large numbers of trees, or to work on very large trees; it also makes it hard or impossible to automate operations. Faced with the need to manipulate large or numerous trees in automated pipelines, we designed and wrote a series of programs that need no user interaction and work with any number of trees of any size, the sole limit being the computer's resources. The results are the subject of this paper.
 
-\subsection*{Example}
-
-\verb|$ nw_reroot vertebrata.nw Gallus Homo Bos|
+For example, suppose we produced a set of around 1,000 maximum-likelihood trees of 1:1 protein orthologs in 30 vertebrate species. We are interested in evolution rates, so we want to extract branch lengths and submit them to multivariate analysis. Since ML trees are not rooted, we must first root all the trees, in this case on \textit{Danio} and \textit{Fugu}. This can be done with the following command:
+\begin{quote}
+\verb|$ nw_reroot vertebrata.nw Danio Fugu|                                                         \end{quote} which will reroot all Newick trees in file \verb|vertebrata.nw| on the clade defined by \verb|Danio| and \verb|Fugu|, and print the rerooted trees to standard output, also in Newick format. To extract branch lengths, we pipe the rooted trees into \verb|nw_distance|:
+\begin{quote}
+\verb%$ nw_reroot vertebrata.nw Danio Fugu | nw_distance -t -%
+\end{quote}
+where option \verb|-t| request tab-separated output, and the '\verb|-|' means to read data on standard input.
 \end{document}
