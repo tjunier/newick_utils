@@ -1,3 +1,9 @@
+nw_display: check the 'null' values (try colormaps). Add a test for every
+option.
+
+add a help text to all programs (option -h)
+
+[later] Add functionality for reducing stair nodes.
 
 [later] Add functionality for directly counting a bipartition from a set of
 replicates.  This would look like: $ nw_bipart <reps> leaf1 ... leafn where a

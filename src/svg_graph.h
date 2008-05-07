@@ -10,6 +10,8 @@ void set_svg_width(int);
 void set_svg_inner_label_font_size(char *);
 void set_svg_leaf_label_font_size(char *);
 void set_svg_colormap_file(char *);
+void set_svg_leaf_vskip(double);
+void set_svg_whole_v_shift(int);
 
 /* Call this before calling svg_header(), etc, but _after_ the set_svg*()
  * functions. It will launch the initializations liek reading the color map,

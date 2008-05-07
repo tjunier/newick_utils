@@ -41,17 +41,14 @@ int init_done = 0;
 /* We can't pass all the parameters to write_nodes_to_g() or any other function
  * - there are too many of them - so we use external variables. */
 
-static char *leaf_label_font_size = "medium";
-static char *inner_label_font_size = "small";
-static int graph_width = 300;
+static char *leaf_label_font_size = NULL;
+static char *inner_label_font_size = NULL;
+static int graph_width = -1;
 static char *colormap_fname = NULL;
-static double leaf_vskip = 40.0; /* Vertical separation of leaves (px) */
-static int svg_whole_v_shift = 20; /* Vertical translation of whole graph */
+static double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
+static int svg_whole_v_shift = -1; /* Vertical translation of whole graph */
 
 static struct llist *colormap = NULL;
-
-/* works OK with scale 1 on Ubuntu */
-// static int char_width = 1;	/* for estimating string lengths */
 
 /* These are setters for the external variables. This way I can keep them
  * static. I just don't like variables open to anyone, maybe I did too much
@@ -61,7 +58,8 @@ void set_svg_leaf_label_font_size(char *size) { leaf_label_font_size = size; }
 void set_svg_inner_label_font_size(char *size) { inner_label_font_size = size; }
 void set_svg_width(int width) { graph_width = width; }
 void set_svg_colormap_file(char *fname) { colormap_fname = fname; }
-// void set_char_width(int width) { char_width = width; }
+void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
+void set_svg_whole_v_shift(int shift) { svg_whole_v_shift = shift; }
 
 void svg_header()
 {
