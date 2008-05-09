@@ -2,3 +2,4 @@ simple:catarrhini_wrong.nw
 optt:-t '.  ' catarrhini_wrong.nw
 multiple:forest.nw
 multiple_optc:-c forest_ind.nw
+plusminus:plusminus.nw

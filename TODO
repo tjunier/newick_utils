@@ -1,7 +1,7 @@
 nw_display: check the 'null' values (try colormaps). Add a test for every
 option.
 
-add a help text to all programs (option -h)
+all: add help, available with option -h (program should then quit successfully).
 
 [later] Add functionality for reducing stair nodes.
 
@@ -111,3 +111,8 @@ suite.
 [done] nw_display: replace underscores by spaces, as underscores are a way to introduce spaces where they are normally not allowed. The transformation is only done in nw_display, not in the parser: this way the labels are always valid Newick.
 
 [done] nw_bipart: invert order of arguments: 'target' newick tree mus be first.
+
+[done] parser: the '+' character causes a syntax error. This should not be the
+case, as every printable char except ()[]:,; is legal in labels. Also confuses
+lexer, so fix it too while we're at it.
+

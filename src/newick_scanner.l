@@ -31,11 +31,11 @@ char * space2underscore(char * s)
 	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
-[a-zA-Z0-9_.-]+	{
+[a-zA-Z0-9_.+-]+	{
 	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
-[a-zA-Z0-9_.-]+([ ][a-zA-Z0-9_.-]+)+	{
+[a-zA-Z0-9_.+-]+([ ][a-zA-Z0-9_.+-]+)+	{
 	nwslval.sval = (char *) space2underscore(strdup(yytext));
 	fprintf (stderr, "WARNING: spaces found in label '%s' - converting to underscores.\n",
 			yytext);
