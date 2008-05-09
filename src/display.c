@@ -18,6 +18,7 @@ struct parameters {
 	char *colormap_fname;	/* TODO: might store FILE* instead of name */
 	char *leaf_label_font_size;
 	char *inner_label_font_size;
+	char *branch_length_font_size;
 	double leaf_vskip;
 };
 
@@ -40,6 +41,8 @@ void help(char* argv[])
 "\n"
 "Options:\n"
 "\n"
+"    -b <number>: branch length font size (default: small) [only SVG].\n"    
+"       setting to 0 disables printing of branch lengths.\n"
 "    -c <colormap-file>: use specified colormap [only SVG]. A colormap is a text\n"    
 "       file which specifies a color for a clade. Each line has the following\n"
 "       structure:\n"
@@ -50,7 +53,10 @@ void help(char* argv[])
 "       LCA of the labels and all descendant nodes are colored.\n"
 "       Default: no colormap, whole tree is black.\n"
 "    -h: prints this message and exits\n"
-"    -I <number>: inner label font size (default: small) [SVG only]\n"
+"    -i <number>: inner label font size (default: small) [SVG only]\n"
+"       setting to 0 disables printing of inner labels.\n"
+"    -l <number>: inner label font size (default: small) [SVG only]\n"
+"       setting to 0 disables printing of inner labels.\n"
 "    -s: output graph as SVG (default: text)\n"
 "    -w <number>: graph should be no wider than <number>, measured in\n"
 "       characters for text and pixels for SVG. Defaults: 80 (text),\n"
@@ -80,22 +86,26 @@ struct parameters get_params(int argc, char *argv[])
 	params.colormap_fname = NULL;
 	params.leaf_label_font_size = "medium";
 	params.inner_label_font_size = "small";
+	params.branch_length_font_size = "small";
 	params.leaf_vskip = 40.0;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "c:hI:L:sv:w:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "b:c:hi:l:sv:w:")) != -1) {
 		switch (opt_char) {
+		case 'b':
+			params.branch_length_font_size = optarg;
+			break;
 		case 'c':
 			params.colormap_fname = optarg;
-			break;
-		case 'L':
-			params.leaf_label_font_size = optarg;
 			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
-		case 'I':
+		case 'i':
 			params.inner_label_font_size = optarg;
+			break;
+		case 'l':
+			params.leaf_label_font_size = optarg;
 			break;
 		case 's':
 			params.svg = TRUE;
@@ -152,8 +162,9 @@ struct parameters get_params(int argc, char *argv[])
 void set_svg_parameters(struct parameters params)
 {
 	set_svg_width(params.width);
-	set_svg_inner_label_font_size(params.inner_label_font_size);
 	set_svg_leaf_label_font_size(params.leaf_label_font_size);
+	set_svg_inner_label_font_size(params.inner_label_font_size);
+	set_svg_branch_length_font_size(params.branch_length_font_size);
 	set_svg_colormap_file(params.colormap_fname);
 	set_svg_leaf_vskip(params.leaf_vskip);
 	set_svg_whole_v_shift(20);	/* pixels */

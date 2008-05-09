@@ -41,8 +41,11 @@ int init_done = 0;
 /* We can't pass all the parameters to write_nodes_to_g() or any other function
  * - there are too many of them - so we use external variables. */
 
+/* SVG font sizes are strings, to allow values like 'small', etc. */
 static char *leaf_label_font_size = NULL;
 static char *inner_label_font_size = NULL;
+static char *branch_length_font_size = NULL;
+
 static int graph_width = -1;
 static char *colormap_fname = NULL;
 static double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
@@ -56,6 +59,8 @@ static struct llist *colormap = NULL;
 
 void set_svg_leaf_label_font_size(char *size) { leaf_label_font_size = size; }
 void set_svg_inner_label_font_size(char *size) { inner_label_font_size = size; }
+void set_svg_branch_length_font_size(char *size) {
+	branch_length_font_size = size; }
 void set_svg_width(int width) { graph_width = width; }
 void set_svg_colormap_file(char *fname) { colormap_fname = fname; }
 void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
@@ -171,11 +176,14 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 			color, svg_h_pos, svg_top_pos, svg_h_pos,
 			svg_bottom_pos);
 		}
-		/* draw label */
-		printf("<text style='stroke:none;font-size:%s' "
-		       "x='%.4f' y='%.4f'>%s</text>",
-			font_size, svg_h_pos + LBL_SPACE,
-			svg_mid_pos, node->label);
+		/* draw label IFF it is nonempty AND requested font size
+		 * is not zero */
+		if (0 != strcmp(font_size, "0") &&
+		    0 != strcmp(node->label, ""))
+			printf("<text style='stroke:none;font-size:%s' "
+			       "x='%.4f' y='%.4f'>%s</text>",
+				font_size, svg_h_pos + LBL_SPACE,
+				svg_mid_pos, node->label);
 		/* draw horizontal line */
 		if (is_root(node)) {
 			printf("<line stroke-linecap='round' "
@@ -192,13 +200,17 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				color, svg_parent_h_pos,
 				 svg_mid_pos, svg_h_pos, svg_mid_pos);
-			printf ("<text style='stroke:none;font-size:%s' "
-				"x='%4f' y='%4f'>%s</text>",
-				inner_label_font_size,
-				(svg_h_pos + svg_parent_h_pos) / 2.0,
-				edge_length_v_offset + svg_mid_pos,
-				node->parent_edge->length_as_string);
-
+			/* Print branch length IFF it is nonempty AND 
+			 * requested size is not 0 */
+			if (0 != strcmp(branch_length_font_size, "0") &&
+			    0 != strcmp(node->parent_edge->length_as_string, "")) {
+				printf("<text style='stroke:none;font-size:%s' "
+					"x='%4f' y='%4f'>%s</text>",
+					branch_length_font_size,
+					(svg_h_pos + svg_parent_h_pos) / 2.0,
+					edge_length_v_offset + svg_mid_pos,
+					node->parent_edge->length_as_string);
+			}
 		}
 
 	}

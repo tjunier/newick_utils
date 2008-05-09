@@ -3,3 +3,4 @@ pure_topol:tetrapoda_pure_topol.nw
 svg_cmap:-s -c color.map catarrhini.nw
 svg_cldgram:-s catarrhini_wrong.nw
 def:def.nw
+svlb: -s -v 8 -l 7 -b 6 HRV.nw
