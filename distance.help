@@ -1,0 +1,41 @@
+%s <tree file|-> [label]*
+
+Prints distances between nodes, following tree branches, in various ways.
+
+Input
+
+First argument is the name of a file containing one or more trees, or '-' (in which case trees are read from standard input). Any subsequent arguments are node labels.
+
+Output
+
+By default, works in "root" mode, i.e. outputs distances from the tree's root
+to all nodes whose labels are passed on the command line, preserving order. Each distance appears on a separate line. If
+no labels are passed, behaves as if all leaf labels had been passed, in the
+order in which they appear in the Newick.
+
+In "last common ancestor" (LCA) mode (see options), finds the LCA of all nodes
+whose labels are passed on the command line; then behaves like root mode, but
+using the LCA instead of the tree's root (which may be the same). If no labels are passed, behaves as in root mode.
+
+In "parent" mode (see options), prints the distance between each node whose
+label is found on the command line and its immediate parent, preserving order.
+Each distance appears on a separate line.  If no label is passed, behaves as if
+all leaf labels had been passed, in the order in which they appear in the
+Newick.
+
+In "matrix" mode (see options), outputs a square matrix of distances between
+all nodes whose labels are passed on the command line, preserving order. If no
+labels are passed, behaves as if all leaf labels had been passed, in the order
+in which they appear in the Newick.
+
+Options
+
+    -h: print this message and exit TODO: now switches on headers!! Need to find another optin character for headers.
+    -i: if no labels have been passed on the command line, behave as if
+        internal labels had been passed too (default: only leaf labels)
+    -m <mode>: selects mode (see Output). Mode is determined by the first
+        letter of the argument: 'r' for root mofr (default), 'l' for LCA,
+        'p' for parent, and 'm' for matrix. Thus, '-mm', '-m matrix',
+        and '-m mat' all select matrix mode.
+    -t: tab-separated - prints values on one line, separated by tabs.
+        Ignored in matrix mode.
