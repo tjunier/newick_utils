@@ -21,6 +21,54 @@ struct parameters {
 	int check_monophyly;
 };
 
+void help(char *argv[])
+{
+	printf(
+"%s [-hm] <target tree filename|-> <label> [label]+\n"
+"\n"
+"Extracts a subtree defined by labels.\n"
+"\n"
+"Input\n"
+"\n"
+"The first argument is the name of a file containing one or more Newick\n"
+"trees, or '-' (in which case the trees are read on stdin).\n"
+"\n"
+"The next arguments are labels found in the tree (both leaf and internal\n"
+"labels work). Any label not found in the tree will be ignored. There\n"
+"must be at least one label.\n"
+"\n"
+"Output\n"
+"\n"
+"Outputs the clade rooted at the last common ancestor of all labels passed\n"
+"as arguments, as Newick.\n"
+"\n"
+"Options\n"
+"\n"
+"    -h: prints this message and exits\n"
+"    -m: only prints the clade if it is monophyletic, in the sense that ONLY\n"
+"        the labels passed as arguments are found in the clade.\n"
+"\n"
+"Examples\n"
+"\n"
+"# clade defined by two leaves\n"
+"$ %s data/catarrhini Homo Hylobates\n"
+"\n"
+"# clade defined by a leaf and a inner node (Hominini)\n"
+"$ %s data/catarrhini Hominini Hylobates\n"
+"\n"
+"# clade is monophyletic\n"
+"$ %s -m data/catarrhini Homo Gorilla Pan\n"
+"\n"
+"# clade is not monophyletic (Gorilla is missing)\n"
+"$ %s -m data/catarrhini Homo Pongo Pan\n",
+	argv[0],
+	argv[0],
+	argv[0],
+	argv[0],
+	argv[0]
+	      );
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 
@@ -29,8 +77,11 @@ struct parameters get_params(int argc, char *argv[])
 	params.check_monophyly = 0;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "m")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hm")) != -1) {
 		switch (opt_char) {
+		case 'h':
+			help(argv);
+			exit(EXIT_SUCCESS);
 		case 'm':
 			params.check_monophyly = 1;
 			break;

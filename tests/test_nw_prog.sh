@@ -31,7 +31,7 @@ pass=TRUE
 while IFS=':' read name args ; do
 	# setting IFS to '' preserves whitespace through shell word splitting
 	IFS='' cmd="../src/$prog $args"
-	echo -n "test: '$cmd' - "
+	echo -n "test '$name': '$cmd' - "
 	eval $cmd > test_${prog}_$name.out
 	if diff test_${prog}_$name.out test_${prog}_$name.exp ; then
 		echo "pass"

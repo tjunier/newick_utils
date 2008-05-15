@@ -16,6 +16,7 @@
 #include "rnode.h"
 #include "redge.h"
 #include "node_pos_alloc.h"
+#include "common.h"
 
 enum {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
 enum {HORIZONTAL, VERTICAL};
@@ -33,6 +34,76 @@ struct parameters {
 
 /* Returns the distance type (root, LCA, or matrix) based on the first characer
  * of 'optarg' */
+
+void help(char *argv[])
+{
+	printf (
+"%s <tree file|-> [label]*\n"
+"\n"
+"Prints distances between nodes, following tree branches, in various ways.\n"
+"\n"
+"Input\n"
+"\n"
+"First argument is the name of a file containing one or more trees, or '-'\n"
+"(in which case trees are read from standard input). Any subsequent arguments\n"
+"are node labels.\n"
+"\n"
+"Output\n"
+"\n"
+"By default, works in \"root\" mode, i.e. outputs distances from the tree's\n"
+"root to all nodes whose labels are passed on the command line, preserving\n"
+"order.  Each distance appears on a separate line. If no labels are passed,\n"
+"behaves as if all leaf labels had been passed, in the order in which they\n"
+"appear in the Newick.\n"
+"\n"
+"In \"last common ancestor\" (LCA) mode (see options), finds the LCA of all\n"
+"nodes whose labels are passed on the command line; then behaves like root\n"
+"mode, but using the LCA instead of the tree's root (which may be the same).\n"
+"If no labels are passed, behaves as in root mode.\n"
+"\n"
+"In \"parent\" mode (see options), prints the distance between each node whose\n"
+"label is found on the command line and its immediate parent, preserving\n"
+"order.  Each distance appears on a separate line.  If no label is passed,\n"
+"behaves as if all leaf labels had been passed, in the order in which they\n"
+"appear in the Newick.\n"
+"\n"
+"In \"matrix\" mode (see options), outputs a square matrix of distances between\n"
+"all nodes whose labels are passed on the command line, preserving order. If\n"
+"no labels are passed, behaves as if all leaf labels had been passed, in the\n"
+"order in which they appear in the Newick.\n"
+"\n"
+"Options\n"
+"\n"
+"    -h: prints this message and exit \n"
+"    -i: if no labels have been passed on the command line, behaves as if\n"
+"        internal labels had been passed too (default: only leaf labels)\n"
+"    -m <mode>: selects mode (see Output). Mode is determined by the first\n"
+"        letter of the argument: 'r' for root mofr (default), 'l' for LCA,\n"
+"        'p' for parent, and 'm' for matrix. Thus, '-mm', '-m matrix',\n"
+"        and '-m mat' all select matrix mode.\n"
+"    -n: prints labels as well as distances\n"
+"    -t: tab-separated - prints values on one line, separated by tabs.\n"
+"        Ignored in matrix mode.\n"
+"\n"
+"Assumptions and Limitations\n"
+"\n"
+"Labels passed as arguments are assumed to exist in the tree. Behaviour is\n"
+"undefined if a label is not found.\n"
+"\n"
+"Examples\n"
+"\n"
+"$ %s data/catarrhini	# all leaves, from root\n"
+"\n"
+"# Pongo and Homo, from their LCA, with labels, single line:\n"
+"$ %s -m lca -t -n data/catarrhini Homo Pongo \n"
+"\n"
+"# All leaves, matrix form, with labels\n"
+"$ %s -mm -n data/catarrhini\n",
+	argv[0],
+	argv[0],
+	argv[0],
+	argv[0]);
+}
 
 int get_distance_type()
 {
@@ -61,25 +132,28 @@ struct parameters get_params(int argc, char *argv[])
 
 	params.distance_type = FROM_ROOT;
 	params.separator = '\n';
-	params.only_leaves = 1;
-	params.header = 0;
+	params.only_leaves = TRUE;
+	params.header = FALSE;
 	params.orientation = VERTICAL;
 	params.shape = SQUARE;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "him:t")) != -1) {
+	while ((opt_char = getopt(argc, argv, "him:nt")) != -1) {
 		switch (opt_char) {
+		case 'h':
+			help(argv);
+			exit(EXIT_SUCCESS);
+		case 'i':
+			params.only_leaves = FALSE;
+			break;
 		case 'm':
 			params.distance_type = get_distance_type();
 			break;
+		case 'n':
+			params.header = TRUE;
+			break;
 		case 't':
 			params.orientation = HORIZONTAL;
-			break;
-		case 'h':
-			params.header = 1;
-			break;
-		case 'i':
-			params.only_leaves = 0;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);

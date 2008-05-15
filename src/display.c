@@ -55,7 +55,7 @@ void help(char* argv[])
 "    -h: prints this message and exits\n"
 "    -i <number>: inner label font size (default: small) [SVG only]\n"
 "       setting to 0 disables printing of inner labels.\n"
-"    -l <number>: inner label font size (default: small) [SVG only]\n"
+"    -l <number>: leaf label font size (default: small) [SVG only]\n"
 "       setting to 0 disables printing of inner labels.\n"
 "    -s: output graph as SVG (default: text)\n"
 "    -w <number>: graph should be no wider than <number>, measured in\n"

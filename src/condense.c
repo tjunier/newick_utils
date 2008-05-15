@@ -17,27 +17,32 @@ struct parameters {
 void help(char *argv[])
 {
 	printf(
-"%s [-sh] <tree|->\n"
+"%s [-h] <tree|->\n"
 "\n"
 "Simplifies a tree by collapsing certain nodes.\n"
 "\n"
-"Input:\n"
+"Input\n"
 "\n"
 "Argument is either the name of a file that contains one or more trees, or '-',\n"
 "in which case the trees are read on stdin.\n"
 "\n"
-"Output:\n"
+"Output\n"
 "\n"
-"The tree(s) with zero or more nodes collapsed. By default, collapses pure\n"
-"clades; with option -s, collapses stair nodes.\n"
+"The tree(s) with pure clades collapsed. A pure clade is a clade in which\n"
+"all leaves have the same label, and it is replaced by a leaf of the same\n"
+"label: (A,(B,(B,B))); has a pure clade of B, and will be replaced by\n"
+"(A,B);. The collapsed clade's support value (if any) is preserved, as is\n"
+"its parent edge's length (if specified).\n"
 "\n"
-"A pure clade is a clade in which all leaves have the same label, and it is\n"
-"replaced by a leaf of the same label: (A,(B,(B,B))); has a pure clade of B, and\n"
-"will be replaced by (A,B);. The collapsed clade's support value (if any) is\n"
-"preserved, as is its parent edge's length (if specified).\n"
+"Options\n"
 "\n"
-"Example:\n"
+"   -h: prints this message and exits\n"
 "\n"
+"Example\n"
+"\n"
+"# produce a tree of families from a genus tree in which all genus names\n"
+"# have been replaced by family names (see nw_rename) - look at\n"
+"# data/falconiformes\n"
 "$ %s data/falc_families\n",
 	argv[0],
 	argv[0]
@@ -59,6 +64,7 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 's':
+			/* Not implemented yet - not sure if it will be */
 			params.action = STAIR_NODES;
 			break;
 		}
