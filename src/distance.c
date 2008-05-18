@@ -1,5 +1,13 @@
 /* distance: print distances between nodes, in various ways. */
 
+=
+/* TODO:
+ * I'm in a big refactoring process: functions print_distance_list() and
+ * print_distance_matrix() now take a list of labels as argument. This worked
+ * fine, but it precludes using labelless nodes. So now they will use a list of
+ * _nodes_ instead, and the list will be derived from the labels (if need be).
+ * */
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,15 +29,16 @@
 enum {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
 enum {HORIZONTAL, VERTICAL};
 enum {SQUARE, TRIANGLE};
+enum {ALL_NODES, ALL_LABELS, ALL_LEAF_LABELS, PARAM_LABELS};
 
 struct parameters {
-	struct llist *labels;
 	int distance_type;
+	int selection;
+	struct llist *labels;
 	char separator;
-	int only_leaves;
-	int header;
-	int orientation;
-	int shape;
+	int show_header;
+	int list_orientation;
+	int matrix_shape;
 };
 
 /* Returns the distance type (root, LCA, or matrix) based on the first characer
@@ -131,20 +140,22 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	params.distance_type = FROM_ROOT;
+	params.selection = ALL_LEAF_LABELS;
 	params.separator = '\n';
-	params.only_leaves = TRUE;
 	params.header = FALSE;
 	params.orientation = VERTICAL;
-	params.shape = SQUARE;
+	params.matrix_shape = SQUARE;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "him:nt")) != -1) {
+	while ((opt_char = getopt(argc, argv, "ahim:nt")) != -1) {
 		switch (opt_char) {
+		case 'a':
+			params.selection = ALL_NODES;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'i':
-			params.only_leaves = FALSE;
+			params.selection = ALL_LABELS;
 			break;
 		case 'm':
 			params.distance_type = get_distance_type();
@@ -179,6 +190,8 @@ struct parameters get_params(int argc, char *argv[])
 			append_element(lbl_list, argv[optind]);
 		}
 		params.labels = lbl_list;
+		if (0 != lbl_list.count)
+			params.selection = PARAM_LABELS;
 	} else {
 		fprintf(stderr, "Usage: %s [-ma] <filename|-> [label+]\n",
 				argv[0]);
@@ -186,6 +199,41 @@ struct parameters get_params(int argc, char *argv[])
 	}
 
 	return params;
+}
+
+struct llist *get_selected_nodes (struct rooted_tree *tree, 
+		int selection)
+{
+	struct llist *result;
+	struct list_elem *el;
+	struct rnode *node;
+
+	switch selection {
+		case ALL_NODES:
+			result = shallow_copy(tree->nodes_in_order);
+		case ALL_LABELS:
+			result = create_llist();
+			for (el = tree->nodes_in_order->head; NULL != el;
+				el = el->next) {
+				node = el->data;
+				if (0 != strcmp(node->label, ""))
+					append_element(result, node)
+			}
+		case ALL_LEAF_LABELS:
+			result = create_llist();
+			for (el = tree->nodes_in_order->head; NULL != el;
+				el = el->next) {
+				node = el->data;
+				if (is_leaf(node) &&
+				   (0 != strcmp(node->label, "")))
+					append_element(result, node)
+			}
+		default:
+			fprintf (stderr, "ERROR: no selection code '%d'\n",
+					selection);
+			exit (EXIT_FAILURE);
+	}
+
 }
 
 struct hash *distance_hash (struct rooted_tree *tree, struct rnode *origin,
@@ -350,7 +398,6 @@ void print_distance_matrix (struct rooted_tree *tree, struct llist *labels,
 	}	
 }
 
-
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
@@ -369,16 +416,19 @@ int main(int argc, char *argv[])
 				set_simple_node_pos_depth,
 				get_simple_node_pos_depth);
 		struct rnode *lca;
-		struct llist *labels = params.labels;
-		/* if no lbl given, use all leaf labels or all labels */
-		if (0 == labels->count) 
-			if (params.only_leaves)
-				labels = get_leaf_labels(tree);
-			else
-				labels = get_labels(tree);
+		struct llist *selected_nodes;
+
+		if (ARGV_LABELS = params.selection) {
+			selected_nodes = nodes_from_labels(tree,
+					params.labels);
+		} else {
+			selected_nodes = get_selected_nodes(tree,
+					params.selection);
+		}
 		switch (params.distance_type) {
 		case FROM_ROOT:
-			print_distance_list(tree, tree->root, labels, params.orientation, params.header);
+			print_distance_list(tree, tree->root, selected_nodes,
+					params.orientation, params.header);
 			break;
 		case FROM_LCA:
 			/* if no lbl given, use root as LCA */
@@ -386,7 +436,7 @@ int main(int argc, char *argv[])
 				lca = tree->root;
 			else
 				lca = lca_from_labels(tree, labels);
-			print_distance_list(tree, lca, labels,
+			print_distance_list(tree, lca, selected_nodes,
 				params.orientation, params.header);
 			break;
 		case MATRIX:

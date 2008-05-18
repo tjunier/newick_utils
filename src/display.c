@@ -29,17 +29,17 @@ void help(char* argv[])
 "\n"
 "Displays a tree as a graph, as text or SVG.\n"
 "\n"
-"Input:\n"
+"Input\n"
 "\n"
 "Argument is the name of the file containing one or more trees,\n"
 "or '-' (in which case the tree is read on stdin).\n"
 "\n"
-"Output:\n"
+"Output\n"
 "\n"
 "Outputs a graph representing the tree, either as text (default) or\n"
 "as SVG (option -s).\n"
 "\n"
-"Options:\n"
+"Options\n"
 "\n"
 "    -b <number>: branch length font size (default: small) [only SVG].\n"    
 "       setting to 0 disables printing of branch lengths.\n"
@@ -63,10 +63,17 @@ void help(char* argv[])
 "       300 (SVG)\n"
 "    -v <number>: number of pixels between leaves (default: 40) [only SVG]\n"
 "\n"
-"Examples:\n"
+"Examples\n"
 "\n"
-"$ %s data/catarrhini"
-"$ %s -s -c data/color.map data/catarrhini",
+"# display tree as ASCII\n"
+"$ %s data/catarrhini\n"
+"\n"
+"# display tree as SVG, using a color map\n"
+"$ %s -s -c data/color.map data/catarrhini\n"
+"\n"
+"# the same; no branch lengths\n"
+"$ %s -s -b 0 -c data/color.map data/catarrhini\n",
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0]
