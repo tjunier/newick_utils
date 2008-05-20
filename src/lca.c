@@ -119,6 +119,18 @@ struct rnode *lca (struct rooted_tree *tree,
 	return (struct rnode *) result;
 }
 
+struct rnode *lca_from_nodes (struct rooted_tree *tree,
+		struct llist *descendants)
+{
+	struct rnode *result;
+	struct llist *copy = shallow_copy(descendants);
+
+	result = lca(tree, copy);
+
+	destroy_llist(copy);
+	return result;
+}
+
 struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 {
 	struct hash *node_map = create_label2node_map(tree->nodes_in_order);

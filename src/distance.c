@@ -232,6 +232,8 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 	return result;
 }
 
+/*TODO: if this function isn't used, drop it. */
+
 /*
 struct hash *distance_hash (struct rooted_tree *tree, struct rnode *origin,
 		struct llist *selected_nodes)
@@ -277,6 +279,10 @@ struct hash *distance_hash (struct rooted_tree *tree, struct rnode *origin,
 
 double distance_to_descendant(struct rnode *ancestor, struct rnode *descendant)
 {
+	if (NULL == ancestor) {
+		ancestor = descendant->parent_edge->parent_node;
+	}
+
 	double ancestor_depth =
 		((struct simple_node_pos *) ancestor->data)->depth;
 	double descendant_depth =
@@ -347,26 +353,28 @@ void print_distance_list (struct rooted_tree *tree, struct rnode *origin,
  * LCA.
  */
 
-double ** fill_matrix (struct rooted_tree *tree, struct llist *labels)
+double ** fill_matrix (struct rooted_tree *tree, struct llist *selected_nodes)
 {
 	struct list_elem *h_el, *v_el;
 	int i, j;
-	int count = labels->count;
-	struct hash *lbl2node_map = create_label2node_map(tree->nodes_in_order);
+	int count = selected_nodes->count;
 	
 	double **lines = malloc(count * sizeof(double *));
 	if (NULL == lines) { perror(NULL), exit (EXIT_FAILURE); }
 	
-	for (j=0, v_el=labels->head; NULL != v_el; v_el=v_el->next, j++) {
+	for (j = 0, v_el = selected_nodes->head; NULL != v_el;
+		v_el = v_el->next, j++) {
 
 		lines[j] = malloc(count * sizeof(double));
 		if (NULL == lines[j]) { perror(NULL), exit (EXIT_FAILURE); }
 
 		struct rnode *h_node, *v_node;
-		v_node = hash_get(lbl2node_map, (char *) v_el->data);
+		v_node = v_el->data;
 
-		for (i=0,h_el=labels->head; NULL!=h_el; h_el=h_el->next,i++) {
-			h_node = hash_get(lbl2node_map, (char *) h_el->data);
+		for (i = 0, h_el = selected_nodes->head; NULL != h_el;
+			h_el = h_el->next, i++) {
+
+			h_node =  h_el->data;
 			if (NULL == v_node || NULL == h_node) {
 				lines[j][i] = -1;
 				break;
@@ -382,23 +390,28 @@ double ** fill_matrix (struct rooted_tree *tree, struct llist *labels)
 		}
 	}	
 
-	destroy_hash(lbl2node_map);
 	return lines;
 }
 
-void print_distance_matrix (struct rooted_tree *tree, struct llist *labels,
-		int headers, int shape)
+void print_distance_matrix (struct rooted_tree *tree,
+		struct llist *selected_nodes, int show_headers, int shape)
 {
-	double **matrix = fill_matrix(tree, labels);
+	double **matrix = fill_matrix(tree, selected_nodes);
 
 	struct list_elem *h_el, *v_el;
 	int i, j;
 	
-	for (j=0, v_el=labels->head; NULL != v_el; v_el=v_el->next, j++) {
-		if (headers) printf ("%s\t", (char *) v_el->data);
-		for (i=0,h_el=labels->head; NULL!=h_el; h_el=h_el->next,i++) {
+	for (j = 0, v_el = selected_nodes->head; NULL != v_el;
+		v_el = v_el->next, j++) {
+
+		if (show_headers) printf ("%s\t",
+			((struct rnode *) v_el->data)->label);
+
+		for (i = 0, h_el = selected_nodes->head; NULL != h_el;
+			h_el = h_el->next , i++) {
+
 			printf("%g", matrix[j][i]);
-			if (h_el == labels->tail) 
+			if (h_el == selected_nodes->tail) 
 				putchar('\n');
 			else
 				putchar('\t');
@@ -423,7 +436,7 @@ int main(int argc, char *argv[])
 		set_node_depth_cb(tree,
 				set_simple_node_pos_depth,
 				get_simple_node_pos_depth);
-		struct rnode *lca;
+		struct rnode *lca_node;
 		struct llist *selected_nodes;
 
 		if (ARGV_LABELS == params.selection) {
@@ -440,11 +453,13 @@ int main(int argc, char *argv[])
 			break;
 		case FROM_LCA:
 			/* if no lbl given, use root as LCA */
-			if (0 == params.labels->count) 
-				lca = tree->root;
-			else
-				//lca = lca_from_labels(tree, labels);
-			print_distance_list(tree, lca, selected_nodes,
+			if (0 == params.labels->count)  {
+				lca_node = tree->root;
+			}
+			else {
+				lca_node = lca_from_nodes(tree, selected_nodes);
+			}
+			print_distance_list(tree, lca_node, selected_nodes,
 				params.list_orientation, params.show_header);
 			break;
 		case MATRIX:

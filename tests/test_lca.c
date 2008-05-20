@@ -197,6 +197,82 @@ int test_lca_from_labels()
 	return 0;
 }
 
+int test_lca_from_nodes()
+{
+	const char *test_name = "test_lca_from_nodes";
+
+	struct rooted_tree tree;
+	struct rnode *ancestor, *desc_A, *desc_B;
+	struct rnode *desc_C, *desc_D, *desc_E;
+	struct rnode *desc_f, *desc_g, *desc_h, *desc_i;
+	struct hash *map;
+	struct llist *descendants;
+
+	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
+	map = create_label2node_map(tree.nodes_in_order);
+	desc_A = hash_get(map, "A");
+	desc_B = hash_get(map, "B");
+	desc_C = hash_get(map, "C");
+	desc_D = hash_get(map, "D");
+	desc_E = hash_get(map, "E");
+	desc_f = hash_get(map, "f");
+	desc_g = hash_get(map, "g");
+	desc_h = hash_get(map, "h");
+	desc_i = hash_get(map, "i");
+
+	descendants = create_llist();
+	append_element(descendants, desc_A);
+	append_element(descendants, desc_B);
+	ancestor = lca_from_nodes(&tree, descendants);
+
+	if (desc_f != ancestor) {
+		printf ("%s: expected node 'f' as LCA of 'A' and 'B' (got '%s').\n",
+				test_name, ancestor->label);
+		return 1;
+	}
+	if (descendants->count != 2) {
+		printf ("%s: argument list was modified.\n",
+				test_name);
+		return 1;
+	}
+
+	descendants = create_llist();
+	append_element(descendants, desc_C);
+	append_element(descendants, desc_D);
+	append_element(descendants, desc_E);
+	ancestor = lca_from_nodes(&tree, descendants);
+
+	if (desc_h != ancestor) {
+		printf ("%s: expected node 'h' as LCA of 'C', 'D' and 'E' (got '%s').\n",
+				test_name, ancestor->label);
+		return 1;
+	}
+	if (descendants->count != 3) {
+		printf ("%s: argument list was modified.\n",
+				test_name);
+		return 1;
+	}
+
+	descendants = create_llist();
+	append_element(descendants, desc_C);
+	append_element(descendants, desc_g);
+	ancestor = lca_from_nodes(&tree, descendants);
+
+	if (desc_h != ancestor) {
+		printf ("%s: expected node 'h' as LCA of 'C', 'D' and 'E' (got '%s').\n",
+				test_name, ancestor->label);
+		return 1;
+	}
+	if (descendants->count != 2) {
+		printf ("%s: argument list was modified.\n",
+				test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -204,6 +280,7 @@ int main()
 	failures += test_lca2();
 	failures += test_lca(); 
 	failures += test_lca_from_labels();
+	failures += test_lca_from_nodes();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

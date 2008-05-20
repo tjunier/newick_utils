@@ -3,15 +3,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "common.h"
+
 extern char *indent_string;
 extern char *eol;
 
 void get_params(int argc, char* argv[])
 {
-	char c;
+	int c;
+	int compact = 0;
+
 	eol = "\n";
 	indent_string = "  ";
-	int compact = 0;
 
 	while ((c = getopt (argc, argv, "ct:")) != -1) {
 		switch (c) {
@@ -23,7 +26,7 @@ void get_params(int argc, char* argv[])
 			 break;
 		}
 	}
-	if (compact) {
+	if (TRUE == compact) {
 		eol = "";
 		indent_string = "";
 	}
