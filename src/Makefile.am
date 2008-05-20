@@ -16,7 +16,7 @@ nw_indent_LDADD = @LEXLIB@
 # I mention all headers here, so they're included in the distro (otherwise this
 # is not necessary, it builds just fine)
 NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
-	  link.c tree.c redge.c $(HDR)
+	  link.c tree.c redge.c nodemap.c hash.c $(HDR)
 
 NW_OUT = to_newick.c concat.c
 
@@ -29,24 +29,23 @@ address_scanner.c: address_scanner.l
 	flex -oaddress_scanner.c address_scanner.l 
 
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
-		simple_node_pos.c svg_graph.c readline.c lca.c nodemap.c \
-		hash.c node_pos_alloc.c
+		simple_node_pos.c svg_graph.c readline.c lca.c \
+		node_pos_alloc.c
 nw_display_LDADD = @LEXLIB@
 
-nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c nodemap.c hash.c \
-		   rnode_iterator.c
+nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c rnode_iterator.c
 nw_clade_LDADD = @LEXLIB@ 
 
-nw_reroot_SOURCES = $(NW_CORE) $(NW_OUT) reroot.c lca.c nodemap.c hash.c
+nw_reroot_SOURCES = $(NW_CORE) $(NW_OUT) reroot.c lca.c
 nw_reroot_LDADD = @LEXLIB@
 
-nw_rename_SOURCES = $(NW_CORE) $(NW_OUT) rename.c hash.c readline.c
+nw_rename_SOURCES = $(NW_CORE) $(NW_OUT) rename.c readline.c
 nw_rename_LDADD = @LEXLIB@
 
 nw_condense_SOURCES = $(NW_CORE) $(NW_OUT) condense.c
 nw_condense_LDADD = @LEXLIB@
 
-nw_bipart_SOURCES = $(NW_CORE) $(NW_OUT) bipart.c hash.c node_set.c
+nw_bipart_SOURCES = $(NW_CORE) $(NW_OUT) bipart.c node_set.c
 nw_bipart_LDADD = @LEXLIB@
 
 nw_ed_SOURCES = $(NW_CORE) $(NW_OUT) address_scanner.l address_parser.y \
@@ -56,14 +55,14 @@ nw_ed_LDADD = @LEXLIB@ -lm
 nw_topology_SOURCES = $(NW_CORE) $(NW_OUT) topology.c
 nw_topology_LDADD = @LEXLIB@
 
-nw_distance_SOURCES = $(NW_CORE) distance.c simple_node_pos.c nodemap.c \
-		hash.c lca.c node_pos_alloc.c
+nw_distance_SOURCES = $(NW_CORE) distance.c simple_node_pos.c lca.c \
+		      node_pos_alloc.c
 nw_distance_LDADD = @LEXLIB@
 
-nw_labels_SOURCES = $(NW_CORE) labels.c
+nw_labels_SOURCES = $(NW_CORE) labels.c 
 nw_labels_LDADD = @LEXLIB@
 
-nw_prune_SOURCES = $(NW_CORE) $(NW_OUT) prune.c nodemap.c hash.c
+nw_prune_SOURCES = $(NW_CORE) $(NW_OUT) prune.c 
 nw_prune_LDADD = @LEXLIB@
 
 nw_order_SOURCES = $(NW_CORE) $(NW_OUT) order.c

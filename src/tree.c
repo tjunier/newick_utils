@@ -7,6 +7,7 @@
 #include "redge.h"
 #include "rnode.h"
 #include "list.h"
+#include "nodemap.h"
 
 const int FREE_NODE_DATA = 1;
 const int DONT_FREE_NODE_DATA = 0;
@@ -202,4 +203,26 @@ int is_cladogram(struct rooted_tree *tree)
 	}
 
 	return 1;
+}
+
+
+struct llist *nodes_from_labels(struct rooted_tree *tree,
+		struct llist *labels)
+{
+	struct hash *label2node_map = create_label2node_map(
+			tree->nodes_in_order); 
+	struct llist *result = create_llist();
+	struct list_elem *el;
+	for (el = labels->head; NULL != el; el = el->next) {
+		char *label = el->data;
+		struct rnode *node = hash_get(label2node_map, label);
+		if (NULL == node) {
+			fprintf (stderr, "WARNING: label '%s' not found.\n",
+					label);
+		} else {
+			append_element(result, node);
+		}
+	}
+
+	return result;
 }

@@ -52,3 +52,9 @@ struct llist *get_labels(struct rooted_tree *);
  * either (exactly what it is, I don't know :-) ) */
 
 int is_cladogram(struct rooted_tree *tree);
+
+/* Takes a list of labels and returns the corresponding nodes, in the same
+ * order */
+
+struct llist *nodes_from_labels(struct rooted_tree *tree,
+		struct llist *labels);

@@ -200,6 +200,52 @@ int test_is_cladogram()
 	return 0;
 }
 
+int test_nodes_from_labels()
+{
+	const char *test_name = "test_nodes_from_labels";
+	struct rooted_tree tree = tree_3();
+      	struct llist *labels = create_llist();
+	append_element(labels, "C");	
+	append_element(labels, "f");	
+	append_element(labels, "D");	
+	append_element(labels, "A");	
+
+	struct llist *nodes = nodes_from_labels(&tree, labels);
+
+	struct list_elem *el = nodes->head;
+	if (strcmp(((struct rnode *) el->data)->label, "C") != 0) {
+		printf ("%s: expected label 'C', got '%s'\n",
+				((struct rnode *) el->data)->label);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp(((struct rnode *) el->data)->label, "f") != 0) {
+		printf ("%s: expected label 'f', got '%s'\n",
+				((struct rnode *) el->data)->label);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp(((struct rnode *) el->data)->label, "D") != 0) {
+		printf ("%s: expected label 'D', got '%s'\n",
+				((struct rnode *) el->data)->label);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp(((struct rnode *) el->data)->label, "A") != 0) {
+		printf ("%s: expected label 'A', got '%s'\n",
+				((struct rnode *) el->data)->label);
+		return 1;
+	}
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: nodes list not terminated.\n");
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -211,6 +257,7 @@ int main()
 	failures += test_get_leaf_labels();
 	failures += test_get_labels();
 	failures += test_is_cladogram();
+	failures += test_nodes_from_labels();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
