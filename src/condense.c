@@ -11,7 +11,7 @@
 enum actions { PURE_CLADES, STAIR_NODES }; /* not sure we'll keep stair nodes */
 
 struct parameters {
-	int action;	
+	int action;	/* for now, only condense pure clades */
 };
 
 void help(char *argv[])

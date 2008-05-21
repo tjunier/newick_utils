@@ -17,18 +17,21 @@ const int DONT_FREE_NODE_DATA = 0;
 void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 {
 	struct rnode *old_root = tree->root;
+	struct rnode *new_root;
+	struct llist *revert_list;
+	struct rnode *node;
+	struct list_elem *elem;
 
 	/* Insert node (will be the new root) above outgroup */
 	insert_node_above(outgroup, "");
-	struct rnode *new_root = outgroup->parent_edge->parent_node;
+	new_root = outgroup->parent_edge->parent_node;
 	
 	/* Invert edges from old root to new root (i.e., the tree is always in
 	 * a consistent state) */
 	/* First, we make a list of the edges we need to revert, by visiting
 	 * the tree from the soon-to-be new root to the old (which is still the
 	 * root) */
-	struct llist *revert_list = create_llist();
-	struct rnode *node;
+	revert_list = create_llist();
 	for (node = new_root; ! is_root(node);
 	node = node->parent_edge->parent_node) {
 		struct redge *edge = node->parent_edge;
@@ -36,7 +39,6 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 		prepend_element(revert_list, edge);
 	}
 	/* Then, we reverse the edges in the list. */
-	struct list_elem *elem;
 	for (elem = revert_list->head; NULL != elem; elem = elem->next) {
 		struct redge *edge = (struct redge*) elem->data;
 		reverse_redge(edge);

@@ -10,3 +10,6 @@ rh:-n dist.nw
 rnh: -n dist.nw D F A
 m: -m matrix dist.nw
 mh: -m matrix -n dist.nw
+par_all: -m p -a dist.nw
+par_all_nam: -m p -a -n dist.nw
+all_nam_tab: -ant dist.nw

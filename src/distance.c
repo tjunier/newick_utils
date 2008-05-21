@@ -143,6 +143,7 @@ struct parameters get_params(int argc, char *argv[])
 		switch (opt_char) {
 		case 'a':
 			params.selection = ALL_NODES;
+			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
@@ -279,6 +280,9 @@ struct hash *distance_hash (struct rooted_tree *tree, struct rnode *origin,
 
 double distance_to_descendant(struct rnode *ancestor, struct rnode *descendant)
 {
+	if (is_root(descendant))
+		return 0.0;
+
 	if (NULL == ancestor) {
 		ancestor = descendant->parent_edge->parent_node;
 	}
@@ -291,8 +295,8 @@ double distance_to_descendant(struct rnode *ancestor, struct rnode *descendant)
 	return descendant_depth - ancestor_depth;
 }
 
-void print_distance_list (struct rooted_tree *tree, struct rnode *origin,
-		struct llist *selected_nodes, int orientation, int header)
+void print_distance_list (struct rnode *origin,
+	struct llist *selected_nodes, int orientation, int header)
 {
 	struct list_elem *el;
 	struct rnode *node;
@@ -448,7 +452,7 @@ int main(int argc, char *argv[])
 		}
 		switch (params.distance_type) {
 		case FROM_ROOT:
-			print_distance_list(tree, tree->root, selected_nodes,
+			print_distance_list(tree->root, selected_nodes,
 				params.list_orientation, params.show_header);
 			break;
 		case FROM_LCA:
@@ -459,7 +463,7 @@ int main(int argc, char *argv[])
 			else {
 				lca_node = lca_from_nodes(tree, selected_nodes);
 			}
-			print_distance_list(tree, lca_node, selected_nodes,
+			print_distance_list(lca_node, selected_nodes,
 				params.list_orientation, params.show_header);
 			break;
 		case MATRIX:
@@ -467,7 +471,7 @@ int main(int argc, char *argv[])
 				params.show_header, params.matrix_shape);
 			break;
 		case FROM_PARENT:
-			print_distance_list(tree, NULL, selected_nodes,
+			print_distance_list(NULL, selected_nodes,
 				params.list_orientation, params.show_header);
 			break;
 		default:
