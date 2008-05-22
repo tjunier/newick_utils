@@ -44,7 +44,8 @@ matches internal nodes, while
 
 				     b > 75
 
-matches nodes whose label has a numerical value of 75 or more (if the label is numeric). Logical operators are allowed, so
+matches nodes whose label has a numerical value of 75 or more (if the label is
+numeric). The usual logical and relational operators are available, so
 
 				   i & b > 75
 
@@ -60,7 +61,7 @@ The functions are:
 
 The operators are:
     ==  equality
-    != inequality
+    !=  inequality
     <   greater than
     >   lesser than
     >=  greater than or equal to
@@ -69,5 +70,14 @@ The operators are:
     &   logical and
     |   logical or
 
+The operator precedence is: relationals, and, or; i.e. 
+
+								 1 == d & i | l
+
+is equivalent to
+
+							   ((1 == d) & i) | l
+
 Parentheses can be used for overriding precedence, or for clarity.
 
+Actions
