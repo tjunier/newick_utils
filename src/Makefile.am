@@ -67,3 +67,10 @@ nw_prune_LDADD = @LEXLIB@
 
 nw_order_SOURCES = $(NW_CORE) $(NW_OUT) order.c
 nw_order_LDADD = @LEXLIB@
+
+# Removes automatically generated C code (Lex & YACC)
+#
+clean-local:
+	$(RM) newick_scanner.c newick_parser.c newick_parser.h \
+	address_scanner.c address_parser.c address_parser.h  \
+	indent_lex.c

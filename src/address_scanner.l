@@ -1,11 +1,13 @@
+/* The node address lexer (see address_scanner.y) */
+
 %option prefix = "ads"
 %{
 #include <string.h>
 #include "enode.h"
 #include "address_parser.h"
 
-/* Since we use our own prefix 'nws' instead of 'yy', we have to supply
- * nwswrap() (yywrap() was available in libfl) */
+/* Since we use our own prefix 'ads' instead of 'yy', we have to supply
+ * ads() (yywrap() was available in libfl) */
 
 int adswrap(void)
 {

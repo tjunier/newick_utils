@@ -63,3 +63,6 @@ test_rnode_iterator_SOURCES = test_rnode_iterator.c $(SRC)/rnode_iterator.c \
        	$(SRC)/hash.c $(SRC)/nodemap.c tree_stubs.c	
 
 test_readline_SOURCES = test_readline.c $(SRC)/readline.c
+
+clean-local:
+	$(RM) *.out

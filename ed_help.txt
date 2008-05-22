@@ -1,0 +1,73 @@
+Performs operation son nodes who match some condition
+
+Synopsis
+--------
+
+%s [-nh] <newick trees filename|-> <address> <operation>
+
+Input
+-----
+
+First argument is the name of a file that contains Newick trees, or '-' (in
+which case trees are read from standard input).
+
+Second argument is an address, in the form of a logical expression (see
+Addresses below).
+
+Third argument is an operation code (see Operations below). The operation will
+be performed on all nodes which match the address.
+
+Output
+------
+
+Depends on the operation and options. May print the whole input tree (possibly
+modified), or some parts of it, or nothing at all.
+
+This program is analogous to pattern-oriented, stream processing UNIX utilities
+like sed(1) and awk(1), but instead of working on lines (like sed) or records
+(like awk), %s works on tree nodes.
+
+The program will traverse the tree in Newick order, evaluating the address
+expression for each node in turn. If (and only if) the address matches, the
+operation is performed.
+
+Addresses
+---------
+
+The address expression involves node properties such as depth, bootstrap
+support, whether or not a node is a leaf, etc. These are represented by
+single-letter codes, to make expressions short. For example:
+
+				       i
+
+matches internal nodes, while
+
+				     b > 75
+
+matches nodes whose label has a numerical value of 75 or more (if the label is numeric). Logical operators are allowed, so
+
+				   i & b > 75
+
+could be used to match internal nodes with a bootstrap support value greater
+than 75.
+
+The functions are:
+    a   numeric    number of ancestors of node	
+    d   numeric    node's depth (distance to root)
+    i	boolean    true iff node is strictly internal (i.e., not root!)
+    l	boolean    true iff node is a leaf
+    r	boolean    true iff node is the root
+
+The operators are:
+    ==  equality
+    != inequality
+    <   greater than
+    >   lesser than
+    >=  greater than or equal to
+    <=  lesser than or equal to
+    !   logical negation
+    &   logical and
+    |   logical or
+
+Parentheses can be used for overriding precedence, or for clarity.
+

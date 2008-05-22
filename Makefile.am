@@ -42,6 +42,7 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/newtree.nw \
 	tests/newtree.rn.nw \
 	tests/numID.nw \
+	tests/plusminus.nw \
 	tests/test_nw_bipart_percent.exp \
 	tests/test_nw_bipart_simple.exp \
 	tests/test_nw_clade_monop.exp \
@@ -54,6 +55,7 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/test_nw_display_pure_topol.exp \
 	tests/test_nw_display_svg_cldgram.exp \
 	tests/test_nw_display_svg_cmap.exp \
+	tests/test_nw_display_svlb.exp \
 	tests/test_nw_distance_an_1.exp \
 	tests/test_nw_distance_an_2.exp \
 	tests/test_nw_distance_i.exp \
@@ -66,11 +68,15 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/test_nw_distance_rh.exp \
 	tests/test_nw_distance_rnh.exp \
 	tests/test_nw_distance_tan.exp \
+	tests/test_nw_distance_par_all.exp \
+	tests/test_nw_distance_par_all_nam.exp \
+	tests/test_nw_distance_all_nam_tab.exp \
 	tests/test_nw_ed_b_d.exp \
 	tests/test_nw_ed_b_s.exp \
 	tests/test_nw_ed_ib_o.exp \
 	tests/test_nw_indent_multiple.exp \
 	tests/test_nw_indent_multiple_optc.exp \
+	tests/test_nw_indent_plusminus.exp \
 	tests/test_nw_indent_optt.exp \
 	tests/test_nw_indent_simple.exp \
 	tests/test_nw_labels_def.exp \

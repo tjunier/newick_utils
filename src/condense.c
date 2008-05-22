@@ -17,16 +17,21 @@ struct parameters {
 void help(char *argv[])
 {
 	printf(
-"%s [-h] <tree|->\n"
-"\n"
 "Simplifies a tree by collapsing certain nodes.\n"
 "\n"
+"Synopsis\n"
+"--------\n"
+"\n"
+"%s [-h] <tree|->\n"
+"\n"
 "Input\n"
+"-----\n"
 "\n"
 "Argument is either the name of a file that contains one or more trees, or '-',\n"
 "in which case the trees are read on stdin.\n"
 "\n"
 "Output\n"
+"------\n"
 "\n"
 "The tree(s) with pure clades collapsed. A pure clade is a clade in which\n"
 "all leaves have the same label, and it is replaced by a leaf of the same\n"
@@ -35,10 +40,12 @@ void help(char *argv[])
 "its parent edge's length (if specified).\n"
 "\n"
 "Options\n"
+"-------\n"
 "\n"
 "   -h: prints this message and exits\n"
 "\n"
 "Example\n"
+"-------\n"
 "\n"
 "# produce a tree of families from a genus tree in which all genus names\n"
 "# have been replaced by family names (see nw_rename) - look at\n"
@@ -82,7 +89,7 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-s] <filename|->\n",
+		fprintf(stderr, "Usage: %s [-h] <filename|->\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}

@@ -1,9 +1,13 @@
+/* A parser for node addresses. Node addresses are used by nw_ed to specify
+ * nodes in a tree (analogous to awk or sed). */
+
 %{
 #define YYDEBUG 1
 #include <stdio.h>
 
 #include "enode.h"
 
+/* The root of the expression (when represented as a parse tree) */
 extern struct enode *expression_root;
 
 void adserror(char *s)

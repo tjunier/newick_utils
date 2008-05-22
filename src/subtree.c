@@ -24,11 +24,15 @@ struct parameters {
 void help(char *argv[])
 {
 	printf(
-"%s [-hm] <target tree filename|-> <label> [label]+\n"
-"\n"
 "Extracts a subtree defined by labels.\n"
 "\n"
+"Synopsis\n"
+"--------\n"
+"\n"
+"%s [-hm] <target tree filename|-> <label> [label]+\n"
+"\n"
 "Input\n"
+"-----\n"
 "\n"
 "The first argument is the name of a file containing one or more Newick\n"
 "trees, or '-' (in which case the trees are read on stdin).\n"
@@ -38,17 +42,20 @@ void help(char *argv[])
 "must be at least one label.\n"
 "\n"
 "Output\n"
+"------\n"
 "\n"
 "Outputs the clade rooted at the last common ancestor of all labels passed\n"
 "as arguments, as Newick.\n"
 "\n"
 "Options\n"
+"-------\n"
 "\n"
 "    -h: prints this message and exits\n"
 "    -m: only prints the clade if it is monophyletic, in the sense that ONLY\n"
 "        the labels passed as arguments are found in the clade.\n"
 "\n"
 "Examples\n"
+"--------\n"
 "\n"
 "# clade defined by two leaves\n"
 "$ %s data/catarrhini Homo Hylobates\n"
@@ -110,7 +117,7 @@ struct parameters get_params(int argc, char *argv[])
 		}
 		params.labels = lbl_list;
 	} else {
-		fprintf(stderr, "Usage: %s <filename|-> <label> [label+]\n",
+		fprintf(stderr, "Usage: %s [-hm] <filename|-> <label> [label+]\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}

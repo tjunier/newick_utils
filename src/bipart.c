@@ -34,11 +34,14 @@ struct parameters {
 void help(char* argv[])
 {
 	printf(
-"%s [-ph] <target tree filename|-> <replicate trees filename>\n"
-"\n"
 "Attributes bootstrap support values to a tree.\n"
 "\n"
+"Synopsis\n"
+"--------\n"
+"%s [-ph] <target tree filename|-> <replicate trees filename>\n"
+"\n"
 "Input\n"
+"-----\n"
 "\n"
 "The first argument is the name of the file containing the target tree (to which\n"
 "support values are to be attributed), or '-' (in which case the tree is read on\n"
@@ -47,20 +50,24 @@ void help(char* argv[])
 "The second argument is the name of the file containing the replicates.\n"
 "\n"
 "Output\n"
+"------\n"
 "\n"
 "Outputs the target tree, with a bipartition frequencies as inner node labels.\n"
 "\n"
 "Options\n"
+"-------\n"
 "\n"
 "    -h: prints this message and exits\n"
 "    -p: prints values as percentages (default: absolute frequencies)\n"
 "\n"
 "Limits & Assumptions\n"
+"--------------------\n"
 "\n"
 "Assumes that the trees have the same number of leaves, and that all trees have\n"
 "the same leaf labels. Behaviour is undefined if this is violated.\n"
 "\n"
 "Example\n"
+"-------\n"
 "\n"
 "# Attributes bipartition counts to data/HRV.nw, based on 20 replicates\n"
 "# stored in data/HRV_20reps.nw\n"
@@ -112,7 +119,7 @@ struct parameters get_params(int argc, char *argv[])
 		}
 		params.rep_trees_file = rtf;
 	} else {
-		fprintf(stderr, "Usage: %s <target tree filename|-> <replicates filename>\n", argv[0]);
+		fprintf(stderr, "Usage: %s [-hlp] <target tree filename|-> <replicates filename>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
