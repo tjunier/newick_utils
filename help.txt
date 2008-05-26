@@ -1,45 +1,43 @@
-"Indents the Newick, making structure more clear.\n"
-"\n"
-"Synopsis\n"
-"--------\n"
-"\n"
-"%s [-cht:] <newick trees filename|->\n"
-"\n"
-"Input\n"
-"-----\n"
-"\n"
-"First argument is the name of a file that contains Newick trees, or '-' (in\n"
-"which case trees are read from standard input).\n"
-"\n"
-"Output\n"
-"------\n"
-"\n"
-"By default, prints the input tree, with each parenthesis and each leaf on a\n"
-"line of its own, and indented a multiple of '  ' (two spaces) to reflect\n"
-"structure. The default output is valid Newick.\n"
-"\n"
-"This is useful for seeing the structure of larger trees, and also for\n"
-"editing them. \n"
-"\n"
-"Indenting is purely lexical, therefore it tolerates syntax errors. A tree\n"
-"that does not parse can be indented for examination, corrected, then\n"
-"compacted (see Options).\n"
-"\n"
-"Options\n"
-"-------\n"
-"\n"
-"    -c: compact - remove indentation \n"
-"    -h: print this message and exit\n"
-"    -t <text>: use 'text' instead of the default '  '. WARNING: using\n"
-"       anything else than whitespace is likely to result in output that\n"
-"       is not valid Newick (which may or may not be a problem).\n"
-"       Ignored with '-c'.\n"
-"\n"
-"Examples\n"
-"--------\n"
-"\n"
-"# Indent\n"
-"%s data/catarrhini\n"
-"\n"
-"# Indent, with visual guides for indentation (NOT valid Newick anymore)\n"
-"%s -t '|  ' data/catarrhini\n"
+Orders nodes by alphabetical order
+
+Synopsis
+--------
+
+%s [-h] <newick trees filename|->
+
+Input
+-----
+
+Argument is the name of a file that contains Newick trees, or '-' (in
+which case trees are read from standard input).
+
+Output
+------
+
+Orders the tree and prints it out on standard output. The ordering field is the
+node's label for leaves, or the first child's order field for inner nodes. The
+tree's topology is not altered: the biological information contained in the
+tree is left intact.
+
+This is useful for comparing trees, because isomorphic trees will yield
+different Newick representations if the nodes are ordered differently.
+
+Options
+-------
+
+    -h: print this message and exit
+
+Examples
+--------
+
+# These two trees look different...
+$ diff -q data/falconiformes data/falconiformes_2 
+Files data/falconiformes and data/falconiformes_2 differ
+
+# but are they really?
+$ nw_order data/falconiformes > f1
+$ nw_order data/falconiformes_2 > f2
+
+# No, they're in fact the same
+$ diff -s f1 f2
+Files f1 and f2 are identical

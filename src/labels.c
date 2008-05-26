@@ -17,6 +17,50 @@ struct parameters {
 	char separator;
 };
 
+void help(char *argv[])
+{
+	printf (
+"Extracts the tree's labels\n"
+"\n"
+"Synopsis\n"
+"--------\n"
+"\n"
+"%s [-hILt] <newick trees filename|->\n"
+"\n"
+"Input\n"
+"-----\n"
+"\n"
+"Argument is the name of a file that contains Newick trees, or '-' (in\n"
+"which case trees are read from standard input).\n"
+"\n"
+"Output\n"
+"------\n"
+"\n"
+"By default, prints all labels that occur in the tree, in the same order as\n"
+"in the Newick, one per line.\n"
+"\n"
+"Options\n"
+"-------\n"
+"\n"
+"    -h: print this message and exit\n"
+"    -I: don't print labels of inner nodes\n"
+"    -L: don't print leaf labels\n"
+"    -t: TAB-separated - print on a single line, separated by tab stops.\n"
+"\n"
+"Examples\n"
+"--------\n"
+"\n"
+"# just show labels\n"
+"%s data/catarrhini\n"
+"\n"
+"# count leaves\n"
+"%s -I data/catarrhini | wc -l\n",
+	argv[0],
+	argv[0],
+	argv[0]
+	);
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 
@@ -28,8 +72,11 @@ struct parameters get_params(int argc, char *argv[])
 	params.separator = '\n';
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "ILt")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hILt")) != -1) {
 		switch (opt_char) {
+		case 'h':
+			help(argv);
+			exit(EXIT_SUCCESS);
 		case 'I':
 			params.show_inner_labels = 0;
 			break;
@@ -57,7 +104,7 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-ILt] <filename|->\n", argv[0]);
+		fprintf(stderr, "Usage: %s [-hILt] <filename|->\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 

@@ -12,22 +12,26 @@
 #include "rnode.h"
 #include "redge.h"
 
+void help (argv)
+{
+	printf (
+	       );
+}
+
 void get_params(int argc, char *argv[])
 {
 
-	/*
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "l")) != -1) {
+	while ((opt_char = getopt(argc, argv, "h")) != -1) {
 		switch (opt_char) {
-		case 'l':
-			params.try_ingroup = 1;
-			break;
+		case 'h':
+			help(argv);
+			exit(EXIT_SUCCESS);
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
 			exit (EXIT_FAILURE);
 		}
 	}
-	*/
 
 	/* check arguments */
 	if ((argc - optind) == 1)	{

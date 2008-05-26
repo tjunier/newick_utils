@@ -21,7 +21,7 @@ void help(char *argv[])
 "Input\n"
 "-----\n"
 "\n"
-"First argument is the name of a file that contains Newick trees, or '-' (in\n"
+"Argument is the name of a file that contains Newick trees, or '-' (in\n"
 "which case trees are read from standard input).\n"
 "\n"
 "Output\n"
