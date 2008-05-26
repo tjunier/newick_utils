@@ -1,16 +1,3 @@
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "common.h"
-
-extern char *indent_string;
-extern char *eol;
-
-void help(char *argv[])
-{
-	printf (
 "Indents the Newick, making structure more clear.\n"
 "\n"
 "Synopsis\n"
@@ -55,60 +42,4 @@ void help(char *argv[])
 "%s data/catarrhini\n"
 "\n"
 "# Indent, with visual guides for indentation (NOT valid Newick anymore)\n"
-"%s -t '|  ' data/catarrhini\n",
-	argv[0],
-	argv[0],
-	argv[0]
-	);
-}
-
-void get_params(int argc, char* argv[])
-{
-	int c;
-	int compact = 0;
-
-	eol = "\n";
-	indent_string = "  ";
-
-	while ((c = getopt (argc, argv, "cht:")) != -1) {
-		switch (c) {
-		case 'c':
-			 compact = 1;
-			 break;
-		case 'h':
-			help(argv);
-			exit(EXIT_SUCCESS);
-		case 't':
-			 indent_string = optarg;
-			 break;
-		}
-	}
-	if (TRUE == compact) {
-		eol = "";
-		indent_string = "";
-	}
-	if (1 == (argc - optind))       {
-		if (0 != strcmp("-", argv[optind])) {
-			FILE *fin = fopen(argv[optind], "r");
-			extern FILE *yyin;
-			if (NULL == fin) {
-				perror(NULL);
-				exit(EXIT_FAILURE);
-			}
-			yyin = fin;
-		}
-	} else {
-		fprintf(stderr, "Usage: %s [-cht:] <filename|->\n", argv[0]);
-		exit(EXIT_FAILURE);
-        }
-}
-
-
-int main(int argc, char* argv[])
-{
-	get_params(argc, argv);
-
-	yylex();
-
-	return 0;
-}
+"%s -t '|  ' data/catarrhini\n"
