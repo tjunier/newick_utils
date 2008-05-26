@@ -13,6 +13,7 @@
 #include "to_newick.h"
 #include "address_parser.h"
 #include "tree_editor_rnode_data.h"
+#include "common.h"
 
 void address_scanner_set_input(char *);
 void address_scanner_clear_input();
@@ -28,17 +29,151 @@ struct parameters {
 	int show_tree;
 };
 
+void help(char *argv[])
+{
+	printf (
+"Performs actions on nodes that match some condition\n"
+"\n"
+"Synopsis\n"
+"--------\n"
+"\n"
+"%s [-nh] <newick trees filename|-> <address> <action>\n"
+"\n"
+"Input\n"
+"-----\n"
+"\n"
+"First argument is the name of a file that contains Newick trees, or '-' (in\n"
+"which case trees are read from standard input).\n"
+"\n"
+"Second argument is a node address, in the form of a logical expression (see\n"
+"Addresses below).\n"
+"\n"
+"Third argument is a code that specifies an action to perform on nodes\n"
+"which match the address (see Actions).\n" 
+"\n"
+"Output\n"
+"------\n"
+"\n"
+"By default, prints the input tree, which may have been modified. However,\n"
+"the 's' action (see Actions, below) causes matching subtrees to be\n"
+"printed out.\n"
+"\n"
+"This program is analogous to pattern-oriented, stream processing UNIX\n"
+"utilities like sed(1) and awk(1), but instead of working on lines (like\n"
+"sed) or records (like awk), %s works on tree nodes.\n"
+"\n"
+"The program traverses the tree in Newick order, evaluating the address\n"
+"expression for each node in turn. If (and only if) the address matches, the\n"
+"action is performed.\n"
+"\n"
+"Addresses\n"
+"---------\n"
+"\n"
+"The address expression involves node properties such as depth, bootstrap\n"
+"support, whether or not a node is a leaf, etc. These are represented by\n"
+"single-letter codes, to make expressions short. For example:\n"
+"\n"
+"				       i\n"
+"\n"
+"matches internal nodes, while\n"
+"\n"
+"				     b > 75\n"
+"\n"
+"matches nodes whose label has a numerical value of 75 or more (if the label\n"
+"is numeric). The usual logical and relational operators are available, so\n"
+"\n"
+"				   i & b > 75\n"
+"\n"
+"could be used to match internal nodes with a bootstrap support value\n"
+"greater than 75.\n"
+"\n"
+"The functions are:\n"
+"    a   numeric    number of ancestors of node	\n"
+"    d   numeric    node's depth (distance to root)\n"
+"    i	boolean    true iff node is strictly internal (i.e., not root!)\n"
+"    l	boolean    true iff node is a leaf\n"
+"    r	boolean    true iff node is the root\n"
+"\n"
+"The operators are:\n"
+"    ==  equality\n"
+"    !=  inequality\n"
+"    <   greater than\n"
+"    >   lesser than\n"
+"    >=  greater than or equal to\n"
+"    <=  lesser than or equal to\n"
+"    !   logical negation\n"
+"    &   logical and\n"
+"    |   logical or\n"
+"\n"
+"The operator precedence is: relationals, and, or; i.e. \n"
+"\n"
+"				 1 == d & i | l\n"
+"\n"
+"is equivalent to\n"
+"\n"
+"			       ((1 == d) & i) | l\n"
+"\n"
+"Parentheses can be used for overriding precedence, or for clarity.\n"
+"\n"
+"Actions\n"
+"-------\n"
+"\n"
+"Actions are performed on nodes that match the address. They are:\n"
+"    s    (Subtree) print subtree rooted at matching node\n"
+"    o    (splice Out) splice out node, and attach children to parent, \n"
+"	 preserving branch lengths. This is useful for \"opening\" poorly\n"
+"         supported nodes.\n"
+"    d    Delete node\n"
+"\n"
+"\n"
+"Options\n"
+"-------\n"
+"\n"
+"    -h: print this help text, and exit\n"
+"    -n: do not print the (possibly modified) tree at the end of the run \n"
+"        (modeled after sed -n)\n"
+"\n"
+"Bugs\n"
+"----\n"
+"\n"
+"Although there are no known bugs in this program, it is to be considered\n"
+"more experimental than the others.\n"
+"\n"
+"Examples\n"
+"--------\n"
+"\n"
+"# \"open\" all nodes with bootstrap support <= 10 (assuming support is coded\n"
+"# in internal node labels)\n"
+"\n"
+"%s data/HRV.bs.nw 'i & b <= 10' o \n"
+"\n"
+"# \"open\" all nodes with bootstrap support < 750, then discard leaves that\n"
+"# are directly attached to the ingroup's root. This effectively keeps only\n"
+"# leaves that are part of well-supported clades.\n"
+"\n"
+"%s data/big.rn.nw 'i & b < 750' o | %s - 'l & a == 2' d\n",
+	argv[0],
+	argv[0],
+	argv[0],
+	argv[0],
+	argv[0]
+	);
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
-	params.show_tree = 1;
+	params.show_tree = TRUE;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "n")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hn")) != -1) {
 		switch (opt_char) {
+		case 'h':
+			help(argv);
+			exit(EXIT_SUCCESS);
 		case 'n':
-			params.show_tree = 0;
+			params.show_tree = FALSE;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -71,7 +206,7 @@ struct parameters get_params(int argc, char *argv[])
 			 exit(EXIT_FAILURE);
 		}
 	} else {
-		fprintf(stderr, "Usage: %s <filename|-> <addr> <act>\n",
+		fprintf(stderr, "Usage: %s [-hn] <filename|-> <address> <operation>\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}
