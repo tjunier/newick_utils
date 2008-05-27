@@ -24,6 +24,58 @@ struct parameters {
 	int try_ingroup;
 };
 
+void help(char *argv[])
+{
+	printf (
+"(Re)roots a tree on a specified outgroup\n"
+"\n"
+"Synopsis\n"
+"--------\n"
+"\n"
+"%s [-hl] <newick trees filename|-> <label> [label*]\n"
+"\n"
+"Input\n"
+"-----\n"
+"\n"
+"First argument is the name of a file that contains Newick trees, or '-' (in\n"
+"which case trees are read from standard input).\n"
+"\n"
+"Further arguments are node labels. There must be at least one.\n"
+"\n"
+"Output\n"
+"------\n"
+"\n"
+"Re-roots the tree on the outgroup formed by the nodes whose labels are\n"
+"passed as arguments (by finding their LCA and rooting on its parent edge).\n"
+"\n"
+"Options\n"
+"-------\n"
+"\n"
+"    -h: print this message and exit\n"
+"    -l: lax - if it is not possible to reroot on the outgroup, try the\n"
+"        ingroup - that is, all nodes whose labels were NOT passed as\n"
+"        arguments.  This can also fail, if both the outgroup and the\n"
+"        ingroup have the tree's root as LCA. Note that to use this option\n"
+"        you must make sure that you pass ALL outgroup labels, otherwise the\n"
+"        ingroup will be wrong.\n"
+"\n"
+"Examples\n"
+"--------\n"
+"\n"
+"# This tree is rooted on humans, but the outgroup should be Cebus (New\n"
+"# World monkey) - let's fix that: \n"
+"\n"
+"%s data/catarrhini_wrong Cebus\n"
+"\n"
+"# We can reroot on more than one node:\n"
+"\n"
+"%s data/catarrhini_wrong_3og Cebus Aotus \n",
+	argv[0],
+	argv[0],
+	argv[0]
+	);
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 
@@ -32,8 +84,11 @@ struct parameters get_params(int argc, char *argv[])
 	params.try_ingroup = 0;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "l")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hl")) != -1) {
 		switch (opt_char) {
+		case 'h':
+			help(argv);
+			exit(EXIT_SUCCESS);
 		case 'l':
 			params.try_ingroup = 1;
 			break;
@@ -61,7 +116,7 @@ struct parameters get_params(int argc, char *argv[])
 		}
 		params.labels = lbl_list;
 	} else {
-		fprintf(stderr, "Usage: %s [-l] <filename|-> <label> [label+]\n",
+		fprintf(stderr, "Usage: %s [-hl] <filename|-> <label> [label+]\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}

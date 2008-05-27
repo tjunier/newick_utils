@@ -18,6 +18,53 @@ struct parameters {
 	int show_branch_lengths;
 };
 
+void help(char *argv[])
+{
+	printf (
+"Discard some or all of a tree's non-structural information\n"
+"\n"
+"Synopsis\n"
+"--------\n"
+"\n"
+"%s [-bhIL] <newick trees filename|->\n"
+"\n"
+"Input\n"
+"-----\n"
+"\n"
+"Argument is the name of a file that contains Newick trees, or '-' (in\n"
+"which case trees are read from standard input).\n"
+"\n"
+"Output\n"
+"------\n"
+"\n"
+"By default, prints the input trees without branch lengths, effectively\n"
+"creating cladograms.\n"
+"\n"
+"Options\n"
+"-------\n"
+"\n"
+"    -b: keep branch lengths\n"
+"    -h: print this message and exit\n"
+"    -I: discard inner node labels\n"
+"    -L: discard leaf labels\n"
+"\n"
+"Examples\n"
+"--------\n"
+"\n"
+"# Make a cladogram of Old-World monkeys and apes by discarding branch\n"
+"# length data:\n"
+"\n"
+"%s data/catarrhini\n"
+"\n"
+"# Make a purely structural tree (still valid Newick!)\n"
+"\n"
+"%s -IL data/catarrhini\n",
+	argv[0],
+	argv[0],
+	argv[0]
+		);
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 
@@ -29,16 +76,19 @@ struct parameters get_params(int argc, char *argv[])
 	params.show_branch_lengths = 0;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "ILb")) != -1) {
+	while ((opt_char = getopt(argc, argv, "bhIL")) != -1) {
 		switch (opt_char) {
+		case 'b':
+			params.show_branch_lengths = 1;
+			break;
+		case 'h':
+			help(argv);
+			exit(EXIT_SUCCESS);
 		case 'I':
 			params.show_inner_labels = 0;
 			break;
 		case 'L':
 			params.show_leaf_labels = 0;
-			break;
-		case 'b':
-			params.show_branch_lengths = 1;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -58,7 +108,7 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-ILb] <filename|->\n", argv[0]);
+		fprintf(stderr, "Usage: %s [-bhIL] <filename|->\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
