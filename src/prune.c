@@ -19,23 +19,74 @@ struct parameters {
 	struct llist *labels;
 };
 
+void help(char *argv[])
+{
+	printf (
+"Removes nodes by label\n"
+"\n"
+"Synopsis\n"
+"--------\n"
+"\n"
+"%s [-h] <newick trees filename|->\n"
+"\n"
+"Input\n"
+"-----\n"
+"\n"
+"Argument is the name of a file that contains Newick trees, or '-' (in which\n"
+"case trees are read from standard input).\n"
+"\n"
+"Output\n"
+"------\n"
+"\n"
+"Removes all nodes whose labels are passed on the command line, and prints\n"
+"out the modified tree. If removing a node causes its parent to have only\n"
+"one child (as is always the case in strictly binary trees), the parent is\n"
+"spliced out and the remaining child is attached to its grandparent,\n"
+"preserving length.\n"
+"\n"
+"Options\n"
+"-------\n"
+"\n"
+"    -h: print this message and exit\n"
+"\n"
+"Assumptions and Limitations\n"
+"---------------------------\n"
+"\n"
+"Labels are assumed to be unique. \n"
+"\n"
+"Examples\n"
+"--------\n"
+"\n"
+"# Remove humans and gorilla\n"
+"%s data/catarrhini Homo Gorilla\n"
+"\n"
+"# Remove humans, chimp, and gorilla\n"
+"%s data/catarrhini Homo Gorilla Pan\n"
+"\n"
+"# the same, but using the clade's label\n"
+"%s data/catarrhini Homininae\n",
+	argv[0],
+	argv[0],
+	argv[0],
+	argv[0]
+	);
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
-	/*
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "l")) != -1) {
+	while ((opt_char = getopt(argc, argv, "h")) != -1) {
 		switch (opt_char) {
-		case 'l':
-			params.try_ingroup = 1;
-			break;
+		case 'h':
+			help(argv);
+			exit (EXIT_SUCCESS);
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
 			exit (EXIT_FAILURE);
 		}
 	}
-	*/
 
 	/* check arguments */
 	if ((argc - optind) >= 2)	{
@@ -55,7 +106,7 @@ struct parameters get_params(int argc, char *argv[])
 		}
 		params.labels = lbl_list;
 	} else {
-		fprintf(stderr, "Usage: %s <filename|-> <label> [label+]\n",
+		fprintf(stderr, "Usage: %s [-h] <filename|-> <label> [label+]\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}

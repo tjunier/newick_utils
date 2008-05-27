@@ -42,7 +42,7 @@ void help(char* argv[])
 "------\n"
 "\n"
 "Outputs a graph representing the tree, either as text (default) or\n"
-"as SVG (option -s).\n"
+"as SVG (option -s). Underscores in labels are replaced with spaces.\n"
 "\n"
 "Options\n"
 "-------\n"

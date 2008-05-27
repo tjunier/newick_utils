@@ -12,9 +12,55 @@
 #include "rnode.h"
 #include "redge.h"
 
-void help (argv)
+void help (char *argv[])
 {
 	printf (
+"Orders nodes by alphabetical order, preserving topology\n"
+"\n"
+"Synopsis\n"
+"--------\n"
+"\n"
+"%s [-h] <newick trees filename|->\n"
+"\n"
+"Input\n"
+"-----\n"
+"\n"
+"Argument is the name of a file that contains Newick trees, or '-' (in\n"
+"which case trees are read from standard input).\n"
+"\n"
+"Output\n"
+"------\n"
+"\n"
+"Orders the tree and prints it out on standard output. The ordering field\n"
+"is the node's label for leaves, or the first child's order field for inner\n"
+"nodes. The tree's topology is not altered: the biological information\n"
+"contained in the tree is left intact.\n"
+"\n"
+"This is useful for comparing trees, because isomorphic trees will yield\n"
+"different Newick representations if the nodes are ordered differently.\n"
+"\n"
+"Options\n"
+"-------\n"
+"\n"
+"    -h: print this message and exit\n"
+"\n"
+"Examples\n"
+"--------\n"
+"\n"
+"# These two trees look different...\n"
+"$ diff -q data/falconiformes data/falconiformes_2 \n"
+"Files data/falconiformes and data/falconiformes_2 differ\n"
+"\n"
+"# but are they really?\n"
+"$ %s data/falconiformes > f1\n"
+"$ %s data/falconiformes_2 > f2\n"
+"\n"
+"# No, they're in fact the same\n"
+"$ diff -s f1 f2\n"
+"Files f1 and f2 are identical\n",
+	argv[0],
+	argv[0],
+	argv[0]
 	       );
 }
 
@@ -45,7 +91,7 @@ void get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s <filename|->\n", argv[0]);
+		fprintf(stderr, "Usage: %s [-h] <filename|->\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 }
