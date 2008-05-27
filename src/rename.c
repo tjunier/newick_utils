@@ -17,6 +17,72 @@ struct parameters {
 	int only_leaves;
 };
 
+void help(char *argv[])
+{
+	printf (
+"Renames nodes using a mapping\n"
+"\n"
+"Synopsis\n"
+"--------\n"
+"\n"
+"%s [-hl] <newick trees filename|-> <map filename>\n"
+"\n"
+"Input\n"
+"-----\n"
+"\n"
+"First argument is the name of a file that contains Newick trees, or '-' (in\n"
+"which case trees are read from standard input).\n"
+"\n"
+"Second argument is the name of the map file, which has one (old-name,\n"
+"new-name) pair per line, e.g:\n"
+"\n"
+"cmp1	Compsognathus\n"
+"trc	Triceratops\n"
+"vlcr	Velociraptor\n"
+"\n"
+"Old and new names should be separated by whitespace.\n"
+"\n"
+"Output\n"
+"------\n"
+"\n"
+"Prints the tree, after replacing all old names by the specified new name.\n"
+"\n"
+"Options\n"
+"-------\n"
+"\n"
+"    -h: print this message and exit\n"
+"    -l: only replace leaf labels. This is useful if all labels are numeric,\n"
+"        but inner labels represent bootstraps, and you don't want to\n"
+"        accidentally modify bootstrap values.\n"
+"\n"
+"Examples\n"
+"--------\n"
+"\n"
+"# Some tree-building programs don't allow labels longer than 10 characters\n"
+"# or so. One way around this limitation is to relabel the sequences using\n"
+"# numbers.  Tree data/HRV_numeric has numeric labels, because its outgroup,\n"
+"# \"Foot_and_Mouth\" is longer than 10 characters. The number->label mapping\n"
+"# was stored in file data/HRV.map. Now we can rename the whole tree:\n"
+"\n"
+"%s data/HRV_numeric data/HRV.map\n"
+"\n"
+"# We can construct a tree of families from a genus tree and a genus->family\n"
+"# map. File data/falconiformes is a tree of diurnal raptor genera, and\n"
+"# data/falc_map maps the genera to families. To produce a family tree, we do: \n"
+"\n"
+"%s data/falconiformes data/falc_map\n"
+"\n"
+"# In fact, we could directly condense the tree, so that only one leaf per\n"
+"# family is left:\n"
+"\n"
+"%s data/falconiformes data/falc_map | nw_condense -\n",
+	argv[0],
+	argv[0],
+	argv[0],
+	argv[0]
+	);
+}
+
 struct hash *read_map(const char *filename)
 {
 	const int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
@@ -56,8 +122,11 @@ struct parameters get_params(int argc, char *argv[])
 	params.only_leaves = 0;	/* default: rename all nodes */
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "l")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hl")) != -1) {
 		switch (opt_char) {
+		case 'h':
+			help(argv);
+			exit(EXIT_SUCCESS);
 		case 'l':
 			params.only_leaves = 1;
 			break;
@@ -77,7 +146,7 @@ struct parameters get_params(int argc, char *argv[])
 		}
 		params.map_filename = argv[optind+1];
 	} else {
-		fprintf(stderr, "Usage: %s <filename|-> <map_filename>\n",
+		fprintf(stderr, "Usage: %s [-hl] <filename|-> <map_filename>\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}
