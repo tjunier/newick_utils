@@ -2,7 +2,7 @@ BUILT_SOURCES = newick_parser.h newick_scanner.c newick_parser.c \
 		address_scanner.c address_parser.c
 
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
-	       nw_condense nw_bipart nw_ed nw_topology nw_distance \
+	       nw_condense nw_support nw_ed nw_topology nw_distance \
 	       nw_labels nw_prune nw_order
 
 HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
@@ -45,8 +45,8 @@ nw_rename_LDADD = @LEXLIB@
 nw_condense_SOURCES = $(NW_CORE) $(NW_OUT) condense.c
 nw_condense_LDADD = @LEXLIB@
 
-nw_bipart_SOURCES = $(NW_CORE) $(NW_OUT) bipart.c node_set.c
-nw_bipart_LDADD = @LEXLIB@
+nw_support_SOURCES = $(NW_CORE) $(NW_OUT) support.c node_set.c
+nw_support_LDADD = @LEXLIB@
 
 nw_ed_SOURCES = $(NW_CORE) $(NW_OUT) address_scanner.l address_parser.y \
 	tree_editor.c enode.c

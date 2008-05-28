@@ -5,11 +5,11 @@ an_2:-m lca dist.nw D F
 tan: -m lca -t dist.nw F E D
 pan: -m p dist.nw F D E B
 paa: -m p dist.nw
-i: -i dist.nw
+i: -s l dist.nw
 rh:-n dist.nw
 rnh: -n dist.nw D F A
 m: -m matrix dist.nw
 mh: -m matrix -n dist.nw
-par_all: -m p -a dist.nw
-par_all_nam: -m p -a -n dist.nw
-all_nam_tab: -ant dist.nw
+par_all: -m p -s all dist.nw
+par_all_nam: -m p -s a -n dist.nw
+all_nam_tab: -sa -nt dist.nw

@@ -33,14 +33,14 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
-	TODO compile depcomp install-sh missing ylwrap
+	TODO compile depcomp install-sh missing mkinstalldirs ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
-mkinstalldirs = $(install_sh) -d
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 SOURCES =
@@ -160,7 +160,7 @@ target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = src tests
-EXTRA_DIST = tests/test_nw_bipart.sh \
+EXTRA_DIST = tests/test_nw_support.sh \
 	tests/test_nw_clade.sh \
 	tests/test_nw_condense.sh \
 	tests/test_nw_display.sh \
@@ -174,7 +174,7 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/test_nw_rename.sh \
 	tests/test_nw_reroot.sh \
 	tests/test_nw_topology.sh \
-	tests/test_nw_bipart_args \
+	tests/test_nw_support_args \
 	tests/test_nw_clade_args \
 	tests/test_nw_condense_args \
 	tests/test_nw_display_args \
@@ -204,8 +204,8 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/newtree.rn.nw \
 	tests/numID.nw \
 	tests/plusminus.nw \
-	tests/test_nw_bipart_percent.exp \
-	tests/test_nw_bipart_simple.exp \
+	tests/test_nw_support_percent.exp \
+	tests/test_nw_support_simple.exp \
 	tests/test_nw_clade_monop.exp \
 	tests/test_nw_clade_monop_f.exp \
 	tests/test_nw_clade_multiple.exp \

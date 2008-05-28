@@ -1,5 +1,5 @@
 SUBDIRS = src tests
-EXTRA_DIST = tests/test_nw_bipart.sh \
+EXTRA_DIST = tests/test_nw_support.sh \
 	tests/test_nw_clade.sh \
 	tests/test_nw_condense.sh \
 	tests/test_nw_display.sh \
@@ -13,7 +13,7 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/test_nw_rename.sh \
 	tests/test_nw_reroot.sh \
 	tests/test_nw_topology.sh \
-	tests/test_nw_bipart_args \
+	tests/test_nw_support_args \
 	tests/test_nw_clade_args \
 	tests/test_nw_condense_args \
 	tests/test_nw_display_args \
@@ -43,8 +43,8 @@ EXTRA_DIST = tests/test_nw_bipart.sh \
 	tests/newtree.rn.nw \
 	tests/numID.nw \
 	tests/plusminus.nw \
-	tests/test_nw_bipart_percent.exp \
-	tests/test_nw_bipart_simple.exp \
+	tests/test_nw_support_percent.exp \
+	tests/test_nw_support_simple.exp \
 	tests/test_nw_clade_monop.exp \
 	tests/test_nw_clade_monop_f.exp \
 	tests/test_nw_clade_multiple.exp \

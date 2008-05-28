@@ -71,26 +71,26 @@ void help(char *argv[])
 "    o all labeled leaves (default): selection is formed by all labeled\n"
 "      leaf nodes, in the order in which they appear in the Newick string\n"
 "      (= Newick order)\n"
-"    o all labeled nodes: selection is formed by all labeled nodes, in\n"
-"      Newick order\n"
-"    o all nodes: selection is formed by all nodes, in Newick order\n"
 "    o command line arguments: labels are passed on the command line,\n"
 "      and the selection is formed by the corresponding nodes, in the\n"
-"      same order\n"
+"      same order.\n"
+"    o all labeled nodes: selection is formed by all labeled nodes, in\n"
+"      Newick order (see Option -s)\n"
+"    o all nodes: selection is formed by all nodes, in Newick order\n"
+"      (see Option -s)\n"
 "\n"
 "Options\n"
 "-------\n"
 "\n"
-"    -a: selection is all nodes - any labels passed as arguments are\n"
-"        ignored.\n"
 "    -h: prints this message and exit \n"
-"    -a: selection is all labeled nodes - any labels passed as arguments are\n"
-"        ignored.\n"
 "    -m <mode>: selects mode (see Output). Mode is determined by the first\n"
 "        letter of the argument: 'r' for root mode (default), 'l' for LCA,\n"
 "        'p' for parent, and 'm' for matrix. Thus, '-mm', '-m matrix',\n"
 "        and '-m mat' all select matrix mode.\n"
 "    -n: prints labels (or "" if empty) in addition to distances.\n"
+"    -s <selection>, where selection is determined by the first letter of\n"
+"        the argument: 'a' for all nodes, 'l' for labeled nodes.\n"
+"        E.g. '-s a' and '-s all' both select all nodes.\n"
 "    -t: tab-separated - prints values on one line, separated by tabs.\n"
 "        Ignored in matrix mode.\n"
 "\n"
@@ -109,15 +109,29 @@ void help(char *argv[])
 "$ %s -m lca -t -n data/catarrhini Homo Pongo \n"
 "\n"
 "# All labeled nodes, matrix form, with labels\n"
-"$ %s -mm -n -i data/catarrhini\n"
+"$ %s -mm -n -sl data/catarrhini\n"
 "\n"
 "# All nodes, distance to parent\n"
-"$ %s -m p -a data/catarrhini\n",
+"$ %s -m p -s a data/catarrhini\n",
 	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
 	argv[0]);
+}
+
+int get_selection()
+{
+	switch (tolower(optarg[0])) {
+	case 'a':
+		return ALL_NODES;
+	case 'l':
+		return ALL_LABELS;
+	default:
+		fprintf (stderr, 
+		"ERROR: unknown selection '%s'\nvalid values: a(ll nodes), l(abeled nodes)", optarg);
+		exit(EXIT_FAILURE);
+	}
 }
 
 int get_distance_type()
@@ -153,22 +167,19 @@ struct parameters get_params(int argc, char *argv[])
 	params.matrix_shape = SQUARE;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "ahim:nt")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hm:ns:t")) != -1) {
 		switch (opt_char) {
-		case 'a':
-			params.selection = ALL_NODES;
-			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
-		case 'i':
-			params.selection = ALL_LABELS;
-			break;
 		case 'm':
 			params.distance_type = get_distance_type();
 			break;
 		case 'n':
 			params.show_header = TRUE;
+			break;
+		case 's':
+			params.selection = get_selection();
 			break;
 		case 't':
 			params.list_orientation = HORIZONTAL;
@@ -246,47 +257,6 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 
 	return result;
 }
-
-/*TODO: if this function isn't used, drop it. */
-
-/*
-struct hash *distance_hash (struct rooted_tree *tree, struct rnode *origin,
-		struct llist *selected_nodes)
-{
-
-	double origin_depth;
-	if (NULL != origin) 
-		origin_depth = ((struct simple_node_pos *) origin->data)->depth;
-
-	struct hash *node_map = create_label2node_map(tree->nodes_in_order);
-	struct hash *distances = create_hash(labels->count);
-	struct list_elem *el;
-	for (el = labels->head; NULL != el; el = el->next) {
-		char *label = (char *) el->data;
-		if (0 == strcmp("", label)) {
-			fprintf(stderr, "WARNING: empty label.\n");
-			continue;
-		}
-		struct rnode *node = hash_get(node_map, label);
-		if (NULL == node) {
-			fprintf(stderr, "WARNING: no node with label '%s'.\n",
-					label);
-			continue;
-		}
-		double node_depth = ((struct simple_node_pos *) node->data)->depth;
-		if (NULL == origin) {
-			struct rnode *parent = node->parent_edge->parent_node;
-			origin_depth = ((struct simple_node_pos *) parent->data)->depth;
-		}
-		double *distance = malloc(sizeof(double));
-		if (NULL == distance) { perror(NULL); exit(EXIT_FAILURE); }
-		*distance =  node_depth - origin_depth;
-		hash_set(distances, label, distance);
-	}
-
-	return distances;
-}
-*/
 
 /* Returns the distance from node 'ancestor' to node 'descendant', where
  * 'descendant' is a decendant of 'ancestor'. Node positions must have been
