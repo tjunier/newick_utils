@@ -163,6 +163,7 @@ void write_nodes_to_g (struct rooted_tree *tree, const double h_scale,
 		char *font_size = is_leaf(node) ?
 			leaf_label_font_size : inner_label_font_size ;
 		char *color = node_data->color;
+		if (NULL == color) color = "black";
 		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
 		double svg_top_pos = v_scale * node_data->top; 
 		double svg_bottom_pos = v_scale * node_data->bottom; 
