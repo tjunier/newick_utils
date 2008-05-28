@@ -28,15 +28,26 @@ a series of programs that need no user interaction and work with any number of
 trees of any size, the sole limit being the computer's resources. The results
 are the subject of this paper.
 
-For example, suppose we produced a set of around 1,000 maximum-likelihood trees
+\section{Design}
+
+\begin{itemize}
+ \item one tool for one operation
+ \item no user interaction required once the program runs: programs can be
+ integrated in pipelines and shell scripts, or called from other programs.
+ \item implement as filters: programs should accept data on standard input, and print results on standard output. This makes it easy to build pipelines and allows interaction with other UNIX shell tools.
+ \item avoid menus, fixed filenames, and control files: all parameters and options are passed on the command line, all data is in files named on the command line, or in standard output.
+\end{itemize}
+
+
+For example, suppose we produced around 1,000 unrooted, maximum-likelihood trees
 of 1:1 protein orthologs in 30 vertebrate species. We are interested in
 evolution rates, so we want to extract branch lengths and submit them to
-multivariate analysis. Since ML trees are not rooted, we must first root all the
-trees, in this case on \textit{Danio} and \textit{Fugu}. This can be done with
+multivariate analysis. We must first root all the
+trees using the ``fishes'' as outgroup. This can be done with
 the following command:
 \begin{quote}
 \verb|$ nw_reroot vertebrata.nw Danio Fugu|                                     
-                   \end{quote} which will reroot all Newick trees in file
+\end{quote} which will reroot all Newick trees in file
 \verb|vertebrata.nw| on the clade defined by \verb|Danio| and \verb|Fugu|, and
 print the rerooted trees to standard output, also in Newick format. To extract
 branch lengths, we pipe the rooted trees into \verb|nw_distance|:
