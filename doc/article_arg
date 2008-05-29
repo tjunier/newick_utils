@@ -1,0 +1,42 @@
+NU: the Newick Utilities
+SP software: software that solves problems without suffering from worse
+	problems
+integrate: use in shell pipelines, scripts, or other programs
+work, extra: e.g., shell wrappers that generate control files or change the
+	fixed names, and other workarounds
+
+NU are useful
+  SP software is useful
+  NU is SP software
+    NU solve an interactivity problem
+      Most tree manipulation tools are interactive
+      Interactivity is a problem
+        There is an automation problem inherent to interactive software
+          interactive software is hard to automate
+          not being automatable is a problem
+            repetitions of the same task is boring and error-prone
+            automation removes the boredom and some of the error risks    
+        There is an integration* problem inherent to interactive software
+          interactive software is hard to integrate*
+          not being integrable* is a problem 
+            integration allows larger apps to be built from simpler blocks
+            integration allows automatic sequential operations (pipelines)
+          NU do not have an interactivity problem
+      NU are not interactive
+      --
+    NU solve an extra work problem
+      There is an 'extra work' problem with some CLI software
+        some CLI software requires extra work* to integrate*
+          integrating programs with fixed I/O filenames implies extra work*
+          some CLI software uses fixed I/O filenames
+          --
+          integrating programs with control files implies extra work*
+          some CLI software puts parameters in control files
+        extra work is a problem
+          extra work takes time
+          extra work is error-prone
+          extra work means more code
+      NU do not require extra work*
+        NU does not use control files not fixed I/O filenames
+        Programs that don't use fixed I/O filenames, etc require no extra work
+    NU perform correctly
