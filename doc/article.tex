@@ -2,7 +2,7 @@
 \usepackage{url}
 
 %opening
-\title{UNIX Shell Utilities for Newick Trees}
+\title{UNIX Shell Filters for Newick Trees}
 \author{Thomas Junier}
 
 \begin{document}
@@ -16,19 +16,38 @@ Newick trees.
 \section{Introduction}
 
 There is a vast choice of programs for manipulating phylogenetic trees (e.g.
-NJPlot \cite{Raton2008} or TreeView, more examples at \url{
+NJPlot or TreeView, more examples at \url{
 http://evolution.genetics.washington.edu/phylip/software.html}), which allow
 operations like (re)rooting, reordering nodes, editing labels, extracting
-subtrees, etc). Virtually all of these applications have an interactive,
-graphical interface. While this makes the tools user-friendly, it also makes it
-awkward to work on large numbers of trees, or to work on very large trees; it
-also makes it hard or impossible to automate operations. Faced with the need to
+subtrees, etc). Most of these applications have an interactive, graphical interface (GUI). The pros and cons of GUIs versus command-line interfaces (CLIs) have been disputed for decades, they are not the focus of this paper, but let us remark that i) interactive interfaces make it
+awkward to work with large numbers of trees, or on very large trees; and ii) interactive programs are hard to integrate into other programs (be they simple shell scripts or complex C applications).
+
+In a UNIX shell environment, filters are particularly useful because they can be strung into shell pipelines. Programs that do not behave like this (e.g. because of fixed input/output filenames or control files) require additional work (e.g. wrappers that rename input/output files or generate control files) if they are to be used in larger programs (for discussion of the advantages of filters and CLIs in general, see e.g. \cite{Gancarz2002}.
+
+Faced with the need to
 manipulate large or numerous trees in automated pipelines, we designed and wrote
 a series of programs that need no user interaction and work with any number of
-trees of any size, the sole limit being the computer's resources. The results
-are the subject of this paper.
+trees of any size, and function as filters.
 
-\section{Design}
+\section{Functionalities}
+
+We needed programs to do the following:
+
+\begin{itemize}
+ \item reroot trees on outgroups defined by labels
+ \item extract subtrees defined by labels
+ \item extract branch lengths in various ways (from root, from parent, as matrix, etc.)
+ \item extract labels (leaf, inner nodes, or both)
+ \item attribute support values to a known tree based on bootstrap replicates
+ \item rename node labels based on a mapping
+ \item order tree nodes (without changing topology)
+ \item extract topological information (by discarding branch length data, etc)
+ \item simplify trees (e.g. whole clades of the same label)
+ \item discard nodes by label
+ \item \ldots [maybe keep only the most interesting]
+\end{itemize}
+
+To simplify work in the shell, a program for displaying tree graphs as text was added to the list (it can also output SVG).
 
 \begin{itemize}
  \item one tool for one operation
