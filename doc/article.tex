@@ -5,6 +5,9 @@
 \title{UNIX Shell Filters for Newick Trees}
 \author{Thomas Junier}
 
+\newcommand{\cli}{\textsc{CLI}}
+\newcommand{\gui}{\textsc{GUI}}
+
 \begin{document}
 
 \maketitle
@@ -13,25 +16,27 @@
 The Newick Utilities are a set of UNIX command-line programs for working with
 Newick trees.
 \end{abstract}
+
+\textit{Intended audience: bioinformaticists with interest/experience in phylogeny and working with the UNIX shell, especially on large data sets. Reader is assumed to have some idea of: phylogenies, Unix, shells (interactive and scripts).}
+ 
 \section{Introduction}
 
 There is a vast choice of programs for manipulating phylogenetic trees (e.g.
 NJPlot or TreeView, more examples at \url{
 http://evolution.genetics.washington.edu/phylip/software.html}), which allow
 operations like (re)rooting, reordering nodes, editing labels, extracting
-subtrees, etc). Most of these applications have an interactive, graphical interface (GUI). The pros and cons of GUIs versus command-line interfaces (CLIs) have been disputed for decades, they are not the focus of this paper, but let us remark that i) interactive interfaces make it
-awkward to work with large numbers of trees, or on very large trees; and ii) interactive programs are hard to integrate into other programs (be they simple shell scripts or complex C applications).
-
-In a UNIX shell environment, filters are particularly useful because they can be strung into shell pipelines. Programs that do not behave like this (e.g. because of fixed input/output filenames or control files) require additional work (e.g. wrappers that rename input/output files or generate control files) if they are to be used in larger programs (for discussion of the advantages of filters and CLIs in general, see e.g. \cite{Gancarz2002}.
+subtrees, etc). Most of these applications have an interactive, graphical interface (\gui{}). The pros and cons of interactive interfaces have been disputed for decades; let us just remark that i) any program that requires user interaction is hard to integrate into a larger application, so pipelines of tree operations are hard to build from interactive tools, and ii) humans are error-prone and  bored by repetitive tasks, so as the amount of data and number of operations grow, human users will eventually find interactive programs unwieldy or inefficient. 
 
 Faced with the need to
-manipulate large or numerous trees in automated pipelines, we designed and wrote
-a series of programs that need no user interaction and work with any number of
-trees of any size, and function as filters.
+handle large or numerous trees in automated pipelines, and having found nothing on the Internet that met our needs, we designed and wrote
+a series of programs that require no user interaction and work with any number of
+trees of any size.
+
+To facilitate interoperation between the utilities themselves and with other UNIX shell programs, we wanted the programs to be \textit{filters}, that its, to be able to read data on standard input and write results on standard output. 
 
 \section{Functionalities}
 
-We needed programs to do the following:
+The functionalities we implemented were largely determined by what we needed in our research projects. We needed programs to do the following:
 
 \begin{itemize}
  \item reroot trees on outgroups defined by labels
@@ -49,14 +54,26 @@ We needed programs to do the following:
 
 To simplify work in the shell, a program for displaying tree graphs as text was added to the list (it can also output SVG).
 
+\section{Results}
+
+The programs perform the functions listed above and have the following properties:
+
 \begin{itemize}
- \item one tool for one operation
- \item no user interaction required once the program runs: programs can be
- integrated in pipelines and shell scripts, or called from other programs.
- \item implement as filters: programs should accept data on standard input, and print results on standard output. This makes it easy to build pipelines and allows interaction with other UNIX shell tools.
- \item avoid menus, fixed filenames, and control files: all parameters and options are passed on the command line, all data is in files named on the command line, or in standard output.
+ \item one program for one operation
+ \item input can contain as many trees as desired
+ \item no interaction required
+ \item implemented as filters
+ \item no menus, fixed filenames, or control files: all parameters and options are passed on the command line, all data is in files named on the command line, or in standard output
+ \item all output is text; those programs which output trees output Newick
+ \item self-documenting (option \texttt{-h})
 \end{itemize}
 
+They are written in C using the \textsc{GNU} autotools familiar to most UNIX users.
+
+\subsection{Performance}
+
+While performance was not the absolute priority (we tried to keep code simple and avoid fancy algorithms where possible), the programs perform reasonably well. For example, rerooting 500 trees of 35 species takes about 8 ms on an Intel Core Duo [\textit{more specs}] running Linux ($N = 100$).
+\section{Examples}
 
 For example, suppose we produced around 1,000 unrooted, maximum-likelihood trees
 of 1:1 protein orthologs in 30 vertebrate species. We are interested in
@@ -75,6 +92,10 @@ branch lengths, we pipe the rooted trees into \verb|nw_distance|:
 \end{quote}
 where option \verb|-t| request tab-separated output, and the '\verb|-|' means to
 read data on standard input.
+
+\section{Discussion}
+
+In our opinion, one of the most useful features of Unix shells is the ability to  ``glue'' programs together in pipelines or shell scripts. To be most useful, however, programs should avoid, as far as possible, writing to or from disk files (if only because it's more efficient to keep data in memory). Using fixed input/output filenames has the drawback that these must be renamed.
 
 \bibliographystyle{alpha} 
 \bibliography{article}

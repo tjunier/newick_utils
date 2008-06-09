@@ -1,8 +1,6 @@
 nw_display: check the 'null' values (try colormaps). Add a test for every
 option.
 
-all: add help, available with option -h (program should then quit successfully).
-
 [later] Add functionality for reducing stair nodes.
 
 [later] Add functionality for directly counting a bipartition from a set of
@@ -116,3 +114,4 @@ suite.
 case, as every printable char except ()[]:,; is legal in labels. Also confuses
 lexer, so fix it too while we're at it.
 
+[done] all: add help, available with option -h (program should then quit successfully).
