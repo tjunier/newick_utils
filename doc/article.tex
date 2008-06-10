@@ -1,5 +1,6 @@
-\documentclass[a4paper,10pt]{article}
+\documentclass[a4paper,11pt]{article}
 \usepackage{url}
+%\usepackage{fullpage}
 
 %opening
 \title{UNIX Shell Filters for Newick Trees}
@@ -7,6 +8,8 @@
 
 \newcommand{\cli}{\textsc{CLI}}
 \newcommand{\gui}{\textsc{GUI}}
+\newcommand{\unix}{Unix}
+\newcommand{\prog}[1][]{\tt nw\_#1}
 
 \begin{document}
 
@@ -14,66 +17,71 @@
 
 \begin{abstract}
 The Newick Utilities are a set of UNIX command-line programs for working with
-Newick trees.
+Newick trees. The motivation for writing them is that we did not find any open-source programs with equivalent functionality and a noninteractive, filter interface.
 \end{abstract}
 
-\textit{Intended audience: bioinformaticists with interest/experience in phylogeny and working with the UNIX shell, especially on large data sets. Reader is assumed to have some idea of: phylogenies, Unix, shells (interactive and scripts).}
+\textit{\noindent{} Intended audience: bioinformaticians with interest/experience in phylogeny and working with the UNIX shell, especially on large data sets. Reader is assumed to have some idea of: phylogenies, Unix, shells (interactive and scripts).}
  
-\section{Introduction}
+\section*{Introduction}
 
-There is a vast choice of programs for manipulating phylogenetic trees (e.g.
+Some applications in phylogeny involve large numbers of trees. Bootstrapping is an obvious example, but others exist, like bootscanning (sliding a window over an alignment and computing a tree at each window position), or (say) evolutionary analysis of all 1:1 orthologs of a given clade. The trees need to be produced, and then must be processed, involving steps like rerooting, attributing support values, extracting support values, extracting branch lengths, extracting subtrees, etc. Due to the large number of trees, it is highly desirable that the processing steps be automated (if only because humans will get bored by repetitive tasks and will commit more errors as the amount of data grows).
+
+There is a large choice of programs for manipulating phylogenetic trees (e.g.
 NJPlot or TreeView, more examples at \url{
-http://evolution.genetics.washington.edu/phylip/software.html}), which allow
-operations like (re)rooting, reordering nodes, editing labels, extracting
-subtrees, etc). Most of these applications have an interactive, graphical interface (\gui{}). The pros and cons of interactive interfaces have been disputed for decades; let us just remark that i) any program that requires user interaction is hard to integrate into a larger application, so pipelines of tree operations are hard to build from interactive tools, and ii) humans are error-prone and  bored by repetitive tasks, so as the amount of data and number of operations grow, human users will eventually find interactive programs unwieldy or inefficient. 
+http://evolution.genetics.washington.edu/phylip/software.html}). Most have an interactive, graphical interface (\gui{}). The advantages and drawbacks of interactive interfaces have been disputed for decades; let us just remark that any program that requires user interaction is hard to integrate into a larger application, so it is difficult to automate tree processing using interactive tools.
 
-Faced with the need to
-handle large or numerous trees in automated pipelines, and having found nothing on the Internet that met our needs, we designed and wrote
-a series of programs that require no user interaction and work with any number of
-trees of any size.
+Automation is also facilitated by good interoperation between the programs involved. The ability to read data from standard input and write results on standard output is one way of improving interoperation in a \unix{} shell environment. \cite{Gancarz2002}
 
-To facilitate interoperation between the utilities themselves and with other UNIX shell programs, we wanted the programs to be \textit{filters}, that its, to be able to read data on standard input and write results on standard output. 
+Faced with the need to handle large or numerous trees in automated pipelines, and having found nothing on the Internet that met our needs, we designed and wrote
+a set of programs that require no user interaction and work with any number of
+trees of any size. The functions implemented are shown in table \ref{tab:NU_func}.
 
-\section{Functionalities}
+\begin{table*}
+\begin{tabular}{lp{0.75\textwidth}}
+Program & Function \\ 
+\hline 
+\prog{reroot} & reroot trees on outgroup, specified by labels \\
+\prog{clade} & extract subtrees defined by labels \\
+\prog{distance} & extract branch lengths in various ways (from root, from parent, as matrix, etc.) \\
+\prog{labels} & extract labels (leaf, inner nodes, or both) \\
+\prog{support} & attribute support values to a known tree based on bootstrap replicates \\
+\prog{rename} & rename node labels based on a mapping \\
+\prog{order} & order tree nodes (without changing topology) \\
+\prog{topology} & extract topological information (by discarding branch length data, etc) \\
+\prog{condense} & simplify trees (e.g. whole clades of the same label) \\
+\prog{prune} & discard nodes by label \\
+ \ldots & [maybe keep only the most interesting] \\
+\hline
+\end{tabular}
+\caption{The Newick Utilities and their functions}
+\label{tab:NU_func}
+\end{table*}
 
-The functionalities we implemented were largely determined by what we needed in our research projects. We needed programs to do the following:
+To help work in the shell, a program for displaying tree graphs as text was added to the list (it can also output SVG).
 
-\begin{itemize}
- \item reroot trees on outgroups defined by labels
- \item extract subtrees defined by labels
- \item extract branch lengths in various ways (from root, from parent, as matrix, etc.)
- \item extract labels (leaf, inner nodes, or both)
- \item attribute support values to a known tree based on bootstrap replicates
- \item rename node labels based on a mapping
- \item order tree nodes (without changing topology)
- \item extract topological information (by discarding branch length data, etc)
- \item simplify trees (e.g. whole clades of the same label)
- \item discard nodes by label
- \item \ldots [maybe keep only the most interesting]
-\end{itemize}
+\section*{Results}
 
-To simplify work in the shell, a program for displaying tree graphs as text was added to the list (it can also output SVG).
-
-\section{Results}
-
-The programs perform the functions listed above and have the following properties:
+The Newick Utilities perform the functions listed in table \ref{tab:NU_func} and have the following properties:
 
 \begin{itemize}
  \item one program for one operation
- \item input can contain as many trees as desired
+ \item input can contain as many trees as desired, no arbitrary limit on tree size
  \item no interaction required
  \item implemented as filters
- \item no menus, fixed filenames, or control files: all parameters and options are passed on the command line, all data is in files named on the command line, or in standard output
+ \item no menus, fixed filenames, or control files: all parameters and options are passed on the command line, all data is in files named on the command line, or in standard input
  \item all output is text; those programs which output trees output Newick
  \item self-documenting (option \texttt{-h})
 \end{itemize}
 
-They are written in C using the \textsc{GNU} autotools familiar to most UNIX users.
+\subsection*{Implementation}
 
-\subsection{Performance}
+The programs are written in C and use the \textsc{GNU} autotools as a build tool. They are known to compile on various distributions of Linux, as well as on MacOS X.
+
+\subsection*{Performance}
 
 While performance was not the absolute priority (we tried to keep code simple and avoid fancy algorithms where possible), the programs perform reasonably well. For example, rerooting 500 trees of 35 species takes about 8 ms on an Intel Core Duo [\textit{more specs}] running Linux ($N = 100$).
-\section{Examples}
+
+\section*{Examples}
 
 For example, suppose we produced around 1,000 unrooted, maximum-likelihood trees
 of 1:1 protein orthologs in 30 vertebrate species. We are interested in
@@ -93,11 +101,11 @@ branch lengths, we pipe the rooted trees into \verb|nw_distance|:
 where option \verb|-t| request tab-separated output, and the '\verb|-|' means to
 read data on standard input.
 
-\section{Discussion}
+\section*{Discussion}
 
-In our opinion, one of the most useful features of Unix shells is the ability to  ``glue'' programs together in pipelines or shell scripts. To be most useful, however, programs should avoid, as far as possible, writing to or from disk files (if only because it's more efficient to keep data in memory). Using fixed input/output filenames has the drawback that these must be renamed.
+In our opinion, one of the most useful features of Unix shells is the ability to  ``glue'' arbitrary programs together in pipelines or shell scripts. This is (partly) because research is sufficiently unpredictable for any specialized tool to be confronted, sooner or later, with a problem it wasn't designed for. We found that the ``Unix Philosophy'' tenets of i) making every program a filter, ii) making every program do one thing well, and iii) avoiding captive interfaces work well in practice, and we designed the Newick Utilities with these guidelines in mind (whether we succeeded is another matter).
 
-\bibliographystyle{alpha} 
+\bibliographystyle{plain} 
 \bibliography{article}
 
 
