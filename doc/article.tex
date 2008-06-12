@@ -9,7 +9,7 @@
 \newcommand{\cli}{\textsc{CLI}}
 \newcommand{\gui}{\textsc{GUI}}
 \newcommand{\unix}{Unix}
-\newcommand{\prog}[1][]{{\texttt nw\_#1}}
+\newcommand{\prog}[1]{\texttt{nw\_#1}}
 
 \begin{document}
 
@@ -20,7 +20,8 @@ The Newick Utilities are a set of UNIX command-line programs for working with
 Newick-formatted phylogenetic trees. The motivation for writing them is that we did not find any open-source programs with equivalent functionality and a noninteractive, filter interface. [\ldots]
 \end{abstract}
 
-\textit{\noindent{} Intended readership: bioinformaticians with interest/experience in phylogeny and working with the UNIX shell, especially on large data sets. Reader is assumed to have some idea of: phylogenies, Unix, shells (interactive and scripts).}
+\textit{\noindent{} [Intended readership: bioinformaticians with interest/experience in phylogeny and working with the UNIX shell, especially on large data sets. Reader is assumed to have some idea of: phylogenies, Unix, shells (interactive and scripts).]
+[Questions: what would be the best journal to send this to? Instructions to authors permitting, should there be more examples?]}
  
 \section*{Introduction}
 
@@ -82,7 +83,9 @@ While performance was not the absolute priority (we tried to keep code simple an
 
 \section*{Examples}
 
-Suppose we are interested in the evolution rates of about one thousand 1:1 orthologs from 10 tetrapod species. We produce the thousand maximum-likelihood trees, and we want to submit the branch lengths to principal components analysis (\textsc{PCA}). Suppose further that we used three ``fishes'', \textit{Fugu}, \textit{Tetraodon} and \textit{Danio}, as outgroup. Finally, say the trees are in a file named \texttt{vertebrata.txt}. The steps involved are:
+\subsection*{PCA of Branch Lengths}
+
+Suppose we are interested in the evolution rates of about one thousand 1:1 orthologs from 7 tetrapod species. We produce the $\sim$ 1,000 maximum-likelihood trees, and we want to submit the branch lengths to principal components analysis (\textsc{PCA}). Suppose further that we used three ``fishes'', \textit{Fugu}, \textit{Tetraodon} and \textit{Danio}, as outgroup. Finally, say the trees are in a file named \texttt{vertebrata.txt}. The steps involved are:
 \begin{enumerate}
  \item reroot all the trees on the ``fishes'' -- ML trees are unrooted
  \item extract the branch lengths for all tetrapods, from their last common ancestor to the tip
@@ -96,6 +99,21 @@ Bos Canis Mus Homo
 \end{verbatim}
 
 The first program, \prog{reroot}, reads in all the trees in \texttt{vertebrata.txt} and reroots them on the clade defined by the ``fishes''. The result is written on standard output, which is piped into the second program, \prog{distance}. For each (rerooted) tree, this program finds the last common ancestor of all tetrapods (\textit{Xenopus} to \textit{Homo}), and prints out the length from that node to each of the tetrapod tips, on one line. The result is a rectangular matrix of 10 columns and 1000 lines, suitable for \textsc{PCA}.
+
+\subsection*{Bootscanning}
+
+In a sliding-window experiment, we have computed a tree for each window over an alignment. We want to extract the tree topology for each window. Say file \texttt{win\_trees.txt} contains the trees, ordered by window position. We need the following steps for each tree:
+\begin{enumerate}
+ \item reroot the tree
+ \item order the tree (folds all equivalent topologies into the same Newick string)
+ \item discard irrelevant branch length and internal label information
+\end{enumerate}
+This can be done like this:
+\begin{verbatim}
+$ nw_reroot win_trees Out | nw_order - | nw_topology -I -
+\end{verbatim}
+where \verb|Out| is the label of the outgroup.
+
 
 \section*{Discussion}
 
