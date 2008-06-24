@@ -18,9 +18,9 @@ struct redge *create_redge(char *length_s)
 	redgep->parent_node = NULL;
 	redgep->child_node = NULL;
 
-	/* A NULL length string means that
-	 * the Newick does not specify length, which is different from a length
-	 * of zero or a negative length (which can happen with NJ trees) */
+	/* A NULL length string means that the Newick does not specify length,
+	 * which is different from a length of zero or a negative length (which
+	 * can happen with NJ trees) */
 
 	if (NULL == length_s) {
 		length_s = "";

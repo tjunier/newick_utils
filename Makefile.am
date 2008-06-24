@@ -27,6 +27,7 @@ EXTRA_DIST = tests/test_nw_support.sh \
 	tests/test_nw_reroot_args \
 	tests/test_nw_topology_args \
 	tests/catarrhini.nw \
+	tests/top.nw \
 	tests/catarrhini_wrong_3og.nw \
 	tests/catarrhini_wrong_mult.nw \
 	tests/catarrhini_wrong.nw \
@@ -74,6 +75,7 @@ EXTRA_DIST = tests/test_nw_support.sh \
 	tests/test_nw_ed_b_d.exp \
 	tests/test_nw_ed_b_s.exp \
 	tests/test_nw_ed_ib_o.exp \
+	tests/test_nw_ed_top.exp \
 	tests/test_nw_indent_multiple.exp \
 	tests/test_nw_indent_multiple_optc.exp \
 	tests/test_nw_indent_plusminus.exp \

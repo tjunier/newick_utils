@@ -100,7 +100,7 @@ void replace_child_edge(struct rnode *node, struct redge *old, struct redge *new
 
 char *add_len_strings(char *ls1, char *ls2)
 {
-	char * result = "";
+	char * result;
 
 	/* if ls1 and ls2 are not both "" */
 	if (	strcmp("", ls1) != 0 ||
@@ -108,6 +108,8 @@ char *add_len_strings(char *ls1, char *ls2)
 		double l1 = atof(ls1);
 		double l2 = atof(ls2);
 		asprintf(&result, "%g", l1 + l2);
+	} else {
+		asprintf(&result, "");
 	}
 
 	return result;

@@ -115,3 +115,8 @@ case, as every printable char except ()[]:,; is legal in labels. Also confuses
 lexer, so fix it too while we're at it.
 
 [done] all: add help, available with option -h (program should then quit successfully).
+
+[done] BUG: nw_ed crashes on cladograms when trying to splice out nodes. Fixed
+- that was because new edge lengths were not malloc()ed when both lengths were
+empty.
+
