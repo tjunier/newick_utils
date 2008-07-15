@@ -201,8 +201,8 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 		const double a_scale, int align_leaves, double dmax)
 {
 	printf( "<g"
-	       	" style='stroke:black;stroke-width:1;"
-	    	"font-size:medium;font-weight:normal;font-family:sans'>");
+	       	" style='stroke:black;stroke-width:1;fill:none'>"
+	    	);
 
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
@@ -230,7 +230,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			double svg_bot_x_pos = svg_radius * cos(svg_bottom_angle);
 			double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
 			printf("<path style='stroke:%s' stroke-linecap='round'"
-			       " d='M%.4f,%.4f A%4f,%4f 0 1 1 %.4f %.4f'/>",
+			       " d='M%.4f,%.4f A%4f,%4f 0 0 1 %.4f %.4f'/>",
 				color,
 				svg_top_x_pos, svg_top_y_pos,
 				svg_radius, svg_radius,
@@ -422,7 +422,6 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	/* This could get more complicated if we print many trees with
 	 * different scales. For now, it's fixed. */
 	double v_scale = leaf_vskip;
-	double a_scale = 2 * PI / tree->nodes_in_order->count;
 
 	if (colormap) set_node_colors(tree);
  	underscores2spaces(tree);
@@ -443,11 +442,35 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	printf ("</g>");
 }
 
+void display_svg_tree_radial(struct rooted_tree *tree,
+		struct h_data hd, int align_leaves)
+{
+	double h_scale = -1;
+	/* This could get more complicated if we print many trees with
+	 * different scales. For now, it's fixed. */
+	double a_scale = 2 * PI / tree->nodes_in_order->count;
+
+	if (colormap) set_node_colors(tree);
+ 	underscores2spaces(tree);
+
+	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
+	/* draw nodes */
+	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	printf( "<g>");
+	/* We draw all the tree's branches in an SVG group of their own, to
+	 * facilitate editing. */
+	draw_branches_radial(tree, h_scale, a_scale, align_leaves, hd.d_max);
+	/* likewise for text */
+	//draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
+	printf ("</g>");
+}
+
 void display_svg_tree(struct rooted_tree *tree, int align_leaves)
 {	
 	assert(init_done);
 
-	/* set node positions */
+	/* set node positions - these are a property of the tree, and are
+	 * independent of the graphics port or style */
  	svg_alloc_node_pos(tree);
 	set_node_vpos_cb(tree,
 			svg_set_node_top, svg_set_node_bottom,
@@ -455,7 +478,8 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves)
 	struct h_data hd = set_node_depth_cb(tree,
 			svg_set_node_depth, svg_get_node_depth);
 
-	display_svg_tree_orthogonal(tree, hd, align_leaves);
+	// display_svg_tree_orthogonal(tree, hd, align_leaves);
+	display_svg_tree_radial(tree, hd, align_leaves);
 }
 
 void svg_footer() { printf ("</svg>"); }
