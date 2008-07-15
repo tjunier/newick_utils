@@ -35,6 +35,7 @@ struct svg_data {
 const int ROOT_SPACE = 10;	/* pixels */
 const int LBL_SPACE = 10;	/* pixels */
 const int edge_length_v_offset = -4; /* pixels */
+const double PI = 3.14159;
 
 int init_done = 0;
 
@@ -138,9 +139,9 @@ void svg_init()
 	init_done = 1;
 }
 
-/* Outputs an SVG <g> element with all the tree branches */
+/* Outputs an SVG <g> element with all the tree branches, orthogonal */
 
-void draw_branches (struct rooted_tree *tree, const double h_scale,
+void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 		const double v_scale, int align_leaves, double dmax)
 {
 	printf( "<g"
@@ -156,10 +157,6 @@ void draw_branches (struct rooted_tree *tree, const double h_scale,
 		if (align_leaves && is_leaf(node))
 			node_data->depth = dmax;
 
-		/* TODO: rm commented code once rest works */
-		/*char *font_size = is_leaf(node) ?
-			leaf_label_font_size : inner_label_font_size ;
-		*/
 		char *color = node_data->color;
 		if (NULL == color) color = "black";
 		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
@@ -175,14 +172,6 @@ void draw_branches (struct rooted_tree *tree, const double h_scale,
 			color, svg_h_pos, svg_top_pos, svg_h_pos,
 			svg_bottom_pos);
 		}
-		/* draw label IFF it is nonempty AND requested font size
-		 * is not zero */
-		/* if (0 != strcmp(font_size, "0") &&
-		    0 != strcmp(node->label, ""))
-			printf("<text style='stroke:none;font-size:%s' "
-			       "x='%.4f' y='%.4f'>%s</text>",
-				font_size, svg_h_pos + LBL_SPACE,
-				svg_mid_pos, node->label); */
 		/* draw horizontal line */
 		if (is_root(node)) {
 			printf("<line stroke-linecap='round' "
@@ -199,28 +188,82 @@ void draw_branches (struct rooted_tree *tree, const double h_scale,
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				color, svg_parent_h_pos,
 				 svg_mid_pos, svg_h_pos, svg_mid_pos);
-			/* Print branch length IFF it is nonempty AND 
-			 * requested size is not 0 */
-			/*
-			if (0 != strcmp(branch_length_font_size, "0") &&
-			    0 != strcmp(node->parent_edge->length_as_string, "")) {
-				printf("<text style='stroke:none;font-size:%s' "
-					"x='%4f' y='%4f'>%s</text>",
-					branch_length_font_size,
-					(svg_h_pos + svg_parent_h_pos) / 2.0,
-					edge_length_v_offset + svg_mid_pos,
-					node->parent_edge->length_as_string);
-			}
-			*/
 		}
 
 	}
 	printf("</g>");
 }
 
-/* Prints the node text (labels and lengths) in a <g> element */
+/* Outputs an SVG <g> element with all the tree branches, radial. In this
+ * context, a node's 'top' and 'bottom' are angles, not vertical positions */
 
-void draw_text (struct rooted_tree *tree, const double h_scale,
+void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
+		const double a_scale, int align_leaves, double dmax)
+{
+	printf( "<g"
+	       	" style='stroke:black;stroke-width:1;"
+	    	"font-size:medium;font-weight:normal;font-family:sans'>");
+
+	struct list_elem *elem;
+	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
+		struct rnode *node = elem->data;
+		struct svg_data *node_data = (struct svg_data *) node->data;
+
+		/* For cladograms */
+		if (align_leaves && is_leaf(node))
+			node_data->depth = dmax;
+
+		char *color = node_data->color;
+		if (NULL == color) color = "black";
+		double svg_radius = ROOT_SPACE + (r_scale * node_data->depth);
+		double svg_top_angle = a_scale * node_data->top; 
+		double svg_bottom_angle = a_scale * node_data->bottom; 
+		double svg_mid_angle =
+			0.5 * a_scale * (node_data->top+node_data->bottom);
+		double svg_mid_x_pos = svg_radius * cos(svg_mid_angle);
+		double svg_mid_y_pos = svg_radius * sin(svg_mid_angle);
+
+		/* draw node (vertical line), except for leaves */
+		if (! is_leaf(node)) {
+			double svg_top_x_pos = svg_radius * cos(svg_top_angle);
+			double svg_top_y_pos = svg_radius * sin(svg_top_angle);
+			double svg_bot_x_pos = svg_radius * cos(svg_bottom_angle);
+			double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
+			printf("<path style='stroke:%s' stroke-linecap='round'"
+			       " d='M%.4f,%.4f A%4f,%4f 0 1 1 %.4f %.4f'/>",
+				color,
+				svg_top_x_pos, svg_top_y_pos,
+				svg_radius, svg_radius,
+				svg_bot_x_pos, svg_bot_y_pos);
+		}
+		/* draw horizontal line */
+		if (is_root(node)) {
+			printf("<line stroke-linecap='round' "
+				"x1='0' y1='0' x2='%.4f' y2='%.4f'/>",
+				svg_mid_x_pos, svg_mid_y_pos);
+
+		} else {
+			struct rnode *parent = node->parent_edge->parent_node;
+			struct svg_data *parent_data = parent->data;
+			double svg_parent_radius = ROOT_SPACE + (
+				a_scale * parent_data->depth);
+			double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
+			double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
+			printf ("<line style='stroke:%s' "
+				"stroke-linecap='round' "
+				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
+				color,
+				svg_mid_x_pos, svg_mid_y_pos,
+				svg_par_x_pos, svg_par_y_pos);
+		}
+
+	}
+	printf("</g>");
+}
+
+/* Prints the node text (labels and lengths) in a <g> element, orthogonal */
+
+void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 		const double v_scale, int align_leaves, double dmax)
 {
 	printf( "<g"
@@ -243,22 +286,8 @@ void draw_text (struct rooted_tree *tree, const double h_scale,
 		char *color = node_data->color;
 		if (NULL == color) color = "black";
 		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
-		double svg_top_pos = v_scale * node_data->top; 
-		double svg_bottom_pos = v_scale * node_data->bottom; 
 		double svg_mid_pos =
 			0.5 * v_scale * (node_data->top+node_data->bottom);
-
-		/* TODO: rm commented code when rest works */
-
-		/* draw node (vertical line), except for leaves */
-		/*
-		if (! is_leaf(node)) {
-		printf("<line style='stroke:%s' stroke-linecap='round' "
-			"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-			color, svg_h_pos, svg_top_pos, svg_h_pos,
-			svg_bottom_pos);
-		}
-		*/
 
 		/* draw label IFF it is nonempty AND requested font size
 		 * is not zero */
@@ -268,26 +297,12 @@ void draw_text (struct rooted_tree *tree, const double h_scale,
 			       "x='%.4f' y='%.4f'>%s</text>",
 				font_size, svg_h_pos + LBL_SPACE,
 				svg_mid_pos, node->label);
-		/* draw horizontal line */
-		if (is_root(node)) {
-			/*
-			printf("<line stroke-linecap='round' "
-				"x1='0' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				svg_mid_pos, svg_h_pos, svg_mid_pos);
-			*/
-			;
-		} else {
+
+		if (! is_root(node)) {
 			struct rnode *parent = node->parent_edge->parent_node;
 			struct svg_data *parent_data = parent->data;
 			double svg_parent_h_pos = ROOT_SPACE + (
 				h_scale * parent_data->depth);
-			/*
-			printf ("<line style='stroke:%s' "
-				"stroke-linecap='round' "
-				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				color, svg_parent_h_pos,
-				 svg_mid_pos, svg_h_pos, svg_mid_pos);
-				 */
 			/* Print branch length IFF it is nonempty AND 
 			 * requested size is not 0 */
 			if (0 != strcmp(branch_length_font_size, "0") &&
@@ -400,6 +415,34 @@ double svg_get_node_depth (struct rnode *node)
 	return ((struct svg_data *) node->data)->depth;
 }
 
+void display_svg_tree_orthogonal(struct rooted_tree *tree,
+		struct h_data hd, int align_leaves)
+{
+	double h_scale = -1;
+	/* This could get more complicated if we print many trees with
+	 * different scales. For now, it's fixed. */
+	double v_scale = leaf_vskip;
+	double a_scale = 2 * PI / tree->nodes_in_order->count;
+
+	if (colormap) set_node_colors(tree);
+ 	underscores2spaces(tree);
+
+	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
+	/* draw nodes */
+	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	printf( "<g"
+	       	" style='stroke:black;stroke-width:1;"
+	    	"font-size:medium;font-weight:normal;font-family:sans'"
+		" transform='translate(0,%d)'"
+		">", svg_whole_v_shift);
+	/* We draw all the tree's branches in an SVG group of their own, to
+	 * facilitate editing. */
+	draw_branches_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
+	/* likewise for text */
+	draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
+	printf ("</g>");
+}
+
 void display_svg_tree(struct rooted_tree *tree, int align_leaves)
 {	
 	assert(init_done);
@@ -411,28 +454,8 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves)
 			svg_get_node_top, svg_get_node_bottom);
 	struct h_data hd = set_node_depth_cb(tree,
 			svg_set_node_depth, svg_get_node_depth);
-	double h_scale = -1;
-	/* This could get more complicated if we print many trees with
-	 * different scales. For now, it's fixed. */
-	double v_scale = leaf_vskip;
 
-	if (colormap) set_node_colors(tree);
- 	underscores2spaces(tree);
-
-	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
-	/* draw nodes */
-	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
-	/* We draw all the tree's branches in an SVG group of their own, to
-	 * facilitate editing. */
-	printf( "<g"
-	       	" style='stroke:black;stroke-width:1;"
-	    	"font-size:medium;font-weight:normal;font-family:sans'"
-		" transform='translate(0,%d)'"
-		">", svg_whole_v_shift);
-	draw_branches(tree, h_scale, v_scale, align_leaves, hd.d_max);
-	/* likewise for text */
-	draw_text(tree, h_scale, v_scale, align_leaves, hd.d_max);
-	printf ("</g>");
+	display_svg_tree_orthogonal(tree, hd, align_leaves);
 }
 
 void svg_footer() { printf ("</svg>"); }
