@@ -25,16 +25,16 @@ Newick-formatted phylogenetic trees. The motivation for writing them is that we 
  
 \section*{Introduction}
 
-Some applications in phylogeny involve large numbers of trees. Bootstrapping is an obvious example, but others exist, like bootscanning (sliding a window over an alignment and computing a tree at each window position), or (say) evolutionary analysis of all 1:1 orthologs of a given clade. The trees need to be produced, and then must be processed, involving steps like rerooting, extracting branch lengths, attributing support values, extracting support values, extracting subtrees, etc. Due to the large number of trees, it is highly desirable that the processing steps be automated (if only because humans will get bored by repetitive tasks and will commit more errors as the amount of data grows).
+Some applications in phylogeny involve large numbers of trees or trees with large numbers of taxa. Bootstrapping is an obvious example, but others exist, like bootscanning (sliding a window over an alignment and computing a tree at each window position), or (say) evolutionary analysis of all 1:1 orthologs of a given clade. The trees need to be produced, and then must be processed, involving steps like rerooting, extracting branch lengths, attributing support values, extracting support values, extracting subtrees, etc. Human users are likely to commit more errors as the size of the data grows, so it is highly desirable that the processing steps be automated. 
 
 There is a large choice of programs for manipulating trees (e.g.
 NJPlot or TreeView, more examples at \url{
 http://evolution.genetics.washington.edu/phylip/software.html}). Most have an interactive, graphical interface (\gui{}). The advantages and drawbacks of interactive interfaces have been disputed for decades; let us just remark that any program that requires user interaction is hard to integrate into a larger application, so it is difficult to automate tree processing using interactive tools.
 
-Automation is also facilitated by good interoperation between the programs involved. The ability to read data from standard input and write results on standard output is one way of improving interoperation in a \unix{} shell environment. \cite{Gancarz2002}. programs that have these properties are known as \textit{filters}.
+Automation is also facilitated by good interoperation between the programs involved. The ability to read data from standard input and write results on standard output is one way of improving interoperation in a \unix{} shell environment. \cite{Gancarz2002}. Programs that have these properties are known as \textit{filters}.
 
 Faced with the need to handle large or numerous trees in automated pipelines, and having found nothing on the Internet that met our needs, we designed and wrote
-a collection of programs that require no user interaction, work with any number of trees of any size, and behave as filters. The functions needed are shown in table \ref{tab:NU_func}.
+a collection of programs that require no user interaction, work with any number of trees of any size, and behave as filters. 
 
 \begin{table*}
 \begin{tabular}{lp{0.75\textwidth}}
@@ -57,11 +57,13 @@ Program & Function \\
 \label{tab:NU_func}
 \end{table*}
 
-To help work in the shell, a program for displaying tree graphs as text was added to the list (it can also output SVG).
+
 
 \section*{Results}
 
-The Newick Utilities perform the functions listed in table \ref{tab:NU_func} and have the following properties:
+We developed a set of programs we callthe Newick Utilities. They perform the functions listed in table \ref{tab:NU_func}. To help work in the shell, a program for displaying tree graphs as text was added to the list (it can also output SVG).
+
+The utilities have the following common properties:
 
 \begin{itemize}
  \item one program for one function

@@ -1,3 +1,7 @@
+nw_display: make one SVG group with tree branches, and another with text
+
+nw_display: add functionality for circular trees
+
 nw_display: check the 'null' values (try colormaps). Add a test for every
 option.
 
