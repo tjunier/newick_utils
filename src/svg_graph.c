@@ -223,7 +223,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 		double svg_mid_x_pos = svg_radius * cos(svg_mid_angle);
 		double svg_mid_y_pos = svg_radius * sin(svg_mid_angle);
 
-		/* draw node (vertical line), except for leaves */
+		/* draw node (arc), except for leaves */
 		if (! is_leaf(node)) {
 			double svg_top_x_pos = svg_radius * cos(svg_top_angle);
 			double svg_top_y_pos = svg_radius * sin(svg_top_angle);
@@ -235,24 +235,33 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 				svg_top_x_pos, svg_top_y_pos,
 				svg_radius, svg_radius,
 				svg_bot_x_pos, svg_bot_y_pos);
+			fprintf (stderr, "inode arc top: (%g,%g), bottom (%g,%g)\n",
+					svg_top_x_pos, svg_top_y_pos,
+					svg_bot_x_pos, svg_bot_y_pos);
 		}
 		/* draw horizontal line */
 		if (is_root(node)) {
 			printf("<line stroke-linecap='round' "
 				"x1='0' y1='0' x2='%.4f' y2='%.4f'/>",
 				svg_mid_x_pos, svg_mid_y_pos);
+			fprintf(stderr, "root: (0,0) -> (%g,%g)\n",
+				svg_mid_x_pos, svg_mid_y_pos);
+
 
 		} else {
 			struct rnode *parent = node->parent_edge->parent_node;
 			struct svg_data *parent_data = parent->data;
 			double svg_parent_radius = ROOT_SPACE + (
-				a_scale * parent_data->depth);
+				r_scale * parent_data->depth);
 			double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
 			double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
 			printf ("<line style='stroke:%s' "
 				"stroke-linecap='round' "
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				color,
+				svg_mid_x_pos, svg_mid_y_pos,
+				svg_par_x_pos, svg_par_y_pos);
+			fprintf (stderr, "edge: (%g,%g) -> (%g,%g)\n",
 				svg_mid_x_pos, svg_mid_y_pos,
 				svg_par_x_pos, svg_par_y_pos);
 		}
@@ -448,7 +457,7 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	double h_scale = -1;
 	/* This could get more complicated if we print many trees with
 	 * different scales. For now, it's fixed. */
-	double a_scale = 2 * PI / tree->nodes_in_order->count;
+	double a_scale = 2 * PI / leaf_count(tree);
 
 	if (colormap) set_node_colors(tree);
  	underscores2spaces(tree);
@@ -456,10 +465,13 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* draw nodes */
 	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	/* TODO: add translation to outer <g> or to <svg>, otherwise renderers
+	 * fail to display. Should translate by a full radius down and right,
+	 * */
 	printf( "<g>");
 	/* We draw all the tree's branches in an SVG group of their own, to
 	 * facilitate editing. */
-	draw_branches_radial(tree, h_scale, a_scale, align_leaves, hd.d_max);
+	draw_branches_radial(tree, 10, a_scale, align_leaves, hd.d_max);
 	/* likewise for text */
 	//draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
 	printf ("</g>");
