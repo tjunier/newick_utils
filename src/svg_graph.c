@@ -319,6 +319,70 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 	printf("</g>");
 }
 
+/* Prints the node text (labels and lengths) in a <g> element, radial */
+
+void draw_text_radial (struct rooted_tree *tree, const double r_scale,
+		const double a_scale, int align_leaves, double dmax)
+{
+	printf( "<g"
+	       	/* " style='stroke:black;stroke-width:1;" */
+	    	/* "font-size:medium;font-weight:normal;font-family:sans'" */
+		">"
+	      );
+
+	struct list_elem *elem;
+	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
+		struct rnode *node = elem->data;
+		struct svg_data *node_data = (struct svg_data *) node->data;
+
+		/* For cladograms */
+		if (align_leaves && is_leaf(node))
+			node_data->depth = dmax;
+
+		char *font_size = is_leaf(node) ?
+			leaf_label_font_size : inner_label_font_size ;
+		char *color = node_data->color;
+		if (NULL == color) color = "black";
+		double svg_radius = ROOT_SPACE + (r_scale * node_data->depth);
+		double svg_mid_angle =
+			0.5 * a_scale * (node_data->top+node_data->bottom);
+		double svg_x_pos = (svg_radius + LBL_SPACE)  * cos(svg_mid_angle);
+		double svg_y_pos = (svg_radius + LBL_SPACE)  * sin(svg_mid_angle);
+
+		/* draw label IFF it is nonempty AND requested font size
+		 * is not zero */
+		if (0 != strcmp(font_size, "0") &&
+		    0 != strcmp(node->label, ""))
+			printf("<text style='stroke:none;font-size:%s' "
+			       "x='%.4f' y='%.4f'>%s</text>",
+				font_size, svg_x_pos, svg_y_pos, node->label);
+
+		/* TODO: add this when node labels work */
+		/*
+		if (! is_root(node)) {
+			struct rnode *parent = node->parent_edge->parent_node;
+			struct svg_data *parent_data = parent->data;
+			double svg_parent_h_pos = ROOT_SPACE + (
+				h_scale * parent_data->depth);
+				*/
+			/* Print branch length IFF it is nonempty AND 
+			 * requested size is not 0 */
+			/*
+			if (0 != strcmp(branch_length_font_size, "0") &&
+			    0 != strcmp(node->parent_edge->length_as_string, "")) {
+				printf("<text style='stroke:none;font-size:%s' "
+					"x='%4f' y='%4f'>%s</text>",
+					branch_length_font_size,
+					(svg_h_pos + svg_parent_h_pos) / 2.0,
+					edge_length_v_offset + svg_mid_pos,
+					node->parent_edge->length_as_string);
+			}
+		}
+		*/
+	}
+	printf("</g>");
+}
+
 /* Passed to dump_llist() for labels */
 void dump_label (void *lbl) { puts((char *) lbl); }
 
@@ -458,7 +522,7 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	 * facilitate editing. */
 	draw_branches_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
 	/* likewise for text */
-	//draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
+	draw_text_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
 	printf ("</g>");
 }
 
