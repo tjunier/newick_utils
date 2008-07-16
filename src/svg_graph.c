@@ -324,10 +324,7 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		const double a_scale, int align_leaves, double dmax)
 {
-	printf( "<g"
-	       	/* " style='stroke:black;stroke-width:1;" */
-	    	/* "font-size:medium;font-weight:normal;font-family:sans'" */
-		">"
+	printf( "<g>"
 	      );
 
 	struct list_elem *elem;
@@ -354,8 +351,12 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		if (0 != strcmp(font_size, "0") &&
 		    0 != strcmp(node->label, ""))
 			printf("<text style='stroke:none;font-size:%s' "
+			       "transform='rotate(%g,%g,%g)' "
 			       "x='%.4f' y='%.4f'>%s</text>",
-				font_size, svg_x_pos, svg_y_pos, node->label);
+				font_size,
+				svg_mid_angle / (2*PI) * 360,
+				svg_x_pos, svg_y_pos,
+				svg_x_pos, svg_y_pos, node->label);
 
 		/* TODO: add this when node labels work */
 		/*
@@ -517,7 +518,8 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* draw nodes */
 	r_scale = (0.5 * graph_width - hd.l_max - 2 * ROOT_SPACE - LBL_SPACE) / hd.d_max;
-	printf( "<g transform='translate(%g,%g)'>", graph_width / 2.0, graph_width / 2.0);
+	printf( "<g transform='translate(%g,%g)'>",
+			graph_width / 2.0, graph_width / 2.0);
 	/* We draw all the tree's branches in an SVG group of their own, to
 	 * facilitate editing. */
 	draw_branches_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
