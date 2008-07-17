@@ -34,6 +34,7 @@ struct svg_data {
 
 const int ROOT_SPACE = 10;	/* pixels */
 const int LBL_SPACE = 10;	/* pixels */
+const int CHAR_WIDTH = 5;	/* pixels, approximattion for 'medium' fonts */
 const int edge_length_v_offset = -4; /* pixels */
 const double PI = 3.14159;
 
@@ -526,7 +527,7 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* draw nodes */
-	r_scale = (0.5 * graph_width - hd.l_max - 2 * ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	r_scale = (0.5 * graph_width - CHAR_WIDTH * hd.l_max - 2 * ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	printf( "<g transform='translate(%g,%g)'>",
 			graph_width / 2.0, graph_width / 2.0);
 	/* We draw all the tree's branches in an SVG group of their own, to
