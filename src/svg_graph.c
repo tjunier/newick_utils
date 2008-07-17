@@ -348,13 +348,22 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 
 		/* draw label IFF it is nonempty AND requested font size
 		 * is not zero */
-		if (0 != strcmp(font_size, "0") &&
-		    0 != strcmp(node->label, ""))
+		if (0 != strcmp(font_size, "0") && 0 != strcmp(node->label, ""))
+		if (svg_x_pos >= 0) 
 			printf("<text style='stroke:none;font-size:%s' "
 			       "transform='rotate(%g,%g,%g)' "
 			       "x='%.4f' y='%.4f'>%s</text>",
 				font_size,
 				svg_mid_angle / (2*PI) * 360,
+				svg_x_pos, svg_y_pos,
+				svg_x_pos, svg_y_pos, node->label);
+		else
+			printf("<text style='text-anchor:end;stroke:none;font-size:%s' "
+			       "transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
+			       "x='%.4f' y='%.4f'>%s</text>",
+				font_size,
+				svg_mid_angle / (2*PI) * 360,
+				svg_x_pos, svg_y_pos,
 				svg_x_pos, svg_y_pos,
 				svg_x_pos, svg_y_pos, node->label);
 
