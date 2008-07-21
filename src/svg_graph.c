@@ -52,6 +52,7 @@ static int graph_width = -1;
 static char *colormap_fname = NULL;
 static double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
 static int svg_whole_v_shift = -1; /* Vertical translation of whole graph */
+static double svg_angle_correction = -0.0349; /* -2°, in radians */ 
 
 static struct llist *colormap = NULL;
 
@@ -67,6 +68,7 @@ void set_svg_width(int width) { graph_width = width; }
 void set_svg_colormap_file(char *fname) { colormap_fname = fname; }
 void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
 void set_svg_whole_v_shift(int shift) { svg_whole_v_shift = shift; }
+void set_svg_angle_correction(double corr) { svg_angle_correction = corr; }
 
 void svg_header()
 {
@@ -223,6 +225,11 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			0.5 * a_scale * (node_data->top+node_data->bottom);
 		double svg_mid_x_pos = svg_radius * cos(svg_mid_angle);
 		double svg_mid_y_pos = svg_radius * sin(svg_mid_angle);
+		int large_arc_flag;
+		if (svg_bottom_angle - svg_top_angle > PI)
+			large_arc_flag = 1;
+		else
+			large_arc_flag = 0;
 
 		/* draw node (arc), except for leaves */
 		if (! is_leaf(node)) {
@@ -231,13 +238,14 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			double svg_bot_x_pos = svg_radius * cos(svg_bottom_angle);
 			double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
 			printf("<path style='stroke:%s' stroke-linecap='round'"
-			       " d='M%.4f,%.4f A%4f,%4f 0 0 1 %.4f %.4f'/>",
+			       " d='M%.4f,%.4f A%4f,%4f 0 %d 1 %.4f %.4f'/>",
 				color,
 				svg_top_x_pos, svg_top_y_pos,
 				svg_radius, svg_radius,
+				large_arc_flag,
 				svg_bot_x_pos, svg_bot_y_pos);
 		}
-		/* draw horizontal line */
+		/* draw radial line */
 		if (is_root(node)) {
 			printf("<line stroke-linecap='round' "
 				"x1='0' y1='0' x2='%.4f' y2='%.4f'/>",
@@ -325,7 +333,7 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		const double a_scale, int align_leaves, double dmax)
 {
-	printf( "<g>"
+	printf( "<g style='stroke:none'>"
 	      );
 
 	struct list_elem *elem;
@@ -341,33 +349,39 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 			leaf_label_font_size : inner_label_font_size ;
 		char *color = node_data->color;
 		if (NULL == color) color = "black";
-		double svg_radius = ROOT_SPACE + (r_scale * node_data->depth);
-		double svg_mid_angle =
+		double radius = ROOT_SPACE + (r_scale * node_data->depth);
+		double mid_angle =
 			0.5 * a_scale * (node_data->top+node_data->bottom);
-		double svg_x_pos = (svg_radius + LBL_SPACE)  * cos(svg_mid_angle);
-		double svg_y_pos = (svg_radius + LBL_SPACE)  * sin(svg_mid_angle);
+		double x_pos;
+		double y_pos;
 
 		/* draw label IFF it is nonempty AND requested font size
 		 * is not zero */
 		if (0 != strcmp(font_size, "0") && 0 != strcmp(node->label, ""))
-		if (svg_x_pos >= 0) 
-			printf("<text style='stroke:none;font-size:%s' "
+		if (cos(mid_angle) >= 0)  {
+			x_pos = (radius+LBL_SPACE) * cos(mid_angle);
+			y_pos = (radius+LBL_SPACE) * sin(mid_angle);
+			printf("<text style='font-size:%s' "
 			       "transform='rotate(%g,%g,%g)' "
 			       "x='%.4f' y='%.4f'>%s</text>",
 				font_size,
-				svg_mid_angle / (2*PI) * 360,
-				svg_x_pos, svg_y_pos,
-				svg_x_pos, svg_y_pos, node->label);
-		else
-			printf("<text style='text-anchor:end;stroke:none;font-size:%s' "
+				mid_angle / (2*PI) * 360,
+				x_pos, y_pos,
+				x_pos, y_pos, node->label);
+		}
+		else {
+			mid_angle += svg_angle_correction;
+			x_pos = (radius+LBL_SPACE) * cos(mid_angle);
+			y_pos = (radius+LBL_SPACE) * sin(mid_angle);
+			printf("<text style='text-anchor:end;font-size:%s' "
 			       "transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
 			       "x='%.4f' y='%.4f'>%s</text>",
 				font_size,
-				svg_mid_angle / (2*PI) * 360,
-				svg_x_pos, svg_y_pos,
-				svg_x_pos, svg_y_pos,
-				svg_x_pos, svg_y_pos, node->label);
-
+				mid_angle / (2*PI) * 360,
+				x_pos, y_pos,
+				x_pos, y_pos,
+				x_pos, y_pos, node->label);
+		}
 		/* TODO: add this when node labels work */
 		/*
 		if (! is_root(node)) {
