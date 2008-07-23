@@ -57,6 +57,9 @@ EXTRA_DIST = tests/test_nw_support.sh \
 	tests/test_nw_display_svg_cldgram.exp \
 	tests/test_nw_display_svg_cmap.exp \
 	tests/test_nw_display_svlb.exp \
+	tests/test_nw_display_svg_cldgram_r.exp \
+	tests/test_nw_display_svg_cmap_r.exp \
+	tests/test_nw_display_svlb_r.exp \
 	tests/test_nw_distance_an_1.exp \
 	tests/test_nw_distance_an_2.exp \
 	tests/test_nw_distance_i.exp \

@@ -13,6 +13,7 @@
 #include "readline.h"
 #include "lca.h"
 #include "hash.h"
+#include "svg_graph.h"
 #include "node_pos_alloc.h"
 
 void underscores2spaces(); /* defined in display.c */
@@ -53,6 +54,7 @@ static char *colormap_fname = NULL;
 static double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
 static int svg_whole_v_shift = -1; /* Vertical translation of whole graph */
 static double svg_angle_correction = -0.0349; /* -2°, in radians */ 
+static int graph_style = -1;
 
 static struct llist *colormap = NULL;
 
@@ -69,6 +71,7 @@ void set_svg_colormap_file(char *fname) { colormap_fname = fname; }
 void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
 void set_svg_whole_v_shift(int shift) { svg_whole_v_shift = shift; }
 void set_svg_angle_correction(double corr) { svg_angle_correction = corr; }
+void set_svg_style(int style) { graph_style = style; }
 
 void svg_header()
 {
@@ -357,30 +360,31 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 
 		/* draw label IFF it is nonempty AND requested font size
 		 * is not zero */
-		if (0 != strcmp(font_size, "0") && 0 != strcmp(node->label, ""))
-		if (cos(mid_angle) >= 0)  {
-			x_pos = (radius+LBL_SPACE) * cos(mid_angle);
-			y_pos = (radius+LBL_SPACE) * sin(mid_angle);
-			printf("<text style='font-size:%s' "
-			       "transform='rotate(%g,%g,%g)' "
-			       "x='%.4f' y='%.4f'>%s</text>",
-				font_size,
-				mid_angle / (2*PI) * 360,
-				x_pos, y_pos,
-				x_pos, y_pos, node->label);
-		}
-		else {
-			mid_angle += svg_angle_correction;
-			x_pos = (radius+LBL_SPACE) * cos(mid_angle);
-			y_pos = (radius+LBL_SPACE) * sin(mid_angle);
-			printf("<text style='text-anchor:end;font-size:%s' "
-			       "transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
-			       "x='%.4f' y='%.4f'>%s</text>",
-				font_size,
-				mid_angle / (2*PI) * 360,
-				x_pos, y_pos,
-				x_pos, y_pos,
-				x_pos, y_pos, node->label);
+		if (0 != strcmp(font_size, "0") && 0 != strcmp(node->label, "")) {
+			if (cos(mid_angle) >= 0)  {
+				x_pos = (radius+LBL_SPACE) * cos(mid_angle);
+				y_pos = (radius+LBL_SPACE) * sin(mid_angle);
+				printf("<text style='font-size:%s' "
+				       "transform='rotate(%g,%g,%g)' "
+				       "x='%.4f' y='%.4f'>%s</text>",
+					font_size,
+					mid_angle / (2*PI) * 360,
+					x_pos, y_pos,
+					x_pos, y_pos, node->label);
+			}
+			else {
+				mid_angle += svg_angle_correction;
+				x_pos = (radius+LBL_SPACE) * cos(mid_angle);
+				y_pos = (radius+LBL_SPACE) * sin(mid_angle);
+				printf("<text style='text-anchor:end;font-size:%s' "
+				       "transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
+				       "x='%.4f' y='%.4f'>%s</text>",
+					font_size,
+					mid_angle / (2*PI) * 360,
+					x_pos, y_pos,
+					x_pos, y_pos,
+					x_pos, y_pos, node->label);
+			}
 		}
 		/* TODO: add this when node labels work */
 		/*
@@ -565,8 +569,14 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves)
 	struct h_data hd = set_node_depth_cb(tree,
 			svg_set_node_depth, svg_get_node_depth);
 
-	// display_svg_tree_orthogonal(tree, hd, align_leaves);
-	display_svg_tree_radial(tree, hd, align_leaves);
+	if (SVG_ORTHOGONAL == graph_style)
+		display_svg_tree_orthogonal(tree, hd, align_leaves);
+	else if (SVG_RADIAL == graph_style)
+		display_svg_tree_radial(tree, hd, align_leaves);
+	else
+		// TODO: better handling of errors: should return error code
+		fprintf (stderr, "Unknown tree style %d\n", graph_style);
+		
 }
 
 void svg_footer() { printf ("</svg>"); }

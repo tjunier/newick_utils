@@ -20,6 +20,7 @@ struct parameters {
 	char *inner_label_font_size;
 	char *branch_length_font_size;
 	double leaf_vskip;
+	int svg_style;	/* radial or orthogonal */
 };
 
 void help(char* argv[])
@@ -63,6 +64,7 @@ void help(char* argv[])
 "       setting to 0 disables printing of inner labels.\n"
 "    -l <number>: leaf label font size (default: small) [SVG only]\n"
 "       setting to 0 disables printing of inner labels.\n"
+"    -r: draw a radial tree (default: orthogonal) [only SVG]\n"
 "    -s: output graph as SVG (default: text). SVG output is currently limited\n"
 "       to one tree - any trees beyond the first one are ignored.\n"
 "    -w <number>: graph should be no wider than <number>, measured in\n"
@@ -103,9 +105,10 @@ struct parameters get_params(int argc, char *argv[])
 	params.inner_label_font_size = "small";
 	params.branch_length_font_size = "small";
 	params.leaf_vskip = 40.0;
+	params.svg_style = SVG_ORTHOGONAL;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "b:c:hi:l:sv:w:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "b:c:hi:l:rsv:w:")) != -1) {
 		switch (opt_char) {
 		case 'b':
 			params.branch_length_font_size = optarg;
@@ -121,6 +124,9 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'l':
 			params.leaf_label_font_size = optarg;
+			break;
+		case 'r':
+			params.svg_style = SVG_RADIAL;
 			break;
 		case 's':
 			params.svg = TRUE;
@@ -183,6 +189,7 @@ void set_svg_parameters(struct parameters params)
 	set_svg_colormap_file(params.colormap_fname);
 	set_svg_leaf_vskip(params.leaf_vskip);
 	set_svg_whole_v_shift(20);	/* pixels */
+	set_svg_style(params.svg_style);	/* radial vs orthogonal */
 }
 
 void underscores2spaces(struct rooted_tree *tree)
