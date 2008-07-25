@@ -1,4 +1,12 @@
 The Newick Utilities are a suite of programs for working with Newick-formatted
 phylogenetic trees.
 
-See INSTALL for installing.
+See INSTALL for installing. Basically, it's the familiar
+
+$ ./configure
+$ make
+$ make check
+$ sudo make install
+
+There are no fancy options. I still use a few nonstandard GNU extensions like
+asprintf(), I will work towards removing them if there is demand for this.

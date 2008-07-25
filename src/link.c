@@ -193,3 +193,21 @@ struct rnode * unlink_rnode(struct rnode *node)
 	}
 	return NULL;
 }
+
+struct llist *siblings(struct rnode *node)
+{
+	struct rnode *parent, *sib;
+	struct llist *result = create_llist();
+	struct list_elem *elem;
+
+	if (is_root(node)) return result;
+
+	parent = node->parent_edge->parent_node;
+	for (elem = parent->children->head; NULL != elem; elem = elem->next) {
+		sib = ((struct redge *) elem->data)->child_node;
+		if (sib != node)
+			append_element(result, sib);
+	}
+
+	return result;
+}

@@ -11,6 +11,10 @@
 #include "to_newick.h"
 #include "hash.h"
 
+/* Many node functions are tested here because it's easier to check them if we
+ * can use the methods in link.h and tree.h - strictly speaking, we can't rely
+ * on them when checking rnode.h */
+
 int test_add_child_edge()
 {
 	char *test_name = "test_add_child_edge";
@@ -48,9 +52,6 @@ int test_add_child_edge()
 	return 0;
 }
 
-/* although this is a property of a node, it's easier to test if we
-   can use linking functions, so we test it here rather than in test_rnode. */
-
 int test_children_count()
 {
 	const char *test_name = "test_children_count";
@@ -77,8 +78,6 @@ int test_children_count()
 	printf("%s ok.\n", test_name);
 	return 0;
 }
-
-/* same remark as for test_children_count(). */
 
 int test_is_leaf()
 {
@@ -734,6 +733,131 @@ int test_is_stair()
 }
 */
 
+int test_siblings()
+{
+	const char *test_name = "test_siblings";
+
+	struct rnode *node_A, *node_B, *node_C;
+	struct rnode *node_e, *node_D, *node_f;
+	/* ((A,B)f,(C,(D,E)g)h)i; */
+	struct rooted_tree tree2 = tree_2();
+	/*  ((A:1,B:1,C:1)e:1,D:2)f; */
+	struct rooted_tree tree6 = tree_6();
+	struct hash *t2map = create_label2node_map(tree2.nodes_in_order);
+	struct hash *t6map = create_label2node_map(tree6.nodes_in_order);
+	struct llist *sibs;
+
+	/* simple case: tree 2 */
+	node_A = hash_get(t2map, "A");
+	node_B = hash_get(t2map, "B");
+	sibs = siblings(node_A);
+	if (sibs->count != 1) {
+		printf ("%s: expected exactly 1 sibling, got %d.\n", test_name,
+				sibs->count);
+		return 1;
+	}
+	if (sibs->head->data != node_B) {
+		printf ("%s: wrong sibling (expected node B, got %s)\n", test_name,
+				((struct rnode *) sibs->head->data)->label);
+		return 1;
+	}
+
+	/* node with >2 children: tree 6 */
+	node_A = hash_get(t6map, "A");
+	node_B = hash_get(t6map, "B");
+	node_C = hash_get(t6map, "C");
+	node_D = hash_get(t6map, "D");
+	node_e = hash_get(t6map, "e");
+	node_f = hash_get(t6map, "f");
+
+	sibs = siblings(node_A);
+	if (sibs->count != 2) {
+		printf ("%s: expected exactly 2 siblings, got %d.\n", test_name,
+				sibs->count);
+		return 1;
+	}
+	if (sibs->head->data != node_B) {
+		printf ("%s: wrong sibling (expected node B, got %s)\n", test_name,
+				((struct rnode *) sibs->head->data)->label);
+		return 1;
+	}
+	if (sibs->tail->data != node_C) {
+		printf ("%s: wrong sibling (expected node C, got %s)\n", test_name,
+				((struct rnode *) sibs->head->data)->label);
+		return 1;
+	}
+
+	sibs = siblings(node_B);
+	if (sibs->count != 2) {
+		printf ("%s: expected exactly 2 siblings, got %d.\n", test_name,
+				sibs->count);
+		return 1;
+	}
+	if (sibs->head->data != node_A) {
+		printf ("%s: wrong sibling (expected node A, got %s)\n", test_name,
+				((struct rnode *) sibs->head->data)->label);
+		return 1;
+	}
+	if (sibs->tail->data != node_C) {
+		printf ("%s: wrong sibling (expected node C, got %s)\n", test_name,
+				((struct rnode *) sibs->head->data)->label);
+		return 1;
+	}
+
+	sibs = siblings(node_C);
+	if (sibs->count != 2) {
+		printf ("%s: expected exactly 2 siblings, got %d.\n", test_name,
+				sibs->count);
+		return 1;
+	}
+	if (sibs->head->data != node_A) {
+		printf ("%s: wrong sibling (expected node A, got %s)\n", test_name,
+				((struct rnode *) sibs->head->data)->label);
+		return 1;
+	}
+	if (sibs->tail->data != node_B) {
+		printf ("%s: wrong sibling (expected node B, got %s)\n", test_name,
+				((struct rnode *) sibs->head->data)->label);
+		return 1;
+	}
+
+	/* Inner node: e */
+	sibs = siblings(node_e);
+	if (sibs->count != 1) {
+		printf ("%s: expected exactly 1 sibling, got %d.\n", test_name,
+				sibs->count);
+		return 1;
+	}
+	if (sibs->head->data != node_D) {
+		printf ("%s: wrong sibling (expected node D, got %s)\n", test_name,
+				((struct rnode *) sibs->head->data)->label);
+		return 1;
+	}
+
+	/* Leaf with inner sibling: D */
+	sibs = siblings(node_D);
+	if (sibs->count != 1) {
+		printf ("%s: expected exactly 1 sibling, got %d.\n", test_name,
+				sibs->count);
+		return 1;
+	}
+	if (sibs->head->data != node_e) {
+		printf ("%s: wrong sibling (expected node e, got %s)\n", test_name,
+				((struct rnode *) sibs->head->data)->label);
+		return 1;
+	}
+
+	/* Root should have no sibling */
+	sibs = siblings(node_f);
+	if (sibs->count != 0) {
+		printf ("%s: expected exactly 0 sibling, got %d.\n", test_name,
+				sibs->count);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
 
 int main()
 {
@@ -758,6 +882,7 @@ int main()
 	failures += test_unlink_rnode();
 	failures += test_unlink_rnode_rad_leaf();
 	failures += test_unlink_rnode_3sibs();
+	failures += test_siblings();
 	// failures += test_is_stair();
 	if (0 == failures) {
 		printf("All tests ok.\n");

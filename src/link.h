@@ -61,3 +61,10 @@ void reverse_redge(struct redge *edge);
  * root AND the root has only one remaining child; NULL otherwise. */
 
 struct rnode * unlink_rnode(struct rnode *);
+
+/* Returns the node's list of siblings. Siblings appear in the same order as in
+ * the parent's children list. The list is empty for root, it may be empty for
+ * leaves (it's not illegal for a node to have just one child), but this is
+ * unusual. */
+
+struct llist *siblings(struct rnode *);

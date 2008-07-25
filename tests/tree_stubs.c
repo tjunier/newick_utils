@@ -212,7 +212,7 @@ struct rooted_tree tree_5()
 }
 
 /* A tree with an inner node that has three children:
- *  ((A:1,B:1,C:1)e:1,D:2)f */
+ *  ((A:1,B:1,C:1)e:1,D:2)f; */
 struct rooted_tree tree_6()
 {
 	struct rnode *node_A, *node_B, *node_C, *node_D;

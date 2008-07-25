@@ -8,6 +8,7 @@
 #include "rnode.h"
 #include "list.h"
 #include "nodemap.h"
+#include "hash.h"
 
 const int FREE_NODE_DATA = 1;
 const int DONT_FREE_NODE_DATA = 0;

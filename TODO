@@ -1,9 +1,4 @@
-nw_display: make one SVG group with tree branches, and another with text
-
-nw_display: add functionality for circular trees
-
-nw_display: check the 'null' values (try colormaps). Add a test for every
-option.
+nw_clade: add functionality for returning sibling, based on one or more labels.
 
 [later] Add functionality for reducing stair nodes.
 
@@ -123,4 +118,11 @@ lexer, so fix it too while we're at it.
 [done] BUG: nw_ed crashes on cladograms when trying to splice out nodes. Fixed
 - that was because new edge lengths were not malloc()ed when both lengths were
 empty.
+
+[done] nw_display: make one SVG group with tree branches, and another with text
+
+[done] nw_display: add functionality for circular trees
+
+[done] nw_display: check the 'null' values (try colormaps). Add a test for every
+option.
 
