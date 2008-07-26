@@ -13,23 +13,26 @@
 #include "lca.h"
 #include "rnode_iterator.h"
 #include "rnode.h"
+#include "common.h"
+#include "link.h"
 
 /* only one param for now, but who knows? */
 
 struct parameters {
 	struct llist *labels;
 	int check_monophyly;
+	int siblings;
 };
 
 void help(char *argv[])
 {
 	printf(
-"Extracts a subtree defined by labels.\n"
+"Extracts a subtree (clade) defined by labels.\n"
 "\n"
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hm] <target tree filename|-> <label> [label]+\n"
+"%s [-hms] <target tree filename|-> <label> [label]+\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -53,6 +56,11 @@ void help(char *argv[])
 "    -h: prints this message and exits\n"
 "    -m: only prints the clade if it is monophyletic, in the sense that ONLY\n"
 "        the labels passed as arguments are found in the clade.\n"
+"        See also -s.\n"
+"    -s: prints the siblings of the clade defined by the labels passed as\n"
+"        arguments, in the order in which they appear in the Newick.\n"
+"        If -m is also passed, only prints siblings if the labels passed\n"
+"        as arguments form a monophyletic group.\n"
 "\n"
 "Examples\n"
 "--------\n"
@@ -81,16 +89,20 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	params.check_monophyly = 0;
+	params.check_monophyly = FALSE;
+	params.siblings = FALSE;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hm")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hms")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'm':
-			params.check_monophyly = 1;
+			params.check_monophyly = TRUE;
+			break;
+		case 's':
+			params.siblings = TRUE;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -173,10 +185,27 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	if (NULL != subtree_root) {
 		if ((! params.check_monophyly) ||
 		    (is_monophyletic(descendants, subtree_root))) {
-			/* monophyly of input labels is verified or not requested */
-			char *newick = to_newick(subtree_root);
-			printf ("%s\n", newick);
-			free(newick);
+			/* monophyly of input labels is verified or not
+			 * requested */
+			char *newick;
+			if (params.siblings) {
+				struct llist *sibs = siblings(subtree_root);
+				struct list_elem *el;
+				for (el=sibs->head;NULL!=el;el=el->next) {
+					struct rnode *sib;
+					sib = el->data;
+					newick = to_newick(sib);
+					printf ("%s\n", newick);
+					free(newick);
+				}
+				destroy_llist(sibs);
+			} else {
+				/* normal operation: print clade defined by
+				 * labels. */
+				newick = to_newick(subtree_root);
+				printf ("%s\n", newick);
+				free(newick);
+			}
 		}
 	} else {
 		fprintf (stderr, "WARNING: LCA not found\n");

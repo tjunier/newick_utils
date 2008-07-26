@@ -1,5 +1,3 @@
-nw_clade: add functionality for returning sibling, based on one or more labels.
-
 [later] Add functionality for reducing stair nodes.
 
 [later] Add functionality for directly counting a bipartition from a set of
@@ -23,7 +21,7 @@ l->head->next is not NULL as it should be. I'm not sure exactly when this
 occurs yet (destroy_llist() is used frequently).
 
 [done] bug in nw_reroot: try nw_reroot -l data/reroot_l_prob.nw
-CL-CAUBET22_3DCL-1243049_3D. It should work, or at least print a message.  
+CL-****2_3DCL-1243049_3D. It should work, or at least print a message.  
 
 [done] Use a struct hash instead of a struct node_map. Eventually remove
 nodemap.[ch] -- Note: kept nodemap.c for its functionality, but now it uses a
@@ -125,4 +123,6 @@ empty.
 
 [done] nw_display: check the 'null' values (try colormaps). Add a test for every
 option.
+
+[done] nw_clade: add functionality for returning sibling, based on one or more labels.
 

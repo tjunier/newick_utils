@@ -1,5 +1,11 @@
 SUBDIRS = src tests
 EXTRA_DIST = tests/test_nw_support.sh \
+	     tests/test_nw_clade_nsibn.exp \
+	     tests/test_nw_clade_nsibnm_f.exp \
+	tests/test_nw_clade_sibn.exp \
+	tests/falconiformes.nw \
+	tests/test_nw_clade_sib1.exp \
+	tests/test_nw_clade_nsibnm.exp \
 	tests/test_nw_clade.sh \
 	tests/test_nw_condense.sh \
 	tests/test_nw_display.sh \
@@ -34,6 +40,7 @@ EXTRA_DIST = tests/test_nw_support.sh \
 	tests/def.nw \
 	tests/dist.nw \
 	tests/edged_root.nw \
+	tests/falconiformes.nw \
 	tests/forest_ind.nw \
 	tests/forest.nw \
 	tests/HRV_20reps.nw \
