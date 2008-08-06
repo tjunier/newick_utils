@@ -12,9 +12,9 @@
 #include "lca.h"
 #include "rnode.h"
 #include "hash.h"
+#include "common.h"
 
-/* return values for reroot() */
-
+/* return values for reroot() */ /* TODO: replace with an enum? */
 const int OK = 0;
 const int NO_LCA = 1;
 const int LCA_IS_TREE_ROOT = 2;
@@ -81,7 +81,7 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	params.try_ingroup = 0;
+	params.try_ingroup = FALSE;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "hl")) != -1) {
@@ -90,7 +90,7 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'l':
-			params.try_ingroup = 1;
+			params.try_ingroup = TRUE;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);

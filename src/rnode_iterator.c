@@ -45,6 +45,18 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
 /* Returns the current node's next un-visited child, or NULL if there is none.
  * Will return NULL if node has no children. */
 
+/* TODO: currently, this function "remembers" visited nodes (in the iter->seen
+ * hash). At every call, it traverses the current node's children list until if
+ * finds at child it has not seen. This takes O(n) time, for n children. Since
+ * this function will be called once per child, the result is O(n²). This could
+ * be improved by "remembering" the last list_elem visited in the children
+ * list. Since this has a pointer to the next element, getting the next
+ * unvisited child takes constant time. There just needs to be a stack of
+ * "remembered" list_elem structures in struct rnode_iterator (instead of the
+ * hash, which has the added benefit of using up less space). When going down
+ * to a child, the current list_elem is pushed on the stack, and it is popped
+ * out of it when going back up. */
+
 static struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 {
 	struct list_elem *elem;

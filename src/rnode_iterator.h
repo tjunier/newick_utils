@@ -18,7 +18,7 @@ void destroy_rnode_iterator(struct rnode_iterator *);
 struct rnode *rnode_iterator_next(struct rnode_iterator *);
 
 /* Returns the list of nodes that descend from the argument node, in parse
- * order. Together wit the argument node, this can be used to create a struct
+ * order. Together with the argument node, this can be used to create a struct
  * rooted_tree. */
 
 struct llist *get_nodes_in_order(struct rnode *);

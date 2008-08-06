@@ -65,7 +65,7 @@ void help(char *argv[])
 void get_params(int argc, char* argv[])
 {
 	int c;
-	int compact = 0;
+	int compact = FALSE;
 
 	eol = "\n";
 	indent_string = "  ";
@@ -73,7 +73,7 @@ void get_params(int argc, char* argv[])
 	while ((c = getopt (argc, argv, "cht:")) != -1) {
 		switch (c) {
 		case 'c':
-			 compact = 1;
+			 compact = TRUE;
 			 break;
 		case 'h':
 			help(argv);

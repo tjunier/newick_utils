@@ -1,3 +1,7 @@
+nw_match: prints out trees which "match" another ("pattern") tree, e.g. if we keep only the species found in the "pattern" tree, topologies should be the same.
+
+nw_tgen: a program to randomly generate trees
+
 [later] Add functionality for reducing stair nodes.
 
 [later] Add functionality for directly counting a bipartition from a set of

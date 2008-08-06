@@ -10,6 +10,7 @@
 #include "redge.h"
 #include "rnode.h"
 #include "list.h"
+#include "common.h"
 
 struct parameters {
 	int show_inner_labels;
@@ -78,10 +79,10 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'I':
-			params.show_inner_labels = 0;
+			params.show_inner_labels = FALSE;
 			break;
 		case 'L':
-			params.show_leaf_labels = 0;
+			params.show_leaf_labels = FALSE;
 			break;
 		case 't':
 			params.separator = '\t';

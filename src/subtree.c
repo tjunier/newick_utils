@@ -139,17 +139,17 @@ struct parameters get_params(int argc, char *argv[])
 
 int is_monophyletic(struct llist *descendants, struct rnode *subtree_root)
 {
-	int result = 1;
+	int result = TRUE;
 
 	struct hash *leaf_map = get_leaf_label_map(subtree_root);
 	if (leaf_map->count != descendants->count) {
-		result = 0;
+		result = FALSE;
 	}
 	struct list_elem *el;
 	for (el = descendants->head; NULL != el; el = el->next) {
 		char *label = ((struct rnode *) el->data)->label;
 		if (NULL == hash_get(leaf_map, label)) {
-			result = 0;
+			result = FALSE;
 			break;
 		}
 	}

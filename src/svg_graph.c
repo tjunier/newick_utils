@@ -15,6 +15,7 @@
 #include "hash.h"
 #include "svg_graph.h"
 #include "node_pos_alloc.h"
+#include "common.h"
 
 void underscores2spaces(); /* defined in display.c */
 
@@ -39,7 +40,7 @@ const int CHAR_WIDTH = 5;	/* pixels, approximattion for 'medium' fonts */
 const int edge_length_v_offset = -4; /* pixels */
 const double PI = 3.14159;
 
-int init_done = 0;
+int init_done = FALSE;
 
 /* We can't pass all the parameters to write_nodes_to_g() or any other function
  * - there are too many of them - so we use external variables. */
@@ -230,7 +231,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 		double svg_mid_y_pos = svg_radius * sin(svg_mid_angle);
 		int large_arc_flag;
 		if (svg_bottom_angle - svg_top_angle > PI)
-			large_arc_flag = 1;
+			large_arc_flag = 1; /* keep 1 and 0: literal SVG flags */
 		else
 			large_arc_flag = 0;
 

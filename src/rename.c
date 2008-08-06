@@ -11,6 +11,7 @@
 #include "list.h"
 #include "rnode.h"
 #include "readline.h"
+#include "common.h"
 
 struct parameters {
 	char  *map_filename;
@@ -119,7 +120,7 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	params.only_leaves = 0;	/* default: rename all nodes */
+	params.only_leaves = FALSE;	/* default: rename all nodes */
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "hl")) != -1) {
@@ -128,7 +129,7 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'l':
-			params.only_leaves = 1;
+			params.only_leaves = TRUE;
 			break;
 		}
 	}

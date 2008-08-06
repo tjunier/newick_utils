@@ -11,6 +11,7 @@
 #include "redge.h"
 #include "rnode.h"
 #include "list.h"
+#include "common.h"
 
 struct parameters {
 	int show_inner_labels;
@@ -71,24 +72,24 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	/* defaults */
-	params.show_inner_labels = 1;
-	params.show_leaf_labels = 1;
-	params.show_branch_lengths = 0;
+	params.show_inner_labels = TRUE;
+	params.show_leaf_labels = TRUE;
+	params.show_branch_lengths = FALSE;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "bhIL")) != -1) {
 		switch (opt_char) {
 		case 'b':
-			params.show_branch_lengths = 1;
+			params.show_branch_lengths = TRUE;
 			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'I':
-			params.show_inner_labels = 0;
+			params.show_inner_labels = FALSE;
 			break;
 		case 'L':
-			params.show_leaf_labels = 0;
+			params.show_leaf_labels = FALSE;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);

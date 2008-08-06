@@ -58,3 +58,11 @@ int is_cladogram(struct rooted_tree *tree);
 
 struct llist *nodes_from_labels(struct rooted_tree *tree,
 		struct llist *labels);
+
+
+/* Clones a tree (allocates storage) */
+/* TODO - not implemented yet - I'm putting this declaration here so that if
+ * ever this is needed, I'll remember to use the rnode_iterator for this, as
+ * half the job  will already have been done */
+
+struct rooted_tree *clone_tree(struct rooted_tree*);
