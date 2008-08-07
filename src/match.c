@@ -21,8 +21,12 @@
 
 extern FILE *nwsin;
 
+void newick_scanner_set_string_input(char *);
+void newick_scanner_clear_string_input();
+void newick_scanner_set_file_input(FILE *);
+
 struct parameters {
-	FILE *target_tree_file;
+	char *pattern;
 };
 
 void help(char* argv[])
@@ -89,15 +93,14 @@ struct parameters get_params(int argc, char *argv[])
 	/* get arguments */
 	if (2 == (argc - optind))	{
 		if (0 != strcmp("-", argv[optind])) {
-			FILE *ttf = fopen(argv[optind], "r");
-			if (NULL == ttf) {
+			FILE *fin = fopen(argv[optind], "r");
+			if (NULL == fin) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
-			params.target_tree_file = ttf;
-		} else {
-			params.target_tree_file = stdin;
+			nwsin = fin;
 		}
+		params.pattern = argv[optind+1];
 	} else {
 		fprintf(stderr, "Usage: %s [-hlp] <target tree filename|-> <replicates filename>\n", argv[0]);
 		exit(EXIT_FAILURE);
@@ -106,12 +109,34 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+/* Get pattern tree, order it, and return its Newick representation */
+char *get_ordered_pattern_newick(char *pattern)
+{
+	struct rooted_tree *pattern_tree;
+
+	newick_scanner_set_string_input(pattern);
+	pattern_tree = parse_tree();
+	if (NULL == pattern_tree) {
+		fprintf (stderr, "Could not parse pattern tree '%s'\n", pattern);
+		exit(EXIT_FAILURE);
+	}
+	newick_scanner_clear_string_input();
+
+	return to_newick(pattern_tree->root); /* mallocs: need to free */
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params = get_params(argc, argv);
+	char *pattern_newick;
 
-	nwsin = params.target_tree_file;
+	pattern_newick = get_ordered_pattern_newick(params.pattern);
+
+	/* It's not enough to just set nwsin to stdin or the input file - it
+	 * segfaults. Apparently you need to explicitly switch to a new buffer.
+	 * See 'Multiple Input Buffers' in the Flex info page ($ info flex)*/
+	newick_scanner_set_file_input(stdin);
 
 	while (NULL != (tree = parse_tree())) {
 		char *newick = to_newick(tree->root);
@@ -119,5 +144,6 @@ int main(int argc, char *argv[])
 		free(newick);
 	}
 
+	free(pattern_newick);
 	return 0;
 }

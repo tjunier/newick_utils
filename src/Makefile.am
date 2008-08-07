@@ -64,7 +64,7 @@ nw_labels_LDADD = @LEXLIB@
 nw_prune_SOURCES = $(NW_CORE) $(NW_OUT) prune.c 
 nw_prune_LDADD = @LEXLIB@
 
-nw_order_SOURCES = $(NW_CORE) $(NW_OUT) order.c
+nw_order_SOURCES = $(NW_CORE) $(NW_OUT) order.c order_tree.c
 nw_order_LDADD = @LEXLIB@
 
 nw_indent_SOURCES = indent.c indent_lex.l

@@ -3,6 +3,13 @@
 #include <string.h>
 #include "newick_parser.h"
 
+/* I'd have liked to #include a header file with those definitions, but Bison
+ * puts it into a .c file (newick_parser.c). So I have top copy it literally. */
+
+#ifndef YY_BUF_SIZE
+#define YY_BUF_SIZE 16384
+#endif
+
 /* Since we use our own prefix 'nws' instead of 'yy', we have to supply
  * nwswrap() (yywrap() was available in libfl) */
 
@@ -21,6 +28,30 @@ char * space2underscore(char * s)
 			*p = '_';
 
 	return s;
+}
+
+YY_BUFFER_STATE string_buf_state;
+YY_BUFFER_STATE file_buf_state;
+
+/* The following two functions are used when lexing from a string. TODO: They
+ * might be better named 'newick_lexer_*_input()', in fact. */
+
+void newick_scanner_set_string_input(char *input)
+{
+	string_buf_state = yy_scan_string(input);
+}
+
+void newick_scanner_clear_string_input()
+{
+	yy_delete_buffer(string_buf_state);
+}
+
+/* And these are for switching to a FILE */
+
+void newick_scanner_set_file_input(FILE *input)
+{
+	file_buf_state = yy_create_buffer(input, YY_BUF_SIZE);
+	yy_switch_to_buffer(file_buf_state);
 }
 
 %}
