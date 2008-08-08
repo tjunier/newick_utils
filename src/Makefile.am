@@ -70,7 +70,7 @@ nw_order_LDADD = @LEXLIB@
 nw_indent_SOURCES = indent.c indent_lex.l
 nw_indent_LDADD = @LEXLIB@
 
-nw_match_SOURCES = match.c $(NW_CORE) $(NW_OUT)
+nw_match_SOURCES = match.c $(NW_CORE) $(NW_OUT) order_tree.c
 nw_match_LDADD = @LEXLIB@
 
 # Removes automatically generated C code (Lex & YACC)

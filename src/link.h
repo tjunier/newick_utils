@@ -37,7 +37,8 @@ void replace_child_edge(struct rnode *node, struct redge *old, struct redge *new
  * to 'node''s parent. New edges have edges such that the children nodes'
  * depth is unchanged. */
 
-/* Should NOT be used for deleting ("pruning") nodes! (will segfault) */
+/* Should NOT be used for deleting ("pruning") nodes (will segfault)! Use
+ * unlink_rnode() instead. */
 
 void splice_out_rnode(struct rnode *node);
 

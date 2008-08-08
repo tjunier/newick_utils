@@ -19,14 +19,13 @@
 #include "to_newick.h"
 #include "tree.h"
 
-extern FILE *nwsin;
-
 void newick_scanner_set_string_input(char *);
 void newick_scanner_clear_string_input();
 void newick_scanner_set_file_input(FILE *);
 
 struct parameters {
 	char *pattern;
+	FILE *target_trees;
 };
 
 void help(char* argv[])
@@ -98,7 +97,9 @@ struct parameters get_params(int argc, char *argv[])
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
-			nwsin = fin;
+			params.target_trees = fin;
+		} else {
+			params.target_trees = stdin;
 		}
 		params.pattern = argv[optind+1];
 	} else {
@@ -136,7 +137,10 @@ int main(int argc, char *argv[])
 	/* It's not enough to just set nwsin to stdin or the input file - it
 	 * segfaults. Apparently you need to explicitly switch to a new buffer.
 	 * See 'Multiple Input Buffers' in the Flex info page ($ info flex)*/
-	newick_scanner_set_file_input(stdin);
+
+	/* TODO: this stops working when I use nwsin. See also match.c.bak for
+	 * functions I had added since checking in. */
+	newick_scanner_set_file_input(params.target_trees);
 
 	while (NULL != (tree = parse_tree())) {
 		char *newick = to_newick(tree->root);
