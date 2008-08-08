@@ -4,13 +4,13 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+
 /*
 #include <assert.h>
 #include <math.h>
 
-#include "redge.h"
 #include "node_set.h"
-#include "common.h"
 */
 #include "parser.h"
 #include "to_newick.h"
@@ -21,6 +21,8 @@
 #include "rnode.h"
 #include "link.h"
 #include "nodemap.h"
+#include "common.h"
+#include "redge.h"
 
 void newick_scanner_set_string_input(char *);
 void newick_scanner_clear_string_input();
@@ -43,9 +45,9 @@ void help(char* argv[])
 "Input\n"
 "-----\n"
 "\n"
-"The first argument is the name of the file containing the target tree (to which\n"
-"support values are to be attributed), or '-' (in which case the tree is read on\n"
-"stdin).\n"
+"The first argument is the name of the file containing the target tree (to\n"
+"which support values are to be attributed), or '-' (in which case the tree\n"
+"is read on stdin).\n"
 "\n"
 "The second argument is a pattern tree\n"
 "\n"
@@ -62,7 +64,8 @@ void help(char* argv[])
 "Limits & Assumptions\n"
 "--------------------\n"
 "\n"
-"Assumes that the labels are unique in all trees (both target and pattern)\n"
+"Assumes that the labels are leaf labels, and that they are unique in\n"
+"all trees (both target and pattern)\n"
 "\n"
 "Example\n"
 "-------\n"
@@ -131,6 +134,21 @@ struct rooted_tree *get_ordered_pattern_tree(char *pattern)
 	return pattern_tree;
 }
 
+/* We only consider leaf labels. This might change if keeping internal labels
+ * proves useful. */
+void remove_inner_node_labels(struct rooted_tree *target_tree)
+{
+	struct list_elem *el;
+
+	for (el=target_tree->nodes_in_order->head; NULL != el; el=el->next) {
+		struct rnode *current = el->data;
+		if (is_leaf(current)) continue;
+		char *label = current->label;
+		free(current->label);
+		current->label = "";
+	}
+}
+
 /* Removes all nodes in target tree whose labels are not found in the 'kept'
  * hash */
 void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
@@ -139,9 +157,26 @@ void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 
 	for (el=target_tree->nodes_in_order->head; NULL != el; el=el->next) {
 		struct rnode *current = el->data;
+		char *label = current->label;
+		if (0 == strcmp("", label)) continue;
+		if (is_root(current)) continue;
 		if (NULL == hash_get(kept, current->label)) {
 			/* not in 'kept': remove */
 			unlink_rnode(current);
+		}
+	}
+}
+
+void remove_branch_lengths(struct rooted_tree *target_tree)
+{
+	struct list_elem *el;
+
+	for (el=target_tree->nodes_in_order->head; NULL != el; el=el->next) {
+		struct rnode *current = el->data;
+		struct redge *cur_edge = current->parent_edge;
+		if (strcmp("", cur_edge->length_as_string) != 0) {
+			free(cur_edge->length_as_string);
+			cur_edge->length_as_string = "";
 		}
 	}
 }
@@ -168,14 +203,17 @@ int main(int argc, char *argv[])
 	newick_scanner_set_file_input(params.target_trees);
 
 	while (NULL != (tree = parse_tree())) {
-		char *newick;
-		/* prune tree */
+		char *original_newick = to_newick(tree->root);
+		remove_inner_node_labels(tree);
 		prune_extra_labels(tree, pattern_labels);
-		newick = to_newick(tree->root);
-		/* order tree */
-		/* compare with pattern */
-		printf ("%s\n", newick);
-		free(newick);
+		remove_branch_lengths(tree);	
+		order_tree(tree);
+		char *processed_newick = to_newick(tree->root);
+		printf ("%s\n", processed_newick);
+		if (0 == strcmp(processed_newick, pattern_newick)) 
+			printf ("%s\n", original_newick);
+		free(processed_newick);
+		free(original_newick);
 	}
 
 	free(pattern_newick);
