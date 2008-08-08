@@ -8,9 +8,6 @@
 #include <assert.h>
 #include <math.h>
 
-#include "list.h"
-#include "hash.h"
-#include "rnode.h"
 #include "redge.h"
 #include "node_set.h"
 #include "common.h"
@@ -18,6 +15,12 @@
 #include "parser.h"
 #include "to_newick.h"
 #include "tree.h"
+#include "order_tree.h"
+#include "hash.h"
+#include "list.h"
+#include "rnode.h"
+#include "link.h"
+#include "nodemap.h"
 
 void newick_scanner_set_string_input(char *);
 void newick_scanner_clear_string_input();
@@ -110,8 +113,8 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-/* Get pattern tree, order it, and return its Newick representation */
-char *get_ordered_pattern_newick(char *pattern)
+/* Get pattern tree and order it */
+struct rooted_tree *get_ordered_pattern_tree(char *pattern)
 {
 	struct rooted_tree *pattern_tree;
 
@@ -123,27 +126,54 @@ char *get_ordered_pattern_newick(char *pattern)
 	}
 	newick_scanner_clear_string_input();
 
-	return to_newick(pattern_tree->root); /* mallocs: need to free */
+	order_tree(pattern_tree);
+
+	return pattern_tree;
+}
+
+/* Removes all nodes in target tree whose labels are not found in the 'kept'
+ * hash */
+void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
+{
+	struct list_elem *el;
+
+	for (el=target_tree->nodes_in_order->head; NULL != el; el=el->next) {
+		struct rnode *current = el->data;
+		if (NULL == hash_get(kept, current->label)) {
+			/* not in 'kept': remove */
+			unlink_rnode(current);
+		}
+	}
 }
 
 int main(int argc, char *argv[])
 {
+	struct rooted_tree *pattern_tree;	
 	struct rooted_tree *tree;	
-	struct parameters params = get_params(argc, argv);
 	char *pattern_newick;
+	struct hash *pattern_labels;
 
-	pattern_newick = get_ordered_pattern_newick(params.pattern);
+	struct parameters params = get_params(argc, argv);
 
-	/* It's not enough to just set nwsin to stdin or the input file - it
-	 * segfaults. Apparently you need to explicitly switch to a new buffer.
-	 * See 'Multiple Input Buffers' in the Flex info page ($ info flex)*/
+	pattern_tree = get_ordered_pattern_tree(params.pattern);
+	pattern_newick = to_newick(pattern_tree->root);
+	printf ("%s\n", pattern_newick);
+	pattern_labels = create_label2node_map(pattern_tree->nodes_in_order);
 
-	/* TODO: this stops working when I use nwsin. See also match.c.bak for
-	 * functions I had added since checking in. */
+	/* get_ordered_pattern_tree() causes a tree to be read from a string,
+	 * which means that we must now tell the lexer to change its input
+	 * source. It's not enough to just set the external FILE pointer
+	 * 'nwsin' to standard input or the user-supplied file, apparently:
+	 * this would segfault. */
 	newick_scanner_set_file_input(params.target_trees);
 
 	while (NULL != (tree = parse_tree())) {
-		char *newick = to_newick(tree->root);
+		char *newick;
+		/* prune tree */
+		prune_extra_labels(tree, pattern_labels);
+		newick = to_newick(tree->root);
+		/* order tree */
+		/* compare with pattern */
 		printf ("%s\n", newick);
 		free(newick);
 	}
