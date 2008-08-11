@@ -109,7 +109,9 @@ char *add_len_strings(char *ls1, char *ls2)
 		double l2 = atof(ls2);
 		asprintf(&result, "%g", l1 + l2);
 	} else {
-		asprintf(&result, "");
+		/* NOTE: this generates an "zero-length format string" warning,
+		 * but it is actually necessary. */
+		asprintf(&result, ""); 
 	}
 
 	return result;
@@ -180,8 +182,11 @@ struct rnode * unlink_rnode(struct rnode *node)
 	struct rnode *parent = parent_edge->parent_node;
 	struct llist *siblings = parent->children; 	/* includes 'node'! */
 	int index = llist_index_of(siblings, parent_edge);
+	/* This removes this node from its parent's list of children (more
+	 * precisely, it removes this nodes _parent_edge_ from the list) */
+	/* We get the resulting list only so we can free it. */
 	struct llist *del = delete_after(siblings, index-1, 1);
-	destroy_llist(del);
+	destroy_llist(del);	
 	if (1 == siblings->count) {
 		if (is_root(parent)) {
 			return ((struct redge *) siblings->head->data)->child_node;

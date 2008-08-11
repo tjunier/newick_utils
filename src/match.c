@@ -31,6 +31,7 @@ void newick_scanner_set_file_input(FILE *);
 struct parameters {
 	char *pattern;
 	FILE *target_trees;
+	int reverse;
 };
 
 void help(char* argv[])
@@ -40,7 +41,7 @@ void help(char* argv[])
 "\n"
 "Synopsis\n"
 "--------\n"
-"%s <target tree filename|-> <pattern tree>\n"
+"%s [-v] <target tree filename|-> <pattern tree>\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -59,7 +60,7 @@ void help(char* argv[])
 "Options\n"
 "-------\n"
 "\n"
-"    -f <file>: reads the pattern from 'file'\n"
+"    -v: prints tree which do NOT match the pattern.\n"
 "\n"
 "Limits & Assumptions\n"
 "--------------------\n"
@@ -83,15 +84,18 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 	char opt_char;
 
+
+	params.reverse = FALSE;
+
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "hf:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		/* we keep this for debugging, but not documented */
-		case 'f':
-			/* read pattern from file */
+		case 'v':
+			params.reverse = TRUE;
 			break;
 		}
 	}
@@ -117,6 +121,7 @@ struct parameters get_params(int argc, char *argv[])
 }
 
 /* Get pattern tree and order it */
+
 struct rooted_tree *get_ordered_pattern_tree(char *pattern)
 {
 	struct rooted_tree *pattern_tree;
@@ -136,6 +141,7 @@ struct rooted_tree *get_ordered_pattern_tree(char *pattern)
 
 /* We only consider leaf labels. This might change if keeping internal labels
  * proves useful. */
+
 void remove_inner_node_labels(struct rooted_tree *target_tree)
 {
 	struct list_elem *el;
@@ -143,7 +149,6 @@ void remove_inner_node_labels(struct rooted_tree *target_tree)
 	for (el=target_tree->nodes_in_order->head; NULL != el; el=el->next) {
 		struct rnode *current = el->data;
 		if (is_leaf(current)) continue;
-		char *label = current->label;
 		free(current->label);
 		current->label = "";
 	}
@@ -151,6 +156,7 @@ void remove_inner_node_labels(struct rooted_tree *target_tree)
 
 /* Removes all nodes in target tree whose labels are not found in the 'kept'
  * hash */
+
 void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 {
 	struct list_elem *el;
@@ -162,7 +168,10 @@ void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 		if (is_root(current)) continue;
 		if (NULL == hash_get(kept, current->label)) {
 			/* not in 'kept': remove */
-			unlink_rnode(current);
+			struct rnode *new_root;
+			new_root = unlink_rnode(current);
+			if (NULL != new_root)
+				target_tree->root = new_root;
 		}
 	}
 }
@@ -192,7 +201,7 @@ int main(int argc, char *argv[])
 
 	pattern_tree = get_ordered_pattern_tree(params.pattern);
 	pattern_newick = to_newick(pattern_tree->root);
-	printf ("%s\n", pattern_newick);
+	// printf ("%s\n", pattern_newick);
 	pattern_labels = create_label2node_map(pattern_tree->nodes_in_order);
 
 	/* get_ordered_pattern_tree() causes a tree to be read from a string,
@@ -209,9 +218,10 @@ int main(int argc, char *argv[])
 		remove_branch_lengths(tree);	
 		order_tree(tree);
 		char *processed_newick = to_newick(tree->root);
-		printf ("%s\n", processed_newick);
-		if (0 == strcmp(processed_newick, pattern_newick)) 
-			printf ("%s\n", original_newick);
+		// printf ("%s\n", processed_newick);
+		int match = (0 == strcmp(processed_newick, pattern_newick));
+		match = params.reverse ? !match : match;
+		if (match) printf ("%s\n", original_newick);
 		free(processed_newick);
 		free(original_newick);
 	}
