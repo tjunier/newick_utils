@@ -8,7 +8,7 @@ TESTS = test_rnode test_redge test_list test_link \
 	test_nw_display.sh test_nw_indent.sh test_nw_support.sh \
 	test_nw_ed.sh test_nw_topology.sh test_nw_clade.sh \
 	test_nw_distance.sh test_nw_labels.sh test_nw_prune.sh \
-	test_nw_order.sh
+	test_nw_order.sh test_nw_match.sh
 
 check_PROGRAMS = test_rnode test_redge test_list test_link \
 		 test_canvas test_concat test_hash test_lca \

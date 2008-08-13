@@ -68,6 +68,13 @@ void enode_eval_set_current_rnode(struct rnode *tree_node)
  * second style, but making the variable static and using a function to set it:
  * this should avoid unwanted write accesses. */
 
+/* Design note: the handling of errors is a bit rough: in case an enode of
+ * unknown type is found, the function calls exit(). But passing a wrong type
+ * enode is going to be a programmer's error, so the program is very unlikely
+ * to exit() on a user, furthermore it is a severe enough error to warrant
+ * immediate termination. And finally, it's not clear how to pass an error code
+ * in a function that returns a float. */ 
+
 float eval_enode(struct enode *node)
 {
 	struct rnode_data *data;

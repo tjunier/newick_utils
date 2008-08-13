@@ -1,4 +1,3 @@
-nw_match: prints out trees which "match" another ("pattern") tree, e.g. if we keep only the species found in the "pattern" tree, topologies should be the same.
 
 nw_tgen: a program to randomly generate trees
 
@@ -130,3 +129,7 @@ option.
 
 [done] nw_clade: add functionality for returning sibling, based on one or more labels.
 
+[done] nw_match: prints out trees which "match" another ("pattern") tree, e.g. if we keep only the species found in the "pattern" tree, topologies should be the same.
+
+[done] check error handling: functions must only call exit() when error is
+unrecoverable, otherwise they should return an error code.

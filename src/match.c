@@ -74,6 +74,12 @@ void help(char* argv[])
 "# Prints trees in data/vrt_gen.nw where Tamias is closer to Homo than it is\n"
 "# to Vulpes:\n"
 "$ %s data/vrt_gen.nw '((Tamias,Homo),Vulpes);'\n",
+"\n"
+"# Prints trees in data/vrt_gen.nw where Tamias is NOT closer to Homo than it is\n"
+"# to Vulpes:\n"
+"$ %s -v data/vrt_gen.nw '((Tamias,Homo),Vulpes);'\n",
+
+	argv[0],
 	argv[0],
 	argv[0]
 	      );
@@ -113,7 +119,7 @@ struct parameters get_params(int argc, char *argv[])
 		}
 		params.pattern = argv[optind+1];
 	} else {
-		fprintf(stderr, "Usage: %s [-hlp] <target tree filename|-> <replicates filename>\n", argv[0]);
+		fprintf(stderr, "Usage: %s [-hv] <target trees filename|-> <pattern>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
