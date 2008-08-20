@@ -25,13 +25,6 @@ AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unist
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
-AC_TYPE_SIZE_T
-AC_TYPE_INT16_T
-AC_TYPE_INT32_T
-AC_TYPE_INT8_T
-AC_TYPE_UINT16_T
-AC_TYPE_UINT32_T
-AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC

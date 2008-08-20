@@ -1,4 +1,4 @@
-%option prefix = "nws"
+%option prefix="nws"
 %{
 #include <string.h>
 #include "newick_parser.h"
