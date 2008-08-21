@@ -20,6 +20,8 @@ int nwswrap(void)
 
 int lineno = 0;
 
+/* ! modifies its argument */
+
 char * space2underscore(char * s)
 {
 	char *p;
