@@ -1,5 +1,5 @@
 
-nw_tgen: a program to randomly generate trees
+have nw_display output its options in a comment, especially for SVG.
 
 [later] Add functionality for reducing stair nodes.
 
@@ -133,3 +133,6 @@ option.
 
 [done] check error handling: functions must only call exit() when error is
 unrecoverable, otherwise they should return an error code.
+
+[done] nw_tgen: a program to randomly generate trees - although it's quite
+primitive now, it works.

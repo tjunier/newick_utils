@@ -527,9 +527,21 @@ void draw_scale_bar(struct rooted_tree *tree, double h_scale,
 	double pot = largest_PoT_lte(d_max);
 	double scale_length = pot * h_scale;
 	printf ("<g transform='translate(%d,%g)'>", ROOT_SPACE, vpos); 
-	printf ("<text style='font-size:small;stroke:none' x='0' y='0'>"
-		"%g</text>", pot);
-	printf ("<path d='M 0 %d L %g %d'/>", skip, scale_length, skip);
+	if (2 * pot > d_max) {
+		/* print 1/10th tick marks */
+		printf ("<text style='font-size:small;stroke:none' x='0' y='0'>" "%g</text>", pot);
+		printf ("<path style='fill:none' d='M 0 0 l 0 %d l %g 0 l 0 %d'/>", skip, scale_length, -skip);
+		double tick;
+		for (tick = 0; tick < pot; tick += (pot/10))
+			printf ("<path transform='translate(%g,0)' d='M 0 0 l 0 %d'/>", tick*scale_length, skip);
+	} else {
+		/* print as many multiples as will fit */
+		int i;
+		for (i = 0; (i+1)*pot < d_max; i++) {
+			printf ("<path transform='translate(%g,0)' style='fill:none' d='M 0 %d l %g 0 l 0 %d'/>", i*scale_length, skip, scale_length, -skip);
+			printf ("<text transform='translate(%g,0)' style='font-size:small;text-anchor:end;stroke:none' x='0' y='0'>%g</text>", (i+1)*scale_length, (i+1)*pot);
+		}
+	}
 	printf ("</g>");
 }
 
