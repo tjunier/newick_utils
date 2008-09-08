@@ -12,10 +12,11 @@
 #include "link.h"
 #include "to_newick.h"
 
-static const double prob_node_has_children = 0.4;
+#define DEFAULT_PROB_HAS_CHILDREN 0.4
 
 struct parameters {
 	int seed;
+	double prob_node_has_children;
 };
 
 void help(char *argv[])
@@ -41,6 +42,7 @@ void help(char *argv[])
 "Options\n"
 "-------\n"
 "\n"
+"    -c <float> sets the probability that a node has children\n"
 "    -h: print this message and exit\n"
 "    -s  <int>: sets the pseudorandom number generator's seed\n"
 "\n"
@@ -60,13 +62,17 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 	params.seed = time(NULL);
+	params.prob_node_has_children = DEFAULT_PROB_HAS_CHILDREN;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hs:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "p:hs:")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
+		case 'p':
+			params.prob_node_has_children = atof(optarg);	
+			break;
 		case 's':
 			params.seed = atoi(optarg);
 			break;
@@ -83,7 +89,7 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-int gets_children()
+int gets_children(double prob_node_has_children)
 {
 	double rn = (double) rand() / RAND_MAX;
 
@@ -96,10 +102,11 @@ int gets_children()
 /* Visits a leaf: probabilistically adds children to the leaf, and adds those
  * children to the leaves queue (since they are new leaves) */
 
-void visit_leaf(struct rnode *leaf, struct llist *leaves_queue)
+void visit_leaf(struct rnode *leaf, double prob_node_has_children,
+		struct llist *leaves_queue)
 {
 	// printf ("visiting leaf %p (%s)\n", leaf, leaf->label);
-	if (gets_children()) {
+	if (gets_children(prob_node_has_children)) {
 		// printf (" gets children\n");
 		struct rnode *kid1 = create_rnode("kid1");	
 		struct rnode *kid2 = create_rnode("kid2");	
@@ -133,7 +140,8 @@ int main(int argc, char *argv[])
 		 * the end of the queue */
 		for (; nb_leaves_to_visit > 0; nb_leaves_to_visit--) {
 			struct rnode *current_leaf = shift(leaves_queue);
-			visit_leaf(current_leaf, leaves_queue);
+			visit_leaf(current_leaf, params.prob_node_has_children,
+					leaves_queue);
 		}
 	}
 
