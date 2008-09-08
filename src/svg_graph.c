@@ -508,8 +508,33 @@ double svg_get_node_depth (struct rnode *node)
 	return ((struct svg_data *) node->data)->depth;
 }
 
+/* Returns the largest power of ten not greater than argument */
+
+double largest_PoT_lte(double arg)
+{
+	double l10 = log(arg) / log(10);
+	double l10_fl = floor(l10);
+	return pow(10, l10_fl);
+}
+
+/* Draws a scale bar below the tree */
+
+void draw_scale_bar(struct rooted_tree *tree, double h_scale,
+		double v_scale, double d_max)
+{
+	const int skip = 5;
+	double vpos = leaf_count(tree) * v_scale;
+	double pot = largest_PoT_lte(d_max);
+	double scale_length = pot * h_scale;
+	printf ("<g transform='translate(%d,%g)'>", ROOT_SPACE, vpos); 
+	printf ("<text style='font-size:small;stroke:none' x='0' y='0'>"
+		"%g</text>", pot);
+	printf ("<path d='M 0 %d L %g %d'/>", skip, scale_length, skip);
+	printf ("</g>");
+}
+
 void display_svg_tree_orthogonal(struct rooted_tree *tree,
-		struct h_data hd, int align_leaves)
+		struct h_data hd, int align_leaves, int with_scale_bar)
 {
 	double h_scale = -1;
 	/* This could get more complicated if we print many trees with
@@ -532,6 +557,7 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	draw_branches_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
 	/* likewise for text */
 	draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
+	if (with_scale_bar) draw_scale_bar(tree, h_scale, v_scale, hd.d_max);
 	printf ("</g>");
 }
 
@@ -557,7 +583,8 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	printf ("</g>");
 }
 
-void display_svg_tree(struct rooted_tree *tree, int align_leaves)
+void display_svg_tree(struct rooted_tree *tree, int align_leaves,
+		int with_scale_bar)
 {	
 	assert(init_done);
 
@@ -571,7 +598,8 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves)
 			svg_set_node_depth, svg_get_node_depth);
 
 	if (SVG_ORTHOGONAL == graph_style)
-		display_svg_tree_orthogonal(tree, hd, align_leaves);
+		display_svg_tree_orthogonal(tree, hd, align_leaves,
+				with_scale_bar);
 	else if (SVG_RADIAL == graph_style)
 		display_svg_tree_radial(tree, hd, align_leaves);
 	else

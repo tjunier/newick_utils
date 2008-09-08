@@ -27,11 +27,13 @@ void svg_init();
 
 void svg_header();
 
-/* Writes a tree into a <g> object. if 'align_leaves' is true, the leaves will
- * be aligned (use this for cladograms). 'style' is either SVG_ORTHOGONAL or
- * SVG_RADIAL. */
+/* Writes a tree into a <g> object. If 'align_leaves' is true, the leaves will
+ * be aligned (use this for cladograms). If 'with_scale_bar' is true, a sclae
+ * bar will be drawn. TODO: pass 'style', where 'style' is either
+ * SVG_ORTHOGONAL or SVG_RADIAL. */
 
-void display_svg_tree(struct rooted_tree *, int align_leaves);
+void display_svg_tree(struct rooted_tree *, int align_leaves,
+		int with_scale_bar);
 
 /* Writes an SVG footer */
 

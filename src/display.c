@@ -189,6 +189,8 @@ void set_svg_parameters(struct parameters params)
 	set_svg_colormap_file(params.colormap_fname);
 	set_svg_leaf_vskip(params.leaf_vskip);
 	set_svg_whole_v_shift(20);	/* pixels */
+	// TODO: this is not really an SVG param, it should be passed as an
+	// argument to display_svg_tree()
 	set_svg_style(params.svg_style);	/* radial vs orthogonal */
 }
 
@@ -209,6 +211,7 @@ int main(int argc, char *argv[])
 	struct rooted_tree *tree;
 	struct parameters params;
 	int align_leaves;
+	int with_scale_bar;
 
 	params = get_params(argc, argv);
 
@@ -218,8 +221,9 @@ int main(int argc, char *argv[])
 		svg_init();
 		tree = parse_tree();
 		align_leaves = is_cladogram(tree);
+		with_scale_bar = !is_cladogram(tree);
 		svg_header();
-		display_svg_tree(tree, align_leaves);
+		display_svg_tree(tree, align_leaves, with_scale_bar);
 		svg_footer();
 		exit(EXIT_SUCCESS);
 	}
