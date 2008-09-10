@@ -206,6 +206,19 @@ void underscores2spaces(struct rooted_tree *tree)
 	}
 }
 
+/* Prints an XML comment containing the command line parameters, so that the
+ * result is easier to reproduce. */
+
+void svg_run_params_comment(int argc, char *argv[])
+{
+	int i;
+
+	printf ("\n<!-- " );
+	for (i = 0; i < argc; i++) 
+		printf ("%s ", argv[i]);
+	printf (" -->\n" );
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;
@@ -223,6 +236,7 @@ int main(int argc, char *argv[])
 		align_leaves = is_cladogram(tree);
 		with_scale_bar = !is_cladogram(tree);
 		svg_header();
+		svg_run_params_comment(argc, argv);
 		display_svg_tree(tree, align_leaves, with_scale_bar);
 		svg_footer();
 		exit(EXIT_SUCCESS);
