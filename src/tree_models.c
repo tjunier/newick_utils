@@ -1,8 +1,11 @@
 /* functions for tree models */
 
+#define _GNU_SOURCE
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "list.h"
 #include "rnode.h"
@@ -81,11 +84,12 @@ void geometric_tree(double prob_node_has_children)
 /******************************************************************/
 /* Time-limited model */
 
-/* Attributes length to the parent edge (exponentially distributed), capped by
- * duration threshold stored in node's data pointer. Returns the remaining time
- * (which can be negative) */
+double reciprocal_exponential_CDF(double x, double k)
+{
+	return - (log(1 - x)/k);
+}
 
-static double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate)
+double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate)
 {
 	/* Just an alias: keeps the formula below readable */
 	double k = branch_termination_rate;
@@ -93,15 +97,25 @@ static double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate)
 	/* I divide by RAND_MAX + 1 instead of RAND_MAX, so that I never get
 	 * exactly 1.0 (which would yield Infinity) */
 	rn -= 1 / RAND_MAX;
-	double length = - (log(1 - rn)/k);
+	double length = reciprocal_exponential_CDF(rn, k);
+	/* The remaining time is the parent edge's length (just
+	 * computed) minus the time threshold stored in the leaf's data
+	 * pointer */
+	double remaining_time = *((double*)leaf->data) - length;
+	/* Add remaining time if it's negative: this caps the branch at the
+	 * time threshold */
+	if (remaining_time < 0)
+		length += remaining_time;
+
+
 	char *length_s;
        	asprintf(&length_s, "%g", length);
 	leaf->parent_edge->length_as_string = length_s;
 
-	/* Returns the remaining time, i.e. the parent edge's length (just
-	 * attribted) minus the time threshold stored in the leaf's data
-	 * pointer */
-	return *((double) (leaf->data));
+	/* Return the remaining time so calling f() can take action based on
+	 * whether there is time left or not */
+
+	return remaining_time;
 }
 
 void time_limited_tree(double branch_termination_rate, double duration)

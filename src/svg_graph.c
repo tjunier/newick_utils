@@ -521,7 +521,7 @@ double largest_PoT_lte(double arg)
  * space */
 
 void draw_scale_bar(struct rooted_tree *tree, double h_scale,
-		double v_scale, double d_max)
+		double v_scale, double d_max, char *branch_length_unit)
 {
 	/* Finds the largest power of 10 that is smaller than the tree's depth.
 	 * Then draws as many multiples of this length as possible. If no more
@@ -530,6 +530,7 @@ void draw_scale_bar(struct rooted_tree *tree, double h_scale,
 
 	const int big_tick_height = 5; 			/* px */
 	const int small_tick_height = 3;		/* px */
+	const int units_text_voffset = -13;		/* px */
 	const int vsep = 1;				/* px */
 	double vpos = leaf_count(tree) * v_scale; 	/* px */
 	double pot = largest_PoT_lte(d_max);		/* tree units */
@@ -573,11 +574,14 @@ void draw_scale_bar(struct rooted_tree *tree, double h_scale,
 				(i+1)*scale_length, (i+1)*pot);
 		}
 	}
+	printf ("<text style='font-size:small;stroke:none' x='0' y='%d'>"
+		"%s</text>", units_text_voffset, branch_length_unit);
 	printf ("</g>");
 }
 
 void display_svg_tree_orthogonal(struct rooted_tree *tree,
-		struct h_data hd, int align_leaves, int with_scale_bar)
+		struct h_data hd, int align_leaves, int with_scale_bar,
+		char *branch_length_unit)
 {
 	double h_scale = -1;
 	/* This could get more complicated if we print many trees with
@@ -600,7 +604,8 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	draw_branches_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
 	/* likewise for text */
 	draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
-	if (with_scale_bar) draw_scale_bar(tree, h_scale, v_scale, hd.d_max);
+	if (with_scale_bar) draw_scale_bar(tree, h_scale, v_scale, hd.d_max,
+			branch_length_unit);
 	printf ("</g>");
 }
 
@@ -617,7 +622,7 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	/* draw nodes */
 	r_scale = (0.5 * graph_width - CHAR_WIDTH * hd.l_max - 2 * ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	printf( "<g transform='translate(%g,%g)'>",
-			graph_width / 2.0, graph_width / 2.0);
+		 	graph_width / 2.0, graph_width / 2.0);
 	/* We draw all the tree's branches in an SVG group of their own, to
 	 * facilitate editing. */
 	draw_branches_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
@@ -627,7 +632,7 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 }
 
 void display_svg_tree(struct rooted_tree *tree, int align_leaves,
-		int with_scale_bar)
+		int with_scale_bar, char *branch_length_unit)
 {	
 	assert(init_done);
 
@@ -642,7 +647,7 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves,
 
 	if (SVG_ORTHOGONAL == graph_style)
 		display_svg_tree_orthogonal(tree, hd, align_leaves,
-				with_scale_bar);
+				with_scale_bar, branch_length_unit);
 	else if (SVG_RADIAL == graph_style)
 		display_svg_tree_radial(tree, hd, align_leaves);
 	else

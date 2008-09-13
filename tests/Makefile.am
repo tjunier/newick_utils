@@ -3,7 +3,7 @@ AM_CFLAGS = -I ../src
 TESTS = test_rnode test_redge test_list test_link \
 	test_canvas test_concat test_hash test_lca test_enode \
 	test_nodemap test_to_newick test_tree test_node_set \
-	test_rnode_iterator \
+	test_rnode_iterator test_tree_models \
 	test_nw_reroot.sh test_nw_rename.sh test_nw_condense.sh \
 	test_nw_display.sh test_nw_indent.sh test_nw_support.sh \
 	test_nw_ed.sh test_nw_topology.sh test_nw_clade.sh \
@@ -13,7 +13,8 @@ TESTS = test_rnode test_redge test_list test_link \
 check_PROGRAMS = test_rnode test_redge test_list test_link \
 		 test_canvas test_concat test_hash test_lca \
 		 test_nodemap test_to_newick test_tree test_node_set \
-		 test_enode test_rnode_iterator test_readline
+		 test_enode test_rnode_iterator test_readline \
+		 test_tree_models
 
 check_HEADERS = tree_stubs.h
 
@@ -63,6 +64,10 @@ test_rnode_iterator_SOURCES = test_rnode_iterator.c $(SRC)/rnode_iterator.c \
        	$(SRC)/hash.c $(SRC)/nodemap.c tree_stubs.c	
 
 test_readline_SOURCES = test_readline.c $(SRC)/readline.c
+
+test_tree_models_SOURCES = test_tree_models.c $(SRC)/tree_models.c \
+	$(SRC)/rnode.c $(SRC)/list.c $(SRC)/to_newick.c $(SRC)/link.c \
+	$(SRC)/concat.c $(SRC)/redge.c
 
 clean-local:
 	$(RM) *.out

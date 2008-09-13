@@ -21,6 +21,7 @@ struct parameters {
 	char *branch_length_font_size;
 	double leaf_vskip;
 	int svg_style;	/* radial or orthogonal */
+	char *branch_length_unit;
 };
 
 void help(char* argv[])
@@ -31,7 +32,7 @@ void help(char* argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-bchilsvw] <tree filename|->\n"
+"%s [-bchilsuvw] <tree filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -44,6 +45,9 @@ void help(char* argv[])
 "\n"
 "Outputs a graph representing the tree, either as text (default) or\n"
 "as SVG (option -s). Underscores in labels are replaced with spaces.\n"
+"Trees with no branch lengths are taken to be cladograms and are\n"
+"dawn with leaves aligned. Otherwise, tree is assumed to be a\n"
+"phylogram and branch lengths are honored and a scale bar is drawn.\n"
 "\n"
 "Options\n"
 "-------\n"
@@ -67,10 +71,12 @@ void help(char* argv[])
 "    -r: draw a radial tree (default: orthogonal) [only SVG]\n"
 "    -s: output graph as SVG (default: text). SVG output is currently limited\n"
 "       to one tree - any trees beyond the first one are ignored.\n"
+"    -u <string>: string is used as unit name for scale bar (ignored\n"
+"       if no scale bar is drawn).\n"
+"    -v <number>: number of pixels between leaves (default: 40) [only SVG]\n"
 "    -w <number>: graph should be no wider than <number>, measured in\n"
 "       characters for text and pixels for SVG. Defaults: 80 (text),\n"
 "       300 (SVG)\n"
-"    -v <number>: number of pixels between leaves (default: 40) [only SVG]\n"
 "\n"
 "Examples\n"
 "--------\n"
@@ -106,9 +112,10 @@ struct parameters get_params(int argc, char *argv[])
 	params.branch_length_font_size = "small";
 	params.leaf_vskip = 40.0;
 	params.svg_style = SVG_ORTHOGONAL;
+	params.branch_length_unit = "";
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "b:c:hi:l:rsv:w:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "b:c:hi:l:rsu:v:w:")) != -1) {
 		switch (opt_char) {
 		case 'b':
 			params.branch_length_font_size = optarg;
@@ -130,6 +137,9 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 's':
 			params.svg = TRUE;
+			break;
+		case 'u':
+			params.branch_length_unit = optarg;
 			break;
 		case 'v':
 			params.leaf_vskip = atof(optarg);
@@ -237,7 +247,8 @@ int main(int argc, char *argv[])
 		with_scale_bar = !is_cladogram(tree);
 		svg_header();
 		svg_run_params_comment(argc, argv);
-		display_svg_tree(tree, align_leaves, with_scale_bar);
+		display_svg_tree(tree, align_leaves, with_scale_bar,
+				params.branch_length_unit);
 		svg_footer();
 		exit(EXIT_SUCCESS);
 	}
