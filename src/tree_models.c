@@ -15,6 +15,8 @@
 #include "tree_models.h"
 #include "redge.h"
 
+#define UNUSED -1
+
 /******************************************************************/
 /* Geometric model */
 
@@ -89,14 +91,21 @@ double reciprocal_exponential_CDF(double x, double k)
 	return - (log(1 - x)/k);
 }
 
-double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate)
+double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate,
+		double alt_random)
 {
 	/* Just an alias: keeps the formula below readable */
 	double k = branch_termination_rate;
-	double rn = (double) rand() / RAND_MAX;
+	double rn;
+       	if (alt_random < 0) {
+	       	rn = (double) rand() / RAND_MAX;
+		rn -= 1 / RAND_MAX;
+	}
+       	else
+	       rn = alt_random;
+
 	/* I divide by RAND_MAX + 1 instead of RAND_MAX, so that I never get
 	 * exactly 1.0 (which would yield Infinity) */
-	rn -= 1 / RAND_MAX;
 	double length = reciprocal_exponential_CDF(rn, k);
 	/* The remaining time is the parent edge's length (just
 	 * computed) minus the time threshold stored in the leaf's data
@@ -136,7 +145,7 @@ void time_limited_tree(double branch_termination_rate, double duration)
 	while (0 != leaves_queue->count) {
 		struct rnode *current_leaf = shift(leaves_queue);
 		double remaining_time = tlt_grow_leaf(current_leaf,
-				branch_termination_rate);
+				branch_termination_rate, UNUSED);
 	}
 	destroy_llist(leaves_queue);
 }

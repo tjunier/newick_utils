@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <complex.h> /* needed for cabs() */
+#include <stdlib.h>
 
 #include "rnode.h"
+#include "redge.h"
 #include "list.h"
 #include "tree_models.h"
 
@@ -28,7 +30,7 @@ int test_reciprocal_exponential_CDF()
 		return 1;
 	}
 	val = reciprocal_exponential_CDF(0.5,1);
-	double exp = 0.693147;
+	double exp = 0.693147; /* -ln(0.5) */
 	if (cabs(val - exp) > TOLERANCE) {
 		printf ("%s: expected %g, got %g (diff: %g)\n", test_name, exp, val, abs(val-exp));
 		return 1;
@@ -53,8 +55,15 @@ int test_tlt_grow_leaf()
 	kid->data = &prior_remaining_time;
 	link_p2c(parent, kid);
 
-	srand(0);
-	tlt_grow_leaf(kid, 8.5);
+	double posterior_remaining_time = tlt_grow_leaf(kid, 1, 0.5);
+	double grown_length = strtod(kid->parent_edge->length_as_string, NULL);
+
+	double exp = prior_remaining_time - posterior_remaining_time;
+	if (cabs(grown_length - exp) > TOLERANCE) {
+		printf ("%s: expected %g, got %g\n", test_name, exp,
+				grown_length);
+		return 1;
+	}
 
 	printf("%s ok.\n", test_name);
 	return 0;
