@@ -146,7 +146,29 @@ void time_limited_tree(double branch_termination_rate, double duration)
 		struct rnode *current_leaf = shift(leaves_queue);
 		double remaining_time = tlt_grow_leaf(current_leaf,
 				branch_termination_rate, UNUSED);
+		if (remaining_time > 0) {
+			// Branch splits
+			kid1 = create_rnode("k1");
+			kid2 = create_rnode("k2");
+			double *k1_time = malloc(sizeof(double));
+			if (NULL == k1_time){perror(NULL);exit(EXIT_FAILURE);}
+			double *k2_time = malloc(sizeof(double));
+			if (NULL == k2_time){perror(NULL);exit(EXIT_FAILURE);}
+			kid1->data = k1_time;
+			kid2->data = k2_time;
+			link_p2c(current_leaf, kid1, "");
+			link_p2c(current_leaf, kid2, "");
+			append_element(leaves_queue, kid1);
+			append_element(leaves_queue, kid2);
+		}
+		// else: branch terminates
 	}
 	destroy_llist(leaves_queue);
+
+	char *newick = to_newick(root);
+	printf("%s\n", newick);
+
+	free(newick);
 }
+
 
