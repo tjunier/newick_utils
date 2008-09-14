@@ -1,6 +1,4 @@
 
-have nw_display output its options in a comment, especially for SVG.
-
 [later] Add functionality for reducing stair nodes.
 
 [later] Add functionality for directly counting a bipartition from a set of
@@ -136,3 +134,6 @@ unrecoverable, otherwise they should return an error code.
 
 [done] nw_tgen: a program to randomly generate trees - although it's quite
 primitive now, it works.
+
+[later] have nw_display output its options in a comment, especially for SVG.
+

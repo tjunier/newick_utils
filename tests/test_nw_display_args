@@ -7,3 +7,4 @@ svlb: -s -v 8 -l 7 -b 6 HRV.nw
 svg_cmap_r:-s -r -c color.map catarrhini.nw
 svg_cldgram_r:-sr catarrhini_wrong.nw
 svlb_r: -s -r -v 8 -l 7 -b 6 HRV.nw
+svgu: -s -u 'substitutions/site' HRV.nw
