@@ -98,14 +98,15 @@ double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate,
 	double k = branch_termination_rate;
 	double rn;
        	if (alt_random < 0) {
-	       	rn = (double) rand() / RAND_MAX;
+		rn = rand();
+	       	rn /= RAND_MAX;
+		/* I remove 1/RAND_MAX so that I
+		 * never get exactly 1.0 (which would yield Infinity) */
 		rn -= 1 / RAND_MAX;
 	}
        	else
 	       rn = alt_random;
 
-	/* I divide by RAND_MAX + 1 instead of RAND_MAX, so that I never get
-	 * exactly 1.0 (which would yield Infinity) */
 	double length = reciprocal_exponential_CDF(rn, k);
 	/* The remaining time is the parent edge's length (just
 	 * computed) minus the time threshold stored in the leaf's data
