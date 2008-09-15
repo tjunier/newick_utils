@@ -54,7 +54,13 @@ static int graph_width = -1;
 static char *colormap_fname = NULL;
 static double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
 static int svg_whole_v_shift = -1; /* Vertical translation of whole graph */
-static double svg_angle_correction = -0.0349; /* -2°, in radians */ 
+/* If this is zero, the label's baseline is aligned on the branch. Use it to
+ * nudge the labels a small angle. Unfortunately the correct amount will depend
+ * on the graph's diameter and the label font size. */
+static double svg_label_angle_correction = 0;
+/* The following applies to labels on the left side of the tree (because they
+ * are subject to a 180° rotation, draw_text_radial() */
+static double svg_left_label_angle_correction = -0.0349; /* -2°, in radians */ 
 static int graph_style = -1;
 
 static struct llist *colormap = NULL;
@@ -71,7 +77,10 @@ void set_svg_width(int width) { graph_width = width; }
 void set_svg_colormap_file(char *fname) { colormap_fname = fname; }
 void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
 void set_svg_whole_v_shift(int shift) { svg_whole_v_shift = shift; }
-void set_svg_angle_correction(double corr) { svg_angle_correction = corr; }
+void set_svg_left_label_angle_correction(double corr) {
+	svg_left_label_angle_correction = corr; }
+void set_svg_label_angle_correction(double corr) {
+	svg_label_angle_correction = corr; }
 void set_svg_style(int style) { graph_style = style; }
 
 void svg_header()
@@ -359,6 +368,8 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		double x_pos;
 		double y_pos;
 
+		mid_angle += svg_label_angle_correction;
+
 		/* draw label IFF it is nonempty AND requested font size
 		 * is not zero */
 		if (0 != strcmp(font_size, "0") && 0 != strcmp(node->label, "")) {
@@ -374,7 +385,7 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 					x_pos, y_pos, node->label);
 			}
 			else {
-				mid_angle += svg_angle_correction;
+				mid_angle += svg_left_label_angle_correction;
 				x_pos = (radius+LBL_SPACE) * cos(mid_angle);
 				y_pos = (radius+LBL_SPACE) * sin(mid_angle);
 				printf("<text style='text-anchor:end;font-size:%s' "
@@ -613,7 +624,9 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 		struct h_data hd, int align_leaves)
 {
 	double r_scale = -1;
-	double a_scale = 2 * PI / leaf_count(tree);
+	/* By using 1.9 PI instead of 2 PI, we leave a wedge that shows the
+	 * tree's bounds */
+	double a_scale = 1.9 * PI / leaf_count(tree); /* radians */
 
 	if (colormap) set_node_colors(tree);
  	underscores2spaces(tree);

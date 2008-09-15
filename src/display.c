@@ -22,6 +22,8 @@ struct parameters {
 	double leaf_vskip;
 	int svg_style;	/* radial or orthogonal */
 	char *branch_length_unit;
+	double label_angle_correction;
+	double left_label_angle_correction;
 };
 
 void help(char* argv[])
@@ -32,7 +34,7 @@ void help(char* argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-bchilsuvw] <tree filename|->\n"
+"%s [-aAbchilsuvw] <tree filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -52,6 +54,11 @@ void help(char* argv[])
 "Options\n"
 "-------\n"
 "\n"
+"    -a <number>: rotate all labels by this amount (radians, default: 0)\n"
+"       [only SVG radial]\n"
+"    -A <number>: rotate left-side labels by this amount (radians,"
+"       default: 0.0349 (=~ 2°)) [only SVG radial]"
+"       [only SVG radial]\n"
 "    -b <number>: branch length font size (default: small) [only SVG].\n"    
 "       setting to 0 disables printing of branch lengths.\n"
 "    -c <colormap-file>: use specified colormap [only SVG]. A colormap is a text\n"    
@@ -66,7 +73,7 @@ void help(char* argv[])
 "    -h: prints this message and exits\n"
 "    -i <number>: inner label font size (default: small) [SVG only]\n"
 "       setting to 0 disables printing of inner labels.\n"
-"    -l <number>: leaf label font size (default: small) [SVG only]\n"
+"    -l <number>: leaf label font size (default: medium) [SVG only]\n"
 "       setting to 0 disables printing of inner labels.\n"
 "    -r: draw a radial tree (default: orthogonal) [only SVG]\n"
 "    -s: output graph as SVG (default: text). SVG output is currently limited\n"
@@ -115,8 +122,14 @@ struct parameters get_params(int argc, char *argv[])
 	params.branch_length_unit = "";
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "b:c:hi:l:rsu:v:w:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:hi:l:rsu:v:w:")) != -1) {
 		switch (opt_char) {
+		case 'a':
+			params.label_angle_correction = atof(optarg);
+			break;
+		case 'A':
+			params.left_label_angle_correction = atof(optarg);
+			break;
 		case 'b':
 			params.branch_length_font_size = optarg;
 			break;
@@ -199,6 +212,8 @@ void set_svg_parameters(struct parameters params)
 	set_svg_colormap_file(params.colormap_fname);
 	set_svg_leaf_vskip(params.leaf_vskip);
 	set_svg_whole_v_shift(20);	/* pixels */
+	set_svg_label_angle_correction(params.label_angle_correction);
+	set_svg_left_label_angle_correction(params.left_label_angle_correction);
 	// TODO: this is not really an SVG param, it should be passed as an
 	// argument to display_svg_tree()
 	set_svg_style(params.svg_style);	/* radial vs orthogonal */
