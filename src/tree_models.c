@@ -97,28 +97,34 @@ double reciprocal_exponential_CDF(double x, double k)
 	return - (log(1 - x)/k);
 }
 
+/* Returns a random number 0 <= rn < 1 */
+
+double random_lt_1()
+{
+	double rn;
+	do {
+		rn = rand() / (double) RAND_MAX;
+	} while (1.0 == rn);
+
+	return rn;
+}
+
 double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate,
 		double alt_random)
 {
 	double rn;
        	if (alt_random < 0) {
-		rn = rand();
-	       	rn /= RAND_MAX;
-		/* I remove 1/RAND_MAX so that I
-		 * never get exactly 1.0 (which would yield Infinity) */
-		rn -= 1 / RAND_MAX;
+		rn = random_lt_1();
 	}
        	else
 	       rn = alt_random;
 
-	/* Just an alias: keeps the formula below readable */
-	double k = branch_termination_rate;
-	double length = reciprocal_exponential_CDF(rn, k);
+	double length = reciprocal_exponential_CDF(rn, 
+			branch_termination_rate);
 
 	/* The remaining time is the parent edge's length (just
 	 * computed) minus the time threshold stored in the leaf's data
 	 * pointer */
-	fprintf (stderr, "leaf data: %g\n", *((double*) leaf->data));
 	double remaining_time = (*((double*)leaf->data)) - length;
 	/* Add remaining time if it's negative: this caps the branch at the
 	 * time threshold */
@@ -139,19 +145,19 @@ double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate,
 
 struct rnode *create_child_with_time_limit(double time_limit)
 {
-	fprintf (stderr, "time limit: %g\n", time_limit);
 	char *label;
 	asprintf(&label, "n%d", running_number());
 	struct rnode *kid = create_rnode(label);
-	double *limit = malloc(sizeof(double));
-	if (NULL == limit) {
+	free(label);
+	double *limit_p = malloc(sizeof(double));
+	if (NULL == limit_p) {
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}
-	*limit = time_limit;
-	kid->data = limit;
+	*limit_p = time_limit;
 
-	fprintf (stderr, "kid time limit: %g\n", *((double*) kid->data));
+	kid->data = limit_p;
+
 	return kid;
 }
 
@@ -161,6 +167,7 @@ void time_limited_tree(double branch_termination_rate, double duration)
 	char *label;
 	asprintf(&label, "n%d", running_number());
 	struct rnode *root = create_rnode(label);
+	free(label);
 
 	/* This list remembers all children nodes created, for purposes of
 	 * freeing */
@@ -173,7 +180,6 @@ void time_limited_tree(double branch_termination_rate, double duration)
 
 	/* 1st child */
 	kid = create_child_with_time_limit(duration);
-	fprintf (stderr, "kid time limit: %g\n", *((double*) kid->data));
 	link_p2c(root, kid, "");	/* length is determined below */
 	append_element(leaves_queue, kid);
 	append_element(all_children, kid);
@@ -209,11 +215,18 @@ void time_limited_tree(double branch_termination_rate, double duration)
 	free(newick);
 	destroy_llist(leaves_queue);
 
+	destroy_llist(root->children);
+	free(root->label);
 	free(root);
 	struct list_elem *elem;
 	for (elem = all_children->head; NULL != elem; elem = elem->next) {
 		kid = elem->data;
+		struct redge *parent = kid->parent_edge;
+		free(parent->length_as_string);
+		free(parent);
+		free(kid->label);
 	       	free(kid->data);
+		destroy_llist(kid->children);
 		free(kid);
 	}
 	destroy_llist(all_children);

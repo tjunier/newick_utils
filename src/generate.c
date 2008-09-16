@@ -9,6 +9,7 @@
 #include "tree_models.h"
 
 #define DEFAULT_PROB_HAS_CHILDREN 0.4
+#define DEFAULT_PROB_EXTINCTION 0.1
 #define DEFAULT_DURATION 3
 
 struct parameters {
@@ -63,6 +64,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.seed = time(NULL);
 	params.prob_node_has_children = DEFAULT_PROB_HAS_CHILDREN;
 	params.duration = DEFAULT_DURATION;
+	params.prob_extinction = DEFAULT_PROB_EXTINCTION;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "c:d:hs:x:")) != -1) {
@@ -78,6 +80,9 @@ struct parameters get_params(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 		case 's':
 			params.seed = atoi(optarg);
+			break;
+		case 'x':
+			params.prob_extinction = atof(optarg);
 			break;
 		}
 	}
