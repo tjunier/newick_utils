@@ -109,7 +109,13 @@ double random_lt_1()
 	return rn;
 }
 
-double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate,
+/* "Grows" a node by setting a length (measured in time units) to its parent
+ * edge. The length is randomly drawn from an exponential distribution, but it
+ * cannot exceed a certain threshold, which must be stored in the node's data.
+ * The function returns the remaining time (threshold - randomly drawn length)
+ * */
+
+double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 		double alt_random)
 {
 	double rn;
@@ -122,22 +128,24 @@ double tlt_grow_leaf(struct rnode *leaf, double branch_termination_rate,
 	double length = reciprocal_exponential_CDF(rn, 
 			branch_termination_rate);
 
-	/* The remaining time is the parent edge's length (just
-	 * computed) minus the time threshold stored in the leaf's data
-	 * pointer */
-	double remaining_time = (*((double*)leaf->data)) - length;
+	/* The remaining time is the node's alloted time minus the branch
+	 * length we just drew from the distribution */
+	double alloted_time = *((double*)leaf->data);
+	double remaining_time = alloted_time - length;
+
 	/* Add remaining time if it's negative: this caps the branch at the
-	 * time threshold */
+	 * time threshold. That way the tree is ultrametric, unless branches
+	 * evolve at different rates. */
 	if (remaining_time < 0)
 		length += remaining_time;
 
 	char *length_s;
        	asprintf(&length_s, "%g", length);
+	free(leaf->parent_edge->length_as_string);
 	leaf->parent_edge->length_as_string = length_s;
 
-	/* Return the remaining time so calling f() can take action based on
+	/* Return the remaining time so caller f() can take action based on
 	 * whether there is time left or not */
-
 	return remaining_time;
 }
 
@@ -161,6 +169,31 @@ struct rnode *create_child_with_time_limit(double time_limit)
 	return kid;
 }
 
+void free_data(char *newick, struct llist *leaves_queue,
+		struct rnode *root, struct llist *all_children)
+{
+	struct rnode *kid;
+
+	free(newick);
+	destroy_llist(leaves_queue);
+
+	destroy_llist(root->children);
+	free(root->label);
+	free(root);
+	struct list_elem *elem;
+	for (elem = all_children->head; NULL != elem; elem = elem->next) {
+		kid = elem->data;
+		struct redge *parent = kid->parent_edge;
+		free(parent->length_as_string);
+		free(parent);
+		free(kid->label);
+	       	free(kid->data);
+		destroy_llist(kid->children);
+		free(kid);
+	}
+	destroy_llist(all_children);
+}
+
 void time_limited_tree(double branch_termination_rate, double duration)
 {
 	/* create root */
@@ -180,29 +213,29 @@ void time_limited_tree(double branch_termination_rate, double duration)
 
 	/* 1st child */
 	kid = create_child_with_time_limit(duration);
-	link_p2c(root, kid, "");	/* length is determined below */
+	link_p2c(root, kid, NULL);	/* length is determined below */
 	append_element(leaves_queue, kid);
 	append_element(all_children, kid);
 
 	/* 2nd child */
 	kid = create_child_with_time_limit(duration);
-	link_p2c(root, kid, "");	
+	link_p2c(root, kid, NULL);	
 	append_element(leaves_queue, kid);
 	append_element(all_children, kid);
 
 
 	while (0 != leaves_queue->count) {
 		struct rnode *current = shift(leaves_queue);
-		double remaining_time = tlt_grow_leaf(current,
+		double remaining_time = tlt_grow_node(current,
 				branch_termination_rate, UNUSED); 
 		if (remaining_time > 0) {
 			kid = create_child_with_time_limit(remaining_time);
-			link_p2c(current, kid, "");
+			link_p2c(current, kid, NULL);
 			append_element(leaves_queue, kid);
 			append_element(all_children, kid);
 
 			kid = create_child_with_time_limit(remaining_time);
-			link_p2c(current, kid, "");
+			link_p2c(current, kid, NULL);
 			append_element(leaves_queue, kid);
 			append_element(all_children, kid);
 		} 
@@ -211,23 +244,5 @@ void time_limited_tree(double branch_termination_rate, double duration)
 	char *newick = to_newick(root);
 	printf("%s\n", newick);
 
-	/* free memory */
-	free(newick);
-	destroy_llist(leaves_queue);
-
-	destroy_llist(root->children);
-	free(root->label);
-	free(root);
-	struct list_elem *elem;
-	for (elem = all_children->head; NULL != elem; elem = elem->next) {
-		kid = elem->data;
-		struct redge *parent = kid->parent_edge;
-		free(parent->length_as_string);
-		free(parent);
-		free(kid->label);
-	       	free(kid->data);
-		destroy_llist(kid->children);
-		free(kid);
-	}
-	destroy_llist(all_children);
+	free_data(newick, leaves_queue, root, all_children);
 }

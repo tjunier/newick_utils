@@ -36,6 +36,7 @@ struct svg_data {
 
 const int ROOT_SPACE = 10;	/* pixels */
 const int LBL_SPACE = 10;	/* pixels */
+const int INNER_LBL_SPACE = 4;	/* pixels */
 const int CHAR_WIDTH = 5;	/* pixels, approximattion for 'medium' fonts */
 const int edge_length_v_offset = -4; /* pixels */
 const double PI = 3.14159;
@@ -312,12 +313,15 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 
 		/* draw label IFF it is nonempty AND requested font size
 		 * is not zero */
+
 		if (0 != strcmp(font_size, "0") &&
 		    0 != strcmp(node->label, ""))
 			printf("<text style='stroke:none;font-size:%s' "
 			       "x='%.4f' y='%.4f'>%s</text>",
 				font_size, svg_h_pos + LBL_SPACE,
 				svg_mid_pos, node->label);
+
+		/* Branch lengths */
 
 		if (! is_root(node)) {
 			struct rnode *parent = node->parent_edge->parent_node;
@@ -370,12 +374,18 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 
 		mid_angle += svg_label_angle_correction;
 
+		double lbl_space;
+		if (is_leaf(node))
+			lbl_space = LBL_SPACE;
+		else
+			lbl_space = INNER_LBL_SPACE;
+
 		/* draw label IFF it is nonempty AND requested font size
 		 * is not zero */
 		if (0 != strcmp(font_size, "0") && 0 != strcmp(node->label, "")) {
 			if (cos(mid_angle) >= 0)  {
-				x_pos = (radius+LBL_SPACE) * cos(mid_angle);
-				y_pos = (radius+LBL_SPACE) * sin(mid_angle);
+				x_pos = (radius+lbl_space) * cos(mid_angle);
+				y_pos = (radius+lbl_space) * sin(mid_angle);
 				printf("<text style='font-size:%s' "
 				       "transform='rotate(%g,%g,%g)' "
 				       "x='%.4f' y='%.4f'>%s</text>",
@@ -386,8 +396,8 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 			}
 			else {
 				mid_angle += svg_left_label_angle_correction;
-				x_pos = (radius+LBL_SPACE) * cos(mid_angle);
-				y_pos = (radius+LBL_SPACE) * sin(mid_angle);
+				x_pos = (radius+lbl_space) * cos(mid_angle);
+				y_pos = (radius+lbl_space) * sin(mid_angle);
 				printf("<text style='text-anchor:end;font-size:%s' "
 				       "transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
 				       "x='%.4f' y='%.4f'>%s</text>",
