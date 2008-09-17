@@ -21,7 +21,8 @@
 enum {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
 enum {HORIZONTAL, VERTICAL};
 enum {SQUARE, TRIANGLE};
-enum {ALL_NODES, ALL_LABELS, ALL_LEAF_LABELS, ARGV_LABELS};
+enum {ALL_NODES, ALL_LABELS, ALL_LEAF_LABELS, ARGV_LABELS, ALL_INNER_NODES,
+	ALL_LEAVES};
 
 struct parameters {
 	int distance_type;
@@ -32,9 +33,6 @@ struct parameters {
 	int list_orientation;
 	int matrix_shape;
 };
-
-/* Returns the distance type (root, LCA, or matrix) based on the first characer
- * of 'optarg' */
 
 void help(char *argv[])
 {
@@ -87,9 +85,10 @@ void help(char *argv[])
 "        letter of the argument: 'r' for root mode (default), 'l' for LCA,\n"
 "        'p' for parent, and 'm' for matrix. Thus, '-mm', '-m matrix',\n"
 "        and '-m mat' all select matrix mode.\n"
-"    -n: prints labels (or "" if empty) in addition to distances.\n"
+"    -n: prints labels (or '' if empty) in addition to distances.\n"
 "    -s <selection>, where selection is determined by the first letter of\n"
-"        the argument: 'a' for all nodes, 'l' for labeled nodes.\n"
+"        the argument: 'a' for all nodes, 'l' for labeled nodes,\n"
+"        'i' for inner nodes, 'f' for leaves.\n"
 "        E.g. '-s a' and '-s all' both select all nodes.\n"
 "    -t: tab-separated - prints values on one line, separated by tabs.\n"
 "        Ignored in matrix mode.\n"
@@ -125,6 +124,10 @@ int get_selection()
 	switch (tolower(optarg[0])) {
 	case 'a':
 		return ALL_NODES;
+	case 'f':
+		return ALL_LEAVES;
+	case 'i':
+		return ALL_INNER_NODES;
 	case 'l':
 		return ALL_LABELS;
 	default:
@@ -133,6 +136,9 @@ int get_selection()
 		exit(EXIT_FAILURE);
 	}
 }
+
+/* Returns the distance type (root, LCA, or matrix) based on the first characer
+ * of 'optarg' */
 
 int get_distance_type()
 {
@@ -246,6 +252,24 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 				node = el->data;
 				if (is_leaf(node) &&
 				   (0 != strcmp(node->label, "")))
+					append_element(result, node);
+			}
+			break;
+		case ALL_LEAVES:
+			result = create_llist();
+			for (el = tree->nodes_in_order->head; NULL != el;
+				el = el->next) {
+				node = el->data;
+				if (is_leaf(node))
+					append_element(result, node);
+			}
+			break;
+		case ALL_INNER_NODES:
+			result = create_llist();
+			for (el = tree->nodes_in_order->head; NULL != el;
+				el = el->next) {
+				node = el->data;
+				if (is_inner_node(node))
 					append_element(result, node);
 			}
 			break;

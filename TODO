@@ -1,3 +1,5 @@
+nw_distance: add tests for new selection options (i and f)
+
 nw_display: use CSS. See "SVG Essentials" pp 45 ff
 
 nw_order: add function for ordering children by number of descendants, like
@@ -139,5 +141,8 @@ unrecoverable, otherwise they should return an error code.
 [done] nw_tgen: a program to randomly generate trees - although it's quite
 primitive now, it works.
 
-[later] have nw_display output its options in a comment, especially for SVG.
+[done] have nw_display output its options in a comment, especially for SVG.
+
+[done] nw_distance: add options for selecting all leaves and all inner nodes
+(regardless of labels)
 
