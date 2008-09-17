@@ -5,6 +5,7 @@
 #include "rnode.h"
 #include "redge.h"
 #include "list.h"
+#include "link.h"
 #include "tree_models.h"
 
 #define TOLERANCE 0.000001
@@ -32,13 +33,13 @@ int test_reciprocal_exponential_CDF()
 	val = reciprocal_exponential_CDF(0.5,1);
 	double exp = 0.693147; /* -ln(0.5) */
 	if (cabs(val - exp) > TOLERANCE) {
-		printf ("%s: expected %g, got %g (diff: %g)\n", test_name, exp, val, abs(val-exp));
+		printf ("%s: expected %g, got %g (diff: %g)\n", test_name, exp, val, cabs(val-exp));
 		return 1;
 	}
 	val = reciprocal_exponential_CDF(0.5,3);
 	exp = 0.693147 / 3;
 	if (cabs(val - exp) > TOLERANCE) {
-		printf ("%s: expected %g, got %g (diff: %g)\n", test_name, exp, val, abs(val-exp));
+		printf ("%s: expected %g, got %g (diff: %g)\n", test_name, exp, val, cabs(val-exp));
 		return 1;
 	}
 
@@ -46,16 +47,17 @@ int test_reciprocal_exponential_CDF()
 	return 0;
 }
 
-int test_tlt_grow_leaf()
+int test_tlt_grow_node()
 {
-	const char *test_name = "test_tlt_grow_leaf";
+	const char *test_name = "test_tlt_grow_node";
 	double prior_remaining_time = 12.3; 	/* arbitrary units */
 	struct rnode *parent = create_rnode("parent");
 	struct rnode *kid = create_rnode("kid");
 	kid->data = &prior_remaining_time;
-	link_p2c(parent, kid);
+	link_p2c(parent, kid, NULL);
 
-	double posterior_remaining_time = tlt_grow_leaf(kid, 1, 0.5);
+	double posterior_remaining_time = tlt_grow_node(kid, 1.0, 0.5);
+	printf ("post rem time: %g\n", posterior_remaining_time);
 	double grown_length = strtod(kid->parent_edge->length_as_string, NULL);
 
 	double exp = prior_remaining_time - posterior_remaining_time;
@@ -74,7 +76,7 @@ int main()
 	int failures = 0;
 	printf("Starting tree generation models test...\n");
 	failures += test_reciprocal_exponential_CDF();
-	failures += test_tlt_grow_leaf();
+	failures += test_tlt_grow_node();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

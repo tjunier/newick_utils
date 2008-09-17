@@ -1,3 +1,7 @@
+nw_display: use CSS. See "SVG Essentials" pp 45 ff
+
+nw_order: add function for ordering children by number of descendants, like
+iTOL seems to do.
 
 [later] Add functionality for reducing stair nodes.
 

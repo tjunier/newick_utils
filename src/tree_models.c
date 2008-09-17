@@ -146,6 +146,7 @@ double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 
 	/* Return the remaining time so caller f() can take action based on
 	 * whether there is time left or not */
+	printf ("remaining time: %g\n", remaining_time);
 	return remaining_time;
 }
 
