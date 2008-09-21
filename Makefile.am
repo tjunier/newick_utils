@@ -46,6 +46,7 @@ EXTRA_DIST = \
 	tests/test_nw_display_svg_cldgram_r.exp \
 	tests/test_nw_display_svg_cmap.exp \
 	tests/test_nw_display_svg_cmap_r.exp \
+	tests/test_nw_display_svgu.exp \
 	tests/test_nw_display_svlb.exp \
 	tests/test_nw_display_svlb_r.exp \
 	tests/test_nw_distance_all_nam_tab.exp \
