@@ -120,6 +120,8 @@ struct parameters get_params(int argc, char *argv[])
 	params.leaf_vskip = 40.0;
 	params.svg_style = SVG_ORTHOGONAL;
 	params.branch_length_unit = "";
+	params.label_angle_correction = 0.0;
+	params.left_label_angle_correction = 0.0;
 	
 	/* parse options and switches */
 	while ((opt_char = getopt(argc, argv, "a:A:b:c:hi:l:rsu:v:w:")) != -1) {

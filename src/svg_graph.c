@@ -58,7 +58,7 @@ static int svg_whole_v_shift = -1; /* Vertical translation of whole graph */
 /* If this is zero, the label's baseline is aligned on the branch. Use it to
  * nudge the labels a small angle. Unfortunately the correct amount will depend
  * on the graph's diameter and the label font size. */
-static double svg_label_angle_correction = 0;
+static double svg_label_angle_correction = 0.0;
 /* The following applies to labels on the left side of the tree (because they
  * are subject to a 180° rotation, draw_text_radial() */
 static double svg_left_label_angle_correction = -0.0349; /* -2°, in radians */ 
