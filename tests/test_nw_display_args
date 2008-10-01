@@ -8,3 +8,4 @@ svg_cmap_r:-s -r -c color.map catarrhini.nw
 svg_cldgram_r:-sr catarrhini_wrong.nw
 svlb_r: -s -r -v 8 -l 7 -b 6 HRV.nw
 svgu: -s -u 'substitutions/site' HRV.nw
+svgac: -sr -w 700 -l 8 -i 7 -a 0.01 -A -0.02 -c 5NCR.cmap figure_S1a.nw
