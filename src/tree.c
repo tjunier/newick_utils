@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <regex.h>
 
 #include "tree.h"
 #include "link.h"
@@ -208,7 +210,6 @@ int is_cladogram(struct rooted_tree *tree)
 	return 1;
 }
 
-
 struct llist *nodes_from_labels(struct rooted_tree *tree,
 		struct llist *labels)
 {
@@ -226,6 +227,42 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 			append_element(result, node);
 		}
 	}
+
+	return result;
+}
+
+struct llist *nodes_from_regexp(struct rooted_tree *tree,
+		char *regexp_string)
+{
+	int errcode;
+	regex_t *preg = malloc(sizeof(regex_t));
+	int cflags = 0;
+	if (NULL == preg) {perror(NULL); exit(EXIT_FAILURE);}
+	errcode = regcomp(preg, regexp_string, cflags);
+	if (errcode) {
+		size_t errbufsize = regerror(errcode, preg, NULL, 0);
+		char *errbuf = malloc(errbufsize * sizeof(char));
+		if (NULL == errbuf) {perror(NULL); exit(EXIT_FAILURE);}
+		regerror(errcode, preg, errbuf, errbufsize);
+		fprintf (stderr, "%s\n", errbuf);
+		exit(EXIT_FAILURE);
+	}
+       				       
+	struct llist *result = create_llist();
+	struct list_elem *el;
+
+	size_t nmatch = 1;	/* either matches or doesn't */
+	regmatch_t pmatch[nmatch]; 
+	int eflags = 0;
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *node = el->data;
+		errcode = regexec(preg, node->label, nmatch, pmatch, eflags);	
+		if (0 == errcode) {
+			append_element(result, node);
+		}
+	}
+	regfree(preg);
 
 	return result;
 }

@@ -291,3 +291,43 @@ struct rooted_tree tree_7()
 
 	return result;
 }
+
+/* ((HRV_A1:1,HRV_A2:1.0)HRV_A:2.0,(HRV_C:1,(HRV_B1:1,HRV_B2:1)HRV_B:2):3)HRV; */
+struct rooted_tree tree_8()
+{
+	struct rnode *hrva1 = create_rnode("HRV_A1");
+	struct rnode *hrva2 = create_rnode("HRV_A2");
+	struct rnode *hrvb1 = create_rnode("HRV_B1");
+	struct rnode *hrvb2 = create_rnode("HRV_B2");
+	struct rnode *hrva = create_rnode("HRV_A");
+	struct rnode *hrvb = create_rnode("HRV_B");
+	struct rnode *hrvc = create_rnode("HRV_C");
+	struct rnode *hrvcb = create_rnode("");
+	struct rnode *root = create_rnode("");
+
+	link_p2c (hrva, hrva1, "1");
+	link_p2c (hrva, hrva2, "1.0");
+	link_p2c (hrvb, hrvb1, "1");
+	link_p2c (hrvb, hrvb2, "1");
+	link_p2c (hrvcb, hrvc, "1");
+	link_p2c (hrvcb, hrvb, "2");
+	link_p2c (root, hrva, "2.0");
+	link_p2c (root, hrvcb, "3");
+
+	struct llist *nodes_in_order = create_llist();
+	append_element(nodes_in_order, hrva1);
+	append_element(nodes_in_order, hrva2);
+	append_element(nodes_in_order, hrva);
+	append_element(nodes_in_order, hrvc);
+	append_element(nodes_in_order, hrvb1);
+	append_element(nodes_in_order, hrvb2);
+	append_element(nodes_in_order, hrvb);
+	append_element(nodes_in_order, hrvcb);
+	append_element(nodes_in_order, root);
+
+	struct rooted_tree result;
+	result.root = root;
+	result.nodes_in_order = nodes_in_order;
+
+	return result;
+}

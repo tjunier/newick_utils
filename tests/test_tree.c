@@ -188,11 +188,13 @@ int test_is_cladogram()
 	struct rooted_tree phylogram = tree_3();
 
 	if (! is_cladogram(&cladogram)) {
-		printf ("%s: is_cladogram() should return true.\n");
+		printf ("%s: is_cladogram() should return true.\n",
+				test_name);
 		return 1;
 	}
 	if (is_cladogram(&phylogram)) {
-		printf ("%s: is_cladogram() should return false.\n");
+		printf ("%s: is_cladogram() should return false.\n",
+				test_name);
 		return 1;
 	}
 
@@ -215,30 +217,84 @@ int test_nodes_from_labels()
 	struct list_elem *el = nodes->head;
 	if (strcmp(((struct rnode *) el->data)->label, "C") != 0) {
 		printf ("%s: expected label 'C', got '%s'\n",
-				((struct rnode *) el->data)->label);
+				test_name, ((struct rnode *) el->data)->label);
 		return 1;
 	}
 	el = el->next;
 	if (strcmp(((struct rnode *) el->data)->label, "f") != 0) {
-		printf ("%s: expected label 'f', got '%s'\n",
+		printf ("%s: expected label 'f', got '%s'\n", test_name,
 				((struct rnode *) el->data)->label);
 		return 1;
 	}
 	el = el->next;
 	if (strcmp(((struct rnode *) el->data)->label, "D") != 0) {
-		printf ("%s: expected label 'D', got '%s'\n",
+		printf ("%s: expected label 'D', got '%s'\n", test_name,
 				((struct rnode *) el->data)->label);
 		return 1;
 	}
 	el = el->next;
 	if (strcmp(((struct rnode *) el->data)->label, "A") != 0) {
-		printf ("%s: expected label 'A', got '%s'\n",
+		printf ("%s: expected label 'A', got '%s'\n", test_name,
 				((struct rnode *) el->data)->label);
 		return 1;
 	}
 	el = el->next;
 	if (NULL != el) {
-		printf ("%s: nodes list not terminated.\n");
+		printf ("%s: nodes list not terminated.\n", test_name);
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
+int test_nodes_from_regexp()
+{
+	const char *test_name = "test_nodes_from_regexp";
+	struct rooted_tree tree = tree_8();
+	struct llist *nodes;
+	char *regexp_string;
+	struct list_elem *el;
+
+	regexp_string = "HRV_A.";
+	nodes = nodes_from_regexp(&tree, regexp_string);
+
+	el = nodes->head;
+	if (strcmp(((struct rnode *) el->data)->label, "HRV_A1") != 0) {
+		printf ("%s: expected label 'HRV_A1', got '%s'\n", test_name,
+				((struct rnode *) el->data)->label);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp(((struct rnode *) el->data)->label, "HRV_A2") != 0) {
+		printf ("%s: expected label 'HRV_A2', got '%s'\n", test_name,
+				((struct rnode *) el->data)->label);
+		return 1;
+	}
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: nodes list not terminated.\n", test_name);
+		return 1;
+	}
+
+	regexp_string = "HRV_[AB]$";
+	nodes = nodes_from_regexp(&tree, regexp_string);
+
+	el = nodes->head;
+	if (strcmp(((struct rnode *) el->data)->label, "HRV_A") != 0) {
+		printf ("%s: expected label 'HRV_A1', got '%s'\n", test_name,
+				((struct rnode *) el->data)->label);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp(((struct rnode *) el->data)->label, "HRV_B") != 0) {
+		printf ("%s: expected label 'HRV_A2', got '%s'\n", test_name,
+				((struct rnode *) el->data)->label);
+		return 1;
+	}
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: nodes list not terminated.\n", test_name);
 		return 1;
 	}
 
@@ -258,6 +314,7 @@ int main()
 	failures += test_get_labels();
 	failures += test_is_cladogram();
 	failures += test_nodes_from_labels();
+	failures += test_nodes_from_regexp();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

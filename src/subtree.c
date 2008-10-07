@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <regex.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -16,12 +18,14 @@
 #include "common.h"
 #include "link.h"
 
-/* only one param for now, but who knows? */
+enum {EXACT, REGEXP};
 
 struct parameters {
 	struct llist *labels;
 	int check_monophyly;
 	int siblings;
+	int mode;
+	char *regexp_string;
 };
 
 void help(char *argv[])
@@ -32,7 +36,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hms] <target tree filename|-> <label> [label]+\n"
+"%s [-hmrs] <target tree filename|-> <label> [label]+\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -42,7 +46,7 @@ void help(char *argv[])
 "\n"
 "The next arguments are labels found in the tree (both leaf and internal\n"
 "labels work). Any label not found in the tree will be ignored. There\n"
-"must be at least one label.\n"
+"must be at least one label. (See also option -r)\n"
 "\n"
 "Output\n"
 "------\n"
@@ -57,6 +61,8 @@ void help(char *argv[])
 "    -m: only prints the clade if it is monophyletic, in the sense that ONLY\n"
 "        the labels passed as arguments are found in the clade.\n"
 "        See also -s.\n"
+"    -r <regexp>: clade is defined by labels that match the regexp (instead.\n"
+"        of labels passed as arguments)\n"
 "    -s: prints the siblings of the clade defined by the labels passed as\n"
 "        arguments, in the order in which they appear in the Newick.\n"
 "        If -m is also passed, only prints siblings if the labels passed\n"
@@ -75,7 +81,11 @@ void help(char *argv[])
 "$ %s -m data/catarrhini Homo Gorilla Pan\n"
 "\n"
 "# clade is not monophyletic (Gorilla is missing)\n"
-"$ %s -m data/catarrhini Homo Pongo Pan\n",
+"$ %s -m data/catarrhini Homo Pongo Pan\n"
+"\n"
+"# clade defined by a regexp (all Poliovirus)\n"
+"$ %s -r data/HRV.nw '^POLIO.*'\n",
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
@@ -91,15 +101,19 @@ struct parameters get_params(int argc, char *argv[])
 
 	params.check_monophyly = FALSE;
 	params.siblings = FALSE;
+	params.mode = EXACT;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hms")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hmrs")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'm':
 			params.check_monophyly = TRUE;
+			break;
+		case 'r':
+			params.mode = REGEXP;
 			break;
 		case 's':
 			params.siblings = TRUE;
@@ -122,12 +136,24 @@ struct parameters get_params(int argc, char *argv[])
 			}
 			nwsin = fin;
 		}
-		struct llist *lbl_list = create_llist();
-		optind++;	/* optind is now index of 1st label */
-		for (; optind < argc; optind++) {
-			append_element(lbl_list, argv[optind]);
+		struct llist *lbl_list;
+		switch (params.mode) {
+		case EXACT:
+			lbl_list = create_llist();
+			optind++;	/* optind is now index of 1st label */
+			for (; optind < argc; optind++) {
+				append_element(lbl_list, argv[optind]);
+			}
+			params.labels = lbl_list;
+			break;
+		case REGEXP:
+			optind++;	/* optind is now index of regexp */
+			params.regexp_string = argv[optind];
+			break;
+		default:
+			fprintf (stderr, "Unknown mode %d\n", params.mode);
+			exit(EXIT_FAILURE);
 		}
-		params.labels = lbl_list;
 	} else {
 		fprintf(stderr, "Usage: %s [-hm] <filename|-> <label> [label+]\n",
 				argv[0]);
@@ -161,23 +187,33 @@ int is_monophyletic(struct llist *descendants, struct rnode *subtree_root)
 
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
-	struct hash *map;
-	struct list_elem *el;
+	struct llist *descendants;
 
-	map = create_label2node_map(tree->nodes_in_order);	
-	struct llist *descendants = create_llist();
-	for (el = params.labels->head; NULL != el; el = el->next) {
-		struct rnode *desc;
-		desc = hash_get(map, (char *) el->data);
-		if (NULL == desc) {
-			fprintf (stderr, "WARNING: label '%s' does not occur in tree\n",
-					(char *) el->data);
-		} else {
-			append_element(descendants, desc);
+	switch (params.mode) {
+	case EXACT:
+		descendants = nodes_from_labels(tree, params.labels);
+		if (0 == descendants->count) {
+			fprintf (stderr, "WARNING: no label matches.\n");
+			/* I don't consider this a failure: it is just the case
+			 * that the tree does not contain the specified labels.
+			 * */
+			exit(EXIT_SUCCESS);
 		}
+		break;
+	case REGEXP:
+		descendants = nodes_from_regexp(tree, params.regexp_string);
+		if (0 == descendants->count) {
+			fprintf (stderr, "WARNING: no match for regexp /%s/\n",
+					params.regexp_string);
+			exit(EXIT_SUCCESS); /** see above */
+		}
+		break;
+	default:
+		fprintf (stderr, "Unknown mode %d\n", params.mode);
+		exit(EXIT_FAILURE);
 	}
-	destroy_hash(map);
 
+	/* We need a copy b/c lca() modifies its arg */
 	struct llist *desc_clone = shallow_copy(descendants);
 	struct rnode *subtree_root = lca(tree, desc_clone);
 	free(desc_clone); /* elems freed in lca() */
@@ -227,7 +263,8 @@ int main(int argc, char *argv[])
 		destroy_tree(tree, DONT_FREE_NODE_DATA);
 	}
 
-	destroy_llist(params.labels);
+	if (EXACT == params.mode)
+		destroy_llist(params.labels);
 
 	return 0;
 }

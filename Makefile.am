@@ -1,6 +1,7 @@
 SUBDIRS = src tests
 EXTRA_DIST = \
 	tests/10vrt.nw \
+	tests/5NCR.cmap \
 	tests/catarrhini.nw \
 	tests/catarrhini_wrong_3og.nw \
 	tests/catarrhini_wrong_mult.nw \
@@ -13,6 +14,7 @@ EXTRA_DIST = \
 	tests/falconiformes.nw \
 	tests/forest_ind.nw \
 	tests/forest.nw \
+	tests/figure_S1a.nw \
 	tests/HRV_20reps.nw \
 	tests/HRV.bs.nw \
 	tests/HRV.nw \
@@ -30,6 +32,7 @@ EXTRA_DIST = \
 	tests/test_nw_clade_nsibn.exp \
 	tests/test_nw_clade_nsibnm.exp \
 	tests/test_nw_clade_nsibnm_f.exp \
+	tests/test_nw_clade_re1.exp \
 	tests/test_nw_clade.sh \
 	tests/test_nw_clade_sib1.exp \
 	tests/test_nw_clade_sibn.exp \
@@ -47,6 +50,7 @@ EXTRA_DIST = \
 	tests/test_nw_display_svg_cmap.exp \
 	tests/test_nw_display_svg_cmap_r.exp \
 	tests/test_nw_display_svgu.exp \
+	tests/test_nw_display_svgac.exp \
 	tests/test_nw_display_svlb.exp \
 	tests/test_nw_display_svlb_r.exp \
 	tests/test_nw_distance_all_nam_tab.exp \

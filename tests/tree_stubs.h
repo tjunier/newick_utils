@@ -29,3 +29,7 @@ struct rooted_tree tree_6();
 /* A tree with some empty labels */
 /* ((A:1,:1.0)f:2.0,(C:1,(D:1,E:1):2)h:3)i; */
 struct rooted_tree tree_7();
+
+/* A tree with labels longer than one char */
+/* ((HRV_A1:1,HRV_A2:1.0)HRV_A:2.0,(HRV_C:1,(HRV_B1:1,HRV_B2:1)HRV_B:2):3)HRV; */
+struct rooted_tree tree_8();

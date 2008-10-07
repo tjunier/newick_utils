@@ -6,3 +6,4 @@ sibn:-s catarrhini.nw Macaca Simias Colobus
 nsibn: -s falconiformes.nw Buteo Milvus
 nsibnm: -sm falconiformes.nw Buteo Milvus Elanus Haliaeetus Aquila
 nsibnm_f: -sm falconiformes.nw Buteo Milvus
+re1: -r HRV.nw '^HRV.*'

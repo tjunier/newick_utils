@@ -1,3 +1,6 @@
+nw_display: add anchors to labels, passed in a separate file named as argument
+to option -u
+
 nw_distance: add tests for new selection options (i and f)
 
 nw_display: use CSS. See "SVG Essentials" pp 45 ff
@@ -146,3 +149,4 @@ primitive now, it works.
 [done] nw_distance: add options for selecting all leaves and all inner nodes
 (regardless of labels)
 
+[done] nw_clade: add specification of labels by regular expression

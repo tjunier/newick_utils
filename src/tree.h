@@ -59,6 +59,12 @@ int is_cladogram(struct rooted_tree *tree);
 struct llist *nodes_from_labels(struct rooted_tree *tree,
 		struct llist *labels);
 
+/* like nodes_from_labels(), but uses a regular expression (compiled from second argument) instead of a list of labels. */
+
+/* TODO: pass compiled regexp instead of string, so compilation occurs just once at the start of the run */
+
+struct llist *nodes_from_regexp(struct rooted_tree *tree,
+		char *regexp_string);
 
 /* Clones a tree (allocates storage) */
 /* TODO - not implemented yet - I'm putting this declaration here so that if
