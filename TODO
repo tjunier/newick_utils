@@ -1,5 +1,13 @@
+add a module 'xml.c' with a function for escaping '&', '<', etc in XML (useful for URLs)
+
+svg_graph.c: make all functions static, except those that are used elsewhere
+
+nw_clade: output context, e.g. given a LCA, output the containing clade, n levels up (n specifiable)
+
+nw_display: output better message when colormap labels are not found
+
 nw_display: add anchors to labels, passed in a separate file named as argument
-to option -u
+to an option
 
 nw_distance: add tests for new selection options (i and f)
 

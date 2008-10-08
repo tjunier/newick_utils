@@ -16,6 +16,7 @@
 #include "svg_graph.h"
 #include "node_pos_alloc.h"
 #include "common.h"
+#include "xml_utils.h"
 
 void underscores2spaces(); /* defined in display.c */
 
@@ -40,6 +41,7 @@ const int INNER_LBL_SPACE = 4;	/* pixels */
 const int CHAR_WIDTH = 5;	/* pixels, approximattion for 'medium' fonts */
 const int edge_length_v_offset = -4; /* pixels */
 const double PI = 3.14159;
+const int URL_MAP_SIZE = 100;	/* bins */
 
 int init_done = FALSE;
 
@@ -63,8 +65,10 @@ static double svg_label_angle_correction = 0.0;
  * are subject to a 180° rotation, draw_text_radial() */
 static double svg_left_label_angle_correction = -0.0349; /* -2°, in radians */ 
 static int graph_style = -1;
+static FILE *url_map_file = NULL;
 
 static struct llist *colormap = NULL;
+static struct hash *url_map = NULL;
 
 /* These are setters for the external variables. This way I can keep them
  * static. I just don't like variables open to anyone, maybe I did too much
@@ -83,6 +87,7 @@ void set_svg_left_label_angle_correction(double corr) {
 void set_svg_label_angle_correction(double corr) {
 	svg_label_angle_correction = corr; }
 void set_svg_style(int style) { graph_style = style; }
+void set_svg_URL_map_file(FILE * map) { url_map_file = map; }
 
 void svg_header()
 {
@@ -90,7 +95,8 @@ void svg_header()
 	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
 		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
 	printf( "<svg width='100%%' height='100%%' version='1.1' "
-		"xmlns='http://www.w3.org/2000/svg'>");
+		"xmlns='http://www.w3.org/2000/svg' "
+		"xmlns:xlink='http://www.w3.org/1999/xlink' >");
 }
 
 /* Builds a colormap structure. This maps SVG color strings to lists of labels.
@@ -132,6 +138,30 @@ struct llist *read_colormap()
 	return colormap;
 }
 
+/* Reads in the URL map (label -> URL) */
+
+struct hash *read_url_map()
+{
+	if (NULL == url_map_file) return NULL;
+
+	struct hash *url_map = create_hash(URL_MAP_SIZE);
+
+	char *line;
+	while ((line = read_line(url_map_file)) != NULL) {
+		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		char *label = wt_next(wtok);
+		char *url = wt_next(wtok);
+		char *escaped_url = escape_predefined_character_entities(url);
+		hash_set(url_map, label, escaped_url);
+		destroy_word_tokenizer(wtok);
+		free(line);
+		free(label);
+		free(url);
+	}
+
+	return url_map;
+}
+
 /* A debugging function - dumps the colormap on stdout */
 
 void dump_colormap(struct llist *colormap)
@@ -150,9 +180,14 @@ void dump_colormap(struct llist *colormap)
 	}
 }
 
+/* Call this function before calling display_svg_tree(). Resist the temptation
+ * to put it inside display_svg_tree(): it is kept separate because its job is
+ * not directly to draw trees*/
+
 void svg_init()
 {
 	colormap = read_colormap();
+	url_map = read_url_map();
 	init_done = 1;
 }
 
@@ -380,9 +415,13 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		else
 			lbl_space = INNER_LBL_SPACE;
 
+		char *url = NULL;
+		if (url_map) url = hash_get(url_map, node->label);
+
 		/* draw label IFF it is nonempty AND requested font size
 		 * is not zero */
 		if (0 != strcmp(font_size, "0") && 0 != strcmp(node->label, "")) {
+			if (url) printf ("<a xlink:href='%s'>", url);
 			if (cos(mid_angle) >= 0)  {
 				x_pos = (radius+lbl_space) * cos(mid_angle);
 				y_pos = (radius+lbl_space) * sin(mid_angle);
@@ -407,6 +446,7 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 					x_pos, y_pos,
 					x_pos, y_pos, node->label);
 			}
+			if (url) printf("</a>");
 		}
 		/* TODO: add this when node labels work */
 		/*

@@ -16,6 +16,7 @@ struct parameters {
 	int width;
 	int svg;
 	char *colormap_fname;	/* TODO: might store FILE* instead of name */
+	FILE *url_map;		/* for this one I try a FILE*, we'll see which is best */
 	char *leaf_label_font_size;
 	char *inner_label_font_size;
 	char *branch_length_font_size;
@@ -34,7 +35,7 @@ void help(char* argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-aAbchilsuvw] <tree filename|->\n"
+"%s [-aAbchilsuUvw] <tree filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -61,9 +62,9 @@ void help(char* argv[])
 "       [only SVG radial]\n"
 "    -b <number>: branch length font size (default: small) [only SVG].\n"    
 "       setting to 0 disables printing of branch lengths.\n"
-"    -c <colormap-file>: use specified colormap [only SVG]. A colormap is a text\n"    
-"       file which specifies a color for a clade. Each line has the following\n"
-"       structure:\n"
+"    -c <colormap-filename>: use specified colormap [only SVG]. A colormap\n"
+"       is a text file which specifies a color for a clade.\n"
+"       Each line has the following structure:\n"
 "       <color> <label> [label]* \n"
 "       <color> is a valid SVG color, e.g. 'blue' or '#ff00a1' (see\n"
 "       http://www.w3.org/TR/SVG11/types.html#DataTypeColor).\n"
@@ -80,6 +81,11 @@ void help(char* argv[])
 "       to one tree - any trees beyond the first one are ignored.\n"
 "    -u <string>: string is used as unit name for scale bar (ignored\n"
 "       if no scale bar is drawn).\n"
+"    -U <URL_filename>: use specified URL map [only SVG]. A URL map\n"
+"       is a text file which specifies a URL for a label.\n"
+"       Each line has the following structure:\n"
+"       <label> <URL>\n"
+"       Clicking on a label will follow the link (if any).\n"
 "    -v <number>: number of pixels between leaves (default: 40) [only SVG]\n"
 "    -w <number>: graph should be no wider than <number>, measured in\n"
 "       characters for text and pixels for SVG. Defaults: 80 (text),\n"
@@ -122,9 +128,10 @@ struct parameters get_params(int argc, char *argv[])
 	params.branch_length_unit = "";
 	params.label_angle_correction = 0.0;
 	params.left_label_angle_correction = 0.0;
+	params.url_map = NULL;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:hi:l:rsu:v:w:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:hi:l:rsu:U:v:w:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -156,6 +163,12 @@ struct parameters get_params(int argc, char *argv[])
 		case 'u':
 			params.branch_length_unit = optarg;
 			break;
+		case 'U':
+			params.url_map = fopen(optarg, "r");
+			if (NULL == params.url_map) {
+				perror(NULL); exit(EXIT_FAILURE);
+			}
+			break;
 		case 'v':
 			params.leaf_vskip = atof(optarg);
 			break;
@@ -177,7 +190,7 @@ struct parameters get_params(int argc, char *argv[])
 			params.width = DEFAULT_WIDTH_CHARS;
 	}
 	/* check arguments */
-	if (1 == (argc - optind))	{
+	if (1 == (argc - optind)) {
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
 			extern FILE *nwsin;
@@ -188,7 +201,7 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-bchilsvw] <filename|->\n",
+		fprintf(stderr, "Usage: %s [-aAbchilsuUvw] <filename|->\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -219,6 +232,7 @@ void set_svg_parameters(struct parameters params)
 	// TODO: this is not really an SVG param, it should be passed as an
 	// argument to display_svg_tree()
 	set_svg_style(params.svg_style);	/* radial vs orthogonal */
+	set_svg_URL_map_file(params.url_map);
 }
 
 void underscores2spaces(struct rooted_tree *tree)

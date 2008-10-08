@@ -8,6 +8,9 @@ EXTRA_DIST = \
 	tests/catarrhini_wrong.nw \
 	tests/color.map \
 	tests/def.nw \
+	tests/dg_color.map \
+	tests/dg_tree.nw \
+	tests/dg_url.map \
 	tests/dist.nw \
 	tests/edged_root.nw \
 	tests/falconiformes.nw \
@@ -49,10 +52,11 @@ EXTRA_DIST = \
 	tests/test_nw_display_svg_cldgram_r.exp \
 	tests/test_nw_display_svg_cmap.exp \
 	tests/test_nw_display_svg_cmap_r.exp \
-	tests/test_nw_display_svgu.exp \
 	tests/test_nw_display_svgac.exp \
 	tests/test_nw_display_svlb.exp \
 	tests/test_nw_display_svlb_r.exp \
+	tests/test_nw_display_svgu.exp \
+	tests/test_nw_display_svgurl.exp \
 	tests/test_nw_distance_all_nam_tab.exp \
 	tests/test_nw_distance_an_1.exp \
 	tests/test_nw_distance_an_2.exp \
