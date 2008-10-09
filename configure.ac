@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([Newick Utils], [0.2.0], [thomas.junier@medecine.unige.ch])
+AC_INIT([Newick Utils], [0.2.1], [thomas.junier@.unige.ch])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src])

@@ -11,7 +11,7 @@ HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
 	node_pos_alloc.h node_set.h parser.h readline.h redge.h rnode.h \
 	rnode_iterator.h simple_node_pos.h svg_graph.h text_graph.h \
 	to_newick.h tree.h tree_editor_rnode_data.h common.h order_tree.h \
-	tree_models.h xml_utils.h
+	tree_models.h xml_utils.h graph_common.h
 
 # I mention all headers here, so they're included in the distro (otherwise this
 # is not necessary, it builds just fine)
@@ -30,7 +30,8 @@ address_scanner.c: address_scanner.l
 
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
 		simple_node_pos.c svg_graph.c readline.c lca.c \
-		node_pos_alloc.c xml_utils.c
+		node_pos_alloc.c xml_utils.c graph_common.c
+
 nw_display_LDADD = @LEXLIB@ -lm
 
 nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c rnode_iterator.c

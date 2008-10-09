@@ -17,8 +17,7 @@
 #include "node_pos_alloc.h"
 #include "common.h"
 #include "xml_utils.h"
-
-void underscores2spaces(); /* defined in display.c */
+#include "graph_common.h"
 
 struct colormap_pair {
 	char *color;		/* a valid SVG color string, e.g. 'blue' */
@@ -150,6 +149,8 @@ struct hash *read_url_map()
 	while ((line = read_line(url_map_file)) != NULL) {
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		char *label = wt_next(wtok);
+		underscores2spaces(label);
+		remove_quotes(label);
 		char *url = wt_next(wtok);
 		char *escaped_url = escape_predefined_character_entities(url);
 		hash_set(url_map, label, escaped_url);
@@ -650,7 +651,7 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	double v_scale = leaf_vskip;
 
 	if (colormap) set_node_colors(tree);
- 	underscores2spaces(tree);
+ 	prettify_labels(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* draw nodes */
@@ -679,7 +680,7 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	double a_scale = 1.9 * PI / leaf_count(tree); /* radians */
 
 	if (colormap) set_node_colors(tree);
- 	underscores2spaces(tree);
+ 	prettify_labels(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* draw nodes */

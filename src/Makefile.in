@@ -68,7 +68,7 @@ am_nw_display_OBJECTS = $(am__objects_2) display.$(OBJEXT) \
 	canvas.$(OBJEXT) text_graph.$(OBJEXT) \
 	simple_node_pos.$(OBJEXT) svg_graph.$(OBJEXT) \
 	readline.$(OBJEXT) lca.$(OBJEXT) node_pos_alloc.$(OBJEXT) \
-	xml_utils.$(OBJEXT)
+	xml_utils.$(OBJEXT) graph_common.$(OBJEXT)
 nw_display_OBJECTS = $(am_nw_display_OBJECTS)
 nw_display_DEPENDENCIES =
 am_nw_distance_OBJECTS = $(am__objects_2) distance.$(OBJEXT) \
@@ -246,7 +246,7 @@ HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
 	node_pos_alloc.h node_set.h parser.h readline.h redge.h rnode.h \
 	rnode_iterator.h simple_node_pos.h svg_graph.h text_graph.h \
 	to_newick.h tree.h tree_editor_rnode_data.h common.h order_tree.h \
-	tree_models.h xml_utils.h
+	tree_models.h xml_utils.h graph_common.h
 
 
 # I mention all headers here, so they're included in the distro (otherwise this
@@ -258,7 +258,7 @@ NW_OUT = to_newick.c concat.c
 AM_YFLAGS = -d
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
 		simple_node_pos.c svg_graph.c readline.c lca.c \
-		node_pos_alloc.c xml_utils.c
+		node_pos_alloc.c xml_utils.c graph_common.c
 
 nw_display_LDADD = @LEXLIB@ -lm
 nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c rnode_iterator.c
@@ -420,6 +420,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/distance.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/enode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/graph_common.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/indent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/indent_lex.Po@am__quote@

@@ -405,6 +405,9 @@ double ** fill_matrix (struct rooted_tree *tree, struct llist *selected_nodes)
 	return lines;
 }
 
+/* Prints a table of distances (square for now, parameter 'shape' will be used
+ * later e.g. to specify triangular form. */
+
 void print_distance_matrix (struct rooted_tree *tree,
 		struct llist *selected_nodes, int show_headers, int shape)
 {

@@ -11,6 +11,7 @@
 #include "svg_graph.h"
 #include "text_graph.h"
 #include "tree.h"
+#include "graph_common.h"
 
 struct parameters {
 	int width;
@@ -235,18 +236,6 @@ void set_svg_parameters(struct parameters params)
 	set_svg_URL_map_file(params.url_map);
 }
 
-void underscores2spaces(struct rooted_tree *tree)
-{
-	struct list_elem *el;
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *current = el->data;
-		char *p;
-		for (p = current->label; '\0' != *p; p++)
-			if ('_' == *p)
-				*p = ' ';
-	}
-}
-
 /* Prints an XML comment containing the command line parameters, so that the
  * result is easier to reproduce. */
 
@@ -286,7 +275,7 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		align_leaves = is_cladogram(tree);
-		underscores2spaces(tree);
+		prettify_labels(tree);
 		display_tree(tree, params.width, align_leaves);
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
