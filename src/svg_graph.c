@@ -24,6 +24,12 @@ struct colormap_pair {
 	struct llist *labels;	/* color whole clade defined by those labels */
 };
 
+struct css_map_element {
+	int clade_nb;	
+	char *style;	/* a valid CSS specification */
+	struct llist *labels;
+};
+
 /* rnode data for SVG trees */
 
 struct svg_data {
@@ -65,8 +71,10 @@ static double svg_label_angle_correction = 0.0;
 static double svg_left_label_angle_correction = -0.0349; /* -2°, in radians */ 
 static int graph_style = -1;
 static FILE *url_map_file = NULL;
+static FILE *css_map_file = NULL;
 
 static struct llist *colormap = NULL;
+static struct llist *css_map = NULL;
 static struct hash *url_map = NULL;
 
 /* These are setters for the external variables. This way I can keep them
@@ -87,6 +95,20 @@ void set_svg_label_angle_correction(double corr) {
 	svg_label_angle_correction = corr; }
 void set_svg_style(int style) { graph_style = style; }
 void set_svg_URL_map_file(FILE * map) { url_map_file = map; }
+void set_svg_CSS_map_file(FILE * map) { css_map_file = map; }
+
+void svg_CSS_stylesheet()
+{
+	struct list_elem *el;
+
+	printf ("<defs><style type='text/css'><![CDATA[\n");
+	for (el = css_map->head; NULL != el; el = el->next) {
+		struct css_map_element *css_el = el->data;
+		printf(" .clade_%d {%s}\n", css_el->clade_nb,
+				css_el->style);
+	}
+	printf ("]]></style></defs>");
+}
 
 void svg_header()
 {
@@ -96,10 +118,11 @@ void svg_header()
 	printf( "<svg width='100%%' height='100%%' version='1.1' "
 		"xmlns='http://www.w3.org/2000/svg' "
 		"xmlns:xlink='http://www.w3.org/1999/xlink' >");
+	if (css_map) svg_CSS_stylesheet();
 }
 
 /* Builds a colormap structure. This maps SVG color strings to lists of labels.
- * The clade detfined by the labels will be of the specified colors. This
+ * The clade defined by the labels will be of the specified colors. This
  * structure's scope is the whole program, therefore it is an external
  * variable. */
 
@@ -135,6 +158,44 @@ struct llist *read_colormap()
 	fclose(cmap_file);
 
 	return colormap;
+}
+
+/* Builds a CSS map structure. This is a list of css_map_element elements, each
+ * of which contains a style specification and a list of labels. The style will
+ * apply to the clade defined by the labels. */
+
+struct llist *read_css_map()
+{
+	if (NULL == css_map_file)  return NULL; 
+
+	struct llist *css_map = create_llist();
+
+	char *line;
+	int i = 0;
+	while ((line = read_line(css_map_file)) != NULL) {
+		struct css_map_element *css_el = malloc(
+				sizeof(struct css_map_element));
+		if (NULL == css_el) { perror(NULL); exit(EXIT_FAILURE); }
+
+		/* split line into whitespace-separeted "words" */
+		struct llist *label_list = create_llist();
+		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		char *style = wt_next(wtok);
+		char *label;
+		while ((label = wt_next(wtok)) != NULL) {
+			append_element(label_list, label);
+		}
+		destroy_word_tokenizer(wtok);
+		free(line);
+		css_el->style = style;
+		css_el->labels = label_list;
+		css_el->clade_nb = i;
+		append_element(css_map, css_el);
+	}
+
+	fclose(css_map_file);
+
+	return css_map;
 }
 
 /* Reads in the URL map (label -> URL) */

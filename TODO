@@ -1,4 +1,6 @@
-add a module 'xml.c' with a function for escaping '&', '<', etc in XML (useful for URLs)
+
+nw_gen: check that help is up-to-date (seems to me that it still describes the
+old function)
 
 svg_graph.c: make all functions static, except those that are used elsewhere
 
@@ -6,12 +8,11 @@ nw_clade: output context, e.g. given a LCA, output the containing clade, n level
 
 nw_display: output better message when colormap labels are not found
 
-nw_display: add anchors to labels, passed in a separate file named as argument
-to an option
-
 nw_distance: add tests for new selection options (i and f)
 
-nw_display: use CSS. See "SVG Essentials" pp 45 ff
+nw_display: use CSS. See "SVG Essentials" pp 45 ff. See data/css_tree.svg as an
+example. What is now the 'color map' should become a clade map, in which not
+only the color but any CSS properties may be specified.
 
 nw_order: add function for ordering children by number of descendants, like
 iTOL seems to do.
@@ -158,3 +159,8 @@ primitive now, it works.
 (regardless of labels)
 
 [done] nw_clade: add specification of labels by regular expression
+
+[done] add a module 'xml_utils' with a function for escaping '&', '<', etc in XML (useful for URLs)
+
+[done] nw_display: add anchors to labels, passed in a separate file named as
+argument to an option
