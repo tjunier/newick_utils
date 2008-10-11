@@ -37,6 +37,7 @@ struct svg_data {
 	double bottom;
 	double depth;
 	char *color;
+	int clade_nb;	/* For attributing styles */
 	/* ... other node properties ... */
 };
 
@@ -171,7 +172,7 @@ struct llist *read_css_map()
 	struct llist *css_map = create_llist();
 
 	char *line;
-	int i = 0;
+	int i = 1;
 	while ((line = read_line(css_map_file)) != NULL) {
 		struct css_map_element *css_el = malloc(
 				sizeof(struct css_map_element));
@@ -191,6 +192,7 @@ struct llist *read_css_map()
 		css_el->labels = label_list;
 		css_el->clade_nb = i;
 		append_element(css_map, css_el);
+		i++;
 	}
 
 	fclose(css_map_file);
@@ -248,7 +250,8 @@ void dump_colormap(struct llist *colormap)
 
 void svg_init()
 {
-	colormap = read_colormap();
+	//colormap = read_colormap();
+	css_map = read_css_map();
 	url_map = read_url_map();
 	init_done = 1;
 }
@@ -327,8 +330,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 		if (align_leaves && is_leaf(node))
 			node_data->depth = dmax;
 
-		char *color = node_data->color;
-		if (NULL == color) color = "black";
+		int clade_nb = node_data->clade_nb;
 		double svg_radius = ROOT_SPACE + (r_scale * node_data->depth);
 		double svg_top_angle = a_scale * node_data->top; 
 		double svg_bottom_angle = a_scale * node_data->bottom; 
@@ -348,9 +350,9 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			double svg_top_y_pos = svg_radius * sin(svg_top_angle);
 			double svg_bot_x_pos = svg_radius * cos(svg_bottom_angle);
 			double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
-			printf("<path style='stroke:%s' stroke-linecap='round'"
+			printf("<path class='clade_%d' stroke-linecap='round'"
 			       " d='M%.4f,%.4f A%4f,%4f 0 %d 1 %.4f %.4f'/>",
-				color,
+				clade_nb,
 				svg_top_x_pos, svg_top_y_pos,
 				svg_radius, svg_radius,
 				large_arc_flag,
@@ -368,10 +370,10 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 				r_scale * parent_data->depth);
 			double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
 			double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
-			printf ("<line style='stroke:%s' "
+			printf ("<line class='clade_%d' "
 				"stroke-linecap='round' "
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				color,
+				clade_nb,
 				svg_mid_x_pos, svg_mid_y_pos,
 				svg_par_x_pos, svg_par_y_pos);
 		}
@@ -586,6 +588,56 @@ void set_node_colors(struct rooted_tree *tree)
 	destroy_llist(nodes_in_reverse_order);
 }
 
+/* Attributes numbers to clades, based on the CSS style map (if one was
+ * supplied - see read_css_map() and svg_CSS_stylesheet() ). The clade number
+ * will translate directly into 'class' attributes in SVG, which in turn will
+ * have a style defined according to the style map. */
+
+void set_clade_numbers(struct rooted_tree *tree)
+{
+	const int UNSTYLED_CLADE = 0;
+
+	/* Iterate through the style map elements. Each one contains (among
+	 * others) a list of labels. Find the LCA of those labels, and set its
+	 * style to that specified by the map. */
+	struct list_elem *elem;
+	for (elem = css_map->head; NULL != elem; elem = elem->next) {
+		struct css_map_element *css_el = elem->data;
+		struct llist *labels = css_el->labels;
+		struct rnode *lca = lca_from_labels(tree, labels);
+		struct svg_data *lca_data = lca->data;
+		lca_data->clade_nb = css_el->clade_nb;
+		fprintf(stderr, "Attributed clade #%d to node %p (%s)\n",
+				lca_data->clade_nb, lca, lca->label);
+	}
+
+	/* Now propagate the styles to the descendants */
+	struct llist *nodes_in_reverse_order;
+	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
+	struct list_elem *el; /* TODO: can't I reuse elem from above? */
+	el = nodes_in_reverse_order->head->next;	/* skip root */
+	for (;  NULL != el; el = el->next) {
+		struct rnode *node = el->data;
+		struct svg_data *node_data = node->data;
+		struct rnode *parent = node->parent_edge->parent_node;
+		struct svg_data *parent_data = parent->data;
+		/* Inherit parent node's style (clade number) IFF 
+		    node has no style of its own */
+		if (UNSTYLED_CLADE == node_data->clade_nb) {
+			node_data->clade_nb = parent_data->clade_nb;
+			fprintf (stderr, "%p (%s): inheriting #%d from %p (%s)\n",
+				node, node->label, node_data->clade_nb,
+				parent, parent->label);
+		}
+				
+	}
+	destroy_llist(nodes_in_reverse_order);
+}
+
+/* Allocates and initializes an svg_data structure for each of the tree's
+ * nodes. The real data are set later through callbacks (see
+ * svg_set_node_top(), etc) */
+
 void svg_alloc_node_pos(struct rooted_tree *tree) 
 {
 	struct list_elem *le;
@@ -597,6 +649,7 @@ void svg_alloc_node_pos(struct rooted_tree *tree)
 		if (NULL == svgd) { perror(NULL); exit (EXIT_FAILURE); }
 		svgd->top = svgd->bottom = svgd->depth = -1.0;
 		svgd->color = NULL;
+		svgd->clade_nb = 0;	/* clade 0 has no special style */
 		node->data = svgd;
 	}
 }
@@ -711,7 +764,8 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	 * different scales. For now, it's fixed. */
 	double v_scale = leaf_vskip;
 
-	if (colormap) set_node_colors(tree);
+	//if (colormap) set_node_colors(tree);
+	if (css_map) set_clade_numbers(tree);
  	prettify_labels(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
@@ -740,7 +794,8 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	 * tree's bounds */
 	double a_scale = 1.9 * PI / leaf_count(tree); /* radians */
 
-	if (colormap) set_node_colors(tree);
+	//if (colormap) set_node_colors(tree);
+	if (css_map) set_clade_numbers(tree);
  	prettify_labels(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */

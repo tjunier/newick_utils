@@ -16,8 +16,8 @@
 struct parameters {
 	int width;
 	int svg;
-	char *colormap_fname;	/* TODO: might store FILE* instead of name */
-	FILE *url_map;		/* for this one I try a FILE*, we'll see which is best */
+	FILE *css_map;	
+	FILE *url_map;
 	char *leaf_label_font_size;
 	char *inner_label_font_size;
 	char *branch_length_font_size;
@@ -120,7 +120,7 @@ struct parameters get_params(int argc, char *argv[])
 	/* set defaults */
 	params.width = -1; 
 	params.svg = FALSE;
-	params.colormap_fname = NULL;
+	params.css_map = NULL;
 	params.leaf_label_font_size = "medium";
 	params.inner_label_font_size = "small";
 	params.branch_length_font_size = "small";
@@ -144,7 +144,10 @@ struct parameters get_params(int argc, char *argv[])
 			params.branch_length_font_size = optarg;
 			break;
 		case 'c':
-			params.colormap_fname = optarg;
+			params.css_map = fopen(optarg, "r");
+			if (NULL == params.css_map) {
+				perror(NULL); exit(EXIT_FAILURE);
+			}
 			break;
 		case 'h':
 			help(argv);
@@ -225,7 +228,6 @@ void set_svg_parameters(struct parameters params)
 	set_svg_leaf_label_font_size(params.leaf_label_font_size);
 	set_svg_inner_label_font_size(params.inner_label_font_size);
 	set_svg_branch_length_font_size(params.branch_length_font_size);
-	set_svg_colormap_file(params.colormap_fname);
 	set_svg_leaf_vskip(params.leaf_vskip);
 	set_svg_whole_v_shift(20);	/* pixels */
 	set_svg_label_angle_correction(params.label_angle_correction);
@@ -234,6 +236,7 @@ void set_svg_parameters(struct parameters params)
 	// argument to display_svg_tree()
 	set_svg_style(params.svg_style);	/* radial vs orthogonal */
 	set_svg_URL_map_file(params.url_map);
+	set_svg_CSS_map_file(params.css_map);
 }
 
 /* Prints an XML comment containing the command line parameters, so that the
