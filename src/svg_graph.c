@@ -19,6 +19,8 @@
 #include "xml_utils.h"
 #include "graph_common.h"
 
+/* TODO: once css works, get rid of 'colormap' */
+
 struct colormap_pair {
 	char *color;		/* a valid SVG color string, e.g. 'blue' */
 	struct llist *labels;	/* color whole clade defined by those labels */
@@ -48,6 +50,9 @@ const int CHAR_WIDTH = 5;	/* pixels, approximattion for 'medium' fonts */
 const int edge_length_v_offset = -4; /* pixels */
 const double PI = 3.14159;
 const int URL_MAP_SIZE = 100;	/* bins */
+
+static char *leaf_label_class = "leaf-label";
+static char *inner_label_class = "inner-label";
 
 int init_done = FALSE;
 
@@ -108,6 +113,9 @@ void svg_CSS_stylesheet()
 		printf(" .clade_%d {%s}\n", css_el->clade_nb,
 				css_el->style);
 	}
+	printf (" .leaf-label {font-size:medium}\n");
+	printf (" .inner-label {font-size:small}\n");
+	printf (" .edge-label {font-size:small}\n");
 	printf ("]]></style></defs>");
 }
 
@@ -263,7 +271,7 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 {
 	printf( "<g"
 	       	" style='stroke:black;stroke-width:1;"
-	    	"font-size:medium;font-weight:normal;font-family:sans'>");
+		"stroke-linecap:round;");
 
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
@@ -284,15 +292,14 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 
 		/* draw node (vertical line), except for leaves */
 		if (! is_leaf(node)) {
-		printf("<line style='stroke:%s' stroke-linecap='round' "
+		printf("<line style='stroke:%s' "
 			"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 			color, svg_h_pos, svg_top_pos, svg_h_pos,
 			svg_bottom_pos);
 		}
 		/* draw horizontal line */
 		if (is_root(node)) {
-			printf("<line stroke-linecap='round' "
-				"x1='0' y1='%.4f' x2='%.4f' y2='%.4f'/>",
+			printf("<line x1='0' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				svg_mid_pos, svg_h_pos, svg_mid_pos);
 
 		} else {
@@ -301,7 +308,6 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 			double svg_parent_h_pos = ROOT_SPACE + (
 				h_scale * parent_data->depth);
 			printf ("<line style='stroke:%s' "
-				"stroke-linecap='round' "
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				color, svg_parent_h_pos,
 				 svg_mid_pos, svg_h_pos, svg_mid_pos);
@@ -318,7 +324,8 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 		const double a_scale, int align_leaves, double dmax)
 {
 	printf( "<g"
-	       	" style='stroke:black;stroke-width:1;fill:none'>"
+	       	" style='stroke:black;fill:none;stroke-width:1;"
+		"stroke-linecap:round'>"
 	    	);
 
 	struct list_elem *elem;
@@ -350,7 +357,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			double svg_top_y_pos = svg_radius * sin(svg_top_angle);
 			double svg_bot_x_pos = svg_radius * cos(svg_bottom_angle);
 			double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
-			printf("<path class='clade_%d' stroke-linecap='round'"
+			printf("<path class='clade_%d'"
 			       " d='M%.4f,%.4f A%4f,%4f 0 %d 1 %.4f %.4f'/>",
 				clade_nb,
 				svg_top_x_pos, svg_top_y_pos,
@@ -360,8 +367,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 		}
 		/* draw radial line */
 		if (is_root(node)) {
-			printf("<line stroke-linecap='round' "
-				"x1='0' y1='0' x2='%.4f' y2='%.4f'/>",
+			printf("<line x1='0' y1='0' x2='%.4f' y2='%.4f'/>",
 				svg_mid_x_pos, svg_mid_y_pos);
 		} else {
 			struct rnode *parent = node->parent_edge->parent_node;
@@ -371,7 +377,6 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
 			double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
 			printf ("<line class='clade_%d' "
-				"stroke-linecap='round' "
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 				clade_nb,
 				svg_mid_x_pos, svg_mid_y_pos,
@@ -387,11 +392,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 		const double v_scale, int align_leaves, double dmax)
 {
-	printf( "<g"
-	       	/* " style='stroke:black;stroke-width:1;" */
-	    	/* "font-size:medium;font-weight:normal;font-family:sans'" */
-		">"
-	      );
+	printf( "<g>");
 
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
@@ -449,8 +450,7 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		const double a_scale, int align_leaves, double dmax)
 {
-	printf( "<g style='stroke:none'>"
-	      );
+	printf( "<g style='stroke:none'>");
 
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
@@ -461,10 +461,6 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		if (align_leaves && is_leaf(node))
 			node_data->depth = dmax;
 
-		char *font_size = is_leaf(node) ?
-			leaf_label_font_size : inner_label_font_size ;
-		char *color = node_data->color;
-		if (NULL == color) color = "black";
 		double radius = ROOT_SPACE + (r_scale * node_data->depth);
 		double mid_angle =
 			0.5 * a_scale * (node_data->top+node_data->bottom);
@@ -482,17 +478,22 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		char *url = NULL;
 		if (url_map) url = hash_get(url_map, node->label);
 
-		/* draw label IFF it is nonempty AND requested font size
-		 * is not zero */
-		if (0 != strcmp(font_size, "0") && 0 != strcmp(node->label, "")) {
+		char *class;
+		if (is_leaf(node))
+			class = leaf_label_class;
+		else
+			class = inner_label_class;
+
+		/* draw label IFF it is nonempty */
+		if (0 != strcmp(node->label, "")) {
 			if (url) printf ("<a xlink:href='%s'>", url);
 			if (cos(mid_angle) >= 0)  {
 				x_pos = (radius+lbl_space) * cos(mid_angle);
 				y_pos = (radius+lbl_space) * sin(mid_angle);
-				printf("<text style='font-size:%s' "
+				printf("<text class='%s' "
 				       "transform='rotate(%g,%g,%g)' "
 				       "x='%.4f' y='%.4f'>%s</text>",
-					font_size,
+					class,
 					mid_angle / (2*PI) * 360,
 					x_pos, y_pos,
 					x_pos, y_pos, node->label);
@@ -501,10 +502,11 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 				mid_angle += svg_left_label_angle_correction;
 				x_pos = (radius+lbl_space) * cos(mid_angle);
 				y_pos = (radius+lbl_space) * sin(mid_angle);
-				printf("<text style='text-anchor:end;font-size:%s' "
-				       "transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
+				printf(	"<text class='%s' "
+					"style='text-anchor:end;' "
+				       	"transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
 				       "x='%.4f' y='%.4f'>%s</text>",
-					font_size,
+					class,
 					mid_angle / (2*PI) * 360,
 					x_pos, y_pos,
 					x_pos, y_pos,
@@ -607,8 +609,6 @@ void set_clade_numbers(struct rooted_tree *tree)
 		struct rnode *lca = lca_from_labels(tree, labels);
 		struct svg_data *lca_data = lca->data;
 		lca_data->clade_nb = css_el->clade_nb;
-		fprintf(stderr, "Attributed clade #%d to node %p (%s)\n",
-				lca_data->clade_nb, lca, lca->label);
 	}
 
 	/* Now propagate the styles to the descendants */
@@ -625,9 +625,6 @@ void set_clade_numbers(struct rooted_tree *tree)
 		    node has no style of its own */
 		if (UNSTYLED_CLADE == node_data->clade_nb) {
 			node_data->clade_nb = parent_data->clade_nb;
-			fprintf (stderr, "%p (%s): inheriting #%d from %p (%s)\n",
-				node, node->label, node_data->clade_nb,
-				parent, parent->label);
 		}
 				
 	}
