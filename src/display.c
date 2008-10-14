@@ -18,11 +18,11 @@ struct parameters {
 	int svg;
 	FILE *css_map;	
 	FILE *url_map;
-	char *leaf_label_font_size;
-	char *inner_label_font_size;
-	char *branch_length_font_size;
+	char *leaf_label_style;		/* CSS */
+	char *inner_label_style;	/* CSS */
+	char *edge_label_style;		/* CSS */
 	double leaf_vskip;
-	int svg_style;	/* radial or orthogonal */
+	int svg_style;		/* radial or orthogonal */
 	char *branch_length_unit;
 	double label_angle_correction;
 	double left_label_angle_correction;
@@ -112,24 +112,24 @@ void help(char* argv[])
 
 struct parameters get_params(int argc, char *argv[])
 {
-	struct parameters params;
+	struct parameters params = {
+		-1,			// width
+		FALSE,			// svg
+		NULL,			// css_map
+		NULL,			// url_map
+		"font-size:medium",	// leaf_label_style
+		"font-size:small",	// inner_label_style
+		"font-size:small",	// edge_label_style
+		40.0,			// leaf_vskip
+		SVG_ORTHOGONAL,		// svg_style
+		"",			// branch_length_unit
+		0.0,			// label_angle_correction
+		0.0			// left_label_angle_correction
+	};
+
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
 	const int DEFAULT_WIDTH_CHARS = 80;
-
-	/* set defaults */
-	params.width = -1; 
-	params.svg = FALSE;
-	params.css_map = NULL;
-	params.leaf_label_font_size = "medium";
-	params.inner_label_font_size = "small";
-	params.branch_length_font_size = "small";
-	params.leaf_vskip = 40.0;
-	params.svg_style = SVG_ORTHOGONAL;
-	params.branch_length_unit = "";
-	params.label_angle_correction = 0.0;
-	params.left_label_angle_correction = 0.0;
-	params.url_map = NULL;
 	
 	/* parse options and switches */
 	while ((opt_char = getopt(argc, argv, "a:A:b:c:hi:l:rsu:U:v:w:")) != -1) {
@@ -141,7 +141,7 @@ struct parameters get_params(int argc, char *argv[])
 			params.left_label_angle_correction = atof(optarg);
 			break;
 		case 'b':
-			params.branch_length_font_size = optarg;
+			params.edge_label_style = optarg;
 			break;
 		case 'c':
 			params.css_map = fopen(optarg, "r");
@@ -153,10 +153,10 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'i':
-			params.inner_label_font_size = optarg;
+			params.inner_label_style = optarg;
 			break;
 		case 'l':
-			params.leaf_label_font_size = optarg;
+			params.leaf_label_style = optarg;
 			break;
 		case 'r':
 			params.svg_style = SVG_RADIAL;
@@ -225,9 +225,6 @@ struct parameters get_params(int argc, char *argv[])
 void set_svg_parameters(struct parameters params)
 {
 	set_svg_width(params.width);
-	set_svg_leaf_label_font_size(params.leaf_label_font_size);
-	set_svg_inner_label_font_size(params.inner_label_font_size);
-	set_svg_branch_length_font_size(params.branch_length_font_size);
 	set_svg_leaf_vskip(params.leaf_vskip);
 	set_svg_whole_v_shift(20);	/* pixels */
 	set_svg_label_angle_correction(params.label_angle_correction);
@@ -236,7 +233,11 @@ void set_svg_parameters(struct parameters params)
 	// argument to display_svg_tree()
 	set_svg_style(params.svg_style);	/* radial vs orthogonal */
 	set_svg_URL_map_file(params.url_map);
+	// TODO: refer to this as "clade CSS", as opposed to node label CSS
 	set_svg_CSS_map_file(params.css_map);
+	set_svg_leaf_label_style(params.leaf_label_style);
+	set_svg_inner_label_style(params.inner_label_style);
+	set_svg_edge_label_style(params.edge_label_style);
 }
 
 /* Prints an XML comment containing the command line parameters, so that the

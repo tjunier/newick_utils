@@ -19,13 +19,6 @@
 #include "xml_utils.h"
 #include "graph_common.h"
 
-/* TODO: once css works, get rid of 'colormap' */
-
-struct colormap_pair {
-	char *color;		/* a valid SVG color string, e.g. 'blue' */
-	struct llist *labels;	/* color whole clade defined by those labels */
-};
-
 struct css_map_element {
 	int clade_nb;	
 	char *style;	/* a valid CSS specification */
@@ -38,7 +31,6 @@ struct svg_data {
 	double top;
 	double bottom;
 	double depth;
-	char *color;
 	int clade_nb;	/* For attributing styles */
 	/* ... other node properties ... */
 };
@@ -50,6 +42,8 @@ const int CHAR_WIDTH = 5;	/* pixels, approximattion for 'medium' fonts */
 const int edge_length_v_offset = -4; /* pixels */
 const double PI = 3.14159;
 const int URL_MAP_SIZE = 100;	/* bins */
+const int UNSTYLED_CLADE = 0;
+
 
 static char *leaf_label_class = "leaf-label";
 static char *inner_label_class = "inner-label";
@@ -58,11 +52,6 @@ int init_done = FALSE;
 
 /* We can't pass all the parameters to write_nodes_to_g() or any other function
  * - there are too many of them - so we use external variables. */
-
-/* SVG font sizes are strings, to allow values like 'small', etc. */
-static char *leaf_label_font_size = NULL;
-static char *inner_label_font_size = NULL;
-static char *branch_length_font_size = NULL;
 
 static int graph_width = -1;
 static char *colormap_fname = NULL;
@@ -78,6 +67,9 @@ static double svg_left_label_angle_correction = -0.0349; /* -2°, in radians */
 static int graph_style = -1;
 static FILE *url_map_file = NULL;
 static FILE *css_map_file = NULL;
+static char *leaf_label_style = NULL;
+static char *inner_label_style = NULL;
+static char *edge_label_style = NULL;
 
 static struct llist *colormap = NULL;
 static struct llist *css_map = NULL;
@@ -87,10 +79,6 @@ static struct hash *url_map = NULL;
  * static. I just don't like variables open to anyone, maybe I did too much
  * OO... */
 
-void set_svg_leaf_label_font_size(char *size) { leaf_label_font_size = size; }
-void set_svg_inner_label_font_size(char *size) { inner_label_font_size = size; }
-void set_svg_branch_length_font_size(char *size) {
-	branch_length_font_size = size; }
 void set_svg_width(int width) { graph_width = width; }
 void set_svg_colormap_file(char *fname) { colormap_fname = fname; }
 void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
@@ -102,6 +90,9 @@ void set_svg_label_angle_correction(double corr) {
 void set_svg_style(int style) { graph_style = style; }
 void set_svg_URL_map_file(FILE * map) { url_map_file = map; }
 void set_svg_CSS_map_file(FILE * map) { css_map_file = map; }
+void set_svg_leaf_label_style(char *style) { leaf_label_style = style; }
+void set_svg_inner_label_style(char *style) { inner_label_style = style; }
+void set_svg_edge_label_style(char *style) { edge_label_style = style; }
 
 void svg_CSS_stylesheet()
 {
@@ -113,9 +104,9 @@ void svg_CSS_stylesheet()
 		printf(" .clade_%d {%s}\n", css_el->clade_nb,
 				css_el->style);
 	}
-	printf (" .leaf-label {font-size:medium}\n");
-	printf (" .inner-label {font-size:small}\n");
-	printf (" .edge-label {font-size:small}\n");
+	printf (" .leaf-label {%s}\n", leaf_label_style);
+	printf (" .inner-label {%s}\n", inner_label_style);
+	printf (" .edge-label {%s}\n", edge_label_style);
 	printf ("]]></style></defs>");
 }
 
@@ -135,6 +126,7 @@ void svg_header()
  * structure's scope is the whole program, therefore it is an external
  * variable. */
 
+#if 0
 struct llist *read_colormap()
 {
 	if (NULL == colormap_fname) { return NULL; }
@@ -168,6 +160,7 @@ struct llist *read_colormap()
 
 	return colormap;
 }
+#endif
 
 /* Builds a CSS map structure. This is a list of css_map_element elements, each
  * of which contains a style specification and a list of labels. The style will
@@ -234,24 +227,6 @@ struct hash *read_url_map()
 	return url_map;
 }
 
-/* A debugging function - dumps the colormap on stdout */
-
-void dump_colormap(struct llist *colormap)
-{
-	printf ("Dump of colormap at %p:\n", colormap);
-
-	struct list_elem *elem;
-	for (elem = colormap->head; NULL != elem; elem = elem->next) {
-		struct colormap_pair *cpair;
-	       	cpair = (struct colormap_pair *) elem->data;
-		struct list_elem *el;
-		for (el = cpair->labels->head; NULL!=el; el=el->next) {
-			printf("%s ", (char *) el->data);
-		}
-		printf ("-> %s\n", cpair->color);
-	}
-}
-
 /* Call this function before calling display_svg_tree(). Resist the temptation
  * to put it inside display_svg_tree(): it is kept separate because its job is
  * not directly to draw trees*/
@@ -271,7 +246,7 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 {
 	printf( "<g"
 	       	" style='stroke:black;stroke-width:1;"
-		"stroke-linecap:round;");
+		"stroke-linecap:round' >");
 
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
@@ -282,8 +257,6 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 		if (align_leaves && is_leaf(node))
 			node_data->depth = dmax;
 
-		char *color = node_data->color;
-		if (NULL == color) color = "black";
 		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
 		double svg_top_pos = v_scale * node_data->top; 
 		double svg_bottom_pos = v_scale * node_data->bottom; 
@@ -292,9 +265,9 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 
 		/* draw node (vertical line), except for leaves */
 		if (! is_leaf(node)) {
-		printf("<line style='stroke:%s' "
+		printf("<line class='clade_%d' "
 			"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-			color, svg_h_pos, svg_top_pos, svg_h_pos,
+			node_data->clade_nb, svg_h_pos, svg_top_pos, svg_h_pos,
 			svg_bottom_pos);
 		}
 		/* draw horizontal line */
@@ -307,9 +280,9 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 			struct svg_data *parent_data = parent->data;
 			double svg_parent_h_pos = ROOT_SPACE + (
 				h_scale * parent_data->depth);
-			printf ("<line style='stroke:%s' "
+			printf ("<line class='clade_%d' "
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				color, svg_parent_h_pos,
+				node_data->clade_nb, svg_parent_h_pos,
 				 svg_mid_pos, svg_h_pos, svg_mid_pos);
 		}
 
@@ -392,7 +365,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 		const double v_scale, int align_leaves, double dmax)
 {
-	printf( "<g>");
+	printf( "<g style='stroke:none'>");
 
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
@@ -403,22 +376,21 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 		if (align_leaves && is_leaf(node))
 			node_data->depth = dmax;
 
-		char *font_size = is_leaf(node) ?
-			leaf_label_font_size : inner_label_font_size ;
-		char *color = node_data->color;
-		if (NULL == color) color = "black";
 		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
 		double svg_mid_pos =
 			0.5 * v_scale * (node_data->top+node_data->bottom);
+		char *class;
+		if (is_leaf(node))
+			class = leaf_label_class;
+		else
+			class = inner_label_class;
 
-		/* draw label IFF it is nonempty AND requested font size
-		 * is not zero */
+		/* draw label IFF it is nonempty */
 
-		if (0 != strcmp(font_size, "0") &&
-		    0 != strcmp(node->label, ""))
-			printf("<text style='stroke:none;font-size:%s' "
+		if (0 != strcmp(node->label, ""))
+			printf("<text class='%s' "
 			       "x='%.4f' y='%.4f'>%s</text>",
-				font_size, svg_h_pos + LBL_SPACE,
+				class, svg_h_pos + LBL_SPACE,
 				svg_mid_pos, node->label);
 
 		/* Branch lengths */
@@ -430,11 +402,10 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 				h_scale * parent_data->depth);
 			/* Print branch length IFF it is nonempty AND 
 			 * requested size is not 0 */
-			if (0 != strcmp(branch_length_font_size, "0") &&
-			    0 != strcmp(node->parent_edge->length_as_string, "")) {
-				printf("<text style='stroke:none;font-size:%s' "
+			if (0 != strcmp(node->parent_edge->length_as_string,
+						"")) {
+				printf("<text class='edge-label' "
 					"x='%4f' y='%4f'>%s</text>",
-					branch_length_font_size,
 					(svg_h_pos + svg_parent_h_pos) / 2.0,
 					edge_length_v_offset + svg_mid_pos,
 					node->parent_edge->length_as_string);
@@ -543,6 +514,7 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 /* Passed to dump_llist() for labels */
 void dump_label (void *lbl) { puts((char *) lbl); }
 
+#if 0
 /* Constructs a hash of node colors from the colormap. Key is node's address,
  * value is a color string. Nodes are specified by their labels or descendant
  * labels ('labels' member of a colormap_pair structure) NOTE: contrary to the
@@ -589,6 +561,8 @@ void set_node_colors(struct rooted_tree *tree)
 	}
 	destroy_llist(nodes_in_reverse_order);
 }
+#endif
+
 
 /* Attributes numbers to clades, based on the CSS style map (if one was
  * supplied - see read_css_map() and svg_CSS_stylesheet() ). The clade number
@@ -597,8 +571,6 @@ void set_node_colors(struct rooted_tree *tree)
 
 void set_clade_numbers(struct rooted_tree *tree)
 {
-	const int UNSTYLED_CLADE = 0;
-
 	/* Iterate through the style map elements. Each one contains (among
 	 * others) a list of labels. Find the LCA of those labels, and set its
 	 * style to that specified by the map. */
@@ -645,8 +617,7 @@ void svg_alloc_node_pos(struct rooted_tree *tree)
 		struct svg_data *svgd = malloc(sizeof(struct svg_data));
 		if (NULL == svgd) { perror(NULL); exit (EXIT_FAILURE); }
 		svgd->top = svgd->bottom = svgd->depth = -1.0;
-		svgd->color = NULL;
-		svgd->clade_nb = 0;	/* clade 0 has no special style */
+		svgd->clade_nb = UNSTYLED_CLADE;	
 		node->data = svgd;
 	}
 }
