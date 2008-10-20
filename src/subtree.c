@@ -15,6 +15,7 @@
 #include "lca.h"
 #include "rnode_iterator.h"
 #include "rnode.h"
+#include "redge.h"
 #include "common.h"
 #include "link.h"
 
@@ -26,6 +27,7 @@ struct parameters {
 	int siblings;
 	int mode;
 	char *regexp_string;
+	int context;
 };
 
 void help(char *argv[])
@@ -36,7 +38,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hmrs] <target tree filename|-> <label> [label]+\n"
+"%s [-chmrs] <target tree filename|-> <label> [label]+\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -57,6 +59,9 @@ void help(char *argv[])
 "Options\n"
 "-------\n"
 "\n"
+"    -c <levels (int)>: give context, i.e. start the subtree not at the last\n"
+"        common ancestor of the labels, but 'level' nodes higher (limited\n"
+"        by the tree's root, of course).\n"
 "    -h: prints this message and exits\n"
 "    -m: only prints the clade if it is monophyletic, in the sense that ONLY\n"
 "        the labels passed as arguments are found in the clade.\n"
@@ -102,10 +107,14 @@ struct parameters get_params(int argc, char *argv[])
 	params.check_monophyly = FALSE;
 	params.siblings = FALSE;
 	params.mode = EXACT;
+	params.context = 0;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hmrs")) != -1) {
+	while ((opt_char = getopt(argc, argv, "c:hmrs")) != -1) {
 		switch (opt_char) {
+		case 'c':
+			params.context = atoi(optarg);
+			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
@@ -217,6 +226,13 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct llist *desc_clone = shallow_copy(descendants);
 	struct rnode *subtree_root = lca(tree, desc_clone);
 	free(desc_clone); /* elems freed in lca() */
+
+	/* Jump up tree to get context, if any was required ('context' > 0) */
+	int context;
+	for (context = params.context; context > 0; context--)
+		if (! is_root(subtree_root))
+			subtree_root = subtree_root->parent_edge->parent_node;
+
 
 	if (NULL != subtree_root) {
 		if ((! params.check_monophyly) ||

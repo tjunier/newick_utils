@@ -10,10 +10,6 @@ nw_display: output better message when colormap labels are not found
 
 nw_distance: add tests for new selection options (i and f)
 
-nw_display: use CSS. See "SVG Essentials" pp 45 ff. See data/css_tree.svg as an
-example. What is now the 'color map' should become a clade map, in which not
-only the color but any CSS properties may be specified.
-
 nw_order: add function for ordering children by number of descendants, like
 iTOL seems to do.
 
@@ -164,3 +160,8 @@ primitive now, it works.
 
 [done] nw_display: add anchors to labels, passed in a separate file named as
 argument to an option
+
+[done] nw_display: use CSS. See "SVG Essentials" pp 45 ff. See
+data/css_tree.svg as an example. What is now the 'color map' should become a
+clade map, in which not only the color but any CSS properties may be specified.
+
