@@ -1,3 +1,8 @@
+nw_display: make links work with orthogonal form
+
+nw_display: add a possibility for adding other attributes to the <a> tag (we
+now have href, which is the only required one, make it possible to specify
+oters on the same line)
 
 nw_gen: check that help is up-to-date (seems to me that it still describes the
 old function)

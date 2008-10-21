@@ -244,9 +244,10 @@ void svg_init()
 void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 		const double v_scale, int align_leaves, double dmax)
 {
-	printf( "<g"
-	       	" style='stroke:black;stroke-width:1;"
-		"stroke-linecap:round' >");
+	printf("<g "
+	       	" style='stroke:black;fill:none;stroke-width:1;"
+		"stroke-linecap:round'>"
+		);
 
 	struct list_elem *elem;
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
@@ -684,7 +685,7 @@ void draw_scale_bar(struct rooted_tree *tree, double h_scale,
 
 	if (2 * pot > d_max) {
 		/* print 1/10th tick marks */
-		printf ("<path style='fill:none' d='M 0 %d l 0 %d "
+		printf ("<path style='stroke:black' d='M 0 %d l 0 %d "
 		       "l %g 0 l 0 %d'/>", vsep, big_tick_height, scale_length,
 		       -big_tick_height);
 		int i;
@@ -709,12 +710,12 @@ void draw_scale_bar(struct rooted_tree *tree, double h_scale,
 		int i;
 		for (i = 0; (i+1)*pot < d_max; i++) {
 			printf ("<path transform='translate(%g,0)' "
-				"style='fill:none' d='M 0 %d l %g 0 l 0 %d'/>",
+				"style='stroke:black;fill:none' d='M 0 %d l %g 0 l 0 %d'/>",
 				i*scale_length, vsep+big_tick_height,
 				scale_length, -big_tick_height);
 			printf ("<text transform='translate(%g,0)' "
 				"style='font-size:small;text-anchor:end;"
-				"stroke:none' x='0' y='0'>%g</text>",
+				"ststroke:black' x='0' y='0'>%g</text>",
 				(i+1)*scale_length, (i+1)*pot);
 		}
 	}
@@ -732,23 +733,23 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	 * different scales. For now, it's fixed. */
 	double v_scale = leaf_vskip;
 
-	//if (colormap) set_node_colors(tree);
 	if (css_map) set_clade_numbers(tree);
  	prettify_labels(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
-	/* draw nodes */
 	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+
+	/* Tree is in a separate group - may be useful when (if?) there are
+	 * more than one tree*/
 	printf( "<g"
-	       	" style='stroke:black;stroke-width:1;"
-	    	"font-size:medium;font-weight:normal;font-family:sans'"
 		" transform='translate(0,%d)'"
 		">", svg_whole_v_shift);
 	/* We draw all the tree's branches in an SVG group of their own, to
-	 * facilitate editing. */
+	 * facilitate editing via Inkscape, Illustrator, etc. */
 	draw_branches_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
-	/* likewise for text */
+	/* ... likewise for text */
 	draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
+	/* Draw scale bar if required */
 	if (with_scale_bar) draw_scale_bar(tree, h_scale, v_scale, hd.d_max,
 			branch_length_unit);
 	printf ("</g>");
