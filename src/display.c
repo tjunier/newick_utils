@@ -112,20 +112,20 @@ void help(char* argv[])
 
 struct parameters get_params(int argc, char *argv[])
 {
-	struct parameters params = {
-		-1,			// width
-		FALSE,			// svg
-		NULL,			// css_map
-		NULL,			// url_map
-		"font-size:medium",	// leaf_label_style
-		"font-size:small",	// inner_label_style
-		"font-size:small",	// edge_label_style
-		40.0,			// leaf_vskip
-		SVG_ORTHOGONAL,		// svg_style
-		"",			// branch_length_unit
-		0.0,			// label_angle_correction
-		0.0			// left_label_angle_correction
-	};
+	struct parameters params;
+
+	params.width =	-1;
+	params.svg = FALSE;
+	params.css_map = NULL;
+	params.url_map = NULL;
+	params.leaf_label_style = "font-size:medium;font-family:sans";
+	params.inner_label_style = "font-size:small;font-family:sans";
+	params.edge_label_style = "font-size:small;font-family:sans";
+	params.leaf_vskip = 40.0;
+	params.svg_style = SVG_ORTHOGONAL;
+	params.branch_length_unit = "";
+	params.label_angle_correction = 0.0;
+	params.left_label_angle_correction = 0.0;
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
