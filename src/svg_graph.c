@@ -1,5 +1,7 @@
 /* text_graph.c - functions for drawing trees on a text canvas. */
 
+#define _GNU_SOURCE
+
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -71,7 +73,6 @@ static char *leaf_label_style = NULL;
 static char *inner_label_style = NULL;
 static char *edge_label_style = NULL;
 
-static struct llist *colormap = NULL;
 static struct llist *css_map = NULL;
 static struct hash *url_map = NULL;
 
@@ -99,10 +100,12 @@ void svg_CSS_stylesheet()
 	struct list_elem *el;
 
 	printf ("<defs><style type='text/css'><![CDATA[\n");
-	for (el = css_map->head; NULL != el; el = el->next) {
-		struct css_map_element *css_el = el->data;
-		printf(" .clade_%d {%s}\n", css_el->clade_nb,
-				css_el->style);
+	if (css_map) {
+		for (el = css_map->head; NULL != el; el = el->next) {
+			struct css_map_element *css_el = el->data;
+			printf(" .clade_%d {%s}\n", css_el->clade_nb,
+					css_el->style);
+		}
 	}
 	printf (" .leaf-label {%s}\n", leaf_label_style);
 	printf (" .inner-label {%s}\n", inner_label_style);
@@ -118,49 +121,13 @@ void svg_header()
 	printf( "<svg width='100%%' height='100%%' version='1.1' "
 		"xmlns='http://www.w3.org/2000/svg' "
 		"xmlns:xlink='http://www.w3.org/1999/xlink' >");
-	if (css_map) svg_CSS_stylesheet();
+	svg_CSS_stylesheet();
 }
 
 /* Builds a colormap structure. This maps SVG color strings to lists of labels.
  * The clade defined by the labels will be of the specified colors. This
  * structure's scope is the whole program, therefore it is an external
  * variable. */
-
-#if 0
-struct llist *read_colormap()
-{
-	if (NULL == colormap_fname) { return NULL; }
-
-	FILE *cmap_file = fopen(colormap_fname, "r");
-	if (NULL == cmap_file) { perror(NULL); exit(EXIT_FAILURE); }
-
-	struct llist *colormap = create_llist();
-
-	char *line;
-	while ((line = read_line(cmap_file)) != NULL) {
-		/* split line into whitespace-separeted "words" */
-		struct colormap_pair *cpair = malloc(sizeof(struct colormap_pair));
-		if (NULL == cpair) { perror(NULL); exit(EXIT_FAILURE); }
-
-		struct llist *label_list = create_llist();
-		struct word_tokenizer *wtok = create_word_tokenizer(line);
-		char *color = wt_next(wtok);
-		char *label;
-		while ((label = wt_next(wtok)) != NULL) {
-			append_element(label_list, label);
-		}
-		destroy_word_tokenizer(wtok);
-		free(line);
-		cpair->color = color;
-		cpair->labels = label_list;
-		append_element(colormap, cpair);
-	}
-
-	fclose(cmap_file);
-
-	return colormap;
-}
-#endif
 
 /* Builds a CSS map structure. This is a list of css_map_element elements, each
  * of which contains a style specification and a list of labels. The style will
@@ -217,7 +184,27 @@ struct hash *read_url_map()
 		remove_quotes(label);
 		char *url = wt_next(wtok);
 		char *escaped_url = escape_predefined_character_entities(url);
-		hash_set(url_map, label, escaped_url);
+		char *anchor_attributes;
+		// TODO: maybe we can do without asprintf()
+		asprintf(&anchor_attributes, "xlink:href='%s' ", escaped_url);
+		char *att;
+		while ((att = wt_next(wtok)) != NULL) {
+			int att_len = strlen(anchor_attributes);
+			/* add length of new attribute */
+			att_len += strlen(att);
+			att_len += 1;	/* trailing space */
+			att_len += 1;	/* terminal '\0' */
+			anchor_attributes = realloc(anchor_attributes,
+				att_len * sizeof(char));
+			if (NULL == anchor_attributes) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
+			strcat(anchor_attributes, att);
+			strcat(anchor_attributes, " ");
+
+		}
+		hash_set(url_map, label, anchor_attributes);
 		destroy_word_tokenizer(wtok);
 		free(line);
 		free(label);
@@ -380,6 +367,10 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
 		double svg_mid_pos =
 			0.5 * v_scale * (node_data->top+node_data->bottom);
+
+		char *url = NULL;
+		if (url_map) url = hash_get(url_map, node->label);
+
 		char *class;
 		if (is_leaf(node))
 			class = leaf_label_class;
@@ -389,10 +380,12 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 		/* draw label IFF it is nonempty */
 
 		if (0 != strcmp(node->label, ""))
+			if (url) printf ("<a %s>", url);
 			printf("<text class='%s' "
 			       "x='%.4f' y='%.4f'>%s</text>",
 				class, svg_h_pos + LBL_SPACE,
 				svg_mid_pos, node->label);
+			if (url) printf ("</a>");
 
 		/* Branch lengths */
 
@@ -458,7 +451,7 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 
 		/* draw label IFF it is nonempty */
 		if (0 != strcmp(node->label, "")) {
-			if (url) printf ("<a xlink:href='%s'>", url);
+			if (url) printf ("<a %s>", url);
 			if (cos(mid_angle) >= 0)  {
 				x_pos = (radius+lbl_space) * cos(mid_angle);
 				y_pos = (radius+lbl_space) * sin(mid_angle);
@@ -733,8 +726,8 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	 * different scales. For now, it's fixed. */
 	double v_scale = leaf_vskip;
 
-	if (css_map) set_clade_numbers(tree);
- 	prettify_labels(tree);
+	// if (css_map) set_clade_numbers(tree);
+ 	// prettify_labels(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
@@ -764,8 +757,8 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	double a_scale = 1.9 * PI / leaf_count(tree); /* radians */
 
 	//if (colormap) set_node_colors(tree);
-	if (css_map) set_clade_numbers(tree);
- 	prettify_labels(tree);
+	// if (css_map) set_clade_numbers(tree);
+ 	// prettify_labels(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* draw nodes */
@@ -793,6 +786,9 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves,
 			svg_get_node_top, svg_get_node_bottom);
 	struct h_data hd = set_node_depth_cb(tree,
 			svg_set_node_depth, svg_get_node_depth);
+
+	if (css_map) set_clade_numbers(tree);
+ 	prettify_labels(tree);
 
 	if (SVG_ORTHOGONAL == graph_style)
 		display_svg_tree_orthogonal(tree, hd, align_leaves,
