@@ -15,7 +15,7 @@
 const int FREE_NODE_DATA = 1;
 const int DONT_FREE_NODE_DATA = 0;
 
-/* 'outgroup' is te node which will be the outgroup after rerooting. */
+/* 'outgroup' is the node which will be the outgroup after rerooting. */
 
 void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 {
@@ -120,7 +120,12 @@ void destroy_tree(struct rooted_tree *tree, int free_node_data)
 	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
 		struct rnode *current = e->data;
 		destroy_llist(current->children);
+		fprintf (stderr, "free()ing edge length '%s' at %p\n",
+			current->parent_edge->length_as_string,
+			current->parent_edge->length_as_string);	
 		free(current->parent_edge->length_as_string);
+		fprintf (stderr, "free()ing edge at %p\n",
+				current->parent_edge);
 		free(current->parent_edge);
 		free(current->label);
 		/* only works if data can be free()d, i.e. has no pointer to

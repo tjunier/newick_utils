@@ -13,7 +13,10 @@ struct redge {
  * numeric or empty (NULL will be replaced by ""). This is because we need a
  * way to store unspecified length, and cannot use numbers for this (zero is a
  * possible numeric length, and even negative numbers are sometimes used (e.g.
- * by Neighbor-Joining)). */
+ * by Neighbor-Joining))
+ * The argument string is copied to a local, dynamically allocated version.
+ * There is no destructor function (yet?) so the copy must be free()d (and the
+ * original too IFF it was dynamically allocated, of course) */
 
 struct redge *create_redge(char *length);
 

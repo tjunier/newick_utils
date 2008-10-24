@@ -69,7 +69,6 @@ void insert_node_above(struct rnode *this, char *label)
 	parent_edge = this->parent_edge;
 	parent = parent_edge->parent_node;
 	new_edge_length = compute_new_edge_length(parent_edge->length_as_string);
-
 	/* create new node */
 	new = create_rnode(label);
 	/* link new node to this node */
@@ -81,7 +80,13 @@ void insert_node_above(struct rnode *this, char *label)
 	replace_child_edge(parent, parent_edge, new_node_parent_edge);
 	new_node_parent_edge->parent_node = parent;
 
+	free(new_edge_length);
 	/* destroy parent edge */
+	fprintf(stderr, "free()ing edge length (%s) at %p\n",
+			parent_edge->length_as_string,
+			parent_edge->length_as_string);
+	free(parent_edge->length_as_string);
+	fprintf (stderr, "free()ing edge at %p\n", parent_edge);
 	free(parent_edge);
 }
 	

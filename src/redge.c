@@ -14,6 +14,7 @@ struct redge *create_redge(char *length_s)
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}
+	fprintf (stderr, "edge at %p\n", redgep);
 
 	redgep->parent_node = NULL;
 	redgep->child_node = NULL;
@@ -26,6 +27,8 @@ struct redge *create_redge(char *length_s)
 		length_s = "";
 	}
 
+	// TODO: just use strdup(), which should take care of allocating
+	// memory.
 	l = strlen(length_s) + 1;
 	redgep->length_as_string = malloc(l * sizeof(char));
 	if (NULL == redgep->length_as_string) {

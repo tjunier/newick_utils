@@ -243,8 +243,8 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		// process_tree(tree, params);
-		destroy_tree(tree, 1);
+		process_tree(tree, params);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	destroy_llist(params.labels);
