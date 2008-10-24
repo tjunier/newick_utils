@@ -1,15 +1,8 @@
-nw_display: make links work with orthogonal form
-
-nw_display: add a possibility for adding other attributes to the <a> tag (we
-now have href, which is the only required one, make it possible to specify
-oters on the same line)
 
 nw_gen: check that help is up-to-date (seems to me that it still describes the
 old function)
 
 svg_graph.c: make all functions static, except those that are used elsewhere
-
-nw_clade: output context, e.g. given a LCA, output the containing clade, n levels up (n specifiable)
 
 nw_display: output better message when colormap labels are not found
 
@@ -170,3 +163,10 @@ argument to an option
 data/css_tree.svg as an example. What is now the 'color map' should become a
 clade map, in which not only the color but any CSS properties may be specified.
 
+[done] nw_display: make links work with orthogonal form
+
+[done ] nw_display: add a possibility for adding other attributes to the <a>
+tag (we now have href, which is the only required one, make it possible to
+
+[done] nw_clade: output context, e.g. given a LCA, output the containing clade, n levels up (n specifiable)
+specify oters on the same line)

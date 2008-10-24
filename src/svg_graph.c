@@ -209,6 +209,7 @@ struct hash *read_url_map()
 		free(line);
 		free(label);
 		free(url);
+		free(escaped_url);
 	}
 
 	return url_map;
