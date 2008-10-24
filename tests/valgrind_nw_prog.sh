@@ -34,8 +34,8 @@ for prog in $progs; do
 	while IFS=':' read name args ; do
 		# setting IFS to '' preserves whitespace through shell word
 		# splitting
-		IFS='' cmd="valgrind -q ../src/$prog $args > /dev/null"
-		echo -n "test: '$cmd' - "
+		echo "  $name"
+		IFS='' cmd="valgrind -q --leak-check=yes ../src/$prog $args > /dev/null"
 		eval $cmd 
 	done < $args_file
 

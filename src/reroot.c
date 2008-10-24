@@ -243,8 +243,10 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, params);
+		// process_tree(tree, params);
+		destroy_tree(tree, 1);
 	}
 
+	destroy_llist(params.labels);
 	return 0;
 }

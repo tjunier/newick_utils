@@ -32,6 +32,8 @@ struct redge *create_redge(char *length_s)
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}
+	fprintf (stderr, "edge length (%s) at %p\n",  length_s,
+			redgep->length_as_string);
 	strncpy(redgep->length_as_string, length_s, l);
 
 	return redgep;
