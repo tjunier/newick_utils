@@ -27,12 +27,6 @@ void collapse_pure_clades(struct rooted_tree *tree);
 
 void destroy_tree(struct rooted_tree *, int free_node_data);
 
-/* If the tree's node have data that cannot just be free()d (i.e., they have
- * pointers to allocated memory), first free that data by iterating on the
- * nodes (tree->nodes_in_order, etc), then free the tree using this function. */
-
-// void destroy_tree_except_data(struct rooted_tree *tree);
-
 /* Returns the number of leaves of this tree */
 
 int leaf_count(struct rooted_tree *);

@@ -6,6 +6,9 @@
 #include "rnode.h"
 #include "list.h"
 #include "redge.h"
+#include "rnode_iterator.h"
+#include "hash.h"
+//#include "common.h"
 
 struct rnode *create_rnode(char *label)
 {
@@ -24,6 +27,11 @@ struct rnode *create_rnode(char *label)
 	node_p->parent_edge = NULL;
 
 	node_p->data = NULL;
+
+#ifdef SHOW_RNODE_CREATE
+	fprintf(stderr, "rnode '%s' at %p\n", node_p->label,
+			node_p);
+#endif
 
 	return node_p;
 }
@@ -57,4 +65,44 @@ void dump_rnode(void *arg)
 	struct rnode *node = (struct rnode *) arg;
 
 	printf ("rnode at %p: %s\n", node, node->label);
+}
+
+void free_descendants(struct rnode *node)
+{
+	const int HASH_SIZE = 1000; 	/* pretty arbitrary */
+	struct hash *to_free = create_hash(HASH_SIZE);
+	struct rnode_iterator *it = create_rnode_iterator(node);
+	struct rnode *current;
+
+	// Iterates through the tree nodes, "remembering" nodes seen for the
+	// first time
+	while (NULL != (current = rnode_iterator_next(it))) {
+		char *node_hash_key = make_hash_key(current);
+		if (NULL == hash_get(to_free, node_hash_key))
+			hash_set(to_free, node_hash_key, current);
+                free(node_hash_key);
+	}
+
+	// Frees all nodes "seen" above - which must be all the tree's nodes.
+	struct llist *keys = hash_keys(to_free);
+       	struct list_elem *el;
+	for (el = keys->head; NULL != el; el = el->next) {
+		char *key = el->data;
+		current = hash_get(to_free, key);
+		if (NULL != current->parent_edge) {
+			assert (NULL != current->parent_edge->length_as_string);
+                        /* should never be NULL (see create_redge()) */
+                        //fprintf (stderr, " freeing redge %p (length %s at %p)\n", current->parent_edge,current->parent_edge->length_as_string,current->parent_edge->length_as_string);
+                        free (current->parent_edge->length_as_string);
+			free (current->parent_edge);
+		}
+                /* these 3 should never be NULL (see create_rnode() above) */
+                destroy_llist(current->children);
+                free(current->label);
+		free(current);
+	}	
+
+        destroy_llist(keys);
+        destroy_hash(to_free);
+	destroy_rnode_iterator(it);
 }

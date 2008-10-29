@@ -16,7 +16,7 @@ HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
 # I mention all headers here, so they're included in the distro (otherwise this
 # is not necessary, it builds just fine)
 NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
-	  link.c tree.c redge.c nodemap.c hash.c $(HDR)
+	  link.c tree.c redge.c nodemap.c hash.c rnode_iterator.c $(HDR)
 
 NW_OUT = to_newick.c concat.c
 
@@ -34,7 +34,7 @@ nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
 
 nw_display_LDADD = @LEXLIB@ -lm
 
-nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c rnode_iterator.c
+nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c
 nw_clade_LDADD = @LEXLIB@ 
 
 nw_reroot_SOURCES = $(NW_CORE) $(NW_OUT) reroot.c lca.c

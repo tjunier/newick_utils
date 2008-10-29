@@ -57,6 +57,10 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
  * to a child, the current list_elem is pushed on the stack, and it is popped
  * out of it when going back up. */
 
+/* Note however that this will only make a difference for trees that are
+ * polytomous. For dichotomous trees, the present approach is probably the
+ * best. */
+
 static struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 {
 	struct list_elem *elem;
@@ -104,6 +108,10 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	}
 }
 
+// TODO: fix this, it doesn't work. We probably need to implement a function
+// that peeks the next unvisited child, i.e.  without free()ing it from the
+// 'seen' hash.
+
 struct llist *get_nodes_in_order(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);
@@ -124,6 +132,7 @@ struct llist *get_nodes_in_order(struct rnode *root)
 			hash_set(seen, node_hash_key, SEEN);
 		}
 	}
+	destroy_rnode_iterator(it);
 
 	return nodes_in_order;
 }

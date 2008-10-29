@@ -82,11 +82,8 @@ void insert_node_above(struct rnode *this, char *label)
 
 	free(new_edge_length);
 	/* destroy parent edge */
-	fprintf(stderr, "free()ing edge length (%s) at %p\n",
-			parent_edge->length_as_string,
-			parent_edge->length_as_string);
+	//fprintf(stderr, " freeing redge %p (length %s at %p)\n", parent_edge, parent_edge->length_as_string, parent_edge->length_as_string);
 	free(parent_edge->length_as_string);
-	fprintf (stderr, "free()ing edge at %p\n", parent_edge);
 	free(parent_edge);
 }
 	
@@ -169,7 +166,8 @@ void reverse_redge(struct redge *edge)
 
 	/* remove edge from old parent's children list */
 	int n = llist_index_of(parent->children, edge);
-	delete_after(parent->children, n - 1, 1);
+	struct llist *deleted = delete_after(parent->children, n - 1, 1);
+        destroy_llist(deleted);
 
 	/* create new edge with same length string as old */
 	reverse_edge = create_redge(edge->length_as_string);
@@ -179,6 +177,9 @@ void reverse_redge(struct redge *edge)
 	add_child_edge(child, reverse_edge); 	/* intentional (reversing!) */
 	reverse_edge->parent_node = child;
 	child->parent_edge = NULL;	
+	//fprintf(stderr, " freeing redge %p (length %s at %p)\n", edge, edge->length_as_string, edge->length_as_string);
+        free(edge->length_as_string);
+        free(edge);
 }
 
 struct rnode * unlink_rnode(struct rnode *node)

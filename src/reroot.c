@@ -145,6 +145,7 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 			append_element(outgroup_nodes, desc);
 		}
 	}
+        destroy_hash(map);
 
 	return outgroup_nodes;
 }
@@ -163,7 +164,9 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 			return LCA_IS_TREE_ROOT;
 		}
 		reroot_tree (tree, outgroup_root);
-		printf ("%s\n", to_newick(tree->root));
+		char *newick = to_newick(tree->root);
+		printf ("%s\n", newick);
+		free(newick);
 		return OK;
 	} else {
 		fprintf (stderr, "Could not find LCA.\n");
@@ -207,6 +210,7 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 	return result;
 }
 
+
 /* Tries to reroot 'directly', i.e. using outgroup. If this fails (because the
  * outgroup's LCA is the tree's root) and 'try_ingroup' is true (option -l),
  * tries with the ingroup */
@@ -233,6 +237,11 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		}
 	}
 	destroy_llist(outgroup_nodes);
+
+	/* I use this rather than destroy_tree(), because the tree structure
+	 * has been changed. */
+	//fprintf(stderr, "freeing tree nodes...\n");
+	free_descendants(tree->root);
 }
 
 int main(int argc, char *argv[])
@@ -243,8 +252,10 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
+		//fprintf(stderr, "rerooting...\n");
 		process_tree(tree, params);
-		destroy_tree(tree, FREE_NODE_DATA);
+		// NOTE: DO NOT use destroy_tree() on this tree, since it has
+		// been modified!
 	}
 
 	destroy_llist(params.labels);

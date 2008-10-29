@@ -28,9 +28,10 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	/* Insert node (will be the new root) above outgroup */
 	insert_node_above(outgroup, "");
 	new_root = outgroup->parent_edge->parent_node;
-	
+
 	/* Invert edges from old root to new root (i.e., the tree is always in
 	 * a consistent state) */
+
 	/* First, we make a list of the edges we need to revert, by visiting
 	 * the tree from the soon-to-be new root to the old (which is still the
 	 * root) */
@@ -41,16 +42,29 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 		/* order of reversals is important: tree is always consistent */
 		prepend_element(revert_list, edge);
 	}
+	/* If old_root has a parent edge (this can happen), we free it now,
+	 * because any pointers to it will now be lost. */
+	if (NULL != old_root->parent_edge) {
+                //fprintf(stderr, " freeing redge %p (length %s at %p)\n", old_root->parent_edge, old_root->parent_edge->length_as_string, old_root->parent_edge->length_as_string);
+                free(old_root->parent_edge->length_as_string);
+		free(old_root->parent_edge);
+	}
 	/* Then, we reverse the edges in the list. */
 	for (elem = revert_list->head; NULL != elem; elem = elem->next) {
 		struct redge *edge = (struct redge*) elem->data;
 		reverse_redge(edge);
 	}
+        destroy_llist(revert_list);
 
 	if (children_count(old_root) == 1)
 		splice_out_rnode(old_root);
 
 	tree->root = new_root;
+	/* TODO: The tree's structure was changed, so 'nodes_in_order' is now
+	 * invalid. when get_nodes_in_order() is fixed, we shall use it here.
+	 * For now we annull it so it cannot be used. */
+        destroy_llist(tree->nodes_in_order);
+	tree->nodes_in_order = NULL;
 }
 
 /* Returns true IFF all children are leaves. Assumes n is not a leaf. */
@@ -120,12 +134,7 @@ void destroy_tree(struct rooted_tree *tree, int free_node_data)
 	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
 		struct rnode *current = e->data;
 		destroy_llist(current->children);
-		fprintf (stderr, "free()ing edge length '%s' at %p\n",
-			current->parent_edge->length_as_string,
-			current->parent_edge->length_as_string);	
 		free(current->parent_edge->length_as_string);
-		fprintf (stderr, "free()ing edge at %p\n",
-				current->parent_edge);
 		free(current->parent_edge);
 		free(current->label);
 		/* only works if data can be free()d, i.e. has no pointer to
@@ -138,25 +147,6 @@ void destroy_tree(struct rooted_tree *tree, int free_node_data)
 	destroy_llist(tree->nodes_in_order);
 	free(tree);
 }
-
-/*
-void destroy_tree_except_data(struct rooted_tree *tree)
-{
-	struct list_elem *e;
-
-	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
-		struct rnode *current = e->data;
-		destroy_llist(current->children);
-		free(current->parent_edge->length_as_string);
-		free(current->parent_edge);
-		free(current->label);
-		free(current);
-	}
-
-	destroy_llist(tree->nodes_in_order);
-	free(tree);
-}
-*/
 
 int leaf_count(struct rooted_tree * tree)
 {

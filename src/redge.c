@@ -14,7 +14,6 @@ struct redge *create_redge(char *length_s)
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}
-	fprintf (stderr, "edge at %p\n", redgep);
 
 	redgep->parent_node = NULL;
 	redgep->child_node = NULL;
@@ -28,15 +27,19 @@ struct redge *create_redge(char *length_s)
 	}
 
 	// TODO: just use strdup(), which should take care of allocating
-	// memory.
+	// memory. 
 	l = strlen(length_s) + 1;
 	redgep->length_as_string = malloc(l * sizeof(char));
 	if (NULL == redgep->length_as_string) {
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}
-	fprintf (stderr, "edge length (%s) at %p\n",  length_s,
-			redgep->length_as_string);
+        /* NOTE: length_as_string is never NULL (at least it points to ""), so
+         * we can use this in assert() statements */
+
+#ifdef SHOW_REDGE_CREATE
+	fprintf (stderr, "creating redge %p (length %s at %p)\n",  redgep, length_s, redgep->length_as_string);
+#endif
 	strncpy(redgep->length_as_string, length_s, l);
 
 	return redgep;
