@@ -8,7 +8,6 @@
 #include "redge.h"
 #include "rnode_iterator.h"
 #include "hash.h"
-//#include "common.h"
 
 struct rnode *create_rnode(char *label)
 {
@@ -29,7 +28,7 @@ struct rnode *create_rnode(char *label)
 	node_p->data = NULL;
 
 #ifdef SHOW_RNODE_CREATE
-	fprintf(stderr, "rnode '%s' at %p\n", node_p->label,
+	fprintf(stderr, "creating rnode '%s' at %p\n", node_p->label,
 			node_p);
 #endif
 
@@ -98,6 +97,7 @@ void free_descendants(struct rnode *node)
 		}
                 /* these 3 should never be NULL (see create_rnode() above) */
                 destroy_llist(current->children);
+                fprintf (stderr, " freeing rnode '%s' at %p\n", current->label, current);
                 free(current->label);
 		free(current);
 	}	

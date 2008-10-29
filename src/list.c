@@ -59,6 +59,9 @@ void append_element(struct llist *list, void *data)
 		list->tail = el_p;
 	}
 	list->count += 1;
+
+        fprintf (stderr, "appended element %p (data: %p) to list %p\n",
+                        el_p, data, list);
 }
 
 struct llist *llist_reverse(struct llist *list)

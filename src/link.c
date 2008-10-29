@@ -44,7 +44,7 @@ void link_p2c(struct rnode *parent, struct rnode *child, char *length_s)
 
 char * compute_new_edge_length(char * length_as_string)
 {
-	char *result = "";
+	char *result;
 
 	if (0 != strcmp("", length_as_string)) {
 		double length = atof(length_as_string);
@@ -52,7 +52,12 @@ char * compute_new_edge_length(char * length_as_string)
 		 * an in-house version that does not require nonstandard
 		 * extensions. */
 		asprintf(&result, "%g", length / 2);
-	}
+	} else  {
+                /* Note: we cannot just say result = ""; because result will be
+                 * free()d later, so it has to have been dynamically allocated.
+                 * */
+                result = strdup("");
+        }
 
 	return result;
 }
@@ -154,6 +159,16 @@ void splice_out_rnode(struct rnode *this)
 	/* insert list of modified edges in parent's children list */
 	insert_after(parent->children, i-1, kids_copy);
 	free(kids_copy);
+
+        /* Now free the node, its label, parent edge, etc */
+        // TODO: really we should have a destroy_rnode() function
+        if (NULL != this->parent_edge) {
+                free(this->parent_edge->length_as_string);
+                free(this->parent_edge);
+        }
+        free(this->children);
+        free(this->label);
+        free(this);
 }
 
 void reverse_redge(struct redge *edge)
