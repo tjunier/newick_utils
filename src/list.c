@@ -292,6 +292,7 @@ void clear_llist(struct llist *l)
 	e = l->head;
 	while (NULL != e) {
 		f = e->next;
+                fprintf (stderr, "freeing element %p (data: %p) from list %p\n", e, e->data, l);
 		free(e);
 		e = f;
 	}
