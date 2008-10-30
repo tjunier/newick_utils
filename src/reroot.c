@@ -237,11 +237,6 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		}
 	}
 	destroy_llist(outgroup_nodes);
-
-	/* I use this rather than destroy_tree(), because the tree structure
-	 * has been changed. */
-	//fprintf(stderr, "freeing tree nodes...\n");
-	free_descendants(tree->root);
 }
 
 int main(int argc, char *argv[])
@@ -254,8 +249,10 @@ int main(int argc, char *argv[])
 	while (NULL != (tree = parse_tree())) {
 		//fprintf(stderr, "rerooting...\n");
 		process_tree(tree, params);
-		// NOTE: DO NOT use destroy_tree() on this tree, since it has
-		// been modified!
+		// NOTE: We CANNOT use destroy_tree() on this tree, since it has
+		// been modified! This is why we do:
+		free_descendants(tree->root);
+		free(tree);
 	}
 
 	destroy_llist(params.labels);
