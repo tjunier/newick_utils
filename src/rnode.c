@@ -97,7 +97,7 @@ void free_descendants(struct rnode *node)
 		}
                 /* these 3 should never be NULL (see create_rnode() above) */
                 destroy_llist(current->children);
-                fprintf (stderr, " freeing rnode '%s' at %p\n", current->label, current);
+                // fprintf (stderr, " freeing rnode '%s' at %p\n", current->label, current);
                 free(current->label);
 		free(current);
 	}	

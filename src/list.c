@@ -60,8 +60,7 @@ void append_element(struct llist *list, void *data)
 	}
 	list->count += 1;
 
-        fprintf (stderr, "appended element %p (data: %p) to list %p\n",
-                        el_p, data, list);
+        //fprintf (stderr, "appended element %p (data: %p) to list %p\n", el_p, data, list);
 }
 
 struct llist *llist_reverse(struct llist *list)
@@ -292,7 +291,6 @@ void clear_llist(struct llist *l)
 	e = l->head;
 	while (NULL != e) {
 		f = e->next;
-                fprintf (stderr, "freeing element %p (data: %p) from list %p\n", e, e->data, l);
 		free(e);
 		e = f;
 	}

@@ -137,7 +137,6 @@ void splice_out_rnode(struct rnode *this)
 	/* change the children's parent edges: they must now point to their
 	 * 'grandparent', and the length from their parent to their grandparent
 	 * must be added. */
-
 	for (elem = this->children->head; NULL != elem; elem = elem->next) {
 		struct redge *child_edge = (struct redge *) elem->data;
 		char *new_edge_len_s = add_len_strings(
@@ -166,7 +165,7 @@ void splice_out_rnode(struct rnode *this)
                 free(this->parent_edge->length_as_string);
                 free(this->parent_edge);
         }
-        free(this->children);
+        destroy_llist(this->children);
         free(this->label);
         free(this);
 }
