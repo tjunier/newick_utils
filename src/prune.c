@@ -131,6 +131,10 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 	}
 
 	destroy_hash(lbl2node_map);
+	// TODO: We invalidate the tree's nodes list, since it is now wrong.
+	// When get_nodes_in_order() works, we may use it here.
+	destroy_llist(tree->nodes_in_order);
+	tree->nodes_in_order = NULL;
 }
 
 int main(int argc, char *argv[])
@@ -145,7 +149,9 @@ int main(int argc, char *argv[])
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);
-		destroy_tree(tree, FREE_NODE_DATA);
+		/* NOTE: since the tree was modified, we CANNOT use destroy_tree() */
+		free_descendants(tree->root);
+		free(tree);
 	}
 
 	destroy_llist(params.labels);
