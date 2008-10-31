@@ -88,13 +88,8 @@ void free_descendants(struct rnode *node)
 	for (el = keys->head; NULL != el; el = el->next) {
 		char *key = el->data;
 		current = hash_get(to_free, key);
-		if (NULL != current->parent_edge) {
-			assert (NULL != current->parent_edge->length_as_string);
-                        /* should never be NULL (see create_redge()) */
-                        //fprintf (stderr, " freeing redge %p (length %s at %p)\n", current->parent_edge,current->parent_edge->length_as_string,current->parent_edge->length_as_string);
-                        free (current->parent_edge->length_as_string);
-			free (current->parent_edge);
-		}
+		if (NULL != current->parent_edge)
+			destroy_redge (current->parent_edge);
                 /* these 3 should never be NULL (see create_rnode() above) */
                 destroy_llist(current->children);
                 // fprintf (stderr, " freeing rnode '%s' at %p\n", current->label, current);

@@ -87,9 +87,7 @@ void insert_node_above(struct rnode *this, char *label)
 
 	free(new_edge_length);
 	/* destroy parent edge */
-	//fprintf(stderr, " freeing redge %p (length %s at %p)\n", parent_edge, parent_edge->length_as_string, parent_edge->length_as_string);
-	free(parent_edge->length_as_string);
-	free(parent_edge);
+	destroy_redge(parent_edge);
 }
 	
 void replace_child_edge(struct rnode *node, struct redge *old, struct redge *new)
@@ -160,11 +158,8 @@ void splice_out_rnode(struct rnode *this)
 	free(kids_copy);
 
         /* Now free the node, its label, parent edge, etc */
-        // TODO: really we should have a destroy_rnode() function
-        if (NULL != this->parent_edge) {
-                free(this->parent_edge->length_as_string);
-                free(this->parent_edge);
-        }
+        if (NULL != parent_edge) 
+		destroy_redge(parent_edge);
         destroy_llist(this->children);
         free(this->label);
         free(this);
@@ -191,9 +186,7 @@ void reverse_redge(struct redge *edge)
 	add_child_edge(child, reverse_edge); 	/* intentional (reversing!) */
 	reverse_edge->parent_node = child;
 	child->parent_edge = NULL;	
-	//fprintf(stderr, " freeing redge %p (length %s at %p)\n", edge, edge->length_as_string, edge->length_as_string);
-        free(edge->length_as_string);
-        free(edge);
+	destroy_redge(edge);
 }
 
 struct rnode * unlink_rnode(struct rnode *node)
@@ -207,6 +200,7 @@ struct rnode * unlink_rnode(struct rnode *node)
 	/* We get the resulting list only so we can free it. */
 	struct llist *del = delete_after(siblings, index-1, 1);
 	destroy_llist(del);	
+	destroy_redge(parent_edge);
 	if (1 == siblings->count) {
 		if (is_root(parent)) {
 			return ((struct redge *) siblings->head->data)->child_node;

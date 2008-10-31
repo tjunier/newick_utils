@@ -45,6 +45,16 @@ struct redge *create_redge(char *length_s)
 	return redgep;
 }
 
+void destroy_redge(struct redge *edge)
+{
+#ifdef SHOW_REDGE_DESTROY
+	fprintf(stderr, " freeing redge %p (length %s at %p)\n",
+		edge, edge->length_as_string, edge->length_as_string);
+#endif
+	free(edge->length_as_string);
+	free(edge);
+}
+
 void dump_redge(void *arg) {
 	struct redge *edge = (struct redge *) arg;
 	printf ("edge ");

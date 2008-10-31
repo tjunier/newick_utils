@@ -20,6 +20,10 @@ struct redge {
 
 struct redge *create_redge(char *length);
 
+/* Frees the memory used by an edge */
+
+void destroy_redge(struct redge *);
+
 /* A dump function, for use with dump_llist() */
 
 void dump_redge(void *);
