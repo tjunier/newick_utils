@@ -156,7 +156,9 @@ void remove_inner_node_labels(struct rooted_tree *target_tree)
 		struct rnode *current = el->data;
 		if (is_leaf(current)) continue;
 		free(current->label);
-		current->label = "";
+		// We need to allocate dynamically, since this will later be
+		// passed to free().
+		current->label = strdup("");
 	}
 }
 
@@ -191,7 +193,10 @@ void remove_branch_lengths(struct rooted_tree *target_tree)
 		struct redge *cur_edge = current->parent_edge;
 		if (strcmp("", cur_edge->length_as_string) != 0) {
 			free(cur_edge->length_as_string);
-			cur_edge->length_as_string = "";
+			// We need to allocate dynamically, since this will
+			// later be passed to free():
+			// WRONG! cur_edge->length_as_string = ""
+			cur_edge->length_as_string = strdup("");
 		}
 	}
 }
@@ -230,8 +235,11 @@ int main(int argc, char *argv[])
 		if (match) printf ("%s\n", original_newick);
 		free(processed_newick);
 		free(original_newick);
+		destroy_tree(tree, DONT_FREE_NODE_DATA);
 	}
 
+	destroy_hash(pattern_labels);
 	free(pattern_newick);
+	destroy_tree(pattern_tree, DONT_FREE_NODE_DATA);
 	return 0;
 }
