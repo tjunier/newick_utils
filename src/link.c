@@ -156,17 +156,7 @@ void splice_out_rnode(struct rnode *this)
 	/* insert list of modified edges in parent's children list */
 	insert_after(parent->children, i-1, kids_copy);
 	free(kids_copy);
-
-	// TODO: this function should NOT destroy the node, as it then becomes
-	// impossible to use the tree's nodes-in-order list to free the nodes.
-	// When it's impossible to do so anyway, we can always free the node
-	// just after calling this function. This will allow nw_prune (which
-	// can free nodes via the tree) to coexist with nw_reroot (which
-	// cannot).
-
-	/* Now free the node (and its label, parent edge, etc ) */
-	// fprintf (stderr, "freeing '%s' (spliced out).\n", this->label);
-	destroy_rnode(this, NULL); }
+}
 
 void reverse_redge(struct redge *edge)
 {

@@ -56,8 +56,11 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	}
         destroy_llist(revert_list);
 
-	if (children_count(old_root) == 1)
+	if (children_count(old_root) == 1) {
 		splice_out_rnode(old_root);
+		// fprintf (stderr, "freeing '%s' (spliced out).\n", old_root->label);
+		destroy_rnode(old_root, NULL);
+	}
 
 	tree->root = new_root;
 	/* TODO: The tree's structure was changed, so 'nodes_in_order' is now

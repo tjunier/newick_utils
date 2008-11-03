@@ -106,6 +106,7 @@ EXTRA_DIST = \
 	tests/test_nw_prune_def1.exp \
 	tests/test_nw_prune_def2.exp \
 	tests/test_nw_prune_def3.exp \
+	tests/test_nw_prune_multi.exp \
 	tests/test_nw_prune.sh \
 	tests/test_nw_rename_args \
 	tests/test_nw_rename_l.exp \
