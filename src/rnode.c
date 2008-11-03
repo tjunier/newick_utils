@@ -28,11 +28,22 @@ struct rnode *create_rnode(char *label)
 	node_p->data = NULL;
 
 #ifdef SHOW_RNODE_CREATE
-	fprintf(stderr, "creating rnode '%s' at %p\n", node_p->label,
-			node_p);
+	fprintf(stderr, "creating rnode %p '%s'\n", node_p, node_p->label);
 #endif
 
 	return node_p;
+}
+
+void destroy_rnode(struct rnode *node, void (*free_data)(void*))
+{
+#ifdef SHOW_RNODE_DESTROY
+	fprintf (stderr, " freeing rnode %p '%s'\n", node, node->label);
+#endif
+	if (NULL != node->parent_edge)
+		destroy_redge(node->parent_edge);
+	destroy_llist(node->children);
+	free(node->label);
+	free(node);
 }
 
 int children_count(struct rnode *node)
@@ -76,6 +87,7 @@ void free_descendants(struct rnode *node)
 	// Iterates through the tree nodes, "remembering" nodes seen for the
 	// first time
 	while (NULL != (current = rnode_iterator_next(it))) {
+		// fprintf (stderr, "visiting node %s\n", current->label);
 		char *node_hash_key = make_hash_key(current);
 		if (NULL == hash_get(to_free, node_hash_key))
 			hash_set(to_free, node_hash_key, current);
@@ -88,13 +100,7 @@ void free_descendants(struct rnode *node)
 	for (el = keys->head; NULL != el; el = el->next) {
 		char *key = el->data;
 		current = hash_get(to_free, key);
-		if (NULL != current->parent_edge)
-			destroy_redge (current->parent_edge);
-                /* these 3 should never be NULL (see create_rnode() above) */
-                destroy_llist(current->children);
-                // fprintf (stderr, " freeing rnode '%s' at %p\n", current->label, current);
-                free(current->label);
-		free(current);
+		destroy_rnode(current, NULL);
 	}	
 
         destroy_llist(keys);

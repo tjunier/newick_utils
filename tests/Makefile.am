@@ -45,7 +45,7 @@ test_lca_SOURCES = test_lca.c $(SRC)/lca.c $(SRC)/list.c $(SRC)/nodemap.c \
 	$(SRC)/rnode_iterator.c tree_stubs.c
 
 test_nodemap_SOURCES = test_nodemap.c $(SRC)/nodemap.c \
-	$(SRC)/rnode.c $(SRC)/list.c $(SRC)/hash.c \
+	$(SRC)/rnode.c $(SRC)/list.c $(SRC)/hash.c $(SRC)/redge.c \
 	$(SRC)/rnode_iterator.c 
 
 test_to_newick_SOURCES = test_to_newick.c $(SRC)/to_newick.c \

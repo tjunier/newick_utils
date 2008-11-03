@@ -247,10 +247,11 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		//fprintf(stderr, "rerooting...\n");
+		// fprintf(stderr, "rerooting...\n");
 		process_tree(tree, params);
 		// NOTE: We CANNOT use destroy_tree() on this tree, since it has
 		// been modified! This is why we do:
+		// fprintf(stderr, "freeing tree...\n");
 		free_descendants(tree->root);
 		free(tree);
 	}

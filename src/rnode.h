@@ -14,6 +14,11 @@ struct rnode {
 
 struct rnode *create_rnode(char *label);
 
+/* Destroys the rnode, including the parent edge (if any). If free_data is not
+ * NULL, it is called to free the node's data */
+
+void destroy_rnode(struct rnode *node, void (*free_data)(void*));
+
 /* returns the number of children a node has. */
 
 int children_count(struct rnode *node);
