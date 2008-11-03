@@ -53,7 +53,9 @@ void order_tree(struct rooted_tree *tree)
 				(void **) kids_array, count);
 			current->children = ordered_kids_list;
 
+			// Get sort field from first child ("back-inherit") [?]
 			current->data = kids_array[0]->child_node->data;
+			free(kids_array);
 		}
 	}
 }
