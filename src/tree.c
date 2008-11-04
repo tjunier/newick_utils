@@ -263,7 +263,11 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree,
 			append_element(result, node);
 		}
 	}
+	/* This does not free 'preg' itself, only memory pointed to by 'preg'
+	 * members and allocated by regcomp().*/
 	regfree(preg);
+	/* Therefore: */
+	free(preg);
 
 	return result;
 }
