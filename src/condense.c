@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);
+		destroy_tree(tree, DONT_FREE_NODE_DATA);
 	}
 
 	return 0;

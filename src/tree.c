@@ -119,8 +119,10 @@ void collapse_pure_clades(struct rooted_tree *tree)
 		if (! all_children_are_leaves(current)) continue;
 		char *label;
 		if (all_children_have_same_label(current, &label)) {
-			/* set own label to children's label */
-			current->label = label;
+			/* set own label to children's label  - we copy it
+			 * because it will be later passed to free() */
+			free(current->label);
+			current->label = strdup(label);
 			/* remove children */
 			clear_llist(current->children);
 		}
