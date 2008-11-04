@@ -342,7 +342,7 @@ void print_distance_list (struct rnode *origin,
 
 /* NOTE: this function could be made more efficient. First, the matrix is
  * symmetric, yet each cell is computed. It is trivial to halve the job.
- * Second, for every pait of labels, the LCA is computed from scratch. But
+ * Second, for every pair of labels, the LCA is computed from scratch. But
  * there is a better way, akin to dynamic programming (heck, maybe it *is*
  * dynamic programming): one can fill a table of LCAs in the following way:
  *
@@ -363,6 +363,10 @@ void print_distance_list (struct rnode *origin,
  * descendants whose LCA we seek is an inner node, one can always fetch its
  * leftmost (or rightmost) descendant from the tree, and use this to get the
  * LCA.
+ *
+ * NOTE: In fact, it is possible to find LCAs in constant time using suffix
+ * trees. Whether this would really be a significant improvement here is
+ * another question.
  */
 
 double ** fill_matrix (struct rooted_tree *tree, struct llist *selected_nodes)
@@ -432,6 +436,12 @@ void print_distance_matrix (struct rooted_tree *tree,
 				putchar('\t');
 		}
 	}	
+
+	/* free matrix's rows, then matrix itself */
+	for (j = 0; j < selected_nodes->count; j++) {
+		free(matrix[j]);
+	}
+	free(matrix);
 }
 
 int main(int argc, char *argv[])
@@ -492,6 +502,7 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 
+		destroy_llist(selected_nodes);
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
 

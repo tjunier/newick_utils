@@ -225,6 +225,7 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 			append_element(result, node);
 		}
 	}
+	destroy_hash(label2node_map);
 
 	return result;
 }
