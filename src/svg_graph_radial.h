@@ -1,3 +1,5 @@
+struct h_data;
+struct rooted_tree;
 
 /* Displays a radial tree in an SVG <g> element */
 

@@ -1,3 +1,4 @@
+struct rooted_tree;
 
 /* Replaces '_' by ' ' (changes argument!) */
 

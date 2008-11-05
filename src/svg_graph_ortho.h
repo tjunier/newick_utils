@@ -1,3 +1,6 @@
+struct rooted_tree;
+struct h_data;
+
 /* Functions for drawing orthogonal trees */
 
 void display_svg_tree_orthogonal (

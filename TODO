@@ -1,7 +1,11 @@
-svg_graph.c: separate the code for radial trees from the common SVG code; do
-the same for orthogonal trees. Keep data as private as possible. Ideally the
-client program (i.e., nw_display) should only know about functions for setting
-SVG parameters, and displaying trees. All the rest should be neatly hidden.
+[in progress ] svg_graph.c: separate the code for radial trees from the common
+SVG code; do the same for orthogonal trees. Keep data as private as possible.
+Ideally the client program (i.e., nw_display) should only know about functions
+for setting SVG parameters, and displaying trees. All the rest should be neatly
+hidden.
+
+implement an in-house version of GNU asprintf(), so that we do not need to
+#define _GNU_SOURCE.
 
 nw_gen: check that help is up-to-date (seems to me that it still describes the
 old function)

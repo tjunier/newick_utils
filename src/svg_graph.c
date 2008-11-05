@@ -2,62 +2,65 @@
 
 #define _GNU_SOURCE
 
-#include <math.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <assert.h>
 
-#include "tree.h"
-#include "list.h"
-#include "rnode.h"
-#include "redge.h"
-#include "assert.h"
-#include "readline.h"
-#include "lca.h"
-#include "hash.h"
-#include "svg_graph.h"
-#include "node_pos_alloc.h"
-#include "common.h"
-#include "xml_utils.h"
-#include "graph_common.h"
-#include "svg_graph_common.h"
 #include "svg_graph_radial.h"
 #include "svg_graph_ortho.h"
+#include "common.h"
+#include "graph_common.h"
+#include "hash.h"
+#include "lca.h"
+#include "list.h"
+#include "node_pos_alloc.h"
+#include "readline.h"
+#include "redge.h"
+#include "rnode.h"
+#include "svg_graph_common.h"
+#include "svg_graph.h"
+#include "tree.h"
+#include "xml_utils.h"
 
 struct css_map_element {
 	int clade_nb;	
-	char *style;	/* a valid CSS specification */
+	char *style;	/* a CSS specification */
 	struct llist *labels;
 };
 
-
+// TODO: #define as constants in svg_graph_common.h ?
 char *leaf_label_class = "leaf-label";
 char *inner_label_class = "inner-label";
 
 int init_done = FALSE;
 
-/* We can't pass all the parameters to write_nodes_to_g() or any other function
- * - there are too many of them - so we use external variables. */
+/************************** external variables *****************************/
 
-int graph_width = -1;
-static char *colormap_fname = NULL;
-int svg_whole_v_shift = -1; /* Vertical translation of whole graph */
+/* We can't pass all the parameters to display_svg_tree() or any other function
+ * - there are too many of them - so we use external variables. The static ones
+ *   are only used here, the other ones have external linkage because they are
+ *   used in other modules. */
+
 static int graph_style = -1;
 static FILE *url_map_file = NULL;
 static FILE *css_map_file = NULL;
 static char *leaf_label_style = NULL;
 static char *inner_label_style = NULL;
 static char *edge_label_style = NULL;
-
 static struct llist *css_map = NULL;
-struct hash *url_map = NULL;
 
-/* These are setters for the external variables. This way I can keep them
- * static. I just don't like variables open to anyone, maybe I did too much
- * OO... */
+struct hash *url_map = NULL;
+int graph_width = -1;
+int svg_whole_v_shift = -1; 	/* Vertical translation of whole graph */
+
+/* These are setters for the external variables. This way I can keep most of
+ * them static. I just don't like variables open to anyone, maybe I did too
+ * much OO... I also provide setters for the nonstatic ones, so the interface
+ * is more homogeneous. */
 
 void set_svg_width(int width) { graph_width = width; }
-void set_svg_colormap_file(char *fname) { colormap_fname = fname; }
 void set_svg_whole_v_shift(int shift) { svg_whole_v_shift = shift; }
 void set_svg_style(int style) { graph_style = style; }
 void set_svg_URL_map_file(FILE * map) { url_map_file = map; }
@@ -65,6 +68,8 @@ void set_svg_CSS_map_file(FILE * map) { css_map_file = map; }
 void set_svg_leaf_label_style(char *style) { leaf_label_style = style; }
 void set_svg_inner_label_style(char *style) { inner_label_style = style; }
 void set_svg_edge_label_style(char *style) { edge_label_style = style; }
+
+/************************** functions *****************************/
 
 void svg_CSS_stylesheet()
 {
@@ -94,11 +99,6 @@ void svg_header()
 		"xmlns:xlink='http://www.w3.org/1999/xlink' >");
 	svg_CSS_stylesheet();
 }
-
-/* Builds a colormap structure. This maps SVG color strings to lists of labels.
- * The clade defined by the labels will be of the specified colors. This
- * structure's scope is the whole program, therefore it is an external
- * variable. */
 
 /* Builds a CSS map structure. This is a list of css_map_element elements, each
  * of which contains a style specification and a list of labels. The style will
@@ -200,56 +200,6 @@ void svg_init()
 
 /* Passed to dump_llist() for labels */
 void dump_label (void *lbl) { puts((char *) lbl); }
-
-#if 0
-/* Constructs a hash of node colors from the colormap. Key is node's address,
- * value is a color string. Nodes are specified by their labels or descendant
- * labels ('labels' member of a colormap_pair structure) NOTE: contrary to the
- * colormap itself, this structure is dependent on the tree it is passed to,
- * since the LCA of a list of labels depends on the tree. So it has to be
- * computed for each tree. */
-
-void set_node_colors(struct rooted_tree *tree)
-{
-	/* Attribute colors to LCA of labels as specified in the color map */
-	struct list_elem *elem;
-	for (elem=colormap->head; NULL!=elem; elem=elem->next) {
-		struct colormap_pair *cpair;
-	       	cpair = (struct colormap_pair *) elem->data;
-		struct llist *labels = cpair->labels;
-		/* printf ("Labels:\n");
-		dump_llist(labels, dump_label);
-		printf ("Color: %s\n", cpair->color); */
-		struct rnode *lca = lca_from_labels(tree, labels);
-		((struct svg_data *) lca->data)->color = cpair->color;
-		// printf ("%s -> %s\n", lca->label, cpair->color);
-	}
-
-	/* Attribute colors to other nodes according to ancestors */
-	struct llist *nodes_in_reverse_order;
-	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
-	struct list_elem *el;
-	for (el=nodes_in_reverse_order->head; NULL!=el; el=el->next) {
-		struct rnode *node = (struct rnode *) el->data;
-		struct svg_data *node_data = (struct svg_data *) node->data;
-		if (NULL == node_data->color) {
-			if (is_root(node)) {
-				node_data->color = "black";
-			} else {
-				struct rnode *parent;
-				parent = node->parent_edge->parent_node;
-				char *parent_color =
-					((struct svg_data *) parent->data)
-					->color;
-				assert(NULL != parent_color);
-				node_data->color = parent_color;
-			}
-		}
-	}
-	destroy_llist(nodes_in_reverse_order);
-}
-#endif
-
 
 /* Attributes numbers to clades, based on the CSS style map (if one was
  * supplied - see read_css_map() and svg_CSS_stylesheet() ). The clade number
