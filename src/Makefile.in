@@ -68,7 +68,8 @@ am_nw_display_OBJECTS = $(am__objects_2) display.$(OBJEXT) \
 	canvas.$(OBJEXT) text_graph.$(OBJEXT) \
 	simple_node_pos.$(OBJEXT) svg_graph.$(OBJEXT) \
 	readline.$(OBJEXT) lca.$(OBJEXT) node_pos_alloc.$(OBJEXT) \
-	xml_utils.$(OBJEXT) graph_common.$(OBJEXT)
+	xml_utils.$(OBJEXT) graph_common.$(OBJEXT) \
+	svg_graph_ortho.$(OBJEXT) svg_graph_radial.$(OBJEXT)
 nw_display_OBJECTS = $(am_nw_display_OBJECTS)
 nw_display_DEPENDENCIES =
 am_nw_distance_OBJECTS = $(am__objects_2) distance.$(OBJEXT) \
@@ -258,7 +259,8 @@ NW_OUT = to_newick.c concat.c
 AM_YFLAGS = -d
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
 		simple_node_pos.c svg_graph.c readline.c lca.c \
-		node_pos_alloc.c xml_utils.c graph_common.c
+		node_pos_alloc.c xml_utils.c graph_common.c \
+		svg_graph_ortho.c svg_graph_radial.c 
 
 nw_display_LDADD = @LEXLIB@ -lm
 nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c
@@ -448,6 +450,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/subtree.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/support.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg_graph.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg_graph_ortho.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg_graph_radial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/text_graph.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/to_newick.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/topology.Po@am__quote@

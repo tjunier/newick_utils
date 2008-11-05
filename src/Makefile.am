@@ -30,7 +30,8 @@ address_scanner.c: address_scanner.l
 
 nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
 		simple_node_pos.c svg_graph.c readline.c lca.c \
-		node_pos_alloc.c xml_utils.c graph_common.c
+		node_pos_alloc.c xml_utils.c graph_common.c \
+		svg_graph_ortho.c svg_graph_radial.c 
 
 nw_display_LDADD = @LEXLIB@ -lm
 

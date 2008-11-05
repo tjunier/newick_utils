@@ -20,6 +20,7 @@
 extern struct llist *nodes_in_order;
 extern struct rnode *root;
 extern int lineno;
+char *nwsget_text();
 
 void nwserror(char *s)
 {

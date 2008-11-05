@@ -7,6 +7,7 @@
 
 struct llist *nodes_in_order;
 struct rnode *root;
+int nwsparse(); // TODO: rm this if fails
 
 struct rooted_tree *parse_tree()
 {

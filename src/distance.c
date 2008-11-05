@@ -415,6 +415,9 @@ double ** fill_matrix (struct rooted_tree *tree, struct llist *selected_nodes)
 void print_distance_matrix (struct rooted_tree *tree,
 		struct llist *selected_nodes, int show_headers, int shape)
 {
+	// TODO: implement triangular matrix
+	shape = shape;	// suppresses warnings
+
 	double **matrix = fill_matrix(tree, selected_nodes);
 
 	struct list_elem *h_el, *v_el;

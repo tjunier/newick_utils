@@ -43,6 +43,8 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void*))
 		destroy_redge(node->parent_edge);
 	destroy_llist(node->children);
 	free(node->label);
+	if (NULL != free_data)
+		free_data(node->data);
 	free(node);
 }
 

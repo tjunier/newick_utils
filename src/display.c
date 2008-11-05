@@ -12,6 +12,7 @@
 #include "text_graph.h"
 #include "tree.h"
 #include "graph_common.h"
+#include "svg_graph_common.h"
 
 struct parameters {
 	int width;

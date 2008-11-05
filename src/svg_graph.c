@@ -20,6 +20,9 @@
 #include "common.h"
 #include "xml_utils.h"
 #include "graph_common.h"
+#include "svg_graph_common.h"
+#include "svg_graph_radial.h"
+#include "svg_graph_ortho.h"
 
 struct css_map_element {
 	int clade_nb;	
@@ -27,45 +30,18 @@ struct css_map_element {
 	struct llist *labels;
 };
 
-/* rnode data for SVG trees */
 
-struct svg_data {
-	double top;
-	double bottom;
-	double depth;
-	int clade_nb;	/* For attributing styles */
-	/* ... other node properties ... */
-};
-
-const int ROOT_SPACE = 10;	/* pixels */
-const int LBL_SPACE = 10;	/* pixels */
-const int INNER_LBL_SPACE = 4;	/* pixels */
-const int CHAR_WIDTH = 5;	/* pixels, approximattion for 'medium' fonts */
-const int edge_length_v_offset = -4; /* pixels */
-const double PI = 3.14159;
-const int URL_MAP_SIZE = 100;	/* bins */
-const int UNSTYLED_CLADE = 0;
-
-
-static char *leaf_label_class = "leaf-label";
-static char *inner_label_class = "inner-label";
+char *leaf_label_class = "leaf-label";
+char *inner_label_class = "inner-label";
 
 int init_done = FALSE;
 
 /* We can't pass all the parameters to write_nodes_to_g() or any other function
  * - there are too many of them - so we use external variables. */
 
-static int graph_width = -1;
+int graph_width = -1;
 static char *colormap_fname = NULL;
-static double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
-static int svg_whole_v_shift = -1; /* Vertical translation of whole graph */
-/* If this is zero, the label's baseline is aligned on the branch. Use it to
- * nudge the labels a small angle. Unfortunately the correct amount will depend
- * on the graph's diameter and the label font size. */
-static double svg_label_angle_correction = 0.0;
-/* The following applies to labels on the left side of the tree (because they
- * are subject to a 180° rotation, draw_text_radial() */
-static double svg_left_label_angle_correction = -0.0349; /* -2°, in radians */ 
+int svg_whole_v_shift = -1; /* Vertical translation of whole graph */
 static int graph_style = -1;
 static FILE *url_map_file = NULL;
 static FILE *css_map_file = NULL;
@@ -74,7 +50,7 @@ static char *inner_label_style = NULL;
 static char *edge_label_style = NULL;
 
 static struct llist *css_map = NULL;
-static struct hash *url_map = NULL;
+struct hash *url_map = NULL;
 
 /* These are setters for the external variables. This way I can keep them
  * static. I just don't like variables open to anyone, maybe I did too much
@@ -82,12 +58,7 @@ static struct hash *url_map = NULL;
 
 void set_svg_width(int width) { graph_width = width; }
 void set_svg_colormap_file(char *fname) { colormap_fname = fname; }
-void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
 void set_svg_whole_v_shift(int shift) { svg_whole_v_shift = shift; }
-void set_svg_left_label_angle_correction(double corr) {
-	svg_left_label_angle_correction = corr; }
-void set_svg_label_angle_correction(double corr) {
-	svg_label_angle_correction = corr; }
 void set_svg_style(int style) { graph_style = style; }
 void set_svg_URL_map_file(FILE * map) { url_map_file = map; }
 void set_svg_CSS_map_file(FILE * map) { css_map_file = map; }
@@ -225,285 +196,6 @@ void svg_init()
 	css_map = read_css_map();
 	url_map = read_url_map();
 	init_done = 1;
-}
-
-/* Outputs an SVG <g> element with all the tree branches, orthogonal */
-
-void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
-		const double v_scale, int align_leaves, double dmax)
-{
-	printf("<g "
-	       	" style='stroke:black;fill:none;stroke-width:1;"
-		"stroke-linecap:round'>"
-		);
-
-	struct list_elem *elem;
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		struct rnode *node = elem->data;
-		struct svg_data *node_data = (struct svg_data *) node->data;
-
-		/* For cladograms */
-		if (align_leaves && is_leaf(node))
-			node_data->depth = dmax;
-
-		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
-		double svg_top_pos = v_scale * node_data->top; 
-		double svg_bottom_pos = v_scale * node_data->bottom; 
-		double svg_mid_pos =
-			0.5 * v_scale * (node_data->top+node_data->bottom);
-
-		/* draw node (vertical line), except for leaves */
-		if (! is_leaf(node)) {
-		printf("<line class='clade_%d' "
-			"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-			node_data->clade_nb, svg_h_pos, svg_top_pos, svg_h_pos,
-			svg_bottom_pos);
-		}
-		/* draw horizontal line */
-		if (is_root(node)) {
-			printf("<line x1='0' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				svg_mid_pos, svg_h_pos, svg_mid_pos);
-
-		} else {
-			struct rnode *parent = node->parent_edge->parent_node;
-			struct svg_data *parent_data = parent->data;
-			double svg_parent_h_pos = ROOT_SPACE + (
-				h_scale * parent_data->depth);
-			printf ("<line class='clade_%d' "
-				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				node_data->clade_nb, svg_parent_h_pos,
-				 svg_mid_pos, svg_h_pos, svg_mid_pos);
-		}
-
-	}
-	printf("</g>");
-}
-
-/* Outputs an SVG <g> element with all the tree branches, radial. In this
- * context, a node's 'top' and 'bottom' are angles, not vertical positions */
-
-void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
-		const double a_scale, int align_leaves, double dmax)
-{
-	printf( "<g"
-	       	" style='stroke:black;fill:none;stroke-width:1;"
-		"stroke-linecap:round'>"
-	    	);
-
-	struct list_elem *elem;
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		struct rnode *node = elem->data;
-		struct svg_data *node_data = (struct svg_data *) node->data;
-
-		/* For cladograms */
-		if (align_leaves && is_leaf(node))
-			node_data->depth = dmax;
-
-		int clade_nb = node_data->clade_nb;
-		double svg_radius = ROOT_SPACE + (r_scale * node_data->depth);
-		double svg_top_angle = a_scale * node_data->top; 
-		double svg_bottom_angle = a_scale * node_data->bottom; 
-		double svg_mid_angle =
-			0.5 * a_scale * (node_data->top+node_data->bottom);
-		double svg_mid_x_pos = svg_radius * cos(svg_mid_angle);
-		double svg_mid_y_pos = svg_radius * sin(svg_mid_angle);
-		int large_arc_flag;
-		if (svg_bottom_angle - svg_top_angle > PI)
-			large_arc_flag = 1; /* keep 1 and 0: literal SVG flags */
-		else
-			large_arc_flag = 0;
-
-		/* draw node (arc), except for leaves */
-		if (! is_leaf(node)) {
-			double svg_top_x_pos = svg_radius * cos(svg_top_angle);
-			double svg_top_y_pos = svg_radius * sin(svg_top_angle);
-			double svg_bot_x_pos = svg_radius * cos(svg_bottom_angle);
-			double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
-			printf("<path class='clade_%d'"
-			       " d='M%.4f,%.4f A%4f,%4f 0 %d 1 %.4f %.4f'/>",
-				clade_nb,
-				svg_top_x_pos, svg_top_y_pos,
-				svg_radius, svg_radius,
-				large_arc_flag,
-				svg_bot_x_pos, svg_bot_y_pos);
-		}
-		/* draw radial line */
-		if (is_root(node)) {
-			printf("<line x1='0' y1='0' x2='%.4f' y2='%.4f'/>",
-				svg_mid_x_pos, svg_mid_y_pos);
-		} else {
-			struct rnode *parent = node->parent_edge->parent_node;
-			struct svg_data *parent_data = parent->data;
-			double svg_parent_radius = ROOT_SPACE + (
-				r_scale * parent_data->depth);
-			double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
-			double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
-			printf ("<line class='clade_%d' "
-				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				clade_nb,
-				svg_mid_x_pos, svg_mid_y_pos,
-				svg_par_x_pos, svg_par_y_pos);
-		}
-
-	}
-	printf("</g>");
-}
-
-/* Prints the node text (labels and lengths) in a <g> element, orthogonal */
-
-void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
-		const double v_scale, int align_leaves, double dmax)
-{
-	printf( "<g style='stroke:none'>");
-
-	struct list_elem *elem;
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		struct rnode *node = elem->data;
-		struct svg_data *node_data = (struct svg_data *) node->data;
-
-		/* For cladograms */
-		if (align_leaves && is_leaf(node))
-			node_data->depth = dmax;
-
-		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
-		double svg_mid_pos =
-			0.5 * v_scale * (node_data->top+node_data->bottom);
-
-		char *url = NULL;
-		if (url_map) url = hash_get(url_map, node->label);
-
-		char *class;
-		if (is_leaf(node))
-			class = leaf_label_class;
-		else
-			class = inner_label_class;
-
-		/* draw label IFF it is nonempty */
-
-		if (0 != strcmp(node->label, ""))
-			if (url) printf ("<a %s>", url);
-			printf("<text class='%s' "
-			       "x='%.4f' y='%.4f'>%s</text>",
-				class, svg_h_pos + LBL_SPACE,
-				svg_mid_pos, node->label);
-			if (url) printf ("</a>");
-
-		/* Branch lengths */
-
-		if (! is_root(node)) {
-			struct rnode *parent = node->parent_edge->parent_node;
-			struct svg_data *parent_data = parent->data;
-			double svg_parent_h_pos = ROOT_SPACE + (
-				h_scale * parent_data->depth);
-			/* Print branch length IFF it is nonempty AND 
-			 * requested size is not 0 */
-			if (0 != strcmp(node->parent_edge->length_as_string,
-						"")) {
-				printf("<text class='edge-label' "
-					"x='%4f' y='%4f'>%s</text>",
-					(svg_h_pos + svg_parent_h_pos) / 2.0,
-					edge_length_v_offset + svg_mid_pos,
-					node->parent_edge->length_as_string);
-			}
-		}
-
-	}
-	printf("</g>");
-}
-
-/* Prints the node text (labels and lengths) in a <g> element, radial */
-
-void draw_text_radial (struct rooted_tree *tree, const double r_scale,
-		const double a_scale, int align_leaves, double dmax)
-{
-	printf( "<g style='stroke:none'>");
-
-	struct list_elem *elem;
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		struct rnode *node = elem->data;
-		struct svg_data *node_data = (struct svg_data *) node->data;
-
-		/* For cladograms */
-		if (align_leaves && is_leaf(node))
-			node_data->depth = dmax;
-
-		double radius = ROOT_SPACE + (r_scale * node_data->depth);
-		double mid_angle =
-			0.5 * a_scale * (node_data->top+node_data->bottom);
-		double x_pos;
-		double y_pos;
-
-		mid_angle += svg_label_angle_correction;
-
-		double lbl_space;
-		if (is_leaf(node))
-			lbl_space = LBL_SPACE;
-		else
-			lbl_space = INNER_LBL_SPACE;
-
-		char *url = NULL;
-		if (url_map) url = hash_get(url_map, node->label);
-
-		char *class;
-		if (is_leaf(node))
-			class = leaf_label_class;
-		else
-			class = inner_label_class;
-
-		/* draw label IFF it is nonempty */
-		if (0 != strcmp(node->label, "")) {
-			if (url) printf ("<a %s>", url);
-			if (cos(mid_angle) >= 0)  {
-				x_pos = (radius+lbl_space) * cos(mid_angle);
-				y_pos = (radius+lbl_space) * sin(mid_angle);
-				printf("<text class='%s' "
-				       "transform='rotate(%g,%g,%g)' "
-				       "x='%.4f' y='%.4f'>%s</text>",
-					class,
-					mid_angle / (2*PI) * 360,
-					x_pos, y_pos,
-					x_pos, y_pos, node->label);
-			}
-			else {
-				mid_angle += svg_left_label_angle_correction;
-				x_pos = (radius+lbl_space) * cos(mid_angle);
-				y_pos = (radius+lbl_space) * sin(mid_angle);
-				printf(	"<text class='%s' "
-					"style='text-anchor:end;' "
-				       	"transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
-				       "x='%.4f' y='%.4f'>%s</text>",
-					class,
-					mid_angle / (2*PI) * 360,
-					x_pos, y_pos,
-					x_pos, y_pos,
-					x_pos, y_pos, node->label);
-			}
-			if (url) printf("</a>");
-		}
-		/* TODO: add this when node labels work */
-		/*
-		if (! is_root(node)) {
-			struct rnode *parent = node->parent_edge->parent_node;
-			struct svg_data *parent_data = parent->data;
-			double svg_parent_h_pos = ROOT_SPACE + (
-				h_scale * parent_data->depth);
-				*/
-			/* Print branch length IFF it is nonempty AND 
-			 * requested size is not 0 */
-			/*
-			if (0 != strcmp(branch_length_font_size, "0") &&
-			    0 != strcmp(node->parent_edge->length_as_string, "")) {
-				printf("<text style='stroke:none;font-size:%s' "
-					"x='%4f' y='%4f'>%s</text>",
-					branch_length_font_size,
-					(svg_h_pos + svg_parent_h_pos) / 2.0,
-					edge_length_v_offset + svg_mid_pos,
-					node->parent_edge->length_as_string);
-			}
-		}
-		*/
-	}
-	printf("</g>");
 }
 
 /* Passed to dump_llist() for labels */
@@ -647,131 +339,11 @@ double svg_get_node_depth (struct rnode *node)
 	return ((struct svg_data *) node->data)->depth;
 }
 
-/* Returns the largest power of ten not greater than argument */
-
 double largest_PoT_lte(double arg)
 {
 	double l10 = log(arg) / log(10);
 	double l10_fl = floor(l10);
 	return pow(10, l10_fl);
-}
-
-/* Draws a scale bar below the tree. Uses a heuristic to manage horizontal
- * space */
-
-void draw_scale_bar(struct rooted_tree *tree, double h_scale,
-		double v_scale, double d_max, char *branch_length_unit)
-{
-	/* Finds the largest power of 10 that is smaller than the tree's depth.
-	 * Then draws as many multiples of this length as possible. If no more
-	 * than one can be drawn (because it's longer than half the tree's
-	 * depth), then we draw tick marks inside it instead. */
-
-	const int big_tick_height = 5; 			/* px */
-	const int small_tick_height = 3;		/* px */
-	const int units_text_voffset = -13;		/* px */
-	const int vsep = 1;				/* px */
-	double vpos = leaf_count(tree) * v_scale; 	/* px */
-	double pot = largest_PoT_lte(d_max);		/* tree units */
-	double scale_length = pot * h_scale;		/* px */
-
-	printf ("<g transform='translate(%d,%g)'>", ROOT_SPACE, vpos); 
-
-	if (2 * pot > d_max) {
-		/* print 1/10th tick marks */
-		printf ("<path style='stroke:black' d='M 0 %d l 0 %d "
-		       "l %g 0 l 0 %d'/>", vsep, big_tick_height, scale_length,
-		       -big_tick_height);
-		int i;
-		for (i = 1; i < 10; i++)
-			printf ("<path d='M %g %d l 0 %d'/>",
-				i * (scale_length/10), 
-				vsep + big_tick_height - small_tick_height,
-				small_tick_height);
-		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:start' x='0' y='0'>0</text>");
-		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:end' x='%g' y='0'>%g</text>",
-			scale_length, pot);
-		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:end' x='%g' y='0'>%g</text>",
-			scale_length/2, pot/2);
-	} else {
-		/* print as many multiples of 'scale_length' as  will fit */
-		printf ("<path d='M 0 %d l 0 %d'/>", vsep, big_tick_height);
-		printf ("<text style='font-size:small;text-anchor:stat;"
-			"stroke:none' x='0' y='0'>0</text>");
-		int i;
-		for (i = 0; (i+1)*pot < d_max; i++) {
-			printf ("<path transform='translate(%g,0)' "
-				"style='stroke:black;fill:none' d='M 0 %d l %g 0 l 0 %d'/>",
-				i*scale_length, vsep+big_tick_height,
-				scale_length, -big_tick_height);
-			printf ("<text transform='translate(%g,0)' "
-				"style='font-size:small;text-anchor:end;"
-				"ststroke:black' x='0' y='0'>%g</text>",
-				(i+1)*scale_length, (i+1)*pot);
-		}
-	}
-	printf ("<text style='font-size:small;stroke:none' x='0' y='%d'>"
-		"%s</text>", units_text_voffset, branch_length_unit);
-	printf ("</g>");
-}
-
-void display_svg_tree_orthogonal(struct rooted_tree *tree,
-		struct h_data hd, int align_leaves, int with_scale_bar,
-		char *branch_length_unit)
-{
-	double h_scale = -1;
-	/* This could get more complicated if we print many trees with
-	 * different scales. For now, it's fixed. */
-	double v_scale = leaf_vskip;
-
-	// if (css_map) set_clade_numbers(tree);
- 	// prettify_labels(tree);
-
-	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
-	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
-
-	/* Tree is in a separate group - may be useful when (if?) there are
-	 * more than one tree*/
-	printf( "<g"
-		" transform='translate(0,%d)'"
-		">", svg_whole_v_shift);
-	/* We draw all the tree's branches in an SVG group of their own, to
-	 * facilitate editing via Inkscape, Illustrator, etc. */
-	draw_branches_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
-	/* ... likewise for text */
-	draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
-	/* Draw scale bar if required */
-	if (with_scale_bar) draw_scale_bar(tree, h_scale, v_scale, hd.d_max,
-			branch_length_unit);
-	printf ("</g>");
-}
-
-void display_svg_tree_radial(struct rooted_tree *tree,
-		struct h_data hd, int align_leaves)
-{
-	double r_scale = -1;
-	/* By using 1.9 PI instead of 2 PI, we leave a wedge that shows the
-	 * tree's bounds */
-	double a_scale = 1.9 * PI / leaf_count(tree); /* radians */
-
-	//if (colormap) set_node_colors(tree);
-	// if (css_map) set_clade_numbers(tree);
- 	// prettify_labels(tree);
-
-	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
-	/* draw nodes */
-	r_scale = (0.5 * graph_width - CHAR_WIDTH * hd.l_max - 2 * ROOT_SPACE - LBL_SPACE) / hd.d_max;
-	printf( "<g transform='translate(%g,%g)'>",
-		 	graph_width / 2.0, graph_width / 2.0);
-	/* We draw all the tree's branches in an SVG group of their own, to
-	 * facilitate editing. */
-	draw_branches_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
-	/* likewise for text */
-	draw_text_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
-	printf ("</g>");
 }
 
 void display_svg_tree(struct rooted_tree *tree, int align_leaves,

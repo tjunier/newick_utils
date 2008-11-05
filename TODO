@@ -1,8 +1,10 @@
+svg_graph.c: separate the code for radial trees from the common SVG code; do
+the same for orthogonal trees. Keep data as private as possible. Ideally the
+client program (i.e., nw_display) should only know about functions for setting
+SVG parameters, and displaying trees. All the rest should be neatly hidden.
 
 nw_gen: check that help is up-to-date (seems to me that it still describes the
 old function)
-
-svg_graph.c: make all functions static, except those that are used elsewhere
 
 nw_display: output better message when colormap labels are not found
 
@@ -170,3 +172,5 @@ tag (we now have href, which is the only required one, make it possible to
 
 [done] nw_clade: output context, e.g. given a LCA, output the containing clade, n levels up (n specifiable)
 specify oters on the same line)
+
+[done] Valgrind everything

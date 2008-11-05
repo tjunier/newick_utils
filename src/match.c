@@ -73,7 +73,7 @@ void help(char* argv[])
 "\n"
 "# Prints trees in data/vrt_gen.nw where Tamias is closer to Homo than it is\n"
 "# to Vulpes:\n"
-"$ %s data/vrt_gen.nw '((Tamias,Homo),Vulpes);'\n",
+"$ %s data/vrt_gen.nw '((Tamias,Homo),Vulpes);'\n"
 "\n"
 "# Prints trees in data/vrt_gen.nw where Tamias is NOT closer to Homo than it is\n"
 "# to Vulpes:\n"

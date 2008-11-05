@@ -2,6 +2,7 @@
  * for displaying and computing node distances. */
 
 struct rooted_tree;
+struct rnode;
 
 /* used for returning max depth and max label length */
 

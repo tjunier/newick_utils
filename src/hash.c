@@ -2,6 +2,8 @@
 
 /* Values are arbitrary objects (void *), keys are char*. Hash size is fixed at creation. */
 
+#define _GNU_SOURCE
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
