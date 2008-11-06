@@ -10,6 +10,7 @@
 
 #include "hash.h"
 #include "list.h"
+#include "masprintf.h"
 
 struct hash *create_hash(int n)
 {
@@ -162,8 +163,8 @@ void destroy_hash(struct hash *h)
 
 char * make_hash_key(void *addr)
 {
-	char *key;
-	if (-1 == asprintf(&key, "%p", addr)) {
+	char *key = masprintf("%p", addr);
+	if (NULL == key) {
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}

@@ -1,8 +1,3 @@
-[in progress ] svg_graph.c: separate the code for radial trees from the common
-SVG code; do the same for orthogonal trees. Keep data as private as possible.
-Ideally the client program (i.e., nw_display) should only know about functions
-for setting SVG parameters, and displaying trees. All the rest should be neatly
-hidden.
 
 implement an in-house version of GNU asprintf(), so that we do not need to
 #define _GNU_SOURCE.
@@ -178,3 +173,9 @@ tag (we now have href, which is the only required one, make it possible to
 specify oters on the same line)
 
 [done] Valgrind everything
+
+[done ] svg_graph.c: separate the code for radial trees from the common
+SVG code; do the same for orthogonal trees. Keep data as private as possible.
+Ideally the client program (i.e., nw_display) should only know about functions
+for setting SVG parameters, and displaying trees. All the rest should be neatly
+hidden.

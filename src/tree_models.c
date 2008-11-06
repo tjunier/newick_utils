@@ -139,8 +139,8 @@ double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 	if (remaining_time < 0)
 		length += remaining_time;
 
-	char *length_s;
-       	asprintf(&length_s, "%g", length);
+	char *length_s = masprintf("%g", length);
+	if (NULL == length_s) { perror(NULL); exit(EXIT_FAILURE); }
 	free(leaf->parent_edge->length_as_string);
 	leaf->parent_edge->length_as_string = length_s;
 
@@ -153,8 +153,8 @@ double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 
 struct rnode *create_child_with_time_limit(double time_limit)
 {
-	char *label;
-	asprintf(&label, "n%d", running_number());
+	char *label = asprintf("n%d", running_number());
+	if (NULL == label) { perror(NULL); exit(EXIT_FAILURE); }
 	struct rnode *kid = create_rnode(label);
 	free(label);
 	double *limit_p = malloc(sizeof(double));
@@ -197,8 +197,8 @@ void free_data(char *newick, struct llist *leaves_queue,
 void time_limited_tree(double branch_termination_rate, double duration)
 {
 	/* create root */
-	char *label;
-	asprintf(&label, "n%d", running_number());
+	char *label = asprintf("n%d", running_number());
+	if (NULL == label) { perror(NULL); exit(EXIT_FAILURE); }
 	struct rnode *root = create_rnode(label);
 	free(label);
 

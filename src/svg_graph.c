@@ -1,7 +1,5 @@
 /* text_graph.c - functions for drawing trees on a text canvas. */
 
-#define _GNU_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -156,8 +154,10 @@ struct hash *read_url_map()
 		char *url = wt_next(wtok);
 		char *escaped_url = escape_predefined_character_entities(url);
 		char *anchor_attributes;
-		// TODO: maybe we can do without asprintf()
-		asprintf(&anchor_attributes, "xlink:href='%s' ", escaped_url);
+		anchor_attributes = masprintf("xlink:href='%s' ", escaped_url);
+		if (NULL == anchor_attributes) {
+			perror(NULL); exit (EXIT_FAILURE);
+		}
 		char *att;
 		while ((att = wt_next(wtok)) != NULL) {
 			int att_len = strlen(anchor_attributes);

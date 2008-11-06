@@ -1,10 +1,9 @@
-#define _GNU_SOURCE
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-
+// TODO: Check this!
 #ifndef RNODE_DEF
 #include "rnode.h"
 #endif
@@ -12,6 +11,7 @@
 #include "redge.h"
 #include "list.h"
 #include "link.h"
+#include "masprintf.h"
 
 void add_child_edge(struct rnode *parent, struct redge *edge)
 {
@@ -48,10 +48,8 @@ char * compute_new_edge_length(char * length_as_string)
 
 	if (0 != strcmp("", length_as_string)) {
 		double length = atof(length_as_string);
-		/* TODO: asprintf() is a GNU extension - later replace it with
-		 * an in-house version that does not require nonstandard
-		 * extensions. */
-		asprintf(&result, "%g", length / 2);
+		result = masprintf("%g", length / 2);
+		if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
 	} else  {
                 /* Note: we cannot just say result = ""; because result will be
                  * free()d later, so it has to have been dynamically allocated.
@@ -112,11 +110,12 @@ char *add_len_strings(char *ls1, char *ls2)
 		strcmp("", ls2) != 0)	{
 		double l1 = atof(ls1);
 		double l2 = atof(ls2);
-		asprintf(&result, "%g", l1 + l2);
+		result = masprintf("%g", l1 + l2);
+		if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
 	} else {
-		/* NOTE: this generates an "zero-length format string" warning,
-		 * but it is actually necessary. */
-		asprintf(&result, ""); 
+		result = strdup("");
+		/* I'd be REALLY suprised if this fails... */
+		if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
 	}
 
 	return result;

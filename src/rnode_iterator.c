@@ -8,8 +8,6 @@
 #include "rnode.h"
 #include "redge.h"
 
-#define _GNU_SOURCE	/* needed for asprintf() */
-
 #define SEEN "SEEN"
 
 static const int INIT_HASH_SIZE = 1000;
