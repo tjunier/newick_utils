@@ -3,6 +3,7 @@ EXTRA_DIST = \
 	tests/10vrt.nw \
 	tests/5NCR.cmap \
 	tests/catarrhini.nw \
+	tests/catarrhini_mult.nw \
 	tests/catarrhini_wrong_3og.nw \
 	tests/catarrhini_wrong_mult.nw \
 	tests/catarrhini_wrong.nw \

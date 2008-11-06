@@ -89,7 +89,10 @@ void help(char *argv[])
 "$ %s -m data/catarrhini Homo Pongo Pan\n"
 "\n"
 "# clade defined by a regexp (all Poliovirus)\n"
-"$ %s -r data/HRV.nw '^POLIO.*'\n",
+"$ %s -r data/HRV.nw '^POLIO.*'\n"
+"\n"
+"# clade defined by Homo and Pan, plus 1 level of context\n"
+"$ %s -c 1 data/catarrhini Homo Pan\n",
 	argv[0],
 	argv[0],
 	argv[0],
