@@ -24,6 +24,17 @@ void prepend_element(struct llist *list, void *data);
 
 void append_element(struct llist *list, void *data);
 
+/* Appends list to target list, by redirecting target's pointers and updating
+ * count - no new memory allocation . The list structure pointed to by 'insert'
+ * is not obsolete, but it points to the middle of a list, which may or may not
+ * be desired.*/
+
+void append_list(struct llist *target, struct llist *insert);
+
+/* prepends list to target list  - see comments for append_list(). */
+
+void prepend_list(struct llist *target, struct llist *insert);
+
 /* returns a new list that is the reverse of the argument */
 
 struct llist *llist_reverse(struct llist *list);

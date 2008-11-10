@@ -24,6 +24,15 @@ struct rnode *lca(struct rooted_tree *, struct llist *);
 
 struct rnode *lca_from_nodes(struct rooted_tree *tree, struct llist *labels);
 
-/* Given a tree and a list of labels, returns the LCA */
+/* Given a tree and a list of labels, returns the LCA (assumes labels are
+unique in tree - use lca_from_labels_multi() if labels are not known to be
+unique) - NOTE: there is probably no reason to use this function rather than
+the newer one that can handle multiple nodes with identical labels. Maybe it is
+a little faster. I keep it for compatibility.  */
 
 struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels);
+
+/* Given a tree and a list of labels, returns the LCA (does not assumes that
+labels unique in tree)  */
+
+struct rnode *lca_from_labels_multi(struct rooted_tree *tree, struct llist *labels);

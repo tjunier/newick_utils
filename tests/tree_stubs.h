@@ -33,3 +33,7 @@ struct rooted_tree tree_7();
 /* A tree with labels longer than one char */
 /* ((HRV_A1:1,HRV_A2:1.0)HRV_A:2.0,(HRV_C:1,(HRV_B1:1,HRV_B2:1)HRV_B:2):3)HRV; */
 struct rooted_tree tree_8();
+
+/* A tree with several redundant labels */
+/* (((D,D)e,D)f,((C,B)g,(B,A)h)i)j; */
+struct rooted_tree tree_9();

@@ -331,3 +331,54 @@ struct rooted_tree tree_8()
 
 	return result;
 }
+
+/* A tree with several redundant labels */
+/* (((D,D)e,D)f,((C,B)g,(B,A)h)i)j; */
+struct rooted_tree tree_9()
+{
+	struct rnode *nA, *nB1, *nB2, *nC, *nD1, *nD2, *nD3;
+	struct rnode *ne, *nf, *ng, *nh, *ni, *nj;
+	struct llist *nodes_in_order = create_llist();
+	struct rooted_tree tree;
+
+	nA = create_rnode("A");
+	nB1 = create_rnode("B");
+	nB2 = create_rnode("B");
+	nC = create_rnode("C");
+	nD1 = create_rnode("D");
+	nD2 = create_rnode("D");
+	nD3 = create_rnode("D");
+	ne = create_rnode("e");	
+	nf = create_rnode("f");	
+	ng = create_rnode("g");	
+	nh = create_rnode("h");	
+	ni = create_rnode("i");	
+	nj = create_rnode("j");	
+
+	link_p2c(ne, nD1, "");	
+	link_p2c(ne, nD2, "");	
+	link_p2c(nf, ne, "");
+	link_p2c(nf, nD3, "");
+	link_p2c(ng, nC, "");	
+	link_p2c(ng, nB1, "");	
+	link_p2c(nh, nB2, "");
+	link_p2c(nh, nA, "");
+	link_p2c(ni, ng, "");
+	link_p2c(ni, nh, "");
+	link_p2c(nj, nf, "");
+	link_p2c(nj, ni, "");
+
+	append_element(nodes_in_order, nD1);
+	append_element(nodes_in_order, nD2);
+	append_element(nodes_in_order, nD3);
+	append_element(nodes_in_order, nC);
+	append_element(nodes_in_order, nB1);
+	append_element(nodes_in_order, nB2);
+	append_element(nodes_in_order, nA);
+
+	tree.root = nj;
+	tree.nodes_in_order = nodes_in_order;
+
+	return tree;
+}
+

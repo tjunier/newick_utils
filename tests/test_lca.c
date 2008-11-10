@@ -273,6 +273,53 @@ int test_lca_from_nodes()
 	return 0;
 }
 
+int test_lca_from_labels_multi()
+{
+	const char *test_name = "test_lca_from_labels_multi";
+
+	/* (((D,D)e,D)f,((C,B)g,(B,A)h)i)j; */
+	struct rooted_tree tree = tree_9();
+	struct rnode *lca;
+	struct llist *labels = create_llist();
+
+	append_element(labels, "C");
+	lca = lca_from_labels_multi(&tree, labels);
+	if (strcmp(lca->label, "C") != 0) {
+		printf ("%s: expected 'C', got '%s'\n", test_name,
+			lca->label);
+		return 1;
+	}
+
+	clear_llist(labels);
+	append_element(labels, "D");
+	lca = lca_from_labels_multi(&tree, labels);
+	if (strcmp(lca->label, "f") != 0) {
+		printf ("%s: expected 'f', got '%s'\n", test_name,
+			lca->label);
+		return 1;
+	}
+
+	clear_llist(labels);
+	append_element(labels, "B");
+	lca = lca_from_labels_multi(&tree, labels);
+	if (strcmp(lca->label, "i") != 0) {
+		printf ("%s: expected 'i', got '%s'\n", test_name,
+			lca->label);
+		return 1;
+	}
+
+	append_element(labels, "D"); /* now contais A and D */
+	lca = lca_from_labels_multi(&tree, labels);
+	if (strcmp(lca->label, "j") != 0) {
+		printf ("%s: expected 'j', got '%s'\n", test_name,
+			lca->label);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -280,6 +327,7 @@ int main()
 	failures += test_lca2();
 	failures += test_lca(); 
 	failures += test_lca_from_labels();
+	failures += test_lca_from_labels_multi();
 	failures += test_lca_from_nodes();
 	if (0 == failures) {
 		printf("All tests ok.\n");

@@ -193,6 +193,395 @@ int test_append_five()
 	return 0;
 }
 
+int test_append_list()
+{
+	const char *test_name = "test_append_list";
+	struct llist *list1;
+	struct llist *list2;
+
+	list1 = create_llist();
+	append_element(list1, "yksi");
+	append_element(list1, "kaksi");
+	append_element(list1, "kolme");
+	append_element(list1, "neljä");
+	append_element(list1, "viisi");
+
+	list2 = create_llist();
+	append_element(list2, "kuusi"); 
+	append_element(list2, "seitsemän"); 
+	append_element(list2, "kahdeksan"); 
+	append_element(list2, "yhdeksän"); 
+	append_element(list2, "kymmenen"); 
+
+	append_list(list1, list2);
+
+	struct list_elem *el;
+
+	if (10 != list1->count) {
+		printf ("%s: expected count of 10, got %d.\n", 
+				test_name, list1->count);
+		return 1;
+	}
+	el = list1->head;
+	if (strcmp("yksi", (char *) el->data) != 0) {
+		printf ("%s: expected 'yksi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kaksi", (char *) el->data) != 0) {
+		printf ("%s: expected 'kaksi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kolme", (char *) el->data) != 0) {
+		printf ("%s: expected 'kolme', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("neljä", (char *) el->data) != 0) {
+		printf ("%s: expected 'neljä', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("viisi", (char *) el->data) != 0) {
+		printf ("%s: expected 'viisi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kuusi", (char *) el->data) != 0) {
+		printf ("%s: expected 'kuusi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("seitsemän", (char *) el->data) != 0) {
+		printf ("%s: expected 'seitsemän', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kahdeksan", (char *) el->data) != 0) {
+		printf ("%s: expected 'kahdeksan', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("yhdeksän", (char *) el->data) != 0) {
+		printf ("%s: expected 'yhdeksän', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kymmenen", (char *) el->data) != 0) {
+		printf ("%s: expected 'kymmenen', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	if (strcmp("kymmenen", (char *) list1->tail->data) != 0) {
+		printf ("%s: expexted list tail to be 'kymmenen', got '%s'.\n",
+				test_name, (char *) list1->tail->data);
+		return 1;
+	}
+	if (NULL != list1->tail->next) {
+		printf ("%s: list1 is not terminated.\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_append_list_empty()
+{
+	const char *test_name = "test_append_list_empty";
+	struct llist *list1;
+	struct llist *list2;
+	struct list_elem *el;
+
+	/* Case 1: list 2 is empty */
+	list1 = create_llist();
+	append_element(list1, "yksi");
+
+	list2 = create_llist();
+
+	append_list(list1, list2);
+
+
+	if (1 != list1->count) {
+		printf ("%s: expected count of 1, got %d.\n", 
+				test_name, list1->count);
+		return 1;
+	}
+	if (strcmp("yksi", (char *) list1->head->data) != 0) {
+		printf ("%s: expected 'yksi', got '%s'.\n", test_name,
+				(char *) list1->head->data);
+		return 1;
+	}
+	if (strcmp("yksi", (char *) list1->tail->data) != 0) {
+		printf ("%s: expexted list tail to be 'yksi', got '%s'.\n",
+				test_name, (char *) list1->tail->data);
+		return 1;
+	}
+	if (NULL != list1->tail->next) {
+		printf ("%s: list1 is not terminated.\n", test_name);
+		return 1;
+	}
+
+	/* Case 2: list 1 is empty */
+	list1 = create_llist();
+
+	list2 = create_llist();
+	append_element(list2, "yksi");
+
+	append_list(list1, list2);
+
+
+	if (1 != list1->count) {
+		printf ("%s: expected count of 1, got %d.\n", 
+				test_name, list1->count);
+		return 1;
+	}
+	el = list1->head;
+	if (strcmp("yksi", (char *) el->data) != 0) {
+		printf ("%s: expected 'yksi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	if (strcmp("yksi", (char *) list1->tail->data) != 0) {
+		printf ("%s: expexted list tail to be 'yksi', got '%s'.\n",
+				test_name, (char *) list1->tail->data);
+		return 1;
+	}
+	if (NULL != list1->tail->next) {
+		printf ("%s: list1 is not terminated.\n", test_name);
+		return 1;
+	}
+
+	/* Case 3: both lists are empty */
+	list1 = create_llist();
+	list2 = create_llist();
+
+	append_list(list1, list2);
+
+	if (0 != list1->count) {
+		printf ("%s: expected count of 0, got %d.\n", 
+				test_name, list1->count);
+		return 1;
+	}
+	if (NULL != list1->head) {
+		printf ("%s: expected NULL head.\n", test_name);
+		return 1;
+	}
+	if (NULL != list1->tail) {
+		printf ("%s: expected NULL tail.\n", test_name);
+		return 1;
+	}
+
+
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_prepend_list()
+{
+	const char *test_name = "test_prepend_list";
+	struct llist *list1;
+	struct llist *list2;
+
+	list1 = create_llist();
+	append_element(list1, "yksi");
+	append_element(list1, "kaksi");
+	append_element(list1, "kolme");
+	append_element(list1, "neljä");
+	append_element(list1, "viisi");
+
+	list2 = create_llist();
+	append_element(list2, "kuusi"); 
+	append_element(list2, "seitsemän"); 
+	append_element(list2, "kahdeksan"); 
+	append_element(list2, "yhdeksän"); 
+	append_element(list2, "kymmenen"); 
+
+	prepend_list(list2, list1);
+
+	struct list_elem *el;
+
+	if (10 != list2->count) {
+		printf ("%s: expected count of 10, got %d.\n", 
+				test_name, list2->count);
+		return 1;
+	}
+	el = list2->head;
+	if (strcmp("yksi", (char *) el->data) != 0) {
+		printf ("%s: expected 'yksi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kaksi", (char *) el->data) != 0) {
+		printf ("%s: expected 'kaksi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kolme", (char *) el->data) != 0) {
+		printf ("%s: expected 'kolme', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("neljä", (char *) el->data) != 0) {
+		printf ("%s: expected 'neljä', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("viisi", (char *) el->data) != 0) {
+		printf ("%s: expected 'viisi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kuusi", (char *) el->data) != 0) {
+		printf ("%s: expected 'kuusi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("seitsemän", (char *) el->data) != 0) {
+		printf ("%s: expected 'seitsemän', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kahdeksan", (char *) el->data) != 0) {
+		printf ("%s: expected 'kahdeksan', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("yhdeksän", (char *) el->data) != 0) {
+		printf ("%s: expected 'yhdeksän', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("kymmenen", (char *) el->data) != 0) {
+		printf ("%s: expected 'kymmenen', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	if (strcmp("kymmenen", (char *) list2->tail->data) != 0) {
+		printf ("%s: expexted list tail to be 'kymmenen', got '%s'.\n",
+				test_name, (char *) list2->tail->data);
+		return 1;
+	}
+	if (NULL != list2->tail->next) {
+		printf ("%s: list2 is not terminated.\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_prepend_list_empty()
+{
+	const char *test_name = "test_prepend_list_empty";
+	struct llist *list1;
+	struct llist *list2;
+	struct list_elem *el;
+
+	/* Case 1: list 2 is empty */
+	list1 = create_llist();
+	append_element(list1, "yksi");
+
+	list2 = create_llist();
+
+	prepend_list(list1, list2);
+
+	if (1 != list1->count) {
+		printf ("%s: expected count of 1, got %d.\n", 
+				test_name, list1->count);
+		return 1;
+	}
+	if (strcmp("yksi", (char *) list1->head->data) != 0) {
+		printf ("%s: expected 'yksi', got '%s'.\n", test_name,
+				(char *) list1->head->data);
+		return 1;
+	}
+	if (strcmp("yksi", (char *) list1->tail->data) != 0) {
+		printf ("%s: expexted list tail to be 'yksi', got '%s'.\n",
+				test_name, (char *) list1->tail->data);
+		return 1;
+	}
+	if (NULL != list1->tail->next) {
+		printf ("%s: list1 is not terminated.\n", test_name);
+		return 1;
+	}
+
+	/* Case 2: list 1 is empty */
+	list1 = create_llist();
+
+	list2 = create_llist();
+	append_element(list2, "yksi");
+
+	prepend_list(list1, list2);
+
+
+	if (1 != list1->count) {
+		printf ("%s: expected count of 1, got %d.\n", 
+				test_name, list1->count);
+		return 1;
+	}
+	el = list1->head;
+	if (strcmp("yksi", (char *) el->data) != 0) {
+		printf ("%s: expected 'yksi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	if (strcmp("yksi", (char *) list1->tail->data) != 0) {
+		printf ("%s: expexted list tail to be 'yksi', got '%s'.\n",
+				test_name, (char *) list1->tail->data);
+		return 1;
+	}
+	if (NULL != list1->tail->next) {
+		printf ("%s: list1 is not terminated.\n", test_name);
+		return 1;
+	}
+
+	/* Case 3: both lists are empty */
+	list1 = create_llist();
+	list2 = create_llist();
+
+	prepend_list(list1, list2);
+
+	if (0 != list1->count) {
+		printf ("%s: expected count of 0, got %d.\n", 
+				test_name, list1->count);
+		return 1;
+	}
+	if (NULL != list1->head) {
+		printf ("%s: expected NULL head.\n", test_name);
+		return 1;
+	}
+	if (NULL != list1->tail) {
+		printf ("%s: expected NULL tail.\n", test_name);
+		return 1;
+	}
+
+
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int test_reverse()
 {
 	char *test_name = "test_reverse";
@@ -1412,6 +1801,10 @@ int main()
 	failures += test_append_five();
 	failures += test_add_many();
 	failures += test_add_struct();
+	failures += test_append_list();
+	failures += test_append_list_empty();
+	failures += test_prepend_list();
+	failures += test_prepend_list_empty();
 	failures += test_reverse();
 	failures += test_shallow_copy();
 	failures += test_shift();

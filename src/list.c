@@ -133,8 +133,18 @@ void dump_llist(struct llist *list, void (*dump_func)(void *))
 
 void prepend_list(struct llist *target, struct llist *insert)
 {
-	struct list_elem *old_head;
 
+	/* special cases */
+	if (0 == insert->count) return;
+
+	if (0 == target->count) {
+		target->head = insert->head;
+		target->tail = insert->tail;
+		target->count = insert->count;
+		return;
+	}
+
+	struct list_elem *old_head;
 	old_head = target->head;
 	target->head = insert->head;
 	insert->tail->next = old_head;
@@ -144,9 +154,18 @@ void prepend_list(struct llist *target, struct llist *insert)
 
 void append_list(struct llist *target, struct llist *insert)
 {
+	/* special cases */
+	if (0 == insert->count) return;
+
+	if (0 == target->count) {
+		target->head = insert->head;
+		target->tail = insert->tail;
+		target->count = insert->count;
+		return;
+	}
+
 	target->tail->next = insert->head;
 	target->tail = insert->tail;
-
 	target->count += insert->count;
 }
 

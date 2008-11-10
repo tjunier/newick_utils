@@ -1,3 +1,14 @@
+nw_display: for SVG, handle trees with multiple instances of the same label.
+There are many developments in this direction:
+	o a single label may match more than one node
+	o one may wish to label those nodes independently (i.e., not as a clade)
+	o one could envision using regular expressions
+And the program should still be reasonably quick. For now I will provide for a
+lable to match more than one node (exact matches, i.e. more than one node have
+the same labe). The heart of this will be a function like
+create_label2node_map(), but that can handle non-unique labels (i.e., the map
+created will store lists of nodes of the same label, instead of directly
+storeing nodes).
 
 nw_gen: check that help is up-to-date (seems to me that it still describes the
 old function)

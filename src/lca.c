@@ -104,7 +104,8 @@ void * lca2w(void *a, void *b)
 }
 
 /* Returns the LCA of any number of nodes, by applying lca2 to a
- * list of descendants. THIS USES UP THE LIST!*/
+ * list of descendants. THIS USES UP THE LIST! Use lca_from_nodes() to keep the
+argument list intact. */
 
 struct rnode *lca (struct rooted_tree *tree,
 		struct llist *descendants)
@@ -156,6 +157,41 @@ struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 
 	destroy_hash(node_map);
 	destroy_llist(descendant_nodes);
+
+	return result;
+}
+
+struct rnode *lca_from_labels_multi (struct rooted_tree *tree, 
+		struct llist *labels)
+{
+	/* Make a hash of lists of nodes of the same label */
+	struct hash *nodes_by_label;
+       	nodes_by_label = create_label2node_list_map(tree->nodes_in_order);
+
+	/* Iterate over labels, add all nodes that have the current label
+	 * (there may be more than one) to the list of descendants. */
+
+	struct llist *descendants = create_llist();
+	struct list_elem *elem;
+	for (elem = labels->head; NULL != elem; elem = elem->next) {
+		char *label = elem->data;
+		struct llist *nodes_list = hash_get(nodes_by_label, label);
+		if (NULL == nodes_list)
+			fprintf (stderr, "WARNING: label '%s' not found.\n",
+					label);
+		else  {
+			append_list (descendants, nodes_list);
+			/* NOT destroy_llist()! elements are now in
+			'descendants' */
+			free (nodes_list);	
+		}
+	}
+
+	// TODO: handle case with no nodes found
+
+	struct rnode *result = lca(tree, descendants);
+	destroy_llist(descendants);
+	// TODO: destroy node list map (write ad hoc function in nodemap.c)
 
 	return result;
 }
