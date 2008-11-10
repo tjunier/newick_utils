@@ -215,7 +215,7 @@ void set_clade_numbers(struct rooted_tree *tree)
 	for (elem = css_map->head; NULL != elem; elem = elem->next) {
 		struct css_map_element *css_el = elem->data;
 		struct llist *labels = css_el->labels;
-		struct rnode *lca = lca_from_labels(tree, labels);
+		struct rnode *lca = lca_from_labels_multi(tree, labels);
 		struct svg_data *lca_data = lca->data;
 		lca_data->clade_nb = css_el->clade_nb;
 	}

@@ -308,7 +308,7 @@ int test_lca_from_labels_multi()
 		return 1;
 	}
 
-	append_element(labels, "D"); /* now contais A and D */
+	append_element(labels, "D"); /* now contains B and D */
 	lca = lca_from_labels_multi(&tree, labels);
 	if (strcmp(lca->label, "j") != 0) {
 		printf ("%s: expected 'j', got '%s'\n", test_name,

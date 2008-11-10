@@ -1,3 +1,5 @@
+nw_display: add examples to help text.
+
 nw_display: for SVG, handle trees with multiple instances of the same label.
 There are many developments in this direction:
 	o a single label may match more than one node

@@ -16,6 +16,8 @@ EXTRA_DIST = \
 	tests/edged_root.nw \
 	tests/falconiformes.nw \
 	tests/falconiformes.nw \
+	tests/falc_css.map \
+	tests/falc_families.nw \
 	tests/forest_ind.nw \
 	tests/forest.nw \
 	tests/figure_S1a.nw \
@@ -53,6 +55,7 @@ EXTRA_DIST = \
 	tests/test_nw_display_svg_cldgram_r.exp \
 	tests/test_nw_display_svg_cmap.exp \
 	tests/test_nw_display_svg_cmap_r.exp \
+	tests/test_nw_display_svg_mlbl1.exp \
 	tests/test_nw_display_svgac.exp \
 	tests/test_nw_display_svlb.exp \
 	tests/test_nw_display_svlb_r.exp \
