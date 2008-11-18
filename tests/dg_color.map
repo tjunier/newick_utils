@@ -1,3 +1,3 @@
-stroke:blue 'Drosophila erecta' 'Pediculus humanus'
-stroke:green 'Homo sapiens' 'Tetraodon nigroviridis'
-stroke:red 'Capitella capitata' 'Schmidtea mediterranea'
+stroke:blue C 'Drosophila erecta' 'Pediculus humanus'
+stroke:green C 'Homo sapiens' 'Tetraodon nigroviridis'
+stroke:red C 'Capitella capitata' 'Schmidtea mediterranea'

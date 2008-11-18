@@ -180,18 +180,19 @@ struct rnode *lca_from_labels_multi (struct rooted_tree *tree,
 			fprintf (stderr, "WARNING: label '%s' not found.\n",
 					label);
 		else  {
-			append_list (descendants, nodes_list);
-			/* NOT destroy_llist()! elements are now in
-			'descendants' */
-			free (nodes_list);	
+			struct llist *copy = shallow_copy(nodes_list);
+			append_list (descendants, copy);
+			free(copy); 	/* NOT destroy_llist(): the list
+					   elements are in descendants. */
 		}
 	}
 
 	// TODO: handle case with no nodes found
 
-	struct rnode *result = lca(tree, descendants);
+	struct rnode *result = lca_from_nodes (tree, descendants);
+
 	destroy_llist(descendants);
-	// TODO: destroy node list map (write ad hoc function in nodemap.c)
+	destroy_label2node_list_map(nodes_by_label);
 
 	return result;
 }

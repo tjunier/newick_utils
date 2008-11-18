@@ -21,9 +21,13 @@
 #include "svg_graph.h"
 #include "tree.h"
 #include "xml_utils.h"
+#include "masprintf.h"
+
+enum { INDIVIDUAL, CLADE, UNKNOWN };
 
 struct css_map_element {
-	int clade_nb;	
+	int group_type;	/* INDIVIDUAL or CLADE */
+	int group_nb;	
 	char *style;	/* a CSS specification */
 	struct llist *labels;
 };
@@ -77,7 +81,7 @@ void svg_CSS_stylesheet()
 	if (css_map) {
 		for (el = css_map->head; NULL != el; el = el->next) {
 			struct css_map_element *css_el = el->data;
-			printf(" .clade_%d {%s}\n", css_el->clade_nb,
+			printf(" .clade_%d {%s}\n", css_el->group_nb,
 					css_el->style);
 		}
 	}
@@ -98,9 +102,40 @@ void svg_header()
 	svg_CSS_stylesheet();
 }
 
-/* Builds a CSS map structure. This is a list of css_map_element elements, each
- * of which contains a style specification and a list of labels. The style will
- * apply to the clade defined by the labels. */
+/* A helper function for read_css_map(). Given a 'type' string (read from the
+ * CSS style file), returns the appropriate type as an integer, or UNKNOWN if
+ * the type is unknown. */
+
+static int get_group_type(const char *type)
+{
+	/* Make lower-case local copy of 'type' */
+	char *t = strdup(type);
+	int l = strlen(t);
+	int i;
+	for (i = 0; i < l; i++)
+		t[i] = tolower(t[i]);
+
+	/* Instead of looking for exact matches, look for any prefix of "clade"
+	 * or "individual": this allows the user to use full keywords like
+	 * "CLADE", but also to abbreviate to "ind" or even "I" or "C". */
+	char *clade = "clade";
+	char *indiv = "individual";
+	int result = UNKNOWN;
+	if (strstr(clade, t) == clade) 
+		result = CLADE;
+	else if (strstr(indiv, t) == indiv)
+		result = INDIVIDUAL;
+	
+	free(t);
+
+	return result;
+}
+
+/* Builds a CSS map structure. This is a list of struct css_map_element, each
+ * of which contains a group type (CLADE or INDIVIDUAL), a style specification,
+ * and a list of labels. The style will apply to the clade defined by the
+ * labels (if the type is CLADE) or to all individual nodes in the list (if the
+ * style is INDIVIDUAL). */
 
 struct llist *read_css_map()
 {
@@ -115,21 +150,35 @@ struct llist *read_css_map()
 				sizeof(struct css_map_element));
 		if (NULL == css_el) { perror(NULL); exit(EXIT_FAILURE); }
 
-		/* split line into whitespace-separeted "words" */
+		/* Split line into whitespace-separated "words" (or words
+		 * delimited by double quotes). First word is the CSS
+		 * specification, second is group type, then come the labels.
+		 * */
 		struct llist *label_list = create_llist();
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		char *style = wt_next(wtok);
+		char *type = wt_next(wtok);
 		char *label;
 		while ((label = wt_next(wtok)) != NULL) {
 			append_element(label_list, label);
 		}
 		destroy_word_tokenizer(wtok);
 		free(line);
+		css_el->group_type = get_group_type(type); 
+		if (UNKNOWN == css_el->group_type) {
+			fprintf (stderr, "WARNING: unknown group type '%s' (ignored)\n", type);
+			free(css_el);
+			free(type);
+			destroy_llist(label_list);
+			continue;
+		}
 		css_el->style = style;
 		css_el->labels = label_list;
-		css_el->clade_nb = i;
+		css_el->group_nb = i;
 		append_element(css_map, css_el);
 		i++;
+
+		free(type);
 	}
 
 	fclose(css_map_file);
@@ -201,23 +250,31 @@ void svg_init()
 /* Passed to dump_llist() for labels */
 void dump_label (void *lbl) { puts((char *) lbl); }
 
-/* Attributes numbers to clades, based on the CSS style map (if one was
- * supplied - see read_css_map() and svg_CSS_stylesheet() ). The clade number
+/* Attributes group numbers to nodes, based on the CSS style map (if one was
+ * supplied - see read_css_map() and svg_CSS_stylesheet() ). The group number
  * will translate directly into 'class' attributes in SVG, which in turn will
  * have a style defined according to the style map. */
 
-void set_clade_numbers(struct rooted_tree *tree)
+// NOTE: this could be made more efficient by having two separate maps, one for
+// CLADE elements and another for INDIVIDUAL elements. That way the list needs
+// not be traversed twice. But all in all it will likely not make a big
+// difference, so I'll keep it for later :-) 
+
+void set_group_numbers(struct rooted_tree *tree)
 {
-	/* Iterate through the style map elements. Each one contains (among
-	 * others) a list of labels. Find the LCA of those labels, and set its
-	 * style to that specified by the map. */
 	struct list_elem *elem;
+	struct css_map_element *css_el;
+
+	/* Iterate through the CLADE style map elements. Each one contains (among
+	 * others) a list of labels. Find the LCA of those labels (which can be
+	 * matched by >1 node), and set its number to that of the css element. */
 	for (elem = css_map->head; NULL != elem; elem = elem->next) {
-		struct css_map_element *css_el = elem->data;
+		css_el = elem->data;
+		if (CLADE != css_el->group_type) continue;
 		struct llist *labels = css_el->labels;
 		struct rnode *lca = lca_from_labels_multi(tree, labels);
 		struct svg_data *lca_data = lca->data;
-		lca_data->clade_nb = css_el->clade_nb;
+		lca_data->group_nb = css_el->group_nb;
 	}
 
 	/* Now propagate the styles to the descendants */
@@ -232,12 +289,51 @@ void set_clade_numbers(struct rooted_tree *tree)
 		struct svg_data *parent_data = parent->data;
 		/* Inherit parent node's style (clade number) IFF 
 		    node has no style of its own */
-		if (UNSTYLED_CLADE == node_data->clade_nb) {
-			node_data->clade_nb = parent_data->clade_nb;
+		if (UNSTYLED_CLADE == node_data->group_nb) {
+			node_data->group_nb = parent_data->group_nb;
 		}
 				
 	}
 	destroy_llist(nodes_in_reverse_order);
+
+	/* Now iterate through the INDIVIDUAL style map elements. They also
+	 * contain a list of labels. Each label is matched by at least 1 node.
+	 * All of these nodes get the map element's number (cf above, in which
+	 * te LCA gets the number, which is then propagated to all descendants)
+	 * */
+	// TODO: think of making the label2node map a member of the tree structure.
+	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
+	for (elem = css_map->head; NULL != elem; elem = elem->next) {
+		css_el = elem->data;
+		if (INDIVIDUAL != css_el->group_type) continue;
+		struct llist *labels = css_el->labels;
+		struct llist *group_nodes = create_llist();
+		/* Iterate over all labels of this element, adding the
+		 * corresponding nodes to 'group_nodes' */
+		for (el = labels->head; NULL != el; el = el->next) {
+			char *label = el->data;
+			struct llist *nodes_of_label;
+			nodes_of_label = hash_get(map, label);
+			if (NULL == nodes_of_label) {
+				fprintf (stderr, "WARNING: label '%s' "
+						"not found - ignored.\n",
+						label);
+				continue;
+			}
+			struct llist *copy = shallow_copy(nodes_of_label);
+			append_list(group_nodes, copy);
+			free(copy); 	/* NOT destroy_llist(): the list
+					   elements are in group_nodes. */
+		}
+		/* Set the group number for all nodes of this group */
+		for (el = group_nodes->head; NULL != el; el = el->next)  {
+			struct rnode *node = el->data;
+			struct svg_data *node_data = node->data;
+			node_data->group_nb = css_el->group_nb;
+		}
+		destroy_llist(group_nodes);
+	}
+	destroy_label2node_list_map(map);
 }
 
 /* Allocates and initializes an svg_data structure for each of the tree's
@@ -254,7 +350,7 @@ void svg_alloc_node_pos(struct rooted_tree *tree)
 		struct svg_data *svgd = malloc(sizeof(struct svg_data));
 		if (NULL == svgd) { perror(NULL); exit (EXIT_FAILURE); }
 		svgd->top = svgd->bottom = svgd->depth = -1.0;
-		svgd->clade_nb = UNSTYLED_CLADE;	
+		svgd->group_nb = UNSTYLED_CLADE;	
 		node->data = svgd;
 	}
 }
@@ -310,7 +406,7 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves,
 	struct h_data hd = set_node_depth_cb(tree,
 			svg_set_node_depth, svg_get_node_depth);
 
-	if (css_map) set_clade_numbers(tree);
+	if (css_map) set_group_numbers(tree);
  	prettify_labels(tree);
 
 	if (SVG_ORTHOGONAL == graph_style)

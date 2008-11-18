@@ -47,3 +47,17 @@ struct hash * create_label2node_list_map(struct llist *node_list)
 
 	return map;
 }
+
+void destroy_label2node_list_map(struct hash *map)
+{
+
+	struct llist *keys = hash_keys(map);	
+	struct list_elem *el;
+	for (el = keys->head; NULL != el; el = el->next) {
+		char *label = el->data;
+		struct llist *nodes_list = hash_get(map, label);
+		destroy_llist(nodes_list);
+	}
+	destroy_llist(keys);
+	destroy_hash(map);
+}

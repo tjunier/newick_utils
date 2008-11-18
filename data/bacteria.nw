@@ -1,0 +1,28 @@
+(
+  (
+    (
+      E._coli,
+      Salmonella
+    ),
+    (
+      Clostridium,
+      B._subtilis
+    )
+  )Ortholog_1,
+  (
+    (
+      (
+        E._coli,
+        Salmonella
+      ),
+      Erwinia
+    ),
+    (
+      Clostridium,
+      (
+        B._subtilis,
+        B._anthracis
+      )
+    )
+  )Ortholog_2
+);

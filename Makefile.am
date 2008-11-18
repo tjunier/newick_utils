@@ -2,6 +2,8 @@ SUBDIRS = src tests
 EXTRA_DIST = \
 	tests/10vrt.nw \
 	tests/5NCR.cmap \
+	tests/bacteria.nw \
+	tests/bacteria_css.map \
 	tests/catarrhini.nw \
 	tests/catarrhini_mult.nw \
 	tests/catarrhini_wrong_3og.nw \
@@ -47,6 +49,7 @@ EXTRA_DIST = \
 	tests/test_nw_condense.sh \
 	tests/test_nw_condense_simple.exp \
 	tests/test_nw_display_args \
+	tests/test_nw_display_css_multi.exp \
 	tests/test_nw_display_def.exp \
 	tests/test_nw_display_multiple.exp \
 	tests/test_nw_display_pure_topol.exp \

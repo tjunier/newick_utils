@@ -14,6 +14,7 @@
 #include "to_newick.h"
 #include "tree_models.h"
 #include "redge.h"
+#include "masprintf.h"
 
 #define UNUSED -1
 
@@ -153,7 +154,7 @@ double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 
 struct rnode *create_child_with_time_limit(double time_limit)
 {
-	char *label = asprintf("n%d", running_number());
+	char *label = masprintf("n%d", running_number());
 	if (NULL == label) { perror(NULL); exit(EXIT_FAILURE); }
 	struct rnode *kid = create_rnode(label);
 	free(label);
@@ -197,7 +198,7 @@ void free_data(char *newick, struct llist *leaves_queue,
 void time_limited_tree(double branch_termination_rate, double duration)
 {
 	/* create root */
-	char *label = asprintf("n%d", running_number());
+	char *label = masprintf("n%d", running_number());
 	if (NULL == label) { perror(NULL); exit(EXIT_FAILURE); }
 	struct rnode *root = create_rnode(label);
 	free(label);

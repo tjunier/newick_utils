@@ -54,7 +54,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 		if (align_leaves && is_leaf(node))
 			node_data->depth = dmax;
 
-		int clade_nb = node_data->clade_nb;
+		int group_nb = node_data->group_nb;
 		double svg_radius = ROOT_SPACE + (r_scale * node_data->depth);
 		double svg_top_angle = a_scale * node_data->top; 
 		double svg_bottom_angle = a_scale * node_data->bottom; 
@@ -76,7 +76,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
 			printf("<path class='clade_%d'"
 			       " d='M%.4f,%.4f A%4f,%4f 0 %d 1 %.4f %.4f'/>",
-				clade_nb,
+				group_nb,
 				svg_top_x_pos, svg_top_y_pos,
 				svg_radius, svg_radius,
 				large_arc_flag,
@@ -95,7 +95,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
 			printf ("<line class='clade_%d' "
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				clade_nb,
+				group_nb,
 				svg_mid_x_pos, svg_mid_y_pos,
 				svg_par_x_pos, svg_par_y_pos);
 		}
@@ -206,10 +206,6 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	/* By using 1.9 PI instead of 2 PI, we leave a wedge that shows the
 	 * tree's bounds */
 	double a_scale = 1.9 * PI / leaf_count(tree); /* radians */
-
-	//if (colormap) set_node_colors(tree);
-	// if (css_map) set_clade_numbers(tree);
- 	// prettify_labels(tree);
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* draw nodes */

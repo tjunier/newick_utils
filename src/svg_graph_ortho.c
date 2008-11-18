@@ -42,7 +42,7 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 		if (! is_leaf(node)) {
 		printf("<line class='clade_%d' "
 			"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-			node_data->clade_nb, svg_h_pos, svg_top_pos, svg_h_pos,
+			node_data->group_nb, svg_h_pos, svg_top_pos, svg_h_pos,
 			svg_bottom_pos);
 		}
 		/* draw horizontal line */
@@ -57,7 +57,7 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 				h_scale * parent_data->depth);
 			printf ("<line class='clade_%d' "
 				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				node_data->clade_nb, svg_parent_h_pos,
+				node_data->group_nb, svg_parent_h_pos,
 				 svg_mid_pos, svg_h_pos, svg_mid_pos);
 		}
 
@@ -198,10 +198,7 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	 * different scales. For now, it's fixed. */
 	double v_scale = leaf_vskip;
 
-	// if (css_map) set_clade_numbers(tree);
- 	// prettify_labels(tree);
-
-	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
+	if (0.0 == hd.d_max) { hd.d_max = 1; } 	/* one-node trees */
 	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 
 	/* Tree is in a separate group - may be useful when (if?) there are

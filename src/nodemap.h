@@ -17,3 +17,8 @@ struct hash *create_label2node_map(const struct llist *);
  * in the order they are in the parameter list. */
 
 struct hash *create_label2node_list_map(const struct llist *);
+
+/* Destroys a label->node list map such as those created by
+ * create_label2node_list_map() */
+
+void destroy_label2node_list_map(struct hash *);

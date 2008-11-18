@@ -1,0 +1,69 @@
+\documentclass[a4paper,10pt]{report}
+
+
+% Title Page
+\title{Newick Utilities Tutorial}
+\author{Thomas Junier}
+
+\newcommand{\nutils}{Newick Utilities}
+\newcommand{\unix}{\textsc{Unix}}
+\newcommand{\ascii}{\textsc{ASCII}}
+\newcommand{\svg}{\textsc{SVG}}
+\newcommand{\display}{\texttt{nw\_display}}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\chapter{Introduction}
+
+The \nutils{} are a set of \unix{} shell programs for working with Newick-formatted phylogenetic trees. Their main feature is that they require no user interaction. Why this is a good thing is not the focus of this document: I shall assume that if you are reading this, you already know when a command-line interface is better than an interactive interface.
+
+The \nutils{} are not tools for \emph{making} phylogenies. Rather, they are for working with existing ones, by which I mean manipulating the tree or extracting information from it. Each of the program performs one task (with some variants). For example, here is how you would reroot a series of trees contained in file \texttt{mytrees.nw} using node \texttt{Dmelano} as outgroup:
+\begin{verbatim}
+$ nw_reroot mytrees.nw Dmelano
+\end{verbatim} 
+Now, you might want to make cladograms from the rerooted trees. This would be done like this:
+\begin{verbatim}
+$ nw_reroot mytrees.nw Dmelano | nw_topology -
+\end{verbatim}
+
+This document is organized as follows: chapter \ref{chap_general} discusses common features of the \nutils, chapter \ref{chap_simple} shows examples of simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks.
+
+\section{Conventions}
+
+Most of the utilities produce Newick output. This is a rather terse format, not easily readable for humans. Therefore, I will generally show the result in graph form, either as \ascii{} or as (rendered!) \svg. The conversion from Newick to graph will be performed with \display{}. To avoid tedious repetitions, however, I will not always explicitly show the \display{} step; that is, if I say that 
+\begin{verbatim}
+$ nw_clade catarrhini.nw Pongo Pan
+\end{verbatim} 
+results in this:
+\begin{samepage}
+\begin{verbatim}
+                  +-----------------+ Gorilla     
+                  |                               
+ +----------------+ Homininae +----------+ Pan    
+ |                +-----------+ Hominini          
+=| Hominidae                  +----------+ Homo   
+ |                                                
+ +---------------------------------+ Pongo  
+\end{verbatim} 
+\end{samepage}
+it will mean that the last step was \display{}, something like this:
+\begin{verbatim}
+$ nw_clade catarrhini.nw Pongo Pan | nw_display -
+\end{verbatim}
+If the graph is \svg, then it will have been \display{} \verb+-s+.
+\chapter{Generalities}
+
+\label{chap_general}
+ 
+\chapter{Simple Tasks}
+\label{chap_simple}
+
+\section{Rerooting}
+
+\section{Labels}
+
+\chapter{Advanced Tasks}
+\label{chap_adv}
+\end{document}

@@ -1,3 +1,7 @@
+/*
+ * NOTE: Care should be exercised when manipulating the lists (e.g.
+ * appending a list to another list), lest it become very hairy to free() them
+ * without free()ing something twice.  shallow_copy() is your friend. */
 
 struct list_elem {
 	struct list_elem *next;

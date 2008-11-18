@@ -20,7 +20,7 @@ struct svg_data {
 	double top;
 	double bottom;
 	double depth;
-	int clade_nb;	/* For attributing styles */
+	int group_nb;	/* For attributing styles */
 	/* ... other node properties ... */
 };
 
