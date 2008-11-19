@@ -98,6 +98,7 @@ void help(char *argv[])
 	argv[0],
 	argv[0],
 	argv[0],
+	argv[0],
 	argv[0]
 	      );
 }

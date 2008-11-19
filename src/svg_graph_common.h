@@ -30,6 +30,7 @@ void set_svg_CSS_map_file(FILE *);
 void set_svg_leaf_label_style(char *);
 void set_svg_inner_label_style(char *);
 void set_svg_edge_label_style(char *);
+void set_svg_plain_node_style(char *);
 
 /* Returns the largest power of ten not greater than argument */
 

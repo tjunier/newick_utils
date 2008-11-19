@@ -30,6 +30,11 @@ $ nw_reroot mytrees.nw Dmelano | nw_topology -
 
 This document is organized as follows: chapter \ref{chap_general} discusses common features of the \nutils, chapter \ref{chap_simple} shows examples of simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks.
 
+\section{The Newick Format}
+\label{sct_newick}
+
+The Newick format is a file format for (phylogenetic) trees. It is one of the most widely used and uderstood formats.
+
 \section{Conventions}
 
 Most of the utilities produce Newick output. This is a rather terse format, not easily readable for humans. Therefore, I will generally show the result in graph form, either as \ascii{} or as (rendered!) \svg. The conversion from Newick to graph will be performed with \display{}. To avoid tedious repetitions, however, I will not always explicitly show the \display{} step; that is, if I say that 
@@ -53,10 +58,47 @@ it will mean that the last step was \display{}, something like this:
 $ nw_clade catarrhini.nw Pongo Pan | nw_display -
 \end{verbatim}
 If the graph is \svg, then it will have been \display{} \verb+-s+.
-\chapter{Generalities}
 
+\chapter{Generalities}
 \label{chap_general}
- 
+
+\section{Help}
+\label{sect_help}
+
+All programs in the \nutils{} package will print a help message if passed option \texttt{-h}:
+
+\begin{samepage}
+\begin{verbatim}
+$ nw_indent -h
+Indents the Newick, making structure more clear.
+
+Synopsis
+--------
+
+nw_indent [-cht:] <newick trees filename|->
+
+Input
+-----
+
+Argument is the name of a file that contains Newick trees, or '-' (in
+which case trees are read from standard input).
+
+Output
+------
+
+By default, prints the input tree, with each parenthesis and each leaf on a
+line of its own, and indented a multiple of '  ' (two spaces) to reflect
+structure. The default output is valid Newick.
+[...]
+\end{verbatim}
+\end{samepage}
+The help page describes the program's purpose, its input and output, and its options, in a format reminiscent of \unix{} manpages. It also shows a few examples. All examples can be tried out using files in the \texttt{data} directory.
+
+\section{Input}
+\label{sect_input}
+
+Since the \nutils{} are for working with trees, it should not be a surprise that all programs accept Newick as input.
+
 \chapter{Simple Tasks}
 \label{chap_simple}
 

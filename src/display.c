@@ -22,11 +22,13 @@ struct parameters {
 	char *leaf_label_style;		/* CSS */
 	char *inner_label_style;	/* CSS */
 	char *edge_label_style;		/* CSS */
+	char *plain_node_style;		/* CSS */
 	double leaf_vskip;
 	int svg_style;		/* radial or orthogonal */
 	char *branch_length_unit;
 	double label_angle_correction;
 	double left_label_angle_correction;
+	int root_length;
 };
 
 void help(char* argv[])
@@ -37,7 +39,7 @@ void help(char* argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-aAbchilsuUvw] <tree filename|->\n"
+"%s [-aAbcdhilrRsuUvw] <tree filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -51,8 +53,8 @@ void help(char* argv[])
 "Outputs a graph representing the tree, either as text (default) or\n"
 "as SVG (option -s). Underscores in labels are replaced with spaces.\n"
 "Trees with no branch lengths are taken to be cladograms and are\n"
-"dawn with leaves aligned. Otherwise, tree is assumed to be a\n"
-"phylogram and branch lengths are honored and a scale bar is drawn.\n"
+"drawn with leaves aligned. Otherwise, the tree is assumed to be a\n"
+"phylogram: branch lengths are honored and a scale bar is drawn.\n"
 "\n"
 "Options\n"
 "-------\n"
@@ -62,24 +64,42 @@ void help(char* argv[])
 "    -A <number>: rotate left-side labels by this amount (radians,"
 "       default: 0.0349 (=~ 2°)) [only SVG radial]"
 "       [only SVG radial]\n"
-"    -b <number>: branch length font size (default: small) [only SVG].\n"    
-"       setting to 0 disables printing of branch lengths.\n"
+"    -b <string>: CSS for branch length labels. [only SVG]\n"
+"       Default: 'font-size:small;font-family:sans'.\n"    
+"       setting 'visibility:hidden' disables printing of branch lengths.\n"
 "    -c <css-filename>: use specified CSS map [only SVG]. A CSS map\n"
 "       is a text file which specifies a style (CSS) for a clade.\n"
 "       Each line has the following structure:\n"
-"       <CSS> <label> [label]* \n"
+"       <CSS> <flag> <label>+\n"
 "       <CSS> is a valid CSS style specification (no spaces allowed)\n"
 "       e.g. 'font-size:small;font-family:italics;stroke:green'.\n"
-"       If there is only one label, this leaf is colored. If there are more, the\n"
-"       LCA of the labels and all descendant nodes are colored. If more than one\n"
-"       node matches a label, all matching nodes are taken into account in\n"
-"       the definition of the LCA.\n"
-"       Default: no CSS map, whole tree is black.\n"
+"       <flag> is either 'Individual' or 'Clade' (case is not important, can\n"
+"       be abbreviated down to 'I' or 'C'). If set to 'Clade', the style is\n"
+"       applied to the clade defined by the labels. If 'Individual', the\n"
+"       style is applied to each node individually.\n"
+"       <label>+ is a nonempty, whitespace-separated list of Newick labels\n"
+"       (spaces are allowed IFF the label is enclosed in ''). If a label\n"
+"       matches more than one node, all matching nodes are used.\n"
+"       Default: no CSS map, whole tree is black (unless specified otherwise\n"
+"       via option -d).\n"
+"       <CSS>, <flag>, and <labels>+ are separated by whitespace.\n"
+"       The following specifies red stroke for a clade defined by A, B and C;\n"
+"       and 2-pixel wide, blue stroke for individual nodes D, E, and F:\n"
+"       stroke:red			Clade	A B C\n"
+"       stroke:blue;stroke-width:2	I	D E F\n"
+"       If no colormap is specified, the default is (but see option -d):\n"
+"       stroke:black;fill:none;stroke-width:1;stroke-linecap:round\n"
+"    -d <string>: CSS for 'plain' tree nodes (i.e., unless overridden by -c)\n"
+"       [only SVG]\n"
+"       Default: stroke:black;fill:none;stroke-width:1;stroke-linecap:round\n"
 "    -h: prints this message and exits\n"
-"    -i <number>: inner label font size (default: small) [SVG only]\n"
-"       setting to 0 disables printing of inner labels.\n"
-"    -l <number>: leaf label font size (default: medium) [SVG only]\n"
-"       setting to 0 disables printing of inner labels.\n"
+"    -i <string>: CSS for inner node labels. [only SVG]\n"
+"       Default: 'font-size:small;font-family:sans'.\n"    
+"       setting 'visibility:hidden' disables printing of inner node labels.\n"
+"    -l <string>: CSS for leaf node labels. [only SVG]\n"
+"       Default: 'font-size:medium;font-family:sans'.\n"    
+"       setting 'visibility:hidden' disables printing of leaf node labels.\n"
+"    -R <integer>: use that many pixels for the root [only SVG]\n"
 "    -r: draw a radial tree (default: orthogonal) [only SVG]\n"
 "    -s: output graph as SVG (default: text). SVG output is currently limited\n"
 "       to one tree - any trees beyond the first one are ignored.\n"
@@ -90,7 +110,8 @@ void help(char* argv[])
 "       Each line has the following structure:\n"
 "       <label> <URL>\n"
 "       Clicking on a label will follow the link (if any).\n"
-"    -v <number>: number of pixels between leaves (default: 40) [only SVG]\n"
+"    -v <number>: number of pixels between leaves (default: 40) [only SVG\n"
+"       orthogonal]\n"
 "    -w <number>: graph should be no wider than <number>, measured in\n"
 "       characters for text and pixels for SVG. Defaults: 80 (text),\n"
 "       300 (SVG)\n"
@@ -105,7 +126,11 @@ void help(char* argv[])
 "$ %s -s -c data/color.map data/catarrhini\n"
 "\n"
 "# the same; no branch lengths\n"
-"$ %s -s -b 0 -c data/color.map data/catarrhini\n",
+"$ %s -s -b 'visibility:hidden' -c data/color.map data/catarrhini\n"
+"\n"
+"# radial tree, leaf labels in italics\n"
+"$ %s -s -r -l 'font-style:italics' data/catarrhini\n",
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
@@ -124,18 +149,20 @@ struct parameters get_params(int argc, char *argv[])
 	params.leaf_label_style = "font-size:medium;font-family:sans";
 	params.inner_label_style = "font-size:small;font-family:sans";
 	params.edge_label_style = "font-size:small;font-family:sans";
+	params.plain_node_style = NULL;	/* svg_graph.c has default */
 	params.leaf_vskip = 40.0;
 	params.svg_style = SVG_ORTHOGONAL;
 	params.branch_length_unit = "";
 	params.label_angle_correction = 0.0;
 	params.left_label_angle_correction = 0.0;
+	params.root_length = ROOT_SPACE;
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
 	const int DEFAULT_WIDTH_CHARS = 80;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:hi:l:rsu:U:v:w:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:l:rR:su:U:v:w:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -152,6 +179,9 @@ struct parameters get_params(int argc, char *argv[])
 				perror(NULL); exit(EXIT_FAILURE);
 			}
 			break;
+		case 'd':
+			params.plain_node_style = optarg;
+			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
@@ -163,6 +193,9 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'r':
 			params.svg_style = SVG_RADIAL;
+			break;
+		case 'R':
+			params.root_length = atoi(optarg);
 			break;
 		case 's':
 			params.svg = TRUE;
@@ -241,6 +274,8 @@ void set_svg_parameters(struct parameters params)
 	set_svg_leaf_label_style(params.leaf_label_style);
 	set_svg_inner_label_style(params.inner_label_style);
 	set_svg_edge_label_style(params.edge_label_style);
+	set_svg_plain_node_style(params.plain_node_style);
+	set_svg_root_length(params.root_length);
 }
 
 /* Prints an XML comment containing the command line parameters, so that the

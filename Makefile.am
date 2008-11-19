@@ -50,9 +50,11 @@ EXTRA_DIST = \
 	tests/test_nw_condense_simple.exp \
 	tests/test_nw_display_args \
 	tests/test_nw_display_css_multi.exp \
+	tests/test_nw_display_css_multi_def.exp \
 	tests/test_nw_display_def.exp \
 	tests/test_nw_display_multiple.exp \
 	tests/test_nw_display_pure_topol.exp \
+	tests/test_nw_display_rl.exp \
 	tests/test_nw_display.sh \
 	tests/test_nw_display_svg_cldgram.exp \
 	tests/test_nw_display_svg_cldgram_r.exp \

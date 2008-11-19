@@ -9,12 +9,8 @@ struct rooted_tree;
 /* The following are for setting parameters for the SVG job. */
 
 void set_svg_width(int);
-void set_svg_inner_label_font_size(char *);
-void set_svg_leaf_label_font_size(char *);
-void set_svg_colormap_file(char *);
 void set_svg_leaf_vskip(double);
 void set_svg_whole_v_shift(int);
-void set_svg_branch_length_font_size(char *);
 void set_svg_style(int);
 void set_svg_URL_map_file(FILE *);
 void set_svg_label_angle_correction(double);

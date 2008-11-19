@@ -5,23 +5,25 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
+#include <ctype.h>
 
-#include "svg_graph_radial.h"
-#include "svg_graph_ortho.h"
 #include "common.h"
 #include "graph_common.h"
 #include "hash.h"
 #include "lca.h"
 #include "list.h"
+#include "masprintf.h"
 #include "node_pos_alloc.h"
+#include "nodemap.h"
 #include "readline.h"
 #include "redge.h"
 #include "rnode.h"
 #include "svg_graph_common.h"
 #include "svg_graph.h"
+#include "svg_graph_ortho.h"
+#include "svg_graph_radial.h"
 #include "tree.h"
 #include "xml_utils.h"
-#include "masprintf.h"
 
 enum { INDIVIDUAL, CLADE, UNKNOWN };
 
@@ -51,6 +53,7 @@ static FILE *css_map_file = NULL;
 static char *leaf_label_style = NULL;
 static char *inner_label_style = NULL;
 static char *edge_label_style = NULL;
+static char *plain_node_style = NULL;
 static struct llist *css_map = NULL;
 
 struct hash *url_map = NULL;
@@ -70,6 +73,7 @@ void set_svg_CSS_map_file(FILE * map) { css_map_file = map; }
 void set_svg_leaf_label_style(char *style) { leaf_label_style = style; }
 void set_svg_inner_label_style(char *style) { inner_label_style = style; }
 void set_svg_edge_label_style(char *style) { edge_label_style = style; }
+void set_svg_plain_node_style(char *style) { plain_node_style = style; }
 
 /************************** functions *****************************/
 
@@ -78,6 +82,11 @@ void svg_CSS_stylesheet()
 	struct list_elem *el;
 
 	printf ("<defs><style type='text/css'><![CDATA[\n");
+	/* The default clade style is specified in this file rather than in the
+	 * client code (TODO: try to get all defaults in the same place, or
+	 * explain why not), so we print the style only if not NULL */
+	if (NULL != plain_node_style)
+		printf (" .clade_0 {%s}\n", plain_node_style);
 	if (css_map) {
 		for (el = css_map->head; NULL != el; el = el->next) {
 			struct css_map_element *css_el = el->data;

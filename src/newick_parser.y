@@ -24,6 +24,7 @@ char *nwsget_text();
 
 void nwserror(char *s)
 {
+	s = s;	/* suppresses warning about unused s */
 	printf ("ERROR: Syntax error at line %d near '%s'\n",
 		lineno, nwsget_text());
 }

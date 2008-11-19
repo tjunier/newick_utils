@@ -12,3 +12,5 @@ svgac: -sr -w 700 -l 'font-size:8' -i 'font-size:7' -a 0.01 -A -0.02 -c 5NCR.cma
 svgurl: -s -r -l 'font-size:7pt' -v 10pt -w 500 -c dg_color.map -U dg_url.map dg_tree.nw
 svg_mlbl1: -sr -c falc_css.map falc_families.nw
 css_multi: -s -c bacteria_css.map bacteria.nw
+css_multi_def: -s -c bacteria_css.map -d 'stroke:grey' bacteria.nw
+rl: -sr -R 20 catarrhini.nw

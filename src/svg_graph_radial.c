@@ -15,14 +15,14 @@ const double PI = 3.14159;
 /* If this is zero, the label's baseline is aligned on the branch. Use it to
  * nudge the labels a small angle. Unfortunately the correct amount will depend
  * on the graph's diameter and the label font size. */
-
 static double svg_label_angle_correction = 0.0;
 
 /* The following applies to labels on the left side of the tree (because they
  * are subject to a 180° rotation, see draw_text_radial(). The default value
  * below was determined by trial and error. */
-
 static double svg_left_label_angle_correction = -0.0349; /* -2°, in radians */ 
+
+static int svg_root_length = ROOT_SPACE;
 
 void set_svg_label_angle_correction(double corr)
 {
@@ -32,6 +32,11 @@ void set_svg_label_angle_correction(double corr)
 void set_svg_left_label_angle_correction(double corr)
 {
 	svg_left_label_angle_correction = corr;
+}
+
+void set_svg_root_length(int length)
+{
+	svg_root_length = length;
 }
 
 /* Outputs an SVG <g> element with all the tree branches, radial. In this
@@ -55,7 +60,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			node_data->depth = dmax;
 
 		int group_nb = node_data->group_nb;
-		double svg_radius = ROOT_SPACE + (r_scale * node_data->depth);
+		double svg_radius = svg_root_length + (r_scale * node_data->depth);
 		double svg_top_angle = a_scale * node_data->top; 
 		double svg_bottom_angle = a_scale * node_data->bottom; 
 		double svg_mid_angle =
@@ -89,7 +94,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 		} else {
 			struct rnode *parent = node->parent_edge->parent_node;
 			struct svg_data *parent_data = parent->data;
-			double svg_parent_radius = ROOT_SPACE + (
+			double svg_parent_radius = svg_root_length + (
 				r_scale * parent_data->depth);
 			double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
 			double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
@@ -120,7 +125,7 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		if (align_leaves && is_leaf(node))
 			node_data->depth = dmax;
 
-		double radius = ROOT_SPACE + (r_scale * node_data->depth);
+		double radius = svg_root_length + (r_scale * node_data->depth);
 		double mid_angle =
 			0.5 * a_scale * (node_data->top+node_data->bottom);
 		double x_pos;
@@ -178,7 +183,7 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		if (! is_root(node)) {
 			struct rnode *parent = node->parent_edge->parent_node;
 			struct svg_data *parent_data = parent->data;
-			double svg_parent_h_pos = ROOT_SPACE + (
+			double svg_parent_h_pos = svg_root_length + (
 				h_scale * parent_data->depth);
 				*/
 			/* Print branch length IFF it is nonempty AND 
@@ -209,7 +214,7 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 	/* draw nodes */
-	r_scale = (0.5 * graph_width - CHAR_WIDTH * hd.l_max - 2 * ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	r_scale = (0.5 * graph_width - CHAR_WIDTH * hd.l_max - 2 * svg_root_length - LBL_SPACE) / hd.d_max;
 	printf( "<g transform='translate(%g,%g)'>",
 		 	graph_width / 2.0, graph_width / 2.0);
 	/* We draw all the tree's branches in an SVG group of their own, to
