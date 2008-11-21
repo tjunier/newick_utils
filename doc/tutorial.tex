@@ -19,7 +19,10 @@
 
 The \nutils{} are a set of \unix{} shell programs for working with Newick-formatted phylogenetic trees. Their main feature is that they require no user interaction. Why this is a good thing is not the focus of this document: I shall assume that if you are reading this, you already know when a command-line interface is better than an interactive interface.
 
-The \nutils{} are not tools for \emph{making} phylogenies. Rather, they are for working with existing ones, by which I mean manipulating the tree or extracting information from it. Each of the program performs one task (with some variants). For example, here is how you would reroot a series of trees contained in file \texttt{mytrees.nw} using node \texttt{Dmelano} as outgroup:
+The \nutils{} are not tools for \emph{making} phylogenies. Rather, they are for working with existing ones, by which I mean manipulating the tree or extracting information from it: rerooting, simplifying, extracting subtrees, printing branch lengths and distances, etc - a glance at the table of contents of this document shoul dgive you an idea.
+
+Each of the program performs one task (with some variants). For example, here is how you would reroot a series of phylograms contained in file \texttt{mytrees.nw} using node \texttt{Dmelano} as outgroup:
+
 \begin{verbatim}
 $ nw_reroot mytrees.nw Dmelano
 \end{verbatim} 
@@ -29,11 +32,6 @@ $ nw_reroot mytrees.nw Dmelano | nw_topology -
 \end{verbatim}
 
 This document is organized as follows: chapter \ref{chap_general} discusses common features of the \nutils, chapter \ref{chap_simple} shows examples of simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks.
-
-\section{The Newick Format}
-\label{sct_newick}
-
-The Newick format is a file format for (phylogenetic) trees. It is one of the most widely used and uderstood formats.
 
 \section{Conventions}
 
@@ -97,7 +95,8 @@ The help page describes the program's purpose, its input and output, and its opt
 \section{Input}
 \label{sect_input}
 
-Since the \nutils{} are for working with trees, it should not be a surprise that all programs accept Newick as input.
+Since the \nutils{} are for working with trees, it should not be a surprise that all programs accept Newick as input. The Newick format is a file format for (phylogenetic) trees. It is one of the most widely used and uderstood formats.
+A full specification can be found at [ref]
 
 \chapter{Simple Tasks}
 \label{chap_simple}
