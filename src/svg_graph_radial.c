@@ -104,6 +104,11 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 				svg_mid_x_pos, svg_mid_y_pos,
 				svg_par_x_pos, svg_par_y_pos);
 		}
+		/* draw ornament, if any */
+		if (NULL != node_data->ornament)
+			printf ("<g transform='translate(%.4f,%.4f)'>%s</g>",
+					svg_mid_x_pos, svg_mid_y_pos,
+					node_data->ornament);
 
 	}
 	printf("</g>");
