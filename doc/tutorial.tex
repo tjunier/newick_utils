@@ -1,5 +1,6 @@
 \documentclass[a4paper,10pt]{report}
 
+\usepackage{url}
 
 % Title Page
 \title{Newick Utilities Tutorial}
@@ -10,6 +11,7 @@
 \newcommand{\ascii}{\textsc{ASCII}}
 \newcommand{\svg}{\textsc{SVG}}
 \newcommand{\display}{\texttt{nw\_display}}
+\newcommand{\stdin}{standard input}
 
 \begin{document}
 \maketitle
@@ -95,13 +97,34 @@ The help page describes the program's purpose, its input and output, and its opt
 \section{Input}
 \label{sect_input}
 
-Since the \nutils{} are for working with trees, it should not be a surprise that all programs accept Newick as input. The Newick format is a file format for (phylogenetic) trees. It is one of the most widely used and uderstood formats.
-A full specification can be found at [ref]
+Since the \nutils{} are for working with trees, it should not be a surprise that all programs take Newick as input. The Newick format is a file format for (phylogenetic) trees. It is one of the most widely used and uderstood formats.
+A complete description can be found at \url{http://evolution.genetics.washington.edu/phylip/newicktree.html}.
+
+The input tree(s) are always the first argument to the program (after any options). They may either be stored in a file, or piped on \stdin{}. In the latter case, the filename is replaced by a '\texttt{-}' (dash):
+
+\begin{samepage}
+\begin{verbatim}
+$ nw_display mytrees.nw
+\end{verbatim}
+is the same as
+\begin{verbatim}
+$ cat mytrees.nw | nw_display -
+\end{verbatim}
+\end{samepage}
+Of course the second form is only really useful when chaining several programs into pipelines.
+
+Most programs can work on any number of trees. That is, in the example above the file \texttt{mytrees.nw} may contain one or more trees, preferably one tree per line\footnote{It may also work if the trees are formatted differently, the programs were only tested on input files with one per line.}. The task will be performed on all input trees. So if you need to reroot 1,000 trees on the same outgroup, you can do it all in a single step (see \ref{sct_reroot}).
+
+\section{Output}
+\label{sect_output}
+
+The \nutils{} either modify trees and print the result, or print information about the trees. In the first case, the output is also Newick. In the 
 
 \chapter{Simple Tasks}
 \label{chap_simple}
 
 \section{Rerooting}
+\label{sct_reroot}
 
 \section{Labels}
 
