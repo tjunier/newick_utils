@@ -34,6 +34,12 @@ struct css_map_element {
 	struct llist *labels;
 };
 
+struct ornament_map_element {
+	int group_type;	/* INDIVIDUAL or CLADE */
+	char *ornament;	/* an SVG snippet */
+	struct llist *labels;
+};
+
 // TODO: #define as constants in svg_graph_common.h ?
 char *leaf_label_class = "leaf-label";
 char *inner_label_class = "inner-label";
@@ -56,9 +62,9 @@ static char *inner_label_style = NULL;
 static char *edge_label_style = NULL;
 static char *plain_node_style = NULL;
 static struct llist *css_map = NULL;
+static struct llist *ornament_map = NULL;
 
 struct hash *url_map = NULL;
-struct hash *ornament_map = NULL;
 int graph_width = -1;
 int svg_whole_v_shift = -1; 	/* Vertical translation of whole graph */
 
@@ -72,6 +78,7 @@ void set_svg_whole_v_shift(int shift) { svg_whole_v_shift = shift; }
 void set_svg_style(int style) { graph_style = style; }
 void set_svg_URL_map_file(FILE * map) { url_map_file = map; }
 void set_svg_CSS_map_file(FILE * map) { css_map_file = map; }
+void set_svg_ornament_map_file(FILE * map) { ornament_map_file = map; }
 void set_svg_leaf_label_style(char *style) { leaf_label_style = style; }
 void set_svg_inner_label_style(char *style) { inner_label_style = style; }
 void set_svg_edge_label_style(char *style) { edge_label_style = style; }
@@ -197,6 +204,55 @@ struct llist *read_css_map()
 	return css_map;
 }
 
+/* Builds an ornament map structure. This is like the CSS map, but for
+ * ornaments. */
+
+struct llist *read_ornament_map()
+{
+	if (NULL == ornament_map_file)  return NULL; 
+
+	struct llist *ornament_map = create_llist();
+
+	char *line;
+	while ((line = read_line(ornament_map_file)) != NULL) {
+		struct ornament_map_element *oel = malloc(
+				sizeof(struct ornament_map_element));
+		if (NULL == oel) { perror(NULL); exit(EXIT_FAILURE); }
+
+		/* Split line into whitespace-separated "words" (or words
+		 * delimited by double quotes). First word is the ornament ,
+		 * second is group type, then come the labels.  */
+
+		struct llist *label_list = create_llist();
+		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		char *ornament = wt_next_noquote(wtok);
+		char *type = wt_next(wtok);
+		char *label;
+		while ((label = wt_next(wtok)) != NULL) {
+			append_element(label_list, label);
+		}
+		destroy_word_tokenizer(wtok);
+		free(line);
+		oel->group_type = get_group_type(type); 
+		if (UNKNOWN == oel->group_type) {
+			fprintf (stderr, "WARNING: unknown group type '%s' (ignored)\n", type);
+			free(oel);
+			free(type);
+			destroy_llist(label_list);
+			continue;
+		}
+		oel->ornament = ornament;
+		oel->labels = label_list;
+		append_element(ornament_map, oel);
+
+		free(type);
+	}
+
+	fclose(ornament_map_file);
+
+	return ornament_map;
+}
+
 /* Reads in the URL map (label -> URL) */
 
 struct hash *read_url_map()
@@ -252,8 +308,8 @@ struct hash *read_url_map()
 
 void svg_init()
 {
-	//colormap = read_colormap();
 	css_map = read_css_map();
+	ornament_map = read_ornament_map();
 	url_map = read_url_map();
 	init_done = 1;
 }
@@ -276,9 +332,11 @@ void set_group_numbers(struct rooted_tree *tree)
 	struct list_elem *elem;
 	struct css_map_element *css_el;
 
-	/* Iterate through the CLADE style map elements. Each one contains (among
-	 * others) a list of labels. Find the LCA of those labels (which can be
-	 * matched by >1 node), and set its number to that of the css element. */
+	/* Iterate through the CLADE style map elements. Each one contains
+	 * (among others) a list of labels. Find the LCA of those labels (which
+	 * can be matched by >1 node), and set its number to that of the css
+	 * element. */
+
 	for (elem = css_map->head; NULL != elem; elem = elem->next) {
 		css_el = elem->data;
 		if (CLADE != css_el->group_type) continue;
@@ -347,6 +405,73 @@ void set_group_numbers(struct rooted_tree *tree)
 	destroy_label2node_list_map(map);
 }
 
+/* Attributes ornaments to nodes, based on the ornament map (if one was
+ * supplied - see read_ornament_map()). The ornament will be printed directly
+ * at the node's position. */
+
+// NOTE: this could be made more efficient by having two separate maps, one for
+// CLADE elements and another for INDIVIDUAL elements. That way the list needs
+// not be traversed twice. But all in all it will likely not make a big
+// difference, so I'll keep it for later :-) 
+
+void set_ornaments(struct rooted_tree *tree)
+{
+	struct list_elem *elem;
+	struct ornament_map_element *oel;
+
+	/* Iterate through the CLADE style map elements. Each one contains
+	 * (among others) a list of labels. Find the LCA of those labels (which
+	 * can be matched by >1 node), and set its ornament */
+
+	for (elem = ornament_map->head; NULL != elem; elem = elem->next) {
+		oel = elem->data;
+		if (CLADE != oel->group_type) continue;
+		struct llist *labels = oel->labels;
+		struct rnode *lca = lca_from_labels_multi(tree, labels);
+		struct svg_data *lca_data = lca->data;
+		lca_data->ornament = strdup(oel->ornament);
+	}
+
+	/* Now iterate through the INDIVIDUAL style map elements. They also
+	 * contain a list of labels. Each label is matched by at least 1 node.
+	 * All of these nodes get the ornament. */
+
+	// TODO: think of making the label2node map a member of the tree structure.
+	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
+	for (elem = ornament_map->head; NULL != elem; elem = elem->next) {
+		oel = elem->data;
+		if (INDIVIDUAL != oel->group_type) continue;
+		struct llist *labels = oel->labels;
+		struct llist *group_nodes = create_llist();
+		/* Iterate over all labels of this element, adding the
+		 * corresponding nodes to 'group_nodes' */
+		struct list_elem *el;
+		for (el = labels->head; NULL != el; el = el->next) {
+			char *label = el->data;
+			struct llist *nodes_of_label;
+			nodes_of_label = hash_get(map, label);
+			if (NULL == nodes_of_label) {
+				fprintf (stderr, "WARNING: label '%s' "
+						"not found - ignored.\n",
+						label);
+				continue;
+			}
+			struct llist *copy = shallow_copy(nodes_of_label);
+			append_list(group_nodes, copy);
+			free(copy); 	/* NOT destroy_llist(): the list
+					   elements are in group_nodes. */
+		}
+		/* Set the ornament for all nodes of this group */
+		for (el = group_nodes->head; NULL != el; el = el->next)  {
+			struct rnode *node = el->data;
+			struct svg_data *node_data = node->data;
+			node_data->ornament = strdup(oel->ornament);
+		}
+		destroy_llist(group_nodes);
+	}
+	destroy_label2node_list_map(map);
+}
+
 /* Allocates and initializes an svg_data structure for each of the tree's
  * nodes. The real data are set later through callbacks (see
  * svg_set_node_top(), etc) */
@@ -362,6 +487,7 @@ void svg_alloc_node_pos(struct rooted_tree *tree)
 		if (NULL == svgd) { perror(NULL); exit (EXIT_FAILURE); }
 		svgd->top = svgd->bottom = svgd->depth = -1.0;
 		svgd->group_nb = UNSTYLED_CLADE;	
+		svgd->ornament = NULL;
 		node->data = svgd;
 	}
 }
@@ -418,6 +544,7 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves,
 			svg_set_node_depth, svg_get_node_depth);
 
 	if (css_map) set_group_numbers(tree);
+	if (ornament_map) set_ornaments(tree);
  	prettify_labels(tree);
 
 	if (SVG_ORTHOGONAL == graph_style)

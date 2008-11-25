@@ -23,6 +23,10 @@ struct word_tokenizer *create_word_tokenizer(const char *);
 
 char *wt_next(struct word_tokenizer *);
 
+/* Same as above, but removes any leading or trailing quotes (' or ") */
+
+char *wt_next_noquote(struct word_tokenizer *);
+
 /* Frees a word_tokenizer */
 
 void destroy_word_tokenizer(struct word_tokenizer *);

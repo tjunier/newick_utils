@@ -100,6 +100,27 @@ char *wt_next(struct word_tokenizer *wt)
 	return word;
 }
 
+char *wt_next_noquote(struct word_tokenizer *wt)
+{
+	char *word = wt_next(wt);
+	if (NULL == word) return NULL;
+
+	size_t len = strlen(word);
+	if (word[0] == '"' || word[0] == '\'')
+		if (word[len-1] == word[0]) {
+			char *unquoted = malloc((len) * sizeof(char));
+			if (NULL == unquoted) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
+			strncpy(unquoted, word+1, len-2);
+			unquoted[len-2] = '\0';
+			free(word);
+			return unquoted;
+		}
+	return word;
+}
+
 void destroy_word_tokenizer(struct word_tokenizer *wt)
 {
 	free(wt->string);

@@ -1,3 +1,5 @@
+test procedure: test program should FAIL if it segfaults (obviously...)
+
 nw_display: add ornaments. That's an arbitrary snippet of SVG code that will be inserted next to a node's label.
 
 nw_display: add scale bar to SVG radial, and to text.

@@ -19,6 +19,7 @@ struct parameters {
 	int svg;
 	FILE *css_map;	
 	FILE *url_map;
+	FILE *ornament_map;		/* SVG */
 	char *leaf_label_style;		/* CSS */
 	char *inner_label_style;	/* CSS */
 	char *edge_label_style;		/* CSS */
@@ -145,6 +146,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.width =	-1;
 	params.svg = FALSE;
 	params.css_map = NULL;
+	params.ornament_map = NULL;
 	params.url_map = NULL;
 	params.leaf_label_style = "font-size:medium;font-family:sans";
 	params.inner_label_style = "font-size:small;font-family:sans";
@@ -162,7 +164,7 @@ struct parameters get_params(int argc, char *argv[])
 	const int DEFAULT_WIDTH_CHARS = 80;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:l:rR:su:U:v:w:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:l:o:rR:su:U:v:w:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -190,6 +192,12 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'l':
 			params.leaf_label_style = optarg;
+			break;
+		case 'o':
+			params.ornament_map = fopen(optarg, "r");
+			if (NULL == params.ornament_map) {
+				perror(NULL); exit(EXIT_FAILURE);
+			}
 			break;
 		case 'r':
 			params.svg_style = SVG_RADIAL;
@@ -271,6 +279,7 @@ void set_svg_parameters(struct parameters params)
 	set_svg_URL_map_file(params.url_map);
 	// TODO: refer to this as "clade CSS", as opposed to node label CSS
 	set_svg_CSS_map_file(params.css_map);
+	set_svg_ornament_map_file(params.ornament_map);
 	set_svg_leaf_label_style(params.leaf_label_style);
 	set_svg_inner_label_style(params.inner_label_style);
 	set_svg_edge_label_style(params.edge_label_style);

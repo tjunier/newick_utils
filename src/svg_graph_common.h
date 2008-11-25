@@ -16,11 +16,14 @@ extern int svg_whole_v_shift;
 
 /* rnode data for SVG trees */
 
+// TODO: URLs should be passed through the node, too.
+
 struct svg_data {
 	double top;
 	double bottom;
 	double depth;
 	int group_nb;	/* For attributing styles */
+	char *ornament;	/* SVG decorations */
 	/* ... other node properties ... */
 };
 
