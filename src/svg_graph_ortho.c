@@ -127,6 +127,29 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 	printf("</g>");
 }
 
+/* Void draws ornaments */
+
+void draw_ornaments_ortho (struct rooted_tree *tree, const double h_scale,
+		const double v_scale)
+{
+	/* iterate over ornaments map */
+	struct llist *keys = hash_keys(ornaments_map);
+	struct list_elem *elem;
+	for (elem = keys->head; NULL != elem; elem = elem->next) {
+		ornament_map_element *ome = elem->data;
+		struct rnode *node = hash_get(map, ome->label);
+		struct svg_data *node_data = node->data;
+		double svg_h_pos = ROOT_SPACE + (h_scale * node_data->depth);
+		double svg_mid_pos =
+			0.5 * v_scale * (node_data->top+node_data->bottom);
+		printf ("<g transform=translate(%.4f,%.4f)>", svg_h_pos,
+				svg_mid_pos);
+		printf (ome->ornament);
+		printf ("</g>");
+	}
+	destroy_llist(keys);
+}
+
 /* Draws a scale bar below the tree. Uses a heuristic to manage horizontal
  * space */
 
@@ -211,6 +234,9 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	draw_branches_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
 	/* ... likewise for text */
 	draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
+	/* Draw ornaments, if any; also in a separate group. */
+	if (NULL != ornament_map)
+		draw_ornaments_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
 	/* Draw scale bar if required */
 	if (with_scale_bar) draw_scale_bar(tree, h_scale, v_scale, hd.d_max,
 			branch_length_unit);

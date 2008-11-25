@@ -50,6 +50,7 @@ int init_done = FALSE;
 static int graph_style = -1;
 static FILE *url_map_file = NULL;
 static FILE *css_map_file = NULL;
+static FILE *ornament_map_file = NULL;
 static char *leaf_label_style = NULL;
 static char *inner_label_style = NULL;
 static char *edge_label_style = NULL;
@@ -57,6 +58,7 @@ static char *plain_node_style = NULL;
 static struct llist *css_map = NULL;
 
 struct hash *url_map = NULL;
+struct hash *ornament_map = NULL;
 int graph_width = -1;
 int svg_whole_v_shift = -1; 	/* Vertical translation of whole graph */
 
