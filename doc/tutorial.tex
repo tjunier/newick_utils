@@ -33,7 +33,7 @@ Now, you might want to make cladograms from the rerooted trees. This would be do
 $ nw_reroot mytrees.nw Dmelano | nw_topology -
 \end{verbatim}
 
-This document is organized as follows: chapter \ref{chap_general} discusses common features of the \nutils, chapter \ref{chap_simple} shows examples of simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks.
+This document is organized as follows: chapter \ref{chap_general} discusses common features of the \nutils, chapter \ref{chap_simple} shows examples of simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks. All the examples shown in this document can be reproduced using files in the \texttt{data} directory.
 
 \section{Conventions}
 
@@ -59,8 +59,10 @@ $ nw_clade catarrhini.nw Pongo Pan | nw_display -
 \end{verbatim}
 If the graph is \svg, then it will have been \display{} \verb+-s+.
 
-\chapter{Generalities}
+\chapter{General Remarks}
 \label{chap_general}
+
+The following applies to all programs in the \nutils{} package.
 
 \section{Help}
 \label{sect_help}
@@ -113,18 +115,23 @@ $ cat mytrees.nw | nw_display -
 \end{samepage}
 Of course the second form is only really useful when chaining several programs into pipelines.
 
-Most programs can work on any number of trees. That is, in the example above the file \texttt{mytrees.nw} may contain one or more trees, preferably one tree per line\footnote{It may also work if the trees are formatted differently, the programs were only tested on input files with one per line.}. The task will be performed on all input trees. So if you need to reroot 1,000 trees on the same outgroup, you can do it all in a single step (see \ref{sct_reroot}).
+Most programs can work on any number of trees. That is, in the example above the file \texttt{mytrees.nw} may contain one or more trees, preferably one tree per line\footnote{It may also work if the trees are formatted differently, but the programs were only tested on input files with one tree per line.}. The task will be performed on each tree in the input. So if you need to reroot 1,000 trees on the same outgroup, you can do it all in a single step (see \ref{sct_reroot}).
 
 \section{Output}
 \label{sect_output}
 
-The \nutils{} either modify trees and print the result, or print information about the trees. In the first case, the output is also Newick. In the 
+The \nutils{} either modify trees and print the result, or print information about the trees. In the first case, the output is also Newick.
 
 \chapter{Simple Tasks}
 \label{chap_simple}
 
-\section{Rerooting}
+\section{Rooting and Rerooting}
 \label{sct_reroot}
+
+Rooting transforms an unrooted tree into a rooted one, and rerooting changes a rooted tree's root. Some tree-building methods produce rooted trees (e.g., \textsc{UPGMA}), others produce unrooted ones (neighbor-joining, maximum-likelihood). 
+
+The Newick format is implicitly rooted, in the sense that there is a 'top' node from which all other nodes descend. Some applications regard a tree with a trifuraction at the top node as unrooted. 
+
 
 \section{Labels}
 
