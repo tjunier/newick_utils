@@ -57,7 +57,6 @@ int test_tlt_grow_node()
 	link_p2c(parent, kid, NULL);
 
 	double posterior_remaining_time = tlt_grow_node(kid, 1.0, 0.5);
-	printf ("post rem time: %g\n", posterior_remaining_time);
 	double grown_length = strtod(kid->parent_edge->length_as_string, NULL);
 
 	double exp = prior_remaining_time - posterior_remaining_time;

@@ -67,6 +67,7 @@ static struct llist *ornament_map = NULL;
 struct hash *url_map = NULL;
 int graph_width = -1;
 int svg_whole_v_shift = -1; 	/* Vertical translation of whole graph */
+double label_char_width = -1;
 
 /* These are setters for the external variables. This way I can keep most of
  * them static. I just don't like variables open to anyone, maybe I did too
@@ -83,6 +84,7 @@ void set_svg_leaf_label_style(char *style) { leaf_label_style = style; }
 void set_svg_inner_label_style(char *style) { inner_label_style = style; }
 void set_svg_edge_label_style(char *style) { edge_label_style = style; }
 void set_svg_plain_node_style(char *style) { plain_node_style = style; }
+void set_svg_label_char_width(double width) { label_char_width = width; }
 
 /************************** functions *****************************/
 
@@ -114,9 +116,10 @@ void svg_header()
 	printf( "<?xml version='1.0' standalone='no'?>"
 	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
 		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
-	printf( "<svg width='100%%' height='100%%' version='1.1' "
+	printf( "<svg width='%d' height='%d' version='1.1' "
 		"xmlns='http://www.w3.org/2000/svg' "
-		"xmlns:xlink='http://www.w3.org/1999/xlink' >");
+		"xmlns:xlink='http://www.w3.org/1999/xlink' >",
+		graph_width, graph_width);
 	svg_CSS_stylesheet();
 }
 
@@ -529,6 +532,94 @@ double largest_PoT_lte(double arg)
 	return pow(10, l10_fl);
 }
 
+/* Draws a square grid, centered on the orgin. This is for debugging. Anyway
+ * some programs (like Eye of Gnome) just can't handle the grid. */
+
+void draw_grid()
+{
+	int i,j;
+
+	printf ("<g class='grid' style='stroke:grey'>");
+	for (i = -1000; i <= 1000; i += 100)
+		printf ("<path d='M %d -1000 v 2000'/>", i);
+	for (j = -1000; j <= 1000; j += 100)
+		printf ("<path d='M -1000 %d h 2000'/>", j);
+	printf ("</g>");
+}
+
+/* Draws a scale bar below the tree. Uses a heuristic to manage horizontal
+ * space */
+
+// TODO: first two args should both be double
+//
+void draw_scale_bar(int hpos, double vpos,
+		double h_scale, double d_max, char *branch_length_unit)
+{
+	/* Finds the largest power of 10 that is smaller than the tree's depth.
+	 * Then draws as many multiples of this length as possible. If no more
+	 * than one can be drawn (because it's longer than half the tree's
+	 * depth), then we draw tick marks inside it instead. */
+
+	const int big_tick_height = 5; 			/* px */
+	const int small_tick_height = 3;		/* px */
+	const int units_text_voffset = 12;		/* px */
+	const int vsep = 1;				/* px */
+	double pot = largest_PoT_lte(d_max);		/* tree units */
+	double scale_length = pot * h_scale;		/* px */
+
+	printf ("<g transform='translate(%d,%g)'>", hpos, vpos); 
+
+	if (2 * pot > d_max) {
+		/* print 1/10th tick marks */
+		printf ("<path style='stroke:black' d='M 0 %d l 0 %d "
+		       "l %g 0 l 0 %d'/>", vsep, big_tick_height, scale_length,
+		       -big_tick_height);
+		int i;
+		for (i = 1; i < 10; i++)
+			printf ("<path d='M %g %d l 0 %d'/>",
+				i * (scale_length/10), 
+				vsep + big_tick_height - small_tick_height,
+				small_tick_height);
+		printf ("<text style='font-size:small;stroke:none;"
+			"text-anchor:start' x='0' y='0'>0</text>");
+		printf ("<text style='font-size:small;stroke:none;"
+			"text-anchor:end' x='%g' y='0'>%g</text>",
+			scale_length, pot);
+		printf ("<text style='font-size:small;stroke:none;"
+			"text-anchor:end' x='%g' y='0'>%g</text>",
+			scale_length/2, pot/2);
+	} else {
+		/* Print as many multiples of 'scale_length' as  will fit */
+
+		/* Find how many multiples fit */
+		int multiples;
+		for (multiples = 0; (multiples+1)*pot < d_max; multiples++)
+			;
+		
+		/* Print base line and tick marks */
+		printf ("<g style='stroke:black;stroke-linecap:round'>");
+		printf ("<path d='M 0 0 h %g'/>",
+				big_tick_height, multiples * scale_length);
+		int i;
+		for (i = 0; i <= multiples; i++) {
+			printf ("<path style='stroke:black' d='M %g 0 v %d'/>",
+				i*scale_length, -big_tick_height);
+		}
+		printf ("</g>");
+
+		/* Print tick labels */
+		printf ("<g style='font-size:small;stroke:none;text-anchor:end'>");
+		for (i = 0; i <= multiples; i++) { 
+			printf ("<text x='%g' y='%d'>%g</text>",
+				i*scale_length, -big_tick_height, i*pot);
+		}
+		printf ("</g>");
+	}
+	printf ("<text style='font-size:small;stroke:none' x='0' y='%d'>"
+		"%s</text>", units_text_voffset, branch_length_unit);
+	printf ("</g>");
+}
+
 void display_svg_tree(struct rooted_tree *tree, int align_leaves,
 		int with_scale_bar, char *branch_length_unit)
 {	
@@ -551,11 +642,11 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves,
 		display_svg_tree_orthogonal(tree, hd, align_leaves,
 				with_scale_bar, branch_length_unit);
 	else if (SVG_RADIAL == graph_style)
-		display_svg_tree_radial(tree, hd, align_leaves);
+		display_svg_tree_radial(tree, hd, align_leaves,
+				with_scale_bar, branch_length_unit);
 	else
 		// TODO: better handling of errors: should return error code
 		fprintf (stderr, "Unknown tree style %d\n", graph_style);
-		
 }
 
 void svg_footer() { printf ("</svg>"); }

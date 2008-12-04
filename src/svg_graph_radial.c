@@ -11,6 +11,7 @@
 #include "math.h"
 
 const double PI = 3.14159;
+const int Scale_bar_left_space = 10;
 
 /* If this is zero, the label's baseline is aligned on the branch. Use it to
  * nudge the labels a small angle. Unfortunately the correct amount will depend
@@ -209,8 +210,40 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 	printf("</g>");
 }
 
+/* Prints an SVG comment block with some run parameters. Useful for debugging */
+
+void params_as_svg_comment (struct h_data hd, double node_area_width,
+		double r_scale)
+{
+	printf ("<!-- SVG parameters:\n"
+		"    primary params:\n"
+		"    ..............\n"
+		"    graph width [g]:\t\t%4d px\n"
+		"    label char width [c]:\t%4g px\n"
+		"    max label length [l]:\t%4d characters\n"
+		"    root length [r]:\t\t%4d px\n"
+		"    label space [s]:\t\t%4d px\n"
+		"    tree depth [d]:\t\t%4g arbitrary units\n\n"
+		"    derived params:\n"
+		"    ..............\n"
+		"    label area [cl]:\t\t\t%4g px\n"
+		"    node area [n = g/2 - cl - r - s]:\t%4g px\n"
+		"    radial scale [S = n / d]:\t\t%4g px / arbitrary units\n"
+		"  -->\n",
+		graph_width,
+	       	label_char_width,
+	       	hd.l_max,
+		svg_root_length,
+	       	LBL_SPACE,
+		hd.d_max,
+	       	label_char_width * hd.l_max,
+		node_area_width,
+		r_scale);
+}
+
 void display_svg_tree_radial(struct rooted_tree *tree,
-		struct h_data hd, int align_leaves)
+		struct h_data hd, int align_leaves, int with_scale_bar,
+		char *branch_length_unit)
 {
 	double r_scale = -1;
 	/* By using 1.9 PI instead of 2 PI, we leave a wedge that shows the
@@ -218,14 +251,41 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	double a_scale = 1.9 * PI / leaf_count(tree); /* radians */
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
-	/* draw nodes */
-	r_scale = (0.5 * graph_width - CHAR_WIDTH * hd.l_max - 2 * svg_root_length - LBL_SPACE) / hd.d_max;
-	printf( "<g transform='translate(%g,%g)'>",
-		 	graph_width / 2.0, graph_width / 2.0);
+
+	/* TODO: why twice svg_root_length? */
+	double node_area_width = 0.5 * graph_width
+			- label_char_width * hd.l_max
+			- svg_root_length - LBL_SPACE;
+	r_scale = node_area_width / hd.d_max;
+
+	params_as_svg_comment(hd, node_area_width, r_scale);
+
+	/* Given that we only 'use' 1.9 PI instead of 2 PI (see above), we can
+	 * rotate the whole graph by 0.05 PI so that we can draw the scale bar
+	 * on the horizontal axis. */
+	/* NOTE: I've tried drawing the scale bar from the tree's center. It's
+	 * not as good as it seems, so for now I shall draw it in the lower
+	 * left corner, just like in an orthogonal tree. If someone really
+	 * insists on this, it can be reenabled by commenting out the following
+	 * (and commenting the appropriate parts), and drwaing the scale bar at
+	 * (0, 0) (actually, needs a bit of vertical nudging, see
+	 * draw_scale_bar() */
+	
+	// double rotation = 0.1 * PI / (2 * PI) * 360;	/* degrees */
+	/*
+	printf( "<g transform='translate(%g,%g) rotate(%g)'>",
+		 	graph_width / 2.0, graph_width / 2.0, rotation);
+	*/
+
+	printf( "<g transform='translate(%g,%g)'>", graph_width / 2.0,
+			graph_width / 2.0); 
 	/* We draw all the tree's branches in an SVG group of their own, to
 	 * facilitate editing. */
 	draw_branches_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
 	/* likewise for text */
 	draw_text_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
 	printf ("</g>");
+	if (with_scale_bar)
+		draw_scale_bar(Scale_bar_left_space, (double) graph_width,
+				r_scale, hd.d_max, branch_length_unit);
 }

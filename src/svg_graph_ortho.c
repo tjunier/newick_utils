@@ -132,68 +132,6 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 	printf("</g>");
 }
 
-/* Draws a scale bar below the tree. Uses a heuristic to manage horizontal
- * space */
-
-void draw_scale_bar(struct rooted_tree *tree, double h_scale,
-		double v_scale, double d_max, char *branch_length_unit)
-{
-	/* Finds the largest power of 10 that is smaller than the tree's depth.
-	 * Then draws as many multiples of this length as possible. If no more
-	 * than one can be drawn (because it's longer than half the tree's
-	 * depth), then we draw tick marks inside it instead. */
-
-	const int big_tick_height = 5; 			/* px */
-	const int small_tick_height = 3;		/* px */
-	const int units_text_voffset = -13;		/* px */
-	const int vsep = 1;				/* px */
-	double vpos = leaf_count(tree) * v_scale; 	/* px */
-	double pot = largest_PoT_lte(d_max);		/* tree units */
-	double scale_length = pot * h_scale;		/* px */
-
-	printf ("<g transform='translate(%d,%g)'>", ROOT_SPACE, vpos); 
-
-	if (2 * pot > d_max) {
-		/* print 1/10th tick marks */
-		printf ("<path style='stroke:black' d='M 0 %d l 0 %d "
-		       "l %g 0 l 0 %d'/>", vsep, big_tick_height, scale_length,
-		       -big_tick_height);
-		int i;
-		for (i = 1; i < 10; i++)
-			printf ("<path d='M %g %d l 0 %d'/>",
-				i * (scale_length/10), 
-				vsep + big_tick_height - small_tick_height,
-				small_tick_height);
-		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:start' x='0' y='0'>0</text>");
-		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:end' x='%g' y='0'>%g</text>",
-			scale_length, pot);
-		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:end' x='%g' y='0'>%g</text>",
-			scale_length/2, pot/2);
-	} else {
-		/* print as many multiples of 'scale_length' as  will fit */
-		printf ("<path d='M 0 %d l 0 %d'/>", vsep, big_tick_height);
-		printf ("<text style='font-size:small;text-anchor:stat;"
-			"stroke:none' x='0' y='0'>0</text>");
-		int i;
-		for (i = 0; (i+1)*pot < d_max; i++) {
-			printf ("<path transform='translate(%g,0)' "
-				"style='stroke:black;fill:none' d='M 0 %d l %g 0 l 0 %d'/>",
-				i*scale_length, vsep+big_tick_height,
-				scale_length, -big_tick_height);
-			printf ("<text transform='translate(%g,0)' "
-				"style='font-size:small;text-anchor:end;"
-				"ststroke:black' x='0' y='0'>%g</text>",
-				(i+1)*scale_length, (i+1)*pot);
-		}
-	}
-	printf ("<text style='font-size:small;stroke:none' x='0' y='%d'>"
-		"%s</text>", units_text_voffset, branch_length_unit);
-	printf ("</g>");
-}
-
 void display_svg_tree_orthogonal(struct rooted_tree *tree,
 		struct h_data hd, int align_leaves, int with_scale_bar,
 		char *branch_length_unit)
@@ -204,7 +142,11 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	double v_scale = leaf_vskip;
 
 	if (0.0 == hd.d_max) { hd.d_max = 1; } 	/* one-node trees */
-	h_scale = (graph_width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	h_scale = (graph_width
+			- label_char_width * hd.l_max
+			- ROOT_SPACE
+			- LBL_SPACE
+		) / hd.d_max;
 
 	/* Tree is in a separate group - may be useful when (if?) there are
 	 * more than one tree*/
@@ -217,7 +159,8 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	/* ... likewise for text */
 	draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
 	/* Draw scale bar if required */
-	if (with_scale_bar) draw_scale_bar(tree, h_scale, v_scale, hd.d_max,
+	double vpos = leaf_count(tree) * v_scale; 	/* px */
+	if (with_scale_bar) draw_scale_bar(ROOT_SPACE, vpos, h_scale, hd.d_max,
 			branch_length_unit);
 	printf ("</g>");
 }

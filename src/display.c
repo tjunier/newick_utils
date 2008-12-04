@@ -25,11 +25,12 @@ struct parameters {
 	char *edge_label_style;		/* CSS */
 	char *plain_node_style;		/* CSS */
 	double leaf_vskip;
-	int svg_style;		/* radial or orthogonal */
+	int svg_style;			/* radial or orthogonal */
 	char *branch_length_unit;
 	double label_angle_correction;
 	double left_label_angle_correction;
 	int root_length;
+	double label_char_width;	/* for estimating label length */
 };
 
 void help(char* argv[])
@@ -40,7 +41,7 @@ void help(char* argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-aAbcdhilrRsuUvw] <tree filename|->\n"
+"%s [-aAbcdhilrRsuUvwW] <tree filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -100,6 +101,8 @@ void help(char* argv[])
 "    -l <string>: CSS for leaf node labels. [only SVG]\n"
 "       Default: 'font-size:medium;font-family:sans'.\n"    
 "       setting 'visibility:hidden' disables printing of leaf node labels.\n"
+"       Note: if you change this, you will probably need to adjust the\n"
+"       space allocated to leaf labels - see option -W.\n"
 "    -R <integer>: use that many pixels for the root [only SVG]\n"
 "    -r: draw a radial tree (default: orthogonal) [only SVG]\n"
 "    -s: output graph as SVG (default: text). SVG output is currently limited\n"
@@ -116,6 +119,11 @@ void help(char* argv[])
 "    -w <number>: graph should be no wider than <number>, measured in\n"
 "       characters for text and pixels for SVG. Defaults: 80 (text),\n"
 "       300 (SVG)\n"
+"    -W <number>: use this as an estimate of the width of a leaf label\n"
+"       character (in pixels) [only SVG]. This affects the space left for\n"
+"       the tree nodes. Default: 5.0 You will probably need this if you\n"
+"       change the leaf label font properties (option -l), especially size.\n"
+"       You will probably need trial and error to find the right value.\n"
 "\n"
 "Examples\n"
 "--------\n"
@@ -154,17 +162,18 @@ struct parameters get_params(int argc, char *argv[])
 	params.plain_node_style = NULL;	/* svg_graph.c has default */
 	params.leaf_vskip = 40.0;
 	params.svg_style = SVG_ORTHOGONAL;
-	params.branch_length_unit = "";
+	params.branch_length_unit = "substitutions/site";
 	params.label_angle_correction = 0.0;
 	params.left_label_angle_correction = 0.0;
 	params.root_length = ROOT_SPACE;
+	params.label_char_width = 8.0;
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
 	const int DEFAULT_WIDTH_CHARS = 80;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:l:o:rR:su:U:v:w:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:l:o:rR:su:U:v:w:W:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -228,6 +237,9 @@ struct parameters get_params(int argc, char *argv[])
 				exit(EXIT_FAILURE);
 			}
 			break;
+		case 'W':
+			params.label_char_width = atof(optarg);
+			break;
 		}
 	}
 	/* if width not set, use default (depends on whether SVG or not) */
@@ -285,6 +297,7 @@ void set_svg_parameters(struct parameters params)
 	set_svg_edge_label_style(params.edge_label_style);
 	set_svg_plain_node_style(params.plain_node_style);
 	set_svg_root_length(params.root_length);
+	set_svg_label_char_width(params.label_char_width);
 }
 
 /* Prints an XML comment containing the command line parameters, so that the
@@ -316,7 +329,9 @@ int main(int argc, char *argv[])
 		tree = parse_tree();
 		align_leaves = is_cladogram(tree);
 		with_scale_bar = !is_cladogram(tree);
-		svg_header();
+		/* NOTE: do NOT refactor svg_header() into display_svg_tree() - maybe one day
+		 * we'll allow >1 tree per graph. */
+		svg_header(); 
 		svg_run_params_comment(argc, argv);
 		display_svg_tree(tree, align_leaves, with_scale_bar,
 				params.branch_length_unit);

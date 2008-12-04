@@ -4,13 +4,13 @@ pure_topol:tetrapoda_pure_topol.nw
 svg_cmap:-s -c color.map catarrhini.nw
 svg_cldgram:-s catarrhini_wrong.nw
 svlb: -s -v 8 -l 'font-size:7' -b 'font-size:6' HRV.nw
-svg_cmap_r:-s -r -c color.map catarrhini.nw
+svg_cmap_r:-s -r -w 450 -c color.map catarrhini.nw
 svg_cldgram_r:-sr catarrhini_wrong.nw
-svlb_r: -s -r -l 'font-size:7' -b 'font-size:6' HRV.nw
+svlb_r: -s -r -l 'font-size:7' -W 5 -b 'font-size:6' HRV.nw
 svgu: -s -u 'substitutions/site' HRV.nw
 svgac: -sr -w 700 -l 'font-size:8' -i 'font-size:7' -a 0.01 -A -0.02 -c 5NCR.cmap figure_S1a.nw
-svgurl: -s -r -l 'font-size:7pt' -v 10pt -w 500 -c dg_color.map -U dg_url.map dg_tree.nw
-svg_mlbl1: -sr -c falc_css.map falc_families.nw
+svgurl: -s -r -l 'font-size:7pt' -W 3.5 -w 500 -c dg_color.map -U dg_url.map dg_tree.nw
+svg_mlbl1: -sr -w 450 -c falc_css.map falc_families.nw
 css_multi: -s -c bacteria_css.map bacteria.nw
 css_multi_def: -s -c bacteria_css.map -d 'stroke:grey' bacteria.nw
-rl: -sr -R 20 catarrhini.nw
+rl: -sr -R 50 -w 500 catarrhini.nw

@@ -1,10 +1,13 @@
-test procedure: test program should FAIL if it segfaults (obviously...)
+nw_display: craft test tree for numeric verification of lengths and positions
 
-nw_display: add ornaments. That's an arbitrary snippet of SVG code that will be inserted next to a node's label.
+nw_display: use CSS in scale bar
 
-nw_display: add scale bar to SVG radial, and to text.
+nw_display: add scale bar to SVG radial -- in progress, but scale is too compressed in radial trees -- try with catarrhini.
 
-nw_display: CSS node groups that aren't clades (flag Invariant) should not be called 'clade_xy' in the SVG, but 'group_xy'.
+nw_display: add scale bar to text display
+
+nw_display: CSS node groups that aren't clades (flag Invariant) should not be
+called 'clade_xy' in the SVG, but 'group_xy'.
 
 tree: consider adding a label->node map as a member. Since this is not used by
 all applications, it could be lazy, i.e. computed on demand. This means there
@@ -204,4 +207,10 @@ individually to all nodes in a group (rather than to their LCA and
 descendents).
 
 [done] nw_display: add an option, perhaps -d or -D, for the CSS style of the default clade (clade_0).
+
+[done] nw_display: add ornaments. That's an arbitrary snippet of SVG code that will be inserted next to a node's label.
+
+[dropped] test procedure: test program should FAIL if it segfaults
+(obviously...) - In fact I could not reproduce a case when it does not fail, so
+I'll leave this out for now.
 

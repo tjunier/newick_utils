@@ -1,6 +1,7 @@
 \documentclass[a4paper,10pt]{report}
 
 \usepackage{url}
+\usepackage{graphics}
 
 % Title Page
 \title{Newick Utilities Tutorial}
@@ -10,8 +11,13 @@
 \newcommand{\unix}{\textsc{Unix}}
 \newcommand{\ascii}{\textsc{ASCII}}
 \newcommand{\svg}{\textsc{SVG}}
-\newcommand{\display}{\texttt{nw\_display}}
 \newcommand{\stdin}{standard input}
+\newcommand{\nw}{Newick}
+
+% names of programs
+\newcommand{\display}{\texttt{nw\_display}}
+\newcommand{\reroot}{\texttt{nw\_reroot}}
+\newcommand{\topology}{\texttt{nw\_topology}}
 
 \begin{document}
 \maketitle
@@ -19,11 +25,15 @@
 
 \chapter{Introduction}
 
-The \nutils{} are a set of \unix{} shell programs for working with Newick-formatted phylogenetic trees. Their main feature is that they require no user interaction. Why this is a good thing is not the focus of this document: I shall assume that if you are reading this, you already know when a command-line interface is better than an interactive interface.
+The \nutils{} are a set of \unix{} shell programs for working with Newick-formatted phylogenetic trees. Their main features are:
+\begin{itemize}
+ \item they require no user interaction.\footnote{Why this is a good thing is not the focus of this document: I shall assume that if you are reading this, you already know when a command-line interface is better than an interactive interface.}
+ \item they can work on any number of trees at a time\footnote{Strictly speaking, a few applications are limited to one input tree because working on more than one is not practical}
+ \item they perform reasonably well with large trees
+\end{itemize}
+They are not tools for \emph{making} phylogenies. Rather, they are for working with existing ones, by which I mean manipulating the tree or extracting information from it: rerooting, simplifying, extracting subtrees, printing branch lengths and distances, etc - a glance at the table of contents of this document should give you an idea.
 
-The \nutils{} are not tools for \emph{making} phylogenies. Rather, they are for working with existing ones, by which I mean manipulating the tree or extracting information from it: rerooting, simplifying, extracting subtrees, printing branch lengths and distances, etc - a glance at the table of contents of this document shoul dgive you an idea.
-
-Each of the program performs one task (with some variants). For example, here is how you would reroot a series of phylograms contained in file \texttt{mytrees.nw} using node \texttt{Dmelano} as outgroup:
+Each of the programs performs one task (with some variants). For example, here is how you would reroot a series of phylograms contained in file \texttt{mytrees.nw} using node \texttt{Dmelano} as outgroup:
 
 \begin{verbatim}
 $ nw_reroot mytrees.nw Dmelano
@@ -32,6 +42,7 @@ Now, you might want to make cladograms from the rerooted trees. This would be do
 \begin{verbatim}
 $ nw_reroot mytrees.nw Dmelano | nw_topology -
 \end{verbatim}
+As you can see, the rerooted tree from \reroot{} is just piped into \topology, which takes care of removing branch lengths, in a typical shell pipeline.
 
 This document is organized as follows: chapter \ref{chap_general} discusses common features of the \nutils, chapter \ref{chap_simple} shows examples of simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks. All the examples shown in this document can be reproduced using files in the \texttt{data} directory.
 
@@ -57,7 +68,7 @@ it will mean that the last step was \display{}, something like this:
 \begin{verbatim}
 $ nw_clade catarrhini.nw Pongo Pan | nw_display -
 \end{verbatim}
-If the graph is \svg, then it will have been \display{} \verb+-s+.
+If the graph is \svg, then it will have been \display{} \verb+-s+. See section \ref{sct_display} for more on displaying trees.
 
 \chapter{General Remarks}
 \label{chap_general}
@@ -67,7 +78,7 @@ The following applies to all programs in the \nutils{} package.
 \section{Help}
 \label{sect_help}
 
-All programs in the \nutils{} package will print a help message if passed option \texttt{-h}:
+All programs print a help message if passed option \texttt{-h}:
 
 \begin{samepage}
 \begin{verbatim}
@@ -115,6 +126,8 @@ $ cat mytrees.nw | nw_display -
 \end{samepage}
 Of course the second form is only really useful when chaining several programs into pipelines.
 
+\subsection{Multiple Trees in Input}
+
 Most programs can work on any number of trees. That is, in the example above the file \texttt{mytrees.nw} may contain one or more trees, preferably one tree per line\footnote{It may also work if the trees are formatted differently, but the programs were only tested on input files with one tree per line.}. The task will be performed on each tree in the input. So if you need to reroot 1,000 trees on the same outgroup, you can do it all in a single step (see \ref{sct_reroot}).
 
 \section{Output}
@@ -125,6 +138,98 @@ The \nutils{} either modify trees and print the result, or print information abo
 \chapter{Simple Tasks}
 \label{chap_simple}
 
+\section{Displaying Trees}
+\label{sct_display}
+
+Perhaps the simplest and most common operation on a \nw{} tree is just to look at it. The \nw{} format is not very easy to understand for us humans, so we have to produce a graphical representation from it. This is the purpose of the \display{} program. At the simplest, it just outputs a text graph:
+
+\begin{samepage}
+\begin{verbatim}
+$ nw_display catarrhini
+                                        +---------------+ Gorilla               
+                                        |                                       
+                          +-------------+ Homininae---------+ Pan               
+                          |             +---------+ Hominini                    
+           +--------------+ Hominidae             +---------+ Homo              
+           |              |                                                     
+ +---------+              +----------------------------+ Pongo                  
+ |         |                                                                    
+ |         +-------------------+ Hylobates                                      
+ |                                                                              
+=|                                                     +---------+ Macaca       
+ |                                 +-------------------+                        
+ |         +-----------------------+ Cercopithecinae   +---------+ Papio        
+ |         |                       |                                            
+ |         |                       +---------+ Cercopithecus                    
+ +---------+ Cercopithecidae                                                    
+           |    +---------+ Simias                                              
+           +----+ Colobinae                                                     
+                +------+ Colobus       
+\end{verbatim}
+\end{samepage}
+
+That's pretty low-tech compared to interactive, colorful graphical displays, but if you use the shell a lot (like I do), you may find it useful.
+
+You can use option \texttt{-w} (``width'') to set the number of columns available for display:
+
+\begin{samepage}
+\begin{verbatim}
+ $ nw_display -w 60 catarrhini
+                            +----------+ Gorilla            
+                            |                               
+                  +---------+ Homininae---+ Pan             
+                  |         +------+ Hominini               
+        +---------+ Hominidae      +------+ Homo            
+        |         |                                         
+ +------+         +-------------------+ Pongo               
+ |      |                                                   
+ |      +------------+ Hylobates                            
+ |                                                          
+=|                                    +------+ Macaca       
+ |                       +------------+                     
+ |      +----------------+ Cercopithecinae---+ Papio        
+ |      |                |                                  
+ |      |                +-----+ Cercopithecus              
+ +------+ Cercopithecidae                                   
+        |  +------+ Simias                                  
+        +--+ Colobinae                                      
+           +----+ Colobus   
+\end{verbatim}
+\end{samepage}
+
+Option \texttt{-s} produces \svg{} output:
+
+\begin{verbatim}
+$ nw_display -s catarrhini > catarrhini.svg
+\end{verbatim}
+
+Now you can visualize the result using any \svg-enabled tool (all good Web browsers can do it), or convert it to another format with, say \texttt{rsvg} or Inkscape. The following image was produced like this:
+
+\begin{verbatim}
+$ inkscape -f catarrhini.svg -A catarrhini.pdf
+\end{verbatim}
+
+\begin{center}
+ \includegraphics{catarrhini.pdf}
+ % catarrhini.pdf: 595x842 pixel, 72dpi, 20.99x29.70 cm, bb=0 0 595 842
+\end{center}
+
+There are many options for \svg{} graphs. First, you can make radial trees, using option \texttt{-r} (from now on I will skip the redirection into an \svg{} file):
+
+\begin{verbatim}
+$ nw_display -sr catarrhini
+\end{verbatim}
+
+\begin{center}
+ \includegraphics{catarrhini_radial.pdf}
+ % catarrhini_radial.pdf: 595x842 pixel, 72dpi, 20.99x29.70 cm, bb=0 0 595 842
+\end{center}
+
+
+
+\section{Indenting}
+\label{sct_indent}
+
 \section{Rooting and Rerooting}
 \label{sct_reroot}
 
@@ -132,6 +237,7 @@ Rooting transforms an unrooted tree into a rooted one, and rerooting changes a r
 
 The Newick format is implicitly rooted, in the sense that there is a 'top' node from which all other nodes descend. Some applications regard a tree with a trifuraction at the top node as unrooted. 
 
+One way of (re)rooting a tree is to specify an \textit{outgroup}. In the simplest case, this is a single leaf. The root is then placed in such a way that one of its children is the outgroup, while the other child is the rest of the tree (sometimes known as the \textit{ingroup}).
 
 \section{Labels}
 
