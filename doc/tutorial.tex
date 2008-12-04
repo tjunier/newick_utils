@@ -2,10 +2,12 @@
 
 \usepackage{url}
 \usepackage{graphics}
+\usepackage{verbatim}
 
 % Title Page
 \title{Newick Utilities Tutorial}
 \author{Thomas Junier}
+
 
 \newcommand{\nutils}{Newick Utilities}
 \newcommand{\unix}{\textsc{Unix}}
@@ -13,6 +15,7 @@
 \newcommand{\svg}{\textsc{SVG}}
 \newcommand{\stdin}{standard input}
 \newcommand{\nw}{Newick}
+\newcommand{\css}{\textsc{CSS}}
 
 % names of programs
 \newcommand{\display}{\texttt{nw\_display}}
@@ -141,61 +144,25 @@ The \nutils{} either modify trees and print the result, or print information abo
 \section{Displaying Trees}
 \label{sct_display}
 
-Perhaps the simplest and most common operation on a \nw{} tree is just to look at it. The \nw{} format is not very easy to understand for us humans, so we have to produce a graphical representation from it. This is the purpose of the \display{} program. At the simplest, it just outputs a text graph:
+Perhaps the simplest and most common operation on a \nw{} tree is just to look at it. The \nw{} format is not very easy to understand for us humans, so we have to produce a graphical representation from it. This is the purpose of the \display{} program. 
 
-\begin{samepage}
-\begin{verbatim}
-$ nw_display catarrhini
-                                        +---------------+ Gorilla               
-                                        |                                       
-                          +-------------+ Homininae---------+ Pan               
-                          |             +---------+ Hominini                    
-           +--------------+ Hominidae             +---------+ Homo              
-           |              |                                                     
- +---------+              +----------------------------+ Pongo                  
- |         |                                                                    
- |         +-------------------+ Hylobates                                      
- |                                                                              
-=|                                                     +---------+ Macaca       
- |                                 +-------------------+                        
- |         +-----------------------+ Cercopithecinae   +---------+ Papio        
- |         |                       |                                            
- |         |                       +---------+ Cercopithecus                    
- +---------+ Cercopithecidae                                                    
-           |    +---------+ Simias                                              
-           +----+ Colobinae                                                     
-                +------+ Colobus       
-\end{verbatim}
-\end{samepage}
+\subsection{As Text}
+\label{sct_display_text}
+
+At the simplest, \display{} just outputs a text graph:
+
+\verbatiminput{dspl1_txt.cmd}
+\verbatiminput{dspl1_txt.out}
 
 That's pretty low-tech compared to interactive, colorful graphical displays, but if you use the shell a lot (like I do), you may find it useful.
 
 You can use option \texttt{-w} (``width'') to set the number of columns available for display:
 
-\begin{samepage}
-\begin{verbatim}
- $ nw_display -w 60 catarrhini
-                            +----------+ Gorilla            
-                            |                               
-                  +---------+ Homininae---+ Pan             
-                  |         +------+ Hominini               
-        +---------+ Hominidae      +------+ Homo            
-        |         |                                         
- +------+         +-------------------+ Pongo               
- |      |                                                   
- |      +------------+ Hylobates                            
- |                                                          
-=|                                    +------+ Macaca       
- |                       +------------+                     
- |      +----------------+ Cercopithecinae---+ Papio        
- |      |                |                                  
- |      |                +-----+ Cercopithecus              
- +------+ Cercopithecidae                                   
-        |  +------+ Simias                                  
-        +--+ Colobinae                                      
-           +----+ Colobus   
-\end{verbatim}
-\end{samepage}
+\verbatiminput{dspl2_txt.cmd}
+\verbatiminput{dspl2_txt.out}
+
+\subsection{As \svg}
+\label{sct_display_svg}
 
 Option \texttt{-s} produces \svg{} output:
 
@@ -210,22 +177,38 @@ $ inkscape -f catarrhini.svg -A catarrhini.pdf
 \end{verbatim}
 
 \begin{center}
- \includegraphics{catarrhini.pdf}
- % catarrhini.pdf: 595x842 pixel, 72dpi, 20.99x29.70 cm, bb=0 0 595 842
+ \includegraphics{dspl_svg1_svg.pdf}
 \end{center}
 
-There are many options for \svg{} graphs. First, you can make radial trees, using option \texttt{-r} (from now on I will skip the redirection into an \svg{} file):
+There are many options for \svg{} graphs.First, you can make radial trees, using option \texttt{-r} (from now on I will skip the redirection into an \svg{} file):
 
 \begin{verbatim}
-$ nw_display -sr catarrhini
+$ nw_display -sr -w 450 catarrhini
 \end{verbatim}
+\verbatiminput{dspl_sr_w450_catarrhini_svg.cmd}
+
+You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
 
 \begin{center}
- \includegraphics{catarrhini_radial.pdf}
- % catarrhini_radial.pdf: 595x842 pixel, 72dpi, 20.99x29.70 cm, bb=0 0 595 842
+ \includegraphics{dspl_sr_w450_catarrhini_svg.pdf}
 \end{center}
 
+\subsubsection{Using \css}
+\label{sct_display_svg_css}
 
+You can modify node style using \css. This is done by specifying a \textit{\css{} map}, which is just a text file that says which style should be applied to which node. If file \texttt{css.map} contains the following
+
+\verbatiminput{css.map}
+
+we can apply the style map to the tree above:
+
+\verbatiminput{nw_display_sr_w450_ccssmap_catarrhini_svg.cmd}
+
+\begin{center}
+ \includegraphics{nw_display_sr_w450_ccssmap_catarrhini_svg.pdf}
+\end{center}
+
+The syntax of the \css{} map is as follows. Each line describes one style and the set of nodes to which it applies.
 
 \section{Indenting}
 \label{sct_indent}
