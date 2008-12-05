@@ -1,4 +1,4 @@
-SUBDIRS = src tests
+SUBDIRS = src tests doc
 EXTRA_DIST = \
 	tests/10vrt.nw \
 	tests/5NCR.cmap \

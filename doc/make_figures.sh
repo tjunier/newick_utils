@@ -12,7 +12,7 @@
 
 # These just generate text
 
-for cmd in *_txt *_nw ; do
+for cmd in *_{txt,nw} ; do
 	# prefix a '$' for inputting into LaTeX
 	echo -n "$ "  > $cmd.cmd
 	cat $cmd >> $cmd.cmd
