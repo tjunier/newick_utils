@@ -182,24 +182,21 @@ $ inkscape -f catarrhini.svg -A catarrhini.pdf
 
 There are many options for \svg{} graphs.First, you can make radial trees, using option \texttt{-r} (from now on I will skip the redirection into an \svg{} file):
 
-\begin{verbatim}
-$ nw_display -sr -w 450 catarrhini
-\end{verbatim}
 \verbatiminput{dspl_sr_w450_catarrhini_svg.cmd}
 
 You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
 
 \begin{center}
- \includegraphics{dspl_sr_w450_catarrhini_svg.pdf}
+\includegraphics{dspl_sr_w450_catarrhini_svg.pdf}
 \end{center}
 
 \subsubsection{Using \css}
 \label{sct_display_svg_css}
 
 You can modify node style using \css. This is done by specifying a \textit{\css{} map}, which is just a text file that says which style should be applied to which node. If file \texttt{css.map} contains the following
-
-\verbatiminput{css.map}
-
+\begin{quote}
+ \verbatiminput{css.map}
+\end{quote} 
 we can apply the style map to the tree above:
 
 \verbatiminput{nw_display_sr_w450_ccssmap_catarrhini_svg.cmd}
@@ -208,7 +205,9 @@ we can apply the style map to the tree above:
  \includegraphics{nw_display_sr_w450_ccssmap_catarrhini_svg.pdf}
 \end{center}
 
-The syntax of the \css{} map is as follows. Each line describes one style and the set of nodes to which it applies.
+The syntax of the \css{} map is as follows. Each line describes one style and the set of nodes to which it applies. The first line in \texttt{css.map} says that the style \texttt{stroke-width:2;stroke:blue} must be applied to the \texttt{CLADE} defined by \texttt{Homo} and \texttt{Pan}, which comprises \texttt{Homo}, \texttt{Pan}, and \texttt{Hominini}. The \texttt{CLADE} keyword can be abbreviated to \texttt{C}, as in the next two lines. The style of an inner clade overrides styles of an outer clade, \textit{e.g.}, although the \texttt{Homo} - \texttt{Pan} clade is nested inside the \texttt{Homo} - \texttt{Hylobates} clade, it has its own style (blue, wide lines) which overrides the containing clade's style (pinkish with normal width).
+
+The \texttt{INDIV} keyword specifies that the style is to be applied to all nodes who match the labels on the line, but individually, that is, the program does not propagate the style to the whole clade defined by the labels. This is why only \texttt{Colobus} and \texttt{Cercopithecus} appear in green; with the \texttt{CLADE} keyword the whole \texttt{Macaca} - \texttt{Colobus} clade (that is, all Old-World monkeys) would be green. Note that \texttt{INDIV} overrides \texttt{CLADE}, which is why \texttt{Cercopithecus} is green even though it belongs to a red clade.
 
 \section{Indenting}
 \label{sct_indent}
@@ -220,8 +219,13 @@ Rooting transforms an unrooted tree into a rooted one, and rerooting changes a r
 
 The Newick format is implicitly rooted, in the sense that there is a 'top' node from which all other nodes descend. Some applications regard a tree with a trifuraction at the top node as unrooted. 
 
-One way of (re)rooting a tree is to specify an \textit{outgroup}. In the simplest case, this is a single leaf. The root is then placed in such a way that one of its children is the outgroup, while the other child is the rest of the tree (sometimes known as the \textit{ingroup}).
+One way of (re)rooting a tree is to specify an \textit{outgroup}. In the simplest case, this is a single leaf. The root is then placed in such a way that one of its children is the outgroup, while the other child is the rest of the tree (sometimes known as the \textit{ingroup}). 
 
+Consider the following primate tree, \texttt{catarrhini\_wrong}:
+
+\includegraphics{reroot_1og_orig_svg.pdf}
+
+It is wrong because
 \section{Labels}
 
 \chapter{Advanced Tasks}
