@@ -111,15 +111,37 @@ void svg_CSS_stylesheet()
 	printf ("]]></style></defs>");
 }
 
-void svg_header()
+/* Prints the SVG header. The first argument is the tree's number of leaves,
+ * needed to compute height for orthogonal trees; the second argument is a
+ * boolean that is true IFF we show a scale bar. */
+
+void svg_header(int nb_leaves, int with_scale_bar)
 {
+	int height;
+
+	switch (graph_style) {
+		case SVG_ORTHOGONAL:
+			/* image fits in a rectangle, so height != width */
+			/* we add 1 leaf skip for the scale bar if needed */
+			if (with_scale_bar) 
+				++nb_leaves;
+			height = nb_leaves * leaf_vskip;
+			break;
+		case SVG_RADIAL:
+			/* image fits in a square, so height == width */
+			height = graph_width;
+			break;
+		default:
+			assert(0);
+	}
+
 	printf( "<?xml version='1.0' standalone='no'?>"
 	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
 		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
 	printf( "<svg width='%d' height='%d' version='1.1' "
 		"xmlns='http://www.w3.org/2000/svg' "
 		"xmlns:xlink='http://www.w3.org/1999/xlink' >",
-		graph_width, graph_width);
+		graph_width, height);
 	svg_CSS_stylesheet();
 }
 
@@ -562,7 +584,7 @@ void draw_scale_bar(int hpos, double vpos,
 
 	const int big_tick_height = 5; 			/* px */
 	const int small_tick_height = 3;		/* px */
-	const int units_text_voffset = 12;		/* px */
+	const int units_text_voffset = -13;		/* px */
 	const int vsep = 1;				/* px */
 	double pot = largest_PoT_lte(d_max);		/* tree units */
 	double scale_length = pot * h_scale;		/* px */

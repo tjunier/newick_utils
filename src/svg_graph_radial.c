@@ -258,7 +258,7 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 			- svg_root_length - LBL_SPACE;
 	r_scale = node_area_width / hd.d_max;
 
-	params_as_svg_comment(hd, node_area_width, r_scale);
+	// params_as_svg_comment(hd, node_area_width, r_scale);
 
 	/* Given that we only 'use' 1.9 PI instead of 2 PI (see above), we can
 	 * rotate the whole graph by 0.05 PI so that we can draw the scale bar

@@ -9,7 +9,7 @@
 #include "node_pos_alloc.h"
 #include "svg_graph_common.h"
 
-static double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
+double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
 
 void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
 

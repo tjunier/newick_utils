@@ -1,6 +1,8 @@
 struct rooted_tree;
 struct h_data;
 
+extern double leaf_vskip;
+
 /* Functions for drawing orthogonal trees */
 
 void display_svg_tree_orthogonal (

@@ -328,10 +328,13 @@ int main(int argc, char *argv[])
 		svg_init();
 		tree = parse_tree();
 		align_leaves = is_cladogram(tree);
-		with_scale_bar = !is_cladogram(tree);
-		/* NOTE: do NOT refactor svg_header() into display_svg_tree() - maybe one day
-		 * we'll allow >1 tree per graph. */
-		svg_header(); 
+		/* show scale bar IFF tree is NOT a cladogram. Since
+		 * is_cladogram() takes some time to run, we just look up
+		 * 'align_leaves' which has the same value. */
+		with_scale_bar = !align_leaves;
+		/* NOTE: do NOT refactor svg_header() into display_svg_tree() -
+		 * maybe one day we'll allow >1 tree per graph. */
+		svg_header(leaf_count(tree), with_scale_bar);
 		svg_run_params_comment(argc, argv);
 		display_svg_tree(tree, align_leaves, with_scale_bar,
 				params.branch_length_unit);
