@@ -19,7 +19,8 @@ void address_scanner_set_input(char *);
 void address_scanner_clear_input();
 int adsparse();
 
-enum action { ACTION_DELETE, ACTION_SUBTREE, ACTION_SPLICE_OUT };
+enum action { ACTION_DELETE, ACTION_SUBTREE, ACTION_SPLICE_OUT,
+	ACTION_PRINT_LABEL };
 
 struct enode *expression_root;
 
@@ -119,11 +120,12 @@ void help(char *argv[])
 "-------\n"
 "\n"
 "Actions are performed on nodes that match the address. They are:\n"
-"    s    (Subtree) print subtree rooted at matching node\n"
-"    o    (splice Out) splice out node, and attach children to parent, \n"
-"	 preserving branch lengths. This is useful for \"opening\" poorly\n"
-"         supported nodes.\n"
-"    d    Delete node\n"
+"    s   (Subtree) print subtree rooted at matching node\n"
+"    o   (splice Out) splice out node, and attach children to parent, \n"
+"	   preserving branch lengths. This is useful for \"opening\" poorly\n"
+"          supported nodes.\n"
+"    d   Delete node\n"
+"    l   Print node's label\n"   
 "\n"
 "\n"
 "Options\n"
@@ -201,6 +203,8 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'd': params.action = ACTION_DELETE;
 		  	break;
+		case 'l': params.action = ACTION_PRINT_LABEL;
+		 	break;
 		default: fprintf(stderr, 
 			"Action '%c' is unknown.\n", action);
 			 exit(EXIT_FAILURE);
@@ -215,8 +219,8 @@ struct parameters get_params(int argc, char *argv[])
 }
 
 /* This allocates the rnode_data structure for each node, and fills it with
- * "top-down" data,  i.e. data for which the parent's value needs to be known.
- * */
+ * "top-down" data,  i.e. data for which the parent's value needs to be known
+ * (such as depth and number of ancestors). */
 
 void reverse_parse_order_traversal(struct rooted_tree *tree)
 {
@@ -301,6 +305,9 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 					r->parent_edge = NULL;
 					tree->root = r;
 				} 
+				break;
+			case ACTION_PRINT_LABEL:
+				printf ("%s\n", current->label);
 				break;
 			default: fprintf (stderr,
 				"Unknown action %d.\n", params.action);

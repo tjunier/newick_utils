@@ -3,6 +3,7 @@
 \usepackage{url}
 \usepackage{graphics}
 \usepackage{verbatim}
+\usepackage{amsthm}
 
 % Title Page
 \title{Newick Utilities Tutorial}
@@ -21,6 +22,12 @@
 \newcommand{\display}{\texttt{nw\_display}}
 \newcommand{\reroot}{\texttt{nw\_reroot}}
 \newcommand{\topology}{\texttt{nw\_topology}}
+\newcommand{\labels}{\texttt{nw\_labels}}
+
+\newtheorem{prop}{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{dfn}{Definition}
 
 \begin{document}
 \maketitle
@@ -33,6 +40,7 @@ The \nutils{} are a set of \unix{} shell programs for working with Newick-format
  \item they require no user interaction.\footnote{Why this is a good thing is not the focus of this document: I shall assume that if you are reading this, you already know when a command-line interface is better than an interactive interface.}
  \item they can work on any number of trees at a time\footnote{Strictly speaking, a few applications are limited to one input tree because working on more than one is not practical}
  \item they perform reasonably well with large trees
+ \item they are implemented as filters
 \end{itemize}
 They are not tools for \emph{making} phylogenies. Rather, they are for working with existing ones, by which I mean manipulating the tree or extracting information from it: rerooting, simplifying, extracting subtrees, printing branch lengths and distances, etc - a glance at the table of contents of this document should give you an idea.
 
@@ -41,11 +49,11 @@ Each of the programs performs one task (with some variants). For example, here i
 \begin{verbatim}
 $ nw_reroot mytrees.nw Dmelano
 \end{verbatim} 
-Now, you might want to make cladograms from the rerooted trees. This would be done like this:
+Now, you might want to make cladograms from the rerooted trees. Program \topology{} does the job, and since the utilities are filters, you can do it in a single command:
 \begin{verbatim}
 $ nw_reroot mytrees.nw Dmelano | nw_topology -
 \end{verbatim}
-As you can see, the rerooted tree from \reroot{} is just piped into \topology, which takes care of removing branch lengths, in a typical shell pipeline.
+As you can see, it is straightforward to pipe \nutils{} together, and of course they can be mixed freely with any other shell tool (see e.g. \ref{sct_counting_leaves}).
 
 This document is organized as follows: chapter \ref{chap_general} discusses common features of the \nutils, chapter \ref{chap_simple} shows examples of simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks. 
 
@@ -225,10 +233,57 @@ The outgroup does not need to be a single leaf. The following tree is wrong for 
 \begin{verbatim}
 $ nw_reroot simiiformes_wrong_3og Platyrrhini
 \end{verbatim}
-will reroot in the same way. (output not shown). Beware that inner labels are often used for support values like bootstrap, which are generally not useful for defining clades.
+will reroot in the same way (not shown). Beware that inner labels are often used for support values (as in bootstrapping), which are generally not useful for defining clades.
 
-\section{Labels}
+\section{Extracting Labels}
+\label{sct_labels}
 
-\chapter{Advanced Tasks}
+To get a list of all labels in a tree, use \labels:
+
+\verbatiminput{labels_xpl1_txt.cmd}
+\verbatiminput{labels_xpl1_txt.out}
+
+\noindent{}The labels are printed out in post-order. To get rid of internal labels, use \texttt{-I}:
+
+\verbatiminput{labels_xpl2_txt.cmd}
+\verbatiminput{labels_xpl2_txt.out}
+
+\noindent{}Likewise, you can use \texttt{-L} to get rid of leaf labels (not shown). Finally, if you use \texttt{-t} the labels are printed on a single line, separated by tabs (for some reason the tabs show as spaces here, I think this is an effect of \LaTeX{}'s \verb+\verbatiminput{}+):
+
+\verbatiminput{labels_xpl3_txt.cmd}
+\verbatiminput{labels_xpl3_txt.out}
+
+\subsection{Counting Leaves in a Tree}
+\label{sct_counting_leaves}
+
+A simple application of \labels{} is a leaf count:
+
+\verbatiminput{labels_xpl4_txt.cmd}
+\verbatiminput{labels_xpl4_txt.out}
+
+\subsection{Extracting Subtrees}
+\label{sct_subtrees}
+
+You can extract subtrees (clades) as defined by labels (see \ref{sct_defining_clades}).
+
+\chapter{More Elaborate Tasks}
 \label{chap_adv}
+
+\appendix
+
+\chapter{Defining Clades with Labels}
+\label{sct_defining_clades}
+
+\begin{dfn}
+Let $T$ be a rooted tree. Any subtree of $T$ that includes a node $n \in T$ and all its descendants is called a \emph{clade} of $T$. 
+\end{dfn}
+
+\begin{prop}
+In a rooted tree, you can always define a clade by specifying a single node: the clade consists of the specified node and all its descendants.
+\end{prop}
+
+\begin{prop}
+In a rooted tree $T$ with unique labels and a node $n$ in $T$, it is always possible to choose two nodes $n_1$ and $n_2$ such that lca($n_1$,$n_2$) = $n$.
+\end{prop}
+
 \end{document}

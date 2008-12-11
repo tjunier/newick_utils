@@ -1,6 +1,8 @@
 
 .PHONY: all
 .PHONY: clean
+.PHONY: distclean
+.PHONY: distdir
 
 all: article.pdf tutorial.pdf
 
