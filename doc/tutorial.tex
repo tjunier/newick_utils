@@ -278,6 +278,32 @@ You can extract subtrees (clades) as defined by labels (see \ref{sct_defining_cl
 Let $T$ be a rooted tree. Any subtree of $T$ that includes a node $n \in T$ and all its descendants is called a \emph{clade} of $T$. 
 \end{dfn}
 
+\begin{dfn}{Ancestry Path} Let $T$ be a rooted tree, $a$ a node of $T$, and $d$ a descendant node of $a$. Then a path that connects $a$ and $d$ is called an \emph{ancestry path}.
+\end{dfn}
+
+\begin{prop}
+\label{anc_path_existence}
+Let $T$ be a rooted tree, and $a$ a node of $T$, and $d$ a descendant node of $a$. Then there exists an ancestry path connecting $a$ and $d$.
+\end{prop}
+\begin{proof}
+An ancestry patgh must exist by the definition of ancestors and descendants.
+\end{proof}
+
+\begin{prop}
+\label{anc_path_unicity}
+Let $T$ be a rooted tree, and $a$ a node of $T$, and $d$ a descendant node of $a$. Then there exists at most one ancestry path connecting $a$ and $d$.
+\end{prop}
+\begin{proof}
+...
+\end{proof}
+
+\begin{prop}
+Let $T$ be a rooted tree, and $a$ a node of $T$, and $d$ a descendant node of $a$. Then there exists exactly one ancestry path connecting $a$ and $d$.
+\end{prop}
+\begin{proof}
+Existence by \ref{anc_path_existence}, unicity by \ref{anc_path_unicity}
+\end{proof}
+
 \begin{prop}
 In a rooted tree, you can always define a clade by specifying a single node: the clade consists of the specified node and all its descendants.
 \end{prop}
