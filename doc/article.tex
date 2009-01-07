@@ -4,7 +4,7 @@
 
 %opening
 \title{UNIX Shell Filters for Newick Trees}
-\author{Thomas Junier}
+\author{Thomas Junier and Evgeny Zdobnov}
 
 \newcommand{\cli}{\textsc{CLI}}
 \newcommand{\gui}{\textsc{GUI}}
@@ -26,16 +26,17 @@ Newick-formatted phylogenetic trees. The motivation for writing them is that we 
  
 \section*{Introduction}
 
-Some applications in phylogeny involve large numbers of trees, or trees with large numbers of taxa. Bootstrapping is an obvious example, but others exist, like bootscanning \cite{Salminen1995}, or (say) evolutionary analysis of all 1:1 orthologs of a given clade. The trees need to be produced, and then must be processed, involving steps like rerooting, extracting branch lengths, computing support values, extracting subtrees, etc. Since human users are likely to commit more errors as the amount of  data grows, it is highly desirable that the processing steps be automated. This will typically be made in an analysis pipeline of some sort.
+Some applications in phylogeny involve large numbers of trees, or trees with large numbers of taxa. Bootstrapping is an obvious example, but others exist, like bootscanning \cite{Salminen1995}, or (say) evolutionary analysis of all 1:1 orthologs of a given clade. Once the trees have been constructed, they must often be processed, involving steps like (re)rooting, extracting branch lengths, computing support values, pruning, extracting subtrees, etc. Since human users are likely to commit more errors as the amount of  data grows, it is desirable that the whole process  be automated. This will typically be made in an analysis pipeline of some sort, possibly involving many programs.
 
-There is a large choice of programs for manipulating trees (e.g.
-NJPlot \cite{Perrière1996} or TreeView, more examples at \url{
-http://evolution.genetics.washington.edu/phylip/software.html}). Most have an interactive, graphical interface (\gui{}). The advantages and drawbacks of interactive interfaces have been disputed for decades; let us just remark that any program that requires user interaction is hard to automate.
+The ease of automation will depend on the type of interface the programs offer. In general, it is harder to automate a program that requires user interaction than one that doesn't. The ability of a program to work on several input trees (rather than a single one) is also a plus.
 
-Automation is also facilitated by good interoperation between the programs involved, when there is more than one. The ability to read data from standard input and write results on standard output is one way of providing interoperation in a \unix{} shell environment \cite{Gancarz2002}. Programs that have these properties are known as \textit{filters}.
+All main methods for constructing trees have command-line implementations (\textit{e.g.}, PhyML \cite{Guindon2003}, BioNJ \cite{Gascuel1997}, etc), these lend themselves well to automation. 
+The situation is different for tree processing. Although there is a large choice of programs for manipulating trees (e.g.
+NJplot \cite{Perrière1996} or TreeView \cite{Page2002}), most have an interactive, graphical interface, which is hard or impossible to automate.
 
-Faced with the need to handle large or numerous trees in automated pipelines, and having found nothing on the Internet that met our needs, we designed and wrote
-a collection of filters that require no user interaction and work with any number of trees of any size. 
+Automation is also facilitated by good interoperation between the programs involved, when there is more than one. The ability to read data from standard input and write results on standard output is one way of providing this in a \unix{} shell environment. Programs that have these properties are termed \textit{filters}.
+
+Faced with the need to handle large or numerous trees in automated pipelines, and having failed to find any software that met our needs, we designed and wrote a collection of filters that perform a range of frequently used tree operations, require no user interaction, and work with any number of trees of any size. 
 
 \begin{table*}
 \begin{tabular}{lp{0.75\textwidth}}
@@ -62,9 +63,7 @@ Program & Function \\
 
 \section*{Results}
 
-We developed a set of programs we named the Newick Utilities. They perform the functions listed in table \ref{tab:NU_func}.
-
-The programs have the following common properties:
+The \nutils{} perform the functions listed in table \ref{tab:NU_func}. The programs have the following common properties:
 
 \begin{itemize}
  \item one program for one function
@@ -86,9 +85,9 @@ While performance was not the absolute priority (we tried to keep code simple an
 
 \section*{Examples}
 
-\subsection*{PCA of Branch Lengths}
+\subsection*{Principal Components Analysis of Branch Lengths}
 
-Suppose we are interested in the evolution rates of about one thousand 1:1 orthologs from 7 tetrapod species. We produce the $\sim$ 1,000 maximum-likelihood trees, and we want to submit the branch lengths to principal components analysis (\textsc{PCA}). Suppose further that we used three ``fishes'', \textit{Fugu}, \textit{Tetraodon} and \textit{Danio}, as outgroup. Finally, say the trees are in a file named \texttt{vertebrata.txt}. The steps involved are:
+Suppose we are interested in the evolution rates of about one thousand 1:1 orthologs from 7 tetrapod species. We produce the $\sim$ 1,000 maximum-likelihood trees, and we want to submit the branch lengths to \textsc{PCA}. Suppose further that we used three ``fishes'', \textit{Fugu}, \textit{Tetraodon} and \textit{Danio}, as outgroup. Finally, say the trees are in a file named \texttt{vertebrata.txt}. The steps involved are:
 \begin{enumerate}
  \item reroot all the trees on the ``fishes'' -- ML trees are unrooted
  \item extract the branch lengths for all tetrapods, from their last common ancestor to the tip
