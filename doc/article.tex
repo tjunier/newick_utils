@@ -10,6 +10,7 @@
 \newcommand{\gui}{\textsc{GUI}}
 \newcommand{\unix}{Unix}
 \newcommand{\prog}[1]{\texttt{nw\_#1}}
+\newcommand{\nutils}{Newick Utilities}
 
 \begin{document}
 
@@ -17,7 +18,7 @@
 
 \begin{abstract}
 The Newick Utilities are a set of UNIX command-line programs for working with
-Newick-formatted phylogenetic trees. The motivation for writing them is that we did not find any open-source programs with equivalent functionality and a noninteractive, filter interface. [\ldots]
+Newick-formatted phylogenetic trees. The motivation for writing them is that we did not find any open-source programs with equivalent functionality and a noninteractive, filter interface.
 \end{abstract}
 
 \textit{\noindent{} [Intended readership: bioinformaticians with interest/experience in phylogeny and working with the UNIX shell, especially on large data sets. Reader is assumed to have some idea of: phylogenies, Unix, shells (interactive and scripts).]
@@ -25,16 +26,16 @@ Newick-formatted phylogenetic trees. The motivation for writing them is that we 
  
 \section*{Introduction}
 
-Some applications in phylogeny involve large numbers of trees or trees with large numbers of taxa. Bootstrapping is an obvious example, but others exist, like bootscanning (sliding a window over an alignment and computing a tree at each window position), or (say) evolutionary analysis of all 1:1 orthologs of a given clade. The trees need to be produced, and then must be processed, involving steps like rerooting, extracting branch lengths, attributing support values, extracting support values, extracting subtrees, etc. Human users are likely to commit more errors as the size of the data grows, so it is highly desirable that the processing steps be automated. 
+Some applications in phylogeny involve large numbers of trees, or trees with large numbers of taxa. Bootstrapping is an obvious example, but others exist, like bootscanning \cite{Salminen1995}, or (say) evolutionary analysis of all 1:1 orthologs of a given clade. The trees need to be produced, and then must be processed, involving steps like rerooting, extracting branch lengths, computing support values, extracting subtrees, etc. Since human users are likely to commit more errors as the amount of  data grows, it is highly desirable that the processing steps be automated. This will typically be made in an analysis pipeline of some sort.
 
 There is a large choice of programs for manipulating trees (e.g.
-NJPlot or TreeView, more examples at \url{
-http://evolution.genetics.washington.edu/phylip/software.html}). Most have an interactive, graphical interface (\gui{}). The advantages and drawbacks of interactive interfaces have been disputed for decades; let us just remark that any program that requires user interaction is hard to integrate into a larger application, so it is difficult to automate tree processing using interactive tools.
+NJPlot \cite{Perrière1996} or TreeView, more examples at \url{
+http://evolution.genetics.washington.edu/phylip/software.html}). Most have an interactive, graphical interface (\gui{}). The advantages and drawbacks of interactive interfaces have been disputed for decades; let us just remark that any program that requires user interaction is hard to automate.
 
-Automation is also facilitated by good interoperation between the programs involved. The ability to read data from standard input and write results on standard output is one way of improving interoperation in a \unix{} shell environment. \cite{Gancarz2002}. Programs that have these properties are known as \textit{filters}.
+Automation is also facilitated by good interoperation between the programs involved, when there is more than one. The ability to read data from standard input and write results on standard output is one way of providing interoperation in a \unix{} shell environment \cite{Gancarz2002}. Programs that have these properties are known as \textit{filters}.
 
 Faced with the need to handle large or numerous trees in automated pipelines, and having found nothing on the Internet that met our needs, we designed and wrote
-a collection of programs that require no user interaction, work with any number of trees of any size, and behave as filters. 
+a collection of filters that require no user interaction and work with any number of trees of any size. 
 
 \begin{table*}
 \begin{tabular}{lp{0.75\textwidth}}
@@ -53,7 +54,7 @@ Program & Function \\
  \ldots & [maybe keep only the most interesting] \\
 \hline
 \end{tabular}
-\caption{The Newick Utilities and their functions}
+\caption{Selected programs from the Newick Utilities}
 \label{tab:NU_func}
 \end{table*}
 
@@ -61,13 +62,13 @@ Program & Function \\
 
 \section*{Results}
 
-We developed a set of programs we callthe Newick Utilities. They perform the functions listed in table \ref{tab:NU_func}. To help work in the shell, a program for displaying tree graphs as text was added to the list (it can also output SVG).
+We developed a set of programs we named the Newick Utilities. They perform the functions listed in table \ref{tab:NU_func}.
 
-The utilities have the following common properties:
+The programs have the following common properties:
 
 \begin{itemize}
  \item one program for one function
- \item input format is Newick, no arbitrary limit on the number or size og the input trees
+ \item input format is Newick, no arbitrary limit on the number or size of the input trees
  \item all output is text; those programs which output trees output Newick
  \item no interaction required
  \item data are read from a file or from standard input; results are written to standard output
@@ -77,7 +78,7 @@ The utilities have the following common properties:
 
 \subsection*{Implementation}
 
-The programs are written in C and use the \textsc{GNU} autotools as a build tool. They are known to compile on various distributions of Linux, as well as on MacOS X.
+The programs are written in C and use the \textsc{GNU} autotools as a build tool.
 
 \subsection*{Performance}
 
@@ -116,10 +117,12 @@ $ nw_reroot win_trees Out | nw_order - | nw_topology -I -
 \end{verbatim}
 where \verb|Out| is the label of the outgroup.
 
+\subsection*{Research}
 
+The Newick utilities have been used \textit{e.g.} in \cite{Tapparel2007}. This study involved computing hundreds of maximum-likelihood trees, which was done with PhyML \cite{Guindon2003}. Rerooting, attribution of bootstrap support values, extraction of subtrees, and classification of topology were done with the \nutils{}.
 \section*{Discussion}
 
-In our opinion, one of the most useful features of Unix shells is the ability to  ``glue'' arbitrary programs together in pipelines or shell scripts. This is (partly) because research is sufficiently unpredictable for any specialized tool to be confronted, sooner or later, with a problem it wasn't designed for. We found that the ``Unix Philosophy'' tenets of i) making every program a filter, ii) making every program do one thing well, and iii) avoiding captive interfaces work well in practice, and we designed the Newick Utilities with these guidelines in mind (whether we succeeded is another matter).
+In our opinion, one of the most useful features of Unix shells is the ability to  ``glue'' arbitrary programs together in pipelines or shell scripts. This is (partly) because research is sufficiently unpredictable for any specialized tool to be confronted, sooner or later, with a problem it wasn't designed for. We found that the ``Unix Philosophy'' tenets of i) making every program a filter, ii) making every program do one thing well, and iii) avoiding captive interfaces work well in practice, and we designed the Newick Utilities with these guidelines in mind.
 
 \bibliographystyle{plain} 
 \bibliography{article}
