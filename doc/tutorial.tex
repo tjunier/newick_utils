@@ -273,6 +273,12 @@ You can extract subtrees (clades) as defined by labels (see \ref{sct_defining_cl
 
 \chapter{Some Properties of Trees}
 \label{sct_defining_clades}
+\begin{figure}[t]
+ \centering
+ \includegraphics{prop_tree.png}
+  \caption{Definitions Illustrated}
+ \label{fig_app_tree_prop}
+\end{figure}
 
 In the following, $T$ will be a rooted tree. We'll recall that a tree (rooted or not) is a connected, acyclic graph. By choosing one node to be the root (which we'll note $R$), and orienting all edges away from the root, we get an oriented graph. A \textit{path} along such a graph is a sequence of nodes such that there is an edge between two successive nodes, and that the nodes are ordered in the sequence as they are in the edge. The first node in the path is called the \textit{start} of the path, and the last node is its \textit{end}. We speak of a path \textit{from} the start \textit{to} the end, equivalently we say that the end is \textit{reachable} from the start. The nodes in a path are ordered: if $a$ and $b$ are in a path, then either $a$ is reachable from $b$, or $b$ is reachable from $a$, or $a = b$; furthermore if $a$ is reachable from $b$, then $b$ is \textit{not} reachable from $a$.
 
