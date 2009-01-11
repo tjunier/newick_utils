@@ -1,45 +1,57 @@
-\documentclass[a4paper,11pt]{article}
-\usepackage{url}
-%\usepackage{fullpage}
+\documentclass{bioinfo}
+\copyrightyear{2009}
+\pubyear{2009}
 
-%opening
-\title{UNIX Shell Filters for Newick Trees}
-\author{Thomas Junier and Evgeny Zdobnov}
+\usepackage{url}
 
 \newcommand{\cli}{\textsc{CLI}}
 \newcommand{\gui}{\textsc{GUI}}
 \newcommand{\unix}{Unix}
 \newcommand{\prog}[1]{\texttt{nw\_#1}}
 \newcommand{\nutils}{Newick Utilities}
+\newcommand{\unix}{\textsc{Unix}}
 
 \begin{document}
+\firstpage{1}
+
+\title{\unix{} Filters for Newick Trees}
+\author[Junier and Zdobnov]{Thomas Junier\,$^{1}$\footnote{to whom correspondence should be addressed}\hspace{1em}and Evgeny Zdobnov}
+\address{$^{1}$Department of Genetic and Development Medicine, Faculty of Medicine, University of Geneva, Geneva, Switzerland}
+
+\history{Received on 2009-xx-yy\ldots}
+
+
+\editor{Associate Editor: John Milton}
 
 \maketitle
 
 \begin{abstract}
-The Newick Utilities are a set of UNIX command-line programs for working with
-Newick-formatted phylogenetic trees. The motivation for writing them is that we did not find any open-source programs with equivalent functionality and a noninteractive, filter interface.
+\emph{[Abstract is now structered as per Instructions]}
+\section{Summary:}
+A set of \unix{} shell tools for working with phylogenetic trees, designed for working with large volumes of data and to make automation easy.
+\section{Availability:}
+C source code is available from \url{http://cegg.unige.ch/newick-utils}.
+\section{Contact:}
+\href{thomas.junier@unige.ch}{thomas.junier@unige.ch}
 \end{abstract}
-
-\textit{\noindent{} [Intended readership: bioinformaticians with interest/experience in phylogeny and working with the UNIX shell, especially on large data sets. Reader is assumed to have some idea of: phylogenies, Unix, shells (interactive and scripts).]
-[Questions: what would be the best journal to send this to? Instructions to authors permitting, should there be more examples?]}
  
-\section*{Introduction}
+\section{Introduction}
 
-Some applications in phylogeny involve large numbers of trees, or trees with large numbers of taxa. Bootstrapping is an obvious example, but others exist, like bootscanning \cite{Salminen1995}, or (say) evolutionary analysis of all 1:1 orthologs of a given clade. Once the trees have been constructed, they must often be processed, involving steps like (re)rooting, extracting branch lengths, computing support values, pruning, extracting subtrees, etc. Since human users are likely to commit more errors as the amount of  data grows, it is desirable that the whole process  be automated. This will typically be made in an analysis pipeline of some sort, possibly involving many programs.
+Some applications in phylogeny involve large numbers of trees. Once the trees have been constructed, they must often be processed, involving steps like (re)rooting, extracting branch lengths, computing support values, pruning, extracting subtrees, etc. To avoid human errors, it is desirable that the whole process  be automated. This is typically done in an analysis pipeline, possibly involving many programs.
 
 The ease of automation will depend on the type of interface the programs offer. In general, it is harder to automate a program that requires user interaction than one that doesn't. The ability of a program to work on several input trees (rather than a single one) is also a plus.
 
-All main methods for constructing trees have command-line implementations (\textit{e.g.}, PhyML \cite{Guindon2003}, BioNJ \cite{Gascuel1997}, etc), these lend themselves well to automation. 
-The situation is different for tree processing. Although there is a large choice of programs for manipulating trees (e.g.
+All main methods for \textit{constructing} trees have command-line implementations (\textit{e.g.}, PhyML (\cite{Guindon2003}), BioNJ (\cite{Gascuel1997}), etc); these lend themselves well to automation. 
+The situation is different for tree processing: although there is a large choice of programs for manipulating trees (e.g.
 NJplot \cite{Perrière1996} or TreeView \cite{Page2002}), most have an interactive, graphical interface, which is hard or impossible to automate.
 
 Automation is also facilitated by good interoperation between the programs involved, when there is more than one. The ability to read data from standard input and write results on standard output is one way of providing this in a \unix{} shell environment. Programs that have these properties are termed \textit{filters}.
 
-Faced with the need to handle large or numerous trees in automated pipelines, and having failed to find any software that met our needs, we designed and wrote a collection of filters that perform a range of frequently used tree operations, require no user interaction, and work with any number of trees of any size. 
+Faced with the need to handle large numbers of trees in automated pipelines, and having failed to find any software that met our needs, we designed and wrote a collection of filters that perform a range of frequently used tree operations, require no user interaction, and work with any number of trees of any size. 
 
-\begin{table*}
-\begin{tabular}{lp{0.75\textwidth}}
+\begin{table}[!t]
+\processtable{\nutils\label{tab:NU_func}}
+{\begin{tabular*}{\columnwidth}{lp{0.7 \columnwidth}}\toprule
 Program & Function \\ 
 \hline 
 \prog{reroot} & reroot trees on outgroup, specified by labels \\
@@ -54,20 +66,16 @@ Program & Function \\
 \prog{prune} & discard nodes by label \\
  \ldots & [maybe keep only the most interesting] \\
 \hline
-\end{tabular}
-\caption{Selected programs from the Newick Utilities}
-\label{tab:NU_func}
-\end{table*}
+\end{tabular*}}{}
+\end{table}
 
+\section{Results}
 
-
-\section*{Results}
-
-The \nutils{} perform the functions listed in table \ref{tab:NU_func}. The programs have the following common properties:
+The \nutils{} perform the functions listed in table \ref{tab:NU_func}. They have the following common properties:
 
 \begin{itemize}
  \item one program for one function
- \item input format is Newick, no arbitrary limit on the number or size of the input trees
+ \item input format is Newick (see \url{http://evolution.genetics.washington.edu/phylip/newicktree.html}), no arbitrary limit on the number or size of the input trees
  \item all output is text; those programs which output trees output Newick
  \item no interaction required
  \item data are read from a file or from standard input; results are written to standard output
@@ -75,15 +83,9 @@ The \nutils{} perform the functions listed in table \ref{tab:NU_func}. The progr
  \item self-documenting (option \texttt{-h})
 \end{itemize}
 
-\subsection*{Implementation}
-
-The programs are written in C and use the \textsc{GNU} autotools as a build tool.
-
-\subsection*{Performance}
-
-While performance was not the absolute priority (we tried to keep code simple and avoid fancy algorithms where possible), the programs perform reasonably well. For example, rerooting 500 trees of 35 species takes about 8 ms on an Intel Core Duo [\textit{more specs}] running Linux ($N = 100$).
-
 \section*{Examples}
+
+\emph{[maybe just one longer example, rather than two shoretr ones?]}
 
 \subsection*{Principal Components Analysis of Branch Lengths}
 
@@ -104,26 +106,29 @@ The first program, \prog{reroot}, reads in all the trees in \texttt{vertebrata.t
 
 \subsection*{Bootscanning}
 
-In a sliding-window experiment, we have computed a tree for each window over an alignment. We want to extract the tree topology for each window. Say file \texttt{win\_trees.txt} contains the trees, ordered by window position. We need the following steps for each tree:
-\begin{enumerate}
- \item reroot the tree
- \item order the tree (folds all equivalent topologies into the same Newick string)
- \item discard irrelevant branch length and internal label information
-\end{enumerate}
-This can be done like this:
+In this technique, we look for recombination breakpoints by finding the nearest neighbor of some reference sequence along a multiple alignment. The alignment is divided into equidistant windows of constant size, and a bootstrapped tree is computed for each window. Then we extract the refrence sequence's nearest neighbor, and the support value of the corresponding clade.
+
+Assuming the trees are in file \verb|win_trees|, extracting the siblings is done like this:
 \begin{verbatim}
-$ nw_reroot win_trees Out | nw_order - | nw_topology -I -
+$ nw_reroot win_trees Out | nw_clade -s - Ref 
 \end{verbatim}
-where \verb|Out| is the label of the outgroup.
+where \texttt{Out} is the label of the outgroup, and \texttt{Ref} is the label of the reference sequence. The first step roots the trees on the outgroup (failing which the subtree extraction of the next step will likely fail). The second step extracts the sibling (\texttt{-s}) of the reference. 
 
-\subsection*{Research}
+The following pipeline extracts the support values:
+\begin{verbatim}
+$ nw_reroot win_trees Out | nw_clade -c1 - Ref | sed 's/^.*://' | tr -d ';'
+\end{verbatim}
 
-The Newick utilities have been used \textit{e.g.} in \cite{Tapparel2007}. This study involved computing hundreds of maximum-likelihood trees, which was done with PhyML \cite{Guindon2003}. Rerooting, attribution of bootstrap support values, extraction of subtrees, and classification of topology were done with the \nutils{}.
-\section*{Discussion}
+\section{Discussion}
 
-In our opinion, one of the most useful features of Unix shells is the ability to  ``glue'' arbitrary programs together in pipelines or shell scripts. This is (partly) because research is sufficiently unpredictable for any specialized tool to be confronted, sooner or later, with a problem it wasn't designed for. We found that the ``Unix Philosophy'' tenets of i) making every program a filter, ii) making every program do one thing well, and iii) avoiding captive interfaces work well in practice, and we designed the Newick Utilities with these guidelines in mind.
+\emph{[I'm not sure what to say here\ldots]}
 
-\bibliographystyle{plain} 
+In our opinion, one of the most useful features of Unix shells is the ability to  ``glue'' arbitrary programs together in pipelines or shell scripts. This is (partly) because research is sufficiently unpredictable for any specialized tool to be confronted, sooner or later, with a problem it wasn't designed for. We found that the ``Unix Philosophy'' tenets of i) making every program a filter, ii) making every program do one thing well, and iii) avoiding captive interfaces work well in practice, and we designed the Newick Utilities with these guidelines in mind. 
+
+\section*{Acknowlkedgements}
+\emph{[Instructions: must cite sources of funding]}
+
+\bibliographystyle{natbib} 
 \bibliography{article}
 
 

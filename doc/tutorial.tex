@@ -25,7 +25,7 @@
 \newcommand{\labels}{\texttt{nw\_labels}}
 
 \newtheorem{prop}{Proposition}
-
+\newtheorem{lemma}{Lemma}
 \theoremstyle{definition}
 \newtheorem{dfn}{Definition}
 
@@ -274,49 +274,75 @@ You can extract subtrees (clades) as defined by labels (see \ref{sct_defining_cl
 \chapter{Some Properties of Trees}
 \label{sct_defining_clades}
 
-In the following, $T$ will be a rooted tree (which is a tree in which some node is singled out and called the root, which we will note $R$). I will use the following notation to define paths in the tree: $[a, b]$ is the path from $a$ to $b$; $[a, b)$ is the path from $a$ to the predecessor of $b$, $(a, b]$ is the path from the successor of $a$ to $b$. COncatenation will be noted by appending path notations, e.g. a path from $a$ to $c$ passing through $b$ can be written $[a,b) [b,c]$ or $[a,b) [b] (b,c]$.
+In the following, $T$ will be a rooted tree. We'll recall that a tree (rooted or not) is a connected, acyclic graph. By choosing one node to be the root (which we'll note $R$), and orienting all edges away from the root, we get an oriented graph. A \textit{path} along such a graph is a sequence of nodes such that there is an edge between two successive nodes, and that the nodes are ordered in the sequence as they are in the edge. The first node in the path is called the \textit{start} of the path, and the last node is its \textit{end}. We speak of a path \textit{from} the start \textit{to} the end, equivalently we say that the end is \textit{reachable} from the start. The nodes in a path are ordered: if $a$ and $b$ are in a path, then either $a$ is reachable from $b$, or $b$ is reachable from $a$, or $a = b$; furthermore if $a$ is reachable from $b$, then $b$ is \textit{not} reachable from $a$.
+
+Now a few definitions - these are mostly renamings of graph-theoretical concepts, to make them more intuitive for phylogenetic trees.
 
 \begin{dfn}
-A path that connects the root to any node of the tree I call a \emph{lineage}. By the definition of a tree (acyclic, connected graph), there is exactly one path between any two nodes, so there is always a lineage to $n$ for any node $n$, and this lineage is unique. So we can unambiguously talk of the lineage of $n$ to mean the path from the $R$ to $n$.
+\label{def_ancestor}
+Let $a$ and $b$ be two different nodes of $T$. We say that $a$ is an \textit{ancestor} of $b$, or (equivalently) that $b$ is a \textit{descendant} of $a$, if and only if there is a path from $a$ to $b$. 
 \end{dfn}
 
-\begin{dfn}{Ancestry relation}
-Let $n$ be a node of $T$, and $L$ the lineage of $n$. A node $a \neq n$ is called an \emph{ancestor} of $n$ iff $L$ passes though $a$. We note this $a < n$ (mnemonic: the arrow points to the root).
+\begin{dfn}
+\label{def_parent}
+Let $P$ be a path in $T$, and $a, b$ two nodes in $P$ such that $b$ is the direct successor of $a$. We will call $a$ the \textit{parent} of $b$. We can say \textit{the} parent (rather than \textit{a} parent) of $b$ because i) $a$ lies on the path from $R$ to $b$ (which is unique), and ii) only one node on any path can be another node's direct predecessor. We also see that any node's parent is also its ancestor (which shouldn't be too surprising\ldots), since $b$ is reachable from $a$
 \end{dfn}
 
-\begin{prop}{Comparability of nodes in a lineage}
-Let $n$ be a node of $T$, $L$ its lineage, and $a, b$ two nodes of $L$. Then either: i) $a < b$ or ii) $a = b$ or iii) $b < a$. 
+\begin{dfn}
+\label{def_child}
+Let $P$ be a path in $T$, and $a, b$ two nodes in $P$ such that $b$ is the direct successor of $a$. We say that $b$ is a \textit{child} of $a$.
+\end{dfn}
+
+Note that a node has exactly one parent, except the root which has none. A node can have zero or more children, but we rarely ever encounter nodes with a single child. A node with no children is called a \textit{leaf}.
+
+\begin{dfn}
+\label{def_lineage}
+A path that starts from the root we call a \emph{lineage}. By the definition of a rooted tree, there is always a lineage to $n$ for any node $n$, and this lineage is unique. So we can unambiguously talk of \textit{the} lineage of $n$ to mean the path from $R$ to $n$. We say that a set $L$ of nodes form a lineage if there exists $n \in L$ such that the path from $R$ to $n$ contains all and only elements of $L$.
+\end{dfn}
+
+\begin{prop}
+\label{prop_lineage_ancestors_equivalence}
+Let $n$ be a node of $T$, and $L$ its lineage. Then all ancestors of $n$ belong to $L$, and all nodes of $L$, except $n$ itself, are ancestors of $n$.
 \end{prop}
 
 \begin{proof}
-Since $L$ is the unique path from $R$ to $n$, and $a$ belongs to it, we can express $L$ as $[R,a) [a] (a,n]$. Now $b$ also belongs to this path.
+
+$\Rightarrow$ Let $a$ be an ancestor of $n$. By definition \ref{def_ancestor}, there is a path from $a$ to $n$. By tree properties, there is a path from $R$ to $a$. Hence $a$ belongs to the path from $R$ to $n$, which is the lineage of $n$.
 \end{proof}
 
-In other words, two nodes in a given lineage are comparable: one is the ancestor of the other, or else they are the same. This is \emph{not} true of any two nodes in $T$, of course - in particular, two leaves are never comparable.
+\noindent{}$\Leftarrow$ Let $l \neq n$ be a node in $L$. Since $L$ is the path from $R$ to $n$, $n$ is reachable from $a$, and hence $a$ is an ancestor of $n$ by definition \ref{def_ancestor}.
 
-\begin{prop}{Antisymmetry of ancestry}
-Let $n$ be a node of $T$, $L$ the lineage of $n$, and $a$, $b$ two nodes belonging to $L$, with $a \neq{} b$. Then either $a$ is an ancestor of $b$, or $b$ is an ancestor of $a$. 
-\end{prop}
+\begin{dfn}
+If $L$ and $M$ are lineages of $T$, then the \textit{intersection}
+of $L$ and $M$, noted $L \cap M$, is the set of nodes that belong to both $L$ and $M$.
+\end{dfn} 
 
-\begin{prop}{Transitivity of ancestry}
-Let $n$ be a node of $T$, $L$ the lineage of $n$, and $a, b, c \in L$ such that $a < b$ and $b < c$. Then $a < c$
-\end{prop}
+\begin{lemma}
+\label{lem_ancestors_in_lineage}
+Let $n$ be a node of $T$, $L$ its lineage, and $l$ a node of $L$. Then $l$'s ancestors also belong to $L$.
+\end{lemma}
+\begin{proof}
+If $l = n$ then the ancestors of $l$ are those of $n$, which belong to $L$ by proposition \ref{prop_lineage_ancestors_equivalence}. If $l \neq n$ then let $a$ be an ancestor of $l$. By definition \ref{def_ancestor}, $l$ is reachable from $a$. By proposition \ref{prop_lineage_ancestors_equivalence}, $l$ is an ancestor of $n$ and again $n$ is reachable from $l$. Therefore, $n$ is reachable from $a$, so $a$ is an ancestor of $n$, and so belongs in $L$.
+\end{proof}
+
+\begin{lemma}
+Let $L$ and $M$ be lineages of $T$, and $q \in L \cap M, q \neq R$. Then $q$'s parent also belongs to $M \cap L$.
+\end{lemma}
+\begin{proof}
+Call $p$ the parent of $q$. $p$ is an ancestor of $q$, and since $q$ belongs to $L$ (by hypothesis), $p$ belongs to $L$ by lemma \ref{lem_ancestors_in_lineage}. By the same reasoning, $p$ belongs to $M$, therefore $p \in L \cap M$.
+
+\end{proof}
 
 
 \begin{prop}
-In the lineage $L$ of a node $n$, the root is an ancestor of all nodes except itself, and $n$ is an ancestor of none.
-\end{prop}
-
-\begin{prop}
-Let $L$ be a lineage of $T$, and $a, b, c$ three different nodes of $L$. Then
-\end{prop}
-
-\begin{prop}
-Let $T$ be a rooted tree, and $a$ a node of $T$, and $d$ a descendant node of $a$. Then there exists exactly one ancestry path connecting $a$ and $d$.
+\label{prop_lineage_intersection}
+Let $L$ and $M$ be lineages of $T$. Then $L \cap M$ also forms a lineage.
 \end{prop}
 \begin{proof}
-Existence by \ref{anc_path_existence}, unicity by \ref{anc_path_unicity}
+Let $N = L \cap M$. Because $N$ is a subset of a lineage (in fact it is a subset of at least two lineages, $L$ and $M$), its elements are ordered, so we can pick the last one and call it $n$. Now all other elements of $N$ are ancestors of $n$, so by lemma \ref{lem_ancestors_in_lineage} they belong in $L$ and in $M$. So far we have proven 
 \end{proof}
+
+
 
 \begin{prop}
 In a rooted tree, you can always define a clade by specifying a single node: the clade consists of the specified node and all its descendants.
