@@ -273,16 +273,23 @@ You can extract subtrees (clades) as defined by labels (see \ref{sct_defining_cl
 
 \chapter{Some Properties of Trees}
 \label{sct_defining_clades}
+
 \begin{figure}[t]
- \centering
- \includegraphics{prop_tree.png}
-  \caption{Definitions Illustrated}
- \label{fig_app_tree_prop}
+\centering
+\includegraphics{oriented_graph.png}
+ % oriented_graph.png: 485x393 pixel, 300dpi, 4.11x3.33 cm, bb=0 0 116 94
+ \caption{An oriented graph (not a tree!), with edge orientation shown as arrows. Two paths are highlighted (cyan and blue). The cyan path starts at node A and ends at node E. Nodes B, C, D, and E are reachable from A. Node C is the direct successor of B in the cyan path; in the blue path the direct successor of B is F. The segment highlighted in red is \emph{not} a path.}
+ \label{fig_oriented_graph}
 \end{figure}
 
-In the following, $T$ will be a rooted tree. We'll recall that a tree (rooted or not) is a connected, acyclic graph. By choosing one node to be the root (which we'll note $R$), and orienting all edges away from the root, we get an oriented graph. A \textit{path} along such a graph is a sequence of nodes such that there is an edge between two successive nodes, and that the nodes are ordered in the sequence as they are in the edge. The first node in the path is called the \textit{start} of the path, and the last node is its \textit{end}. We speak of a path \textit{from} the start \textit{to} the end, equivalently we say that the end is \textit{reachable} from the start. The nodes in a path are ordered: if $a$ and $b$ are in a path, then either $a$ is reachable from $b$, or $b$ is reachable from $a$, or $a = b$; furthermore if $a$ is reachable from $b$, then $b$ is \textit{not} reachable from $a$.
 
-Now a few definitions - these are mostly renamings of graph-theoretical concepts, to make them more intuitive for phylogenetic trees.
+
+In the following, $T$ will be a rooted tree. We'll recall that a tree (rooted or not) is a connected, acyclic graph. By choosing one node to be the root (which we'll note $R$), and orienting all edges away from the root, we get an oriented graph. A \textit{path} along such a graph is a sequence of nodes such that there is an edge between two successive nodes, and that these nodes are ordered in the sequence as they are in the edge. The first node in the path is called the \textit{start} of the path, and the last node is its \textit{end}. We speak of a path \textit{from} the start \textit{to} the end, equivalently we say that the end is \textit{reachable} from the start. The nodes in a path are ordered: if $a$ and $b$ are in a path, then either $a$ is reachable from $b$, or $b$ is reachable from $a$, or $a = b$; furthermore if $a$ is reachable from $b$, then $b$ is \textit{not} reachable from $a$. If an edge connects $a$ to $b$, then $b$ is the \textit{direct successor} of $a$, and $a$ is the \textit{direct predecessor} of $b$
+See figure {\ref{fig_oriented_graph}.
+
+Although paths are not sets, we will (somewhat abusively, perhaps) use set notation with paths, unless there is a risk of confusion. Thus is $P$ is a path and $n$ is a node, then $n \in P$ means that $n$ is ``in'' $P$  or ``belongs to'' $P$ (strictly speaking, $n$ is reachable from the start of $P$, and the end of $P$ is reachable from $n$).
+
+Now a few definitions - these are mostly renamings of graph-theoretical concepts, to make them more intuitive for phylogenetic trees. 
 
 \begin{dfn}
 \label{def_ancestor}
@@ -305,6 +312,13 @@ Note that a node has exactly one parent, except the root which has none. A node 
 \label{def_lineage}
 A path that starts from the root we call a \emph{lineage}. By the definition of a rooted tree, there is always a lineage to $n$ for any node $n$, and this lineage is unique. So we can unambiguously talk of \textit{the} lineage of $n$ to mean the path from $R$ to $n$. We say that a set $L$ of nodes form a lineage if there exists $n \in L$ such that the path from $R$ to $n$ contains all and only elements of $L$.
 \end{dfn}
+
+\begin{figure}[b]
+ \centering
+ \includegraphics{prop_tree.png}
+  \caption{A rooted tree}
+ \label{fig_app_tree_prop}
+\end{figure}
 
 \begin{prop}
 \label{prop_lineage_ancestors_equivalence}

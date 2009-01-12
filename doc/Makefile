@@ -16,5 +16,5 @@ tutorial.pdf: tutorial.tex
 	pdflatex tutorial.tex
 
 clean:
-	$(RM) *.{pdf,out,cmd,aux,log,dvi,toc,svg}
+	$(RM) *.{pdf,out,cmd,aux,log,dvi,toc}
 
