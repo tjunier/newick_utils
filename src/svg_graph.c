@@ -577,14 +577,15 @@ void draw_grid()
 void draw_scale_bar(int hpos, double vpos,
 		double h_scale, double d_max, char *branch_length_unit)
 {
-	/* Finds the largest power of 10 that is smaller than the tree's depth.
-	 * Then draws as many multiples of this length as possible. If no more
-	 * than one can be drawn (because it's longer than half the tree's
-	 * depth), then we draw tick marks inside it instead. */
+	/* Finds the largest power of 10 that is smaller than d_max (which
+	 * should be the tree's depth).  Then draws as many multiples of this
+	 * length as possible. If no more than one can be drawn (because it's
+	 * longer than half the tree's depth), then we draw tick marks inside
+	 * it instead. */
 
 	const int big_tick_height = 5; 			/* px */
 	const int small_tick_height = 3;		/* px */
-	const int units_text_voffset = -13;		/* px */
+	const int units_text_voffset = -15;		/* px */
 	const int vsep = 1;				/* px */
 	double pot = largest_PoT_lte(d_max);		/* tree units */
 	double scale_length = pot * h_scale;		/* px */

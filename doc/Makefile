@@ -4,7 +4,7 @@
 .PHONY: distclean
 .PHONY: distdir
 
-all: article.pdf tutorial.pdf
+doc: article.pdf tutorial.pdf
 
 article.pdf: article.tex
 	pdflatex article.tex
