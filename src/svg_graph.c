@@ -64,6 +64,7 @@ static char *plain_node_style = NULL;
 static struct llist *css_map = NULL;
 static struct llist *ornament_map = NULL;
 
+int scale_bar_height = 30;	/* px */
 struct hash *url_map = NULL;
 int graph_width = -1;
 int svg_whole_v_shift = -1; 	/* Vertical translation of whole graph */
@@ -122,10 +123,7 @@ void svg_header(int nb_leaves, int with_scale_bar)
 	switch (graph_style) {
 		case SVG_ORTHOGONAL:
 			/* image fits in a rectangle, so height != width */
-			/* we add 1 leaf skip for the scale bar if needed */
-			if (with_scale_bar) 
-				++nb_leaves;
-			height = nb_leaves * leaf_vskip;
+			height = graph_height(nb_leaves, with_scale_bar);
 			break;
 		case SVG_RADIAL:
 			/* image fits in a square, so height == width */

@@ -13,6 +13,17 @@ double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
 
 void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
 
+/* Overall graph height (assuming 1 tree per graph, as always) */
+
+int graph_height(int nb_leaves, int with_scale_bar)
+{
+	int height = 2 * svg_whole_v_shift + ((nb_leaves -1)  * leaf_vskip);
+	if (with_scale_bar) 
+		height += scale_bar_height;
+
+	return height;
+}
+
 /* Outputs an SVG <g> element with all the tree branches, orthogonal */
 
 void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
@@ -159,8 +170,10 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	/* ... likewise for text */
 	draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
 	/* Draw scale bar if required */
-	double vpos = leaf_count(tree) * v_scale; 	/* px */
-	if (with_scale_bar) draw_scale_bar(ROOT_SPACE, vpos, h_scale, hd.d_max,
+	double scalebar_vpos = (double)
+		graph_height(leaf_count(tree), with_scale_bar) - svg_whole_v_shift;
+	if (with_scale_bar)
+		draw_scale_bar(ROOT_SPACE, scalebar_vpos, h_scale, hd.d_max,
 			branch_length_unit);
 	printf ("</g>");
 }

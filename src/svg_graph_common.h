@@ -13,6 +13,7 @@ extern char *inner_label_class;
 extern int graph_width;
 extern int svg_whole_v_shift; 
 extern double label_char_width;
+extern int scale_bar_height;
 
 /* rnode data for SVG trees */
 
