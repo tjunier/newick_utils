@@ -585,8 +585,10 @@ void draw_scale_bar(int hpos, double vpos,
 
 	const int big_tick_height = 5; 			/* px */
 	const int small_tick_height = 3;		/* px */
-	const int units_text_voffset = -15;		/* px */
+	const int units_text_voffset = -18;		/* px */
 	const int vsep = 1;				/* px */
+	const int lbl_vspace = 2;			/* px */
+	const int lbl_hspace = 2;			/* px */
 	double pot = largest_PoT_lte(d_max);		/* tree units */
 	double scale_length = pot * h_scale;		/* px */
 
@@ -621,8 +623,7 @@ void draw_scale_bar(int hpos, double vpos,
 		
 		/* Print base line and tick marks */
 		printf ("<g style='stroke:black;stroke-linecap:round'>");
-		printf ("<path d='M 0 0 h %g'/>",
-				big_tick_height, multiples * scale_length);
+		printf ("<path d='M 0 0 h %g'/>", multiples * scale_length);
 		int i;
 		for (i = 0; i <= multiples; i++) {
 			printf ("<path style='stroke:black' d='M %g 0 v %d'/>",
@@ -634,7 +635,7 @@ void draw_scale_bar(int hpos, double vpos,
 		printf ("<g style='font-size:small;stroke:none;text-anchor:end'>");
 		for (i = 0; i <= multiples; i++) { 
 			printf ("<text x='%g' y='%d'>%g</text>",
-				i*scale_length, -big_tick_height, i*pot);
+				i*scale_length + lbl_hspace, -big_tick_height - lbl_vspace, i*pot);
 		}
 		printf ("</g>");
 	}
