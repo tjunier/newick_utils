@@ -2,7 +2,7 @@ def:def.nw
 multiple:forest.nw
 pure_topol:tetrapoda_pure_topol.nw
 svg_cmap:-s -c color.map catarrhini.nw
-svg_cldgram:-s catarrhini_wrong.nw
+svg_cldgram:-s -W 8.6 catarrhini_wrong.nw
 svlb: -s -v 8 -l 'font-size:7' -b 'font-size:6' HRV.nw
 svg_cmap_r:-s -r -w 450 -c color.map catarrhini.nw
 svg_cldgram_r:-sr catarrhini_wrong.nw
