@@ -1,0 +1,74 @@
+
+\section{Displaying Trees}
+\label{sct_display}
+
+Perhaps the simplest and most common operation on a \nw{} tree is just to look at it. The \nw{} format is not very easy to understand for us humans, so we have to produce a graphical representation from it. This is the purpose of the \display{} program. 
+
+\subsection{As Text}
+\label{sct_display_text}
+
+At the simplest, \display{} just outputs a text graph:
+
+\verbatiminput{dspl1_txt.cmd}
+\verbatiminput{dspl1_txt.out}
+
+That's pretty low-tech compared to interactive, colorful graphical displays, but if you use the shell a lot (like I do), you may find it useful.
+
+You can use option \texttt{-w} (``width'') to set the number of columns available for display:
+
+\verbatiminput{dspl2_txt.cmd}
+\verbatiminput{dspl2_txt.out}
+
+\subsection{As \svg}
+\label{sct_display_svg}
+
+First, a disclaimer: there are dozens of tools for viewing trees out there, and I'm not interested in competing with them. The reason why I added \svg{} capabilities were:
+\begin{itemize}
+ \item I wanted to be able to produce reasonable graphics even if no other tool was available
+ \item I wanted to be sure that large trees could be rendered\footnote{I have had serious problems visualising trees of more than 1,000 leaves using some popular software I will not name here - either it was painfully slow, or it simply crashed} 
+\end{itemize}
+
+\noindent{}To produce \svg, pass option \texttt{-s}:
+\begin{verbatim}
+$ nw_display -s catarrhini > catarrhini.svg
+\end{verbatim}
+
+Now you can visualize the result using any \svg-enabled tool (all good Web browsers can do it), or convert it to another format with, say \texttt{rsvg} or Inkscape. The following image was produced like this:
+
+\begin{verbatim}
+$ inkscape -f catarrhini.svg -A catarrhini.pdf
+\end{verbatim}
+
+\begin{center}
+ \includegraphics{dspl_svg1_svg.pdf}
+\end{center}
+
+There are many options for \svg{} graphs.First, you can make radial trees, using option \texttt{-r} (from now on I will skip the redirection into an \svg{} file):
+
+\verbatiminput{dspl_sr_w450_catarrhini_svg.cmd}
+
+You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
+
+\begin{center}
+\includegraphics{dspl_sr_w450_catarrhini_svg.pdf}
+\end{center}
+
+\subsubsection{Using \css}
+\label{sct_display_svg_css}
+
+You can modify node style using \css. This is done by specifying a \textit{\css{} map}, which is just a text file that says which style should be applied to which node. If file \texttt{css.map} contains the following
+\begin{quote}
+ \verbatiminput{css.map}
+\end{quote} 
+we can apply the style map to the tree above:
+
+\verbatiminput{nw_display_sr_w450_ccssmap_catarrhini_svg.cmd}
+
+\begin{center}
+ \includegraphics{nw_display_sr_w450_ccssmap_catarrhini_svg.pdf}
+\end{center}
+
+The syntax of the \css{} map is as follows. Each line describes one style and the set of nodes to which it applies. The first line in \texttt{css.map} says that the style \texttt{stroke-width:2;stroke:blue} must be applied to the \texttt{CLADE} defined by \texttt{Homo} and \texttt{Pan}, which comprises \texttt{Homo}, \texttt{Pan}, and \texttt{Hominini}. The \texttt{CLADE} keyword can be abbreviated to \texttt{C}, as in the next two lines. The style of an inner clade overrides styles of an outer clade, \textit{e.g.}, although the \texttt{Homo} - \texttt{Pan} clade is nested inside the \texttt{Homo} - \texttt{Hylobates} clade, it has its own style (blue, wide lines) which overrides the containing clade's style (pinkish with normal width).
+
+The \texttt{INDIV} keyword specifies that the style is to be applied to all nodes who match the labels on the line, but individually, that is, the program does not propagate the style to the whole clade defined by the labels. This is why only \texttt{Colobus} and \texttt{Cercopithecus} appear in green; with the \texttt{CLADE} keyword the whole \texttt{Macaca} - \texttt{Colobus} clade (that is, all Old-World monkeys) would be green. Note that \texttt{INDIV} overrides \texttt{CLADE}, which is why \texttt{Cercopithecus} is green even though it belongs to a red clade.
+

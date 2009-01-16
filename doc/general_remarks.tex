@@ -1,0 +1,66 @@
+
+\chapter{General Remarks}
+\label{chap_general}
+
+The following applies to all programs in the \nutils{} package.
+
+\section{Help}
+\label{sect_help}
+
+All programs print a help message if passed option \texttt{-h}:
+
+\begin{samepage}
+\begin{verbatim}
+$ nw_indent -h
+Indents the Newick, making structure more clear.
+
+Synopsis
+--------
+
+nw_indent [-cht:] <newick trees filename|->
+
+Input
+-----
+
+Argument is the name of a file that contains Newick trees, or '-' (in
+which case trees are read from standard input).
+
+Output
+------
+
+By default, prints the input tree, with each parenthesis and each leaf on a
+line of its own, and indented a multiple of '  ' (two spaces) to reflect
+structure. The default output is valid Newick.
+[...]
+\end{verbatim}
+\end{samepage}
+The help page describes the program's purpose, its input and output, and its options, in a format reminiscent of \unix{} manpages. It also shows a few examples. All examples can be tried out using files in the \texttt{data} directory.
+
+\section{Input}
+\label{sect_input}
+
+Since the \nutils{} are for working with trees, it should not be a surprise that all programs take Newick as input. The Newick format is a file format for (phylogenetic) trees. It is one of the most widely used and uderstood formats.
+A complete description can be found at \url{http://evolution.genetics.washington.edu/phylip/newicktree.html}.
+
+The input tree(s) are always the first argument to the program (after any options). They may either be stored in a file, or piped on \stdin{}. In the latter case, the filename is replaced by a '\texttt{-}' (dash):
+
+\begin{samepage}
+\begin{verbatim}
+$ nw_display mytrees.nw
+\end{verbatim}
+is the same as
+\begin{verbatim}
+$ cat mytrees.nw | nw_display -
+\end{verbatim}
+\end{samepage}
+Of course the second form is only really useful when chaining several programs into pipelines.
+
+\subsection{Multiple Trees in Input}
+
+Most programs can work on any number of trees. That is, in the example above the file \texttt{mytrees.nw} may contain one or more trees, preferably one tree per line\footnote{It may also work if the trees are formatted differently, but the programs were only tested on input files with one tree per line.}. The task will be performed on each tree in the input. So if you need to reroot 1,000 trees on the same outgroup, you can do it all in a single step (see \ref{sct_reroot}).
+
+\section{Output}
+\label{sect_output}
+
+The \nutils{} either modify trees and print the result, or print information about the trees. In the first case, the output is also Newick.
+
