@@ -10,7 +10,7 @@ article.pdf: article.tex
 	pdflatex article.tex
 	pdflatex article.tex
 
-tutorial.pdf: tutorial.tex
+tutorial.pdf: tutorial.tex tree_axioms.tex tree_properties.tex
 	./make_figures.sh
 	pdflatex tutorial.tex
 	pdflatex tutorial.tex

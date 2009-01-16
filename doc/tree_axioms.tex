@@ -1,0 +1,36 @@
+\chapter{Axiomatic Construction of Rooted Trees}
+
+Here is one way of considering rooted trees. We start with a set $N$, whose
+elements we call \emph{nodes}.  We'll assume that $N \neq \emptyset$, because
+empty trees are not very interesting. Then we introduce an irreflexive,
+antisymmetric relation on $N$, noted $<$:
+\begin{align}
+n \nless n & & \forall \; n \in N & & \text{irreflexivity} \\
+m < n \Rightarrow n \nless m &  & \forall \; m, n \in N & &  \text{antisymmetry}
+\end{align}
+In other words, $<$ is a binary relation on $N$ such that no node is
+related to itself, and if node $n$ is related to $m$, then $m$ is \emph{not}
+related to $n$. If $m < n$, we say that $m$ is a \emph{parent} of $n$.
+
+Now we introduce axioms that produce rooted trees.
+\begin{axiom}
+There exists a node that has no parent:
+\[ \exists \; r \in N \; | \; n \nless r \qquad \forall \; n \in N \]
+\end{axiom}
+
+\begin{axiom}
+There is only one node that has no parent. Let $S = \{x \in N\,|\, n \nless x \; \forall \; n \in N \}$ be the set of parentless nodes of $N$. Then:
+\[ r, s \in S \quad \Rightarrow \quad r = s \qquad \forall \;r, s \in N \]
+\end{axiom} 
+
+The unique parentless node of $N$ is called the \emph{root}.
+
+\begin{axiom}
+Every node except the root has a parent.
+\end{axiom} 
+
+\begin{axiom}
+No node has more than one parent.
+\end{axiom} 
+
+We can now speak of \emph{the} parent of node $n$ (unless $n$ is the root), and we will note it $\mathrm{par}(n)$.
