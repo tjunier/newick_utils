@@ -27,8 +27,10 @@ First, a disclaimer: there are dozens of tools for viewing trees out there, and 
  \item I wanted to be able to produce reasonable graphics even if no other tool was available
  \item I wanted to be sure that large trees could be rendered\footnote{I have had serious problems visualising trees of more than 1,000 leaves using some popular software I will not name here - either it was painfully slow, or it simply crashed} 
 \end{itemize}
+The \svg{} is designed to be easy to edit in an interactive editor like
+Inkscape: the tree edges are in one group, and the text in another. So it would be easy to change the line properties of the edges, or the font family of the text, for example (you can also do this from \display{} using a \css{} map, see \ref{sct_display_svg_css}).
 
-\noindent{}To produce \svg, pass option \texttt{-s}:
+To produce \svg, pass option \texttt{-s}:
 \begin{verbatim}
 $ nw_display -s catarrhini > catarrhini.svg
 \end{verbatim}
@@ -68,7 +70,42 @@ we can apply the style map to the tree above:
  \includegraphics{nw_display_sr_w450_ccssmap_catarrhini_svg.pdf}
 \end{center}
 
-The syntax of the \css{} map is as follows. Each line describes one style and the set of nodes to which it applies. The first line in \texttt{css.map} says that the style \texttt{stroke-width:2;stroke:blue} must be applied to the \texttt{CLADE} defined by \texttt{Homo} and \texttt{Pan}, which comprises \texttt{Homo}, \texttt{Pan}, and \texttt{Hominini}. The \texttt{CLADE} keyword can be abbreviated to \texttt{C}, as in the next two lines. The style of an inner clade overrides styles of an outer clade, \textit{e.g.}, although the \texttt{Homo} - \texttt{Pan} clade is nested inside the \texttt{Homo} - \texttt{Hylobates} clade, it has its own style (blue, wide lines) which overrides the containing clade's style (pinkish with normal width).
+The syntax of the \css{} map is as follows. Each line describes one style and the set of nodes to which it applies. The first line in \texttt{css.map} says that the style \texttt{stroke-width:2;stroke:blue} must be applied to the \texttt{Clade} defined by \texttt{Homo} and \texttt{Pan}, which comprises \texttt{Homo}, \texttt{Pan}, and \texttt{Hominini}. The \texttt{Clade} keyword can be abbreviated to \texttt{C}, as in the next two lines. The style of an inner clade overrides styles of an outer clade, \textit{e.g.}, although the \texttt{Homo} - \texttt{Pan} clade is nested inside the \texttt{Homo} - \texttt{Hylobates} clade, it has its own style (blue, wide lines) which overrides the containing clade's style (pinkish with normal width).
 
-The \texttt{INDIV} keyword specifies that the style is to be applied to all nodes who match the labels on the line, but individually, that is, the program does not propagate the style to the whole clade defined by the labels. This is why only \texttt{Colobus} and \texttt{Cercopithecus} appear in green; with the \texttt{CLADE} keyword the whole \texttt{Macaca} - \texttt{Colobus} clade (that is, all Old-World monkeys) would be green. Note that \texttt{INDIV} overrides \texttt{CLADE}, which is why \texttt{Cercopithecus} is green even though it belongs to a red clade.
+The \texttt{Individual} keyword specifies that the style is to be applied to all nodes who match the labels on the line, but individually, that is, the program does not propagate the style to the whole clade defined by the labels. This is why only \texttt{Colobus} and \texttt{Cercopithecus} appear in green; with the \texttt{Clade} keyword the whole \texttt{Macaca} - \texttt{Colobus} clade (that is, all Old-World monkeys) would be green. Note that \texttt{Individual} overrides \texttt{Clade}, which is why \texttt{Cercopithecus} is green even though it belongs to a red clade.
 
+The \texttt{Clade} and \texttt{Individual} keywords are not case-sensitive and can be abbreviated - in fact only the first letter counts.
+
+\subsection{Ornaments}
+
+Ornaments are arbitrary snippets of \svg{} code that are displayed at specified
+node positions. As for \css, this is done with a map. The ornament map has the
+same syntax as the \css{} map, except that you specify \svg{} objects rather
+than \css{} styles. In particular, the \texttt{Individual} and \texttt{Clade}
+keywords have the same meaning, and can be abbreviated in the same way. The
+following file, \texttt{ornament.map}, instructs to draw a red circle with a
+black border on \texttt{Homo} and \texttt{Pan}, and a cyan circle with a blue
+border on the root of the \texttt{Homo} - \texttt{Hylobates} clade. The \svg{} is enclosed in double quotes because it contains spaces. The
+ornament map is specified with option \texttt{-o}:
+				
+\begin{quote}
+ \verbatiminput{ornament.map}
+\end{quote}
+
+\verbatiminput{nw_display_sr_w450_oornmap_catarrhini_svg.cmd}
+
+\begin{center}
+ \includegraphics{nw_display_sr_w450_oornmap_catarrhini_svg.pdf}
+\end{center}
+
+\noindent{}The \css{} map and ornaments can be combined:
+
+\verbatiminput{nw_display_sr_w450_oornmap_ccssmap_catarrhini_svg.cmd}
+
+\begin{center}
+ \includegraphics{nw_display_sr_w450_oornmap_ccssmap_catarrhini_svg.pdf}
+\end{center}
+
+\subsection{Options not Covered}
+
+\display{} has many options, and we will not describe them all here - all of them are described when you pass option \texttt{-h}. They include support for clickable images, setting the scale bar units, setting the leaf, inner label, and branch length styles.

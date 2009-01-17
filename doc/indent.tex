@@ -1,4 +1,31 @@
 
-
 \section{Indenting}
 \label{sct_indent}
+
+\nwindent{} shows a \nw{} tree in indented form. This shows the structure more
+clearly than the compact form. For example, this is a tree in compact form, in
+file \texttt{falconiformes}:
+\verbatiminput{falconiformes}
+And this is the same tree, indented:
+\verbatiminput{indent1_nw.cmd}
+\verbatiminput{indent1_nw.out}
+The structure is much more clear, it is also relatively easy to edit manually
+in a text editor. An added benefit is that it is still valid \nw. 
+
+Yet another advantage of indentation is that it is resistant to certain errors which would cause \display{} to fail with a syntax error.\footnote{This is because indentation is a purely lexical process, hence it does not need a syntactically correct tree.}For example, there is an error in this tree:
+\emph{[add example of syntactically wrong tree and show that indenting allows the error to be spotted]}
+
+The indentation can be varied by supplying a string (option \texttt{-t}) that
+will be used instead of the default (which is two spaces). If you want a deeper
+indentation, you could say this:
+\verbatiminput{indent2_nw.cmd}
+\verbatiminput{indent2_nw.out}
+You can also use option \texttt{-t} to highlight indentation:
+\verbatiminput{indent3_txt.cmd}
+\verbatiminput{indent3_txt.out}
+Now the indentation levels are easier to see, but at the expense of the tree no
+longer being valid \nw.
+
+
+
+

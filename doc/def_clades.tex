@@ -1,0 +1,25 @@
+\chapter{Defining Clades by their Descendants}
+
+When you need to specify a clade using the \nutils{}, you either give the label
+of the clade's root, or the labels of (some of) its descendants. Since inner
+node rarely have labels (or worse, have unuseable labels like bootstrap support
+		values), you will often need to specify clades by their
+descendants.
+
+Consider the following tree:
+
+\begin{center}
+\includegraphics{reroot_1og_corr_svg.pdf} 
+\end{center}
+
+Suppose we want to extract the Hominoidea clade - the apes. It is the clade
+that contains \texttt{Homo}, \texttt{Pan} (chimps), \texttt{Gorilla},
+     \texttt{Pongo} (orangutan), and \texttt{Hylobates} (gibbons). The clade is
+     not labeled in this tree, but this list of labels defines it without
+     ambiguity. In fact, we can define it unambiguously using just
+     \texttt{Hylobates} and \texttt{Homo} - or \texttt{Hylobates} and any other
+     label. The point is that \emph{you never need more than two labels to
+     unambiguously define a clade}.
+
+You cannot choose any two nodes, however: the condition is that the last
+common ancestor of the two nodes be the root of the desired clade.
