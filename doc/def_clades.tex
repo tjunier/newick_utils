@@ -12,7 +12,7 @@ Consider the following tree:
 \includegraphics{reroot_1og_corr_svg.pdf} 
 \end{center}
 
-Suppose we want to extract the Hominoidea clade - the apes. It is the clade
+Suppose we want to specify the Hominoidea clade - the apes. It is the clade
 that contains \texttt{Homo}, \texttt{Pan} (chimps), \texttt{Gorilla},
      \texttt{Pongo} (orangutan), and \texttt{Hylobates} (gibbons). The clade is
      not labeled in this tree, but this list of labels defines it without
@@ -23,3 +23,7 @@ that contains \texttt{Homo}, \texttt{Pan} (chimps), \texttt{Gorilla},
 
 You cannot choose any two nodes, however: the condition is that the last
 common ancestor of the two nodes be the root of the desired clade.
+
+\section{Why not jus use node numbers?}
+
+Some applications atribute numbers to all inner nodes and allow users to specify clades by refering to this number. Such a scheme is not workable when one has many input trees, however, because tere is no guarantee that the same clade (assuming it is present) will have the same number.

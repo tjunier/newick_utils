@@ -12,8 +12,15 @@ And this is the same tree, indented:
 The structure is much more clear, it is also relatively easy to edit manually
 in a text editor. An added benefit is that it is still valid \nw. 
 
-Yet another advantage of indentation is that it is resistant to certain errors which would cause \display{} to fail with a syntax error.\footnote{This is because indentation is a purely lexical process, hence it does not need a syntactically correct tree.}For example, there is an error in this tree:
-\emph{[add example of syntactically wrong tree and show that indenting allows the error to be spotted]}
+Yet another advantage of indenting is that it is resistant to certain errors
+which would cause \display{} to fail.\footnote{This is
+because indenting is a purely lexical process, hence it does not need a
+syntactically correct tree.} For example, there is an error in this tree:
+\verbatiminput{falconiformes_error}
+yet it is hard to spot, and trying \display{} won't help as it will generate a
+parse error. With \nwindent{}, however, you can at least look at the tree:
+\verbatiminput{indent4_nw.out}
+While the error is not exactly obvious, you can at least view the Newick. It turns out there is a comma missing after \texttt{Sagittarius}.
 
 The indentation can be varied by supplying a string (option \texttt{-t}) that
 will be used instead of the default (which is two spaces). If you want a deeper
