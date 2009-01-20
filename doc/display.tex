@@ -76,6 +76,26 @@ The \texttt{Individual} keyword specifies that the style is to be applied to all
 
 The \texttt{Clade} and \texttt{Individual} keywords are not case-sensitive and can be abbreviated - in fact only the first letter counts.
 
+Styles can also be applied to labels. Option \texttt{-l} specifies the leaf
+label style, option \texttt{-i} the inner node label style, and option
+textt{-b} the branch length style. For example, th efollowing tree, which was
+produced using defaults, could be improved a bit:
+
+\verbatiminput{nw_display_s_vertebrata_svg.cmd}
+\begin{center}
+  \includegraphics{nw_display_s_vertebrata_svg.pdf}
+\end{center}
+
+\noindent{}Specifically, we're going to remove the branch lengths, reduce the vertical spacing, and put the leaf labels in italics:
+
+\verbatiminput{nw_display_s_vertebrata_styled_svg.cmd}
+\begin{center}
+  \includegraphics{nw_display_s_vertebrata_styled_svg.pdf}
+\end{center}
+
+Note that we did not \emph{discard} the branch lengths (we could do this with
+\topology), because doing so would reduce the tree to a cladogram.
+
 \subsection{Ornaments}
 
 Ornaments are arbitrary snippets of \svg{} code that are displayed at specified
