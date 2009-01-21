@@ -12,7 +12,8 @@ At the simplest, \display{} just outputs a text graph:
 \verbatiminput{dspl1_txt.cmd}
 \verbatiminput{dspl1_txt.out}
 
-That's pretty low-tech compared to interactive, colorful graphical displays, but if you use the shell a lot (like I do), you may find it useful.
+That's pretty low-tech compared to interactive, colorful graphical displays,
+but if you use the shell a lot (like I do), you may find it useful.
 
 You can use option \texttt{-w} (``width'') to set the number of columns available for display:
 
@@ -58,11 +59,11 @@ You already know \texttt{-w}, except that for \svg{} the value is in pixels inst
 \subsubsection{Using \css}
 \label{sct_display_svg_css}
 
-You can modify node style using \css. This is done by specifying a \textit{\css{} map}, which is just a text file that says which style should be applied to which node. If file \texttt{css.map} contains the following
-\begin{quote}
- \verbatiminput{css.map}
-\end{quote} 
-we can apply the style map to the tree above:
+You can modify node style using \css. This is done by specifying a
+\textit{\css{} map}, which is just a text file that says which style should be
+applied to which node. If file \texttt{css.map} contains the following
+\begin{quote} \verbatiminput{css.map} \end{quote} we can apply the style map to
+the tree above:
 
 \verbatiminput{nw_display_sr_w450_ccssmap_catarrhini_svg.cmd}
 
@@ -86,15 +87,20 @@ produced using defaults, could be improved a bit:
   \includegraphics{nw_display_s_vertebrata_svg.pdf}
 \end{center}
 
-\noindent{}Specifically, we're going to remove the branch lengths, reduce the vertical spacing, and put the leaf labels in italics:
-
+\noindent{}Specifically, we're going to remove the branch length labels, reduce
+the vertical spacing, reduce the size of inner node labels (bootstrap values),
+and write th eleaf labels in italics, using a font with serifs:
 \verbatiminput{nw_display_s_vertebrata_styled_svg.cmd}
 \begin{center}
   \includegraphics{nw_display_s_vertebrata_styled_svg.pdf}
 \end{center}
-
-Note that we did not \emph{discard} the branch lengths (we could do this with
-\topology), because doing so would reduce the tree to a cladogram.
+Option \texttt{-v} specifies the vertical spacing, in pixels, between two
+successive leaves (the default is 40). Option \texttt{-b} sets the style of
+branch labels, option \texttt{-l} sets the style of leaf labels, and option
+\texttt{-i} sets the style of inner node labels. Note that we did not
+\emph{discard} the branch lengths (we could do this with \topology), because
+doing so would reduce the tree to a cladogram. Instead, we set their \css{}
+style to \texttt{opacity:0} (\texttt{visibility:hidden} also works).
 
 \subsection{Ornaments}
 
@@ -128,4 +134,7 @@ ornament map is specified with option \texttt{-o}:
 
 \subsection{Options not Covered}
 
-\display{} has many options, and we will not describe them all here - all of them are described when you pass option \texttt{-h}. They include support for clickable images, setting the scale bar units, setting the leaf, inner label, and branch length styles.
+\display{} has many options, and we will not describe them all here - all of
+them are described when you pass option \texttt{-h}. They include support for
+clickable images (with URLs to arbitrary Web pages), setting the scale bar
+units, changing the root length, etc. 
