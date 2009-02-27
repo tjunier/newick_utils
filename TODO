@@ -1,3 +1,5 @@
+nw_prune: reomve complement (i.e., keep specified nodes and prune the rest);  allow selection of a branch ba its LCA.
+
 nw_ed: make test for action 'l' (print label)
 
 nw_display: craft test tree for numeric verification of lengths and positions

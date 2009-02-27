@@ -10,14 +10,14 @@ And this is the same tree, indented:
 \verbatiminput{indent1_nw.cmd}
 \verbatiminput{indent1_nw.out}
 The structure is much more clear, it is also relatively easy to edit manually
-in a text editor. An added benefit is that it is still valid \nw. 
+in a text editor - while still being valid \nw.
 
-Yet another advantage of indenting is that it is resistant to certain errors
+Another advantage of indenting is that it is resistant to certain errors
 which would cause \display{} to fail.\footnote{This is
 because indenting is a purely lexical process, hence it does not need a
 syntactically correct tree.} For example, there is an error in this tree:
 \verbatiminput{falconiformes_error}
-yet it is hard to spot, and trying \display{} won't help as it will generate a
+yet it is hard to spot, and trying \display{} won't help as it will abort with a
 parse error. With \nwindent{}, however, you can at least look at the tree:
 \verbatiminput{indent4_nw.out}
 While the error is not exactly obvious, you can at least view the Newick. It turns out there is a comma missing after \texttt{Sagittarius}.
@@ -33,6 +33,15 @@ Option \texttt{-t} can also be used to highlight indentation:
 Now the indentation levels are easier to see, but at the expense of the tree no
 longer being valid \nw.
 
-
-
+Finally, option \texttt{-c} ("compact") does the reverse: it removes all
+indentation and produces a compact tree. You can use this when you want to
+produce a compact Newick file after editing. For example, using Vim, after
+loading a newick tree I do 
+\begin{quote}
+\verb+gg!}nw_indent -+
+\end{quote}
+to indent the file, then I edit it, then compact it again:
+\begin{quote}
+\verb+gg!}nw_indent -c -+
+\end{quote}
 

@@ -6,7 +6,7 @@ Rooting transforms an unrooted tree into a rooted one, and rerooting changes a r
 
 The Newick format is implicitly rooted, in the sense that there is a 'top' node from which all other nodes descend. Some applications regard a tree with a trifuraction at the top node as unrooted. 
 
-One way of (re)rooting a tree is to specify an \textit{outgroup}. In the simplest case, this is a single leaf. The root is then placed in such a way that one of its children is the outgroup, while the other child is the rest of the tree (sometimes known as the \textit{ingroup}). 
+Rooting a tree is usually done by specifying an \textit{outgroup}. In the simplest case, this is a single leaf. The root is then placed in such a way that one of its children is the outgroup, while the other child is the rest of the tree (sometimes known as the \textit{ingroup}). 
 
 Consider the following primate tree, \texttt{simiiformes\_wrong}:
 
@@ -32,30 +32,3 @@ The outgroup does not need to be a single leaf. The following tree is wrong for 
 $ nw_reroot simiiformes_wrong_3og Platyrrhini
 \end{verbatim}
 will reroot in the same way (not shown). Beware that inner labels are often used for support values (as in bootstrapping), which are generally not useful for defining clades.
-
-\section{Extracting Labels}
-\label{sct_labels}
-
-To get a list of all labels in a tree, use \labels:
-
-\verbatiminput{labels_xpl1_txt.cmd}
-\verbatiminput{labels_xpl1_txt.out}
-
-\noindent{}The labels are printed out in post-order. To get rid of internal labels, use \texttt{-I}:
-
-\verbatiminput{labels_xpl2_txt.cmd}
-\verbatiminput{labels_xpl2_txt.out}
-
-\noindent{}Likewise, you can use \texttt{-L} to get rid of leaf labels (not shown). Finally, if you use \texttt{-t} the labels are printed on a single line, separated by tabs (for some reason the tabs show as spaces here, I think this is an effect of \LaTeX{}'s \verb+\verbatiminput{}+):
-
-\verbatiminput{labels_xpl3_txt.cmd}
-\verbatiminput{labels_xpl3_txt.out}
-
-\subsection{Counting Leaves in a Tree}
-\label{sct_counting_leaves}
-
-A simple application of \labels{} is a leaf count:
-
-\verbatiminput{labels_xpl4_txt.cmd}
-\verbatiminput{labels_xpl4_txt.out}
-

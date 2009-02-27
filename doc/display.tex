@@ -25,11 +25,11 @@ You can use option \texttt{-w} (``width'') to set the number of columns availabl
 
 First, a disclaimer: there are dozens of tools for viewing trees out there, and I'm not interested in competing with them. The reason why I added \svg{} capabilities were:
 \begin{itemize}
- \item I wanted to be able to produce reasonable graphics even if no other tool was available
+ \item I wanted to be able to produce reasonable graphics even if no other tool was at hand
  \item I wanted to be sure that large trees could be rendered\footnote{I have had serious problems visualising trees of more than 1,000 leaves using some popular software I will not name here - either it was painfully slow, or it simply crashed} 
 \end{itemize}
 The \svg{} is designed to be easy to edit in an interactive editor like
-Inkscape: the tree edges are in one group, and the text in another. So it would be easy to change the line properties of the edges, or the font family of the text, for example (you can also do this from \display{} using a \css{} map, see \ref{sct_display_svg_css}).
+Inkscape: the tree edges are in one group, and the text in another. So it is easy to change the line properties of the edges, or the font family of the text, for example (you can also do this from \display{} using a \css{} map, see \ref{sct_display_svg_css}).
 
 To produce \svg, pass option \texttt{-s}:
 \begin{verbatim}
@@ -79,7 +79,7 @@ The \texttt{Clade} and \texttt{Individual} keywords are not case-sensitive and c
 
 Styles can also be applied to labels. Option \texttt{-l} specifies the leaf
 label style, option \texttt{-i} the inner node label style, and option
-textt{-b} the branch length style. For example, th efollowing tree, which was
+\texttt{-b} the branch length style. For example, the following tree, which was
 produced using defaults, could be improved a bit:
 
 \verbatiminput{nw_display_s_vertebrata_svg.cmd}
@@ -87,9 +87,9 @@ produced using defaults, could be improved a bit:
   \includegraphics{nw_display_s_vertebrata_svg.pdf}
 \end{center}
 
-\noindent{}Specifically, we're going to remove the branch length labels, reduce
+\noindent{}Let's remove the branch length labels, reduce
 the vertical spacing, reduce the size of inner node labels (bootstrap values),
-and write th eleaf labels in italics, using a font with serifs:
+and write the leaf labels in italics, using a font with serifs:
 \verbatiminput{nw_display_s_vertebrata_styled_svg.cmd}
 \begin{center}
   \includegraphics{nw_display_s_vertebrata_styled_svg.pdf}

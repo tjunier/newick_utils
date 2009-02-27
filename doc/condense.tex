@@ -1,0 +1,18 @@
+\section{Condensing}
+\label{sct_condense}
+
+Condensing a tree means reducing its size in a systematic, meaningful way
+(compare this to \emph{pruning} (\ref{sct_prune}) which arbitrarily removes
+branches). Currently the only condensing method available is simplifying
+clades in which all leaves have the same label. Consider this tree:
+
+\includegraphics{condense1_svg.pdf}
+
+it has a clade that consists only of A, another of only C, plus a B leaf. We
+can condense it:
+
+\verbatiminput{condense2_svg.cmd}
+\includegraphics{condense2_svg.pdf}
+
+A typical use of this is producing genus trees from species trees, or any
+higher-level tree from a lower-level one - see \ref{sct_higher_lvl}).

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Some figures in the docs are teh direct output of nw_* commands. This script
+# Some figures in the docs are the direct output of nw_* commands. This script
 # runs them so that the docs are up-to-date and accurate.
 
 # Commands for making figures are in files with suffixes in _txt (text graphs),
@@ -19,6 +19,8 @@ for cmd in *_{txt,nw} ; do
 	# run command
 	sh < $cmd > $cmd.out
 done
+
+# These generate SVG
 
 for cmd in *_svg ; do
 	# prefix a '$' for inputting into LaTeX

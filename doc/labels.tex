@@ -1,0 +1,29 @@
+
+
+\section{Extracting Labels}
+\label{sct_labels}
+
+To get a list of all labels in a tree, use \labels:
+
+\verbatiminput{labels_xpl1_txt.cmd}
+\verbatiminput{labels_xpl1_txt.out}
+
+\noindent{}The labels are printed out in post-order. To get rid of internal labels, use \texttt{-I}:
+
+\verbatiminput{labels_xpl2_txt.cmd}
+\verbatiminput{labels_xpl2_txt.out}
+
+\noindent{}Likewise, you can use \texttt{-L} to get rid of leaf labels (not shown). Finally, if you use \texttt{-t} the labels are printed on a single line, separated by tabs (for some reason the tabs show as spaces here, I think this is an effect of \LaTeX{}'s \verb+\verbatiminput{}+):
+
+\verbatiminput{labels_xpl3_txt.cmd}
+\verbatiminput{labels_xpl3_txt.out}
+
+\subsection{Counting Leaves in a Tree}
+\label{sct_counting_leaves}
+
+A simple application of \labels{} is a leaf count (assuming each leaf is
+labeled - \nw{} does not require labels):
+
+\verbatiminput{labels_xpl4_txt.cmd}
+\verbatiminput{labels_xpl4_txt.out}
+

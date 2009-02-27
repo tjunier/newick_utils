@@ -1,27 +1,27 @@
-\documentclass{bioinfo}
-\copyrightyear{2009}
-\pubyear{2009}
+\documentclass{article}
+%\documentclass{bioinfo}
+%\copyrightyear{2009}
+%\pubyear{2009}
 
 \usepackage{url}
 
 \newcommand{\cli}{\textsc{CLI}}
 \newcommand{\gui}{\textsc{GUI}}
-\newcommand{\unix}{Unix}
 \newcommand{\prog}[1]{\texttt{nw\_#1}}
 \newcommand{\nutils}{Newick Utilities}
 \newcommand{\unix}{\textsc{Unix}}
 
 \begin{document}
-\firstpage{1}
+%\firstpage{1}
 
 \title{\unix{} Shell Filters for Newick Trees}
 \author[Junier and Zdobnov]{Thomas Junier\,$^{1}$\footnote{to whom correspondence should be addressed}\hspace{1em}and Evgeny Zdobnov}
-\address{$^{1}$Department of Genetic and Development Medicine, Faculty of Medicine, University of Geneva, Geneva, Switzerland}
+%\address{$^{1}$Department of Genetic and Development Medicine, Faculty of Medicine, University of Geneva, Geneva, Switzerland}
 
-\history{Received on 2009-xx-yy\ldots}
+%\history{Received on 2009-xx-yy\ldots}
 
 
-\editor{Associate Editor: John Milton}
+%\editor{Associate Editor: John Milton}
 
 \maketitle
 
@@ -32,7 +32,7 @@ A set of \unix{} shell tools for working with phylogenetic trees, designed for w
 \section{Availability:}
 C source code and examples are available from \url{http://cegg.unige.ch/newick-utils}.
 \section{Contact:}
-\href{thomas.junier@unige.ch}{thomas.junier@unige.ch}
+%\href{thomas.junier@unige.ch}{thomas.junier@unige.ch}
 \end{abstract}
  
 \section{Introduction}
@@ -50,8 +50,10 @@ Automation is also facilitated by good interoperation between the programs invol
 Faced with the need to handle large numbers of trees in automated pipelines, and having failed to find any software that met our needs, we designed and wrote a collection of filters that perform a range of frequently used tree operations, require no user interaction, and work with any number of trees of any size. 
 
 \begin{table}[!t]
-\processtable{\nutils\label{tab:NU_func}}
-{\begin{tabular*}{\columnwidth}{lp{0.7 \columnwidth}}\toprule
+%\processtable{\nutils\label{tab:NU_func}}{
+%\begin{tabular*}{\columnwidth}{lp{0.7 \columnwidth}}\toprule
+\begin{tabular*}{\textwidth}{lp{0.7 \textwidth}}
+%\toprule
 Program & Function \\ 
 \hline 
 \prog{reroot} & reroot trees on outgroup, specified by labels \\
@@ -66,7 +68,8 @@ Program & Function \\
 \prog{prune} & discard nodes by label \\
  \ldots & [maybe keep only the most interesting] \\
 \hline
-\end{tabular*}}{}
+\end{tabular*}
+%}{}
 \end{table}
 
 \section{Results}
