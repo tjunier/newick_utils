@@ -1,3 +1,6 @@
+nw_display: SVG ortho, align middle of label, rather than bottom, to branch.
+Try with some SVG property.
+
 nw_prune: reomve complement (i.e., keep specified nodes and prune the rest);  allow selection of a branch ba its LCA.
 
 nw_ed: make test for action 'l' (print label)

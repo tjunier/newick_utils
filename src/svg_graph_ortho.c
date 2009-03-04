@@ -117,7 +117,7 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 			printf("<text class='%s' "
 			       "x='%.4f' y='%.4f'>%s</text>",
 				class, svg_h_pos + LBL_SPACE,
-				svg_mid_pos, node->label);
+				svg_mid_pos + LBL_VOFFSET, node->label);
 			if (url) printf ("</a>");
 
 		/* Branch lengths */

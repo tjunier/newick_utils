@@ -2,6 +2,7 @@
 
 #define ROOT_SPACE 10			/* pixels */
 #define LBL_SPACE 10			/* pixels */
+#define LBL_VOFFSET 4			/* pixels */
 #define INNER_LBL_SPACE 4		/* pixels */
 #define edge_length_v_offset -4 	/* pixels */
 #define URL_MAP_SIZE 100		/* bins */
