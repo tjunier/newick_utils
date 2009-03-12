@@ -31,6 +31,7 @@ declare -ri BOOTSTRAPS=10
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
 declare -r DISTANCES=$INPUT_FILE.dist
 declare -r GNUPLOT=$INPUT_FILE.gplot
+declare -r IMAGE=$INPUT_FILE.png
 
 
 # Align sequences
@@ -87,7 +88,6 @@ labels=($(nw_clade -s ${MUSCLE_OUT}_slice_1-*.rr.nw $OUTGROUP | nw_labels -I -))
 # each position. At the end of the loop, the header column is removed, and the
 # lines are sorted by position.
 
-shopt -s -o xtrace
 echo "Computing distances for ${labels[*]}"
 for rooted_tree in ${MUSCLE_OUT}_slice_*.rr.nw ; do 
 	position=${rooted_tree/*_slice_/}
@@ -98,12 +98,19 @@ for rooted_tree in ${MUSCLE_OUT}_slice_*.rr.nw ; do
 	nw_distance -mm -n $rooted_tree ${labels[*]} | grep $REFERENCE
 done | cut -f1,3-12 | sort -k1n > $DISTANCES
 
+
 # Generate plot with GNUplot
 
 echo "Plotting"
-printf "plot '%s' using 1:2 title '%s'" $DISTANCES ${labels[0]} > $GNUPLOT
+printf "set terminal png\n" > $GNUPLOT
+printf "set output '%s'\n" $IMAGE >> $GNUPLOT
+printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
+	$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $GNUPLOT
+printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $GNUPLOT
+printf "set ylabel 'distance to reference [subst./site]'\n" >> $GNUPLOT
+printf "plot '%s' using (\$1+($SLICE_WIDTH/2)):2 with lines title '%s'" $DISTANCES ${labels[0]} >> $GNUPLOT
 for i in $(seq 1 ${#labels[*]}); do
-	printf ", '' using 1:%d title '%s'" $((i+1)) ${labels[$((i-1))]}
-done > $GNUPLOT
+	printf ", '' using (\$1+($SLICE_WIDTH/2)):%d with lines title '%s'" $((i+1)) ${labels[$((i-1))]}
+done >> $GNUPLOT
 
-
+gnuplot $GNUPLOT
