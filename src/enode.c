@@ -54,19 +54,21 @@ struct enode *create_enode_func(int type)
 	return create_enode(type, NULL, NULL, 0);
 }
 
+/* Design note: evaluating an enode sometimes requires calling a function on an
+ * rnode (tree node). There are two ways of doing this (at least): pass the
+ * rnode as an argument to eval_enode(), or use a "global" variable. The first
+ * style would involve carrying around an argument that is not always required
+ * (for all enodes that do not depend on an rnode), but the second style is
+ * somewhat dangerous becaue globals are ingerently dangerous. I chose the
+ * second style, but making the variable static and using a function
+ * (enode_eval_set_current_rnode()) to set it: this should avoid unwanted write
+ * accesses. */
+
 void enode_eval_set_current_rnode(struct rnode *tree_node)
 {
 	current_tree_node = tree_node;
 }
 
-/* Design note: evaluating an enode sometimes requires calling a function on an
- * rnode (tree node). There are two ways of doing this (at least): pass the
- * rnode as an argument to eval_enode(), or use "global" variable. The first
- * style would involve carrying around an argument that is not always required
- * (for all enodes that do not depend on an rnode), but the second style is
- * somewhat dangerous becaue globals are ingerently dangerous. I chose the
- * second style, but making the variable static and using a function to set it:
- * this should avoid unwanted write accesses. */
 
 /* Design note: the handling of errors is a bit rough: in case an enode of
  * unknown type is found, the function calls exit(). But passing a wrong type

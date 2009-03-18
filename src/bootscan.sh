@@ -30,6 +30,7 @@ declare -ri BOOTSTRAPS=10
 
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
 declare -r DISTANCES=$INPUT_FILE.dist
+declare -r TOP_DIST=$INPUT_FILE.top.dist
 declare -r GNUPLOT=$INPUT_FILE.gplot
 declare -r IMAGE=$INPUT_FILE.png
 
@@ -83,6 +84,7 @@ done
 # use the first slice, but we could use any of them.
 
 labels=($(nw_clade -s ${MUSCLE_OUT}_slice_1-*.rr.nw $OUTGROUP | nw_labels -I -))
+nb_labels=${#labels[*]}
 
 # This prints the distance from the reference to all labels in the list, for
 # each position. At the end of the loop, the header column is removed, and the
@@ -109,8 +111,25 @@ printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
 printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $GNUPLOT
 printf "set ylabel 'distance to reference [subst./site]'\n" >> $GNUPLOT
 printf "plot '%s' using (\$1+($SLICE_WIDTH/2)):2 with lines title '%s'" $DISTANCES ${labels[0]} >> $GNUPLOT
-for i in $(seq 1 ${#labels[*]}); do
+for i in $(seq 1 $nb_labels); do
 	printf ", '' using (\$1+($SLICE_WIDTH/2)):%d with lines title '%s'" $((i+1)) ${labels[$((i-1))]}
 done >> $GNUPLOT
 
 gnuplot $GNUPLOT
+
+
+# Topological bootscanning
+
+# Get index of reference in list of labels
+ref_ndx=$(echo ${labels[*]} | tr ' ' "\n" | awk -vref=$REFERENCE '$1 == ref {print NR}')
+
+echo "Generating Topological distances file"
+
+for i in $(seq $nb_labels); do
+	# use i-1 for the index of a label in the $labels array (start at 0)
+	# use i+1 for the corresponding column in the distances file (start at 2)
+	[[ $ref_ndx = $i ]] && continue	# Skip reference
+	printf "# column %d - %s\n" $((i+1)) ${labels[$((i-1))]}
+	awk "\$$i < 0.15 {printf \"%s\t%d\n\", \$1, $i}" < $DISTANCES
+	printf "\n"
+done > $TOP_DIST

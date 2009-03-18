@@ -133,7 +133,7 @@ void destroy_tree(struct rooted_tree *tree, int free_node_data)
 {
 	struct list_elem *e;
 
-	/* Traversing in parse order ensures that children list's data are
+	/* Traversing in post-order ensures that children list's data are
 	 * already empty when we destroy the list (since the lists contain
 	 * children edges) */
 	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
@@ -145,7 +145,7 @@ void destroy_tree(struct rooted_tree *tree, int free_node_data)
 		/* only works if data can be free()d, i.e. has no pointer to
 		 * allocated storage. Otherwise free the data "manually". */
 		if (free_node_data)
-			free(current->data);	
+			free(current->data);
 		free(current);
 	}
 

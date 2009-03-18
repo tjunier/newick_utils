@@ -1,3 +1,5 @@
+nw_ed: nw_ed -n data/catarrhini i d segfaults
+
 nw_display: SVG ortho, align middle of label, rather than bottom, to branch.
 Try with some SVG property.
 
