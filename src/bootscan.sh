@@ -55,20 +55,37 @@ reroot_trees()
 	done
 }
 
-# This function prints the distance from the reference to all labels in the list, for
-# each position. At the end of the loop, the header column is removed, and the
-# lines are sorted by position.
+# This extract the following data
+# - a list of all labels, taken from the first slice
+# - the number of labels
+# - the index of the reference in the list of labels
+# - the list of all labels _except_ the reference
+
+label_data()
+{
+	labels=($(nw_clade -s ${MUSCLE_OUT}_slice_1-*.rr.nw $OUTGROUP | nw_labels -I -))
+	nb_labels=${#labels[*]}
+	# This gives the index of the reference in the list of labels (starting at 1)
+	ref_ndx=$(echo ${labels[*]} | tr ' ' "\n" | awk -vref=$REFERENCE '$1 == ref {print NR}')
+	labels_noref=($(echo ${labels[*]} | tr ' ' "\n" | grep -v $REFERENCE))
+}
+
+# This function prints the distance from the reference to all labels in the
+# list, for each position. At the end of the loop, the header column and
+# reference column are removed, and the lines are sorted by position.
 
 extract_distances()
 {
+	# The reference column will be 1+reference index (after the line header is removed)
+	ref_col=$((ref_ndx+1))	
 	for rooted_tree in ${MUSCLE_OUT}_slice_*.rr.nw ; do 
 		position=${rooted_tree/*_slice_/}
 		position=${position/-*}
 		echo -n "$position	"	# TAB!
 		# We compute a matrix of all-vs-all distances, but only keep the line for
-		# the reference
+		# reference vs. all
 		nw_distance -mm -n $rooted_tree ${labels[*]} | grep $REFERENCE
-	done | cut -f1,3-12 | sort -k1n > $DISTANCES
+	done | cut -f1,3- | cut -f 1-$((ref_col-1)),$((ref_col+1))- | sort -k1n > $DIST_NOREF
 }
 
 plot_classic()
@@ -79,9 +96,9 @@ plot_classic()
 		$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $DIST_GNUPLOT
 	printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $DIST_GNUPLOT
 	printf "set ylabel 'distance to reference [subst./site]'\n" >> $DIST_GNUPLOT
-	printf "plot '%s' using (\$1+(%d/2)):2 with lines title '%s'" $DISTANCES $SLICE_WIDTH ${labels[0]} >> $DIST_GNUPLOT
-	for i in $(seq 1 $nb_labels); do
-		printf ", '' using (\$1+(%d/2)):%d with lines title '%s'" $SLICE_WIDTH $((i+1)) ${labels[$((i-1))]}
+	printf "plot '%s' using (\$1+(%d/2)):2 with lines title '%s'" $DIST_NOREF $SLICE_WIDTH ${labels_noref[0]} >> $DIST_GNUPLOT
+	for i in $(seq 2 $((nb_labels-1))); do
+		printf ", '' using (\$1+(%d/2)):%d with lines title '%s'" $SLICE_WIDTH $((i+1)) ${labels_noref[$((i-1))]}
 	done >> $DIST_GNUPLOT
 
 	gnuplot $DIST_GNUPLOT
@@ -136,7 +153,7 @@ declare -ri BOOTSTRAPS=10
 declare -r R_DISTANCE_THRESHOLD=0.4
 
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
-declare -r DISTANCES=$INPUT_FILE.dist
+declare -r DIST_NOREF=$INPUT_FILE.dist
 declare -r DIST_GNUPLOT=$INPUT_FILE.dist.plt
 declare -r DIST_IMAGE=$INPUT_FILE.dist.png
 declare -r NEIGHBORHOODS=$INPUT_FILE.nbhd
@@ -155,20 +172,13 @@ make_trees
 echo "Rerooting trees on $OUTGROUP"
 reroot_trees
 
-# This creates an array of all labels (minus the outgroup). First we extract
-# the ingroup (nw_clade -s), then we list all leaf labels (nw_labels -I). We
-# use the first slice, but we could use any of them.
-
-labels=($(nw_clade -s ${MUSCLE_OUT}_slice_1-*.rr.nw $OUTGROUP | nw_labels -I -))
-nb_labels=${#labels[*]}
+label_data
 
 echo "Extracting distances for ${labels[*]}"
 extract_distances
 echo "Plotting classic bootscan"
 plot_classic
 
-# Get index of reference in list of labels
-ref_ndx=$(echo ${labels[*]} | tr ' ' "\n" | awk -vref=$REFERENCE '$1 == ref {print NR}')
 
 echo "Generating Neighborhoods file"
 extract_neighborhoods
