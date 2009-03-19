@@ -145,6 +145,14 @@ printf "set terminal png\n" > $NHBD_GNUPLOT
 printf "set output '%s'\n" $NHBD_IMAGE >> $NHBD_GNUPLOT
 printf "set title 'Neighborhood Bootscanning of %s WRT %s, slice size %d nt'\n" \
 	$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $NHBD_GNUPLOT
+printf 'set ytics ("%s" %d' ${labels[0]} 1 >> $NHBD_GNUPLOT
+# Sets the y-axis tics (labels)
+for i in $(seq 2 $nb_labels) ; do
+	# use i-1 for the index of a label in the $labels array (start at 0)
+	# use i+1 for the corresponding column in the distances file (start at 2)
+	printf ', "%s" %d' ${labels[$((i-1))]} $i >> $NHBD_GNUPLOT
+done
+printf ")\n" >> $NHBD_GNUPLOT
 printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $NHBD_GNUPLOT
 printf "set ylabel 'neighbors at less than %g relative distance'\n" $R_DISTANCE_THRESHOLD >> $NHBD_GNUPLOT
 printf "plot [][0:%d] '%s'" $((nb_labels+1)) $NEIGHBORHOODS >> $NHBD_GNUPLOT
