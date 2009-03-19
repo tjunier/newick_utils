@@ -56,14 +56,16 @@ reroot_trees()
 }
 
 # This extract the following data
-# - a list of all labels, taken from the first slice
+# - a list of all labels, taken from the most frequent topology (this has some
+# influence on the layout of the neighborhood bootscan)
 # - the number of labels
 # - the index of the reference in the list of labels
 # - the list of all labels _except_ the reference
 
 label_data()
 {
-	labels=($(nw_clade -s ${MUSCLE_OUT}_slice_1-*.rr.nw $OUTGROUP | nw_labels -I -))
+	modal_topology=$(cat ${MUSCLE_OUT}_slice*.rr.nw | nw_topology -I - | nw_order - | sort | uniq -c | sort -nr | head -1 | sed 's/[0-9]\+//')
+	labels=($(echo $modal_topology | nw_clade -s - $OUTGROUP | nw_labels -I -))
 	nb_labels=${#labels[*]}
 	# This gives the index of the reference in the list of labels (starting at 1)
 	ref_ndx=$(echo ${labels[*]} | tr ' ' "\n" | awk -vref=$REFERENCE '$1 == ref {print NR}')
