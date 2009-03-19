@@ -74,7 +74,7 @@ label_data()
 # list, for each position. At the end of the loop, the header column and
 # reference column are removed, and the lines are sorted by position.
 
-extract_distances()
+extract_distances_noref()
 {
 	# The reference column will be 1+reference index (after the line header is removed)
 	ref_col=$((ref_ndx+1))	
@@ -104,6 +104,22 @@ plot_classic()
 	gnuplot $DIST_GNUPLOT
 }
 
+# This function is similar to extract_distances_noref(), but it does NOT remove
+# the reference (so we do not need to correct for the missing reference when we
+# loop over all columns).
+
+extract_distances()
+{
+	for rooted_tree in ${MUSCLE_OUT}_slice_*.rr.nw ; do 
+		position=${rooted_tree/*_slice_/}
+		position=${position/-*}
+		echo -n "$position	"	# TAB!
+		# We compute a matrix of all-vs-all distances, but only keep the line for
+		# reference vs. all
+		nw_distance -mm -n $rooted_tree ${labels[*]} | grep $REFERENCE
+	done | cut -f1,3- | sort -k1n > $DIST_WREF
+}
+
 extract_neighborhoods()
 {
 	for i in $(seq $nb_labels); do
@@ -111,11 +127,10 @@ extract_neighborhoods()
 		# use i+1 for the corresponding column in the distances file (start at 2)
 		[[ $ref_ndx = $i ]] && continue	# Skip reference
 		printf "# column %d - %s\n" $((i+1)) ${labels[$((i-1))]}
-		# awk "\$$i < $R_DISTANCE_THRESHOLD {printf \"%s\t%d\n\", \$1, $i}" < $DISTANCES
 		awk -vsz=$SLICE_WIDTH \
 			-vt=$R_DISTANCE_THRESHOLD \
 			-vcol=$((i+1)) \
-			'{min=$2; max=$2; for (i=3; i<=NF; i++) { if ($i > max) max = $i; if ($i < min) min = $i; }; if (($col-min)/(max-min) <= t) { print $1+sz/2, col-1;}}' < $DISTANCES
+			'{min=$2; max=$2; for (i=3; i<=NF; i++) { if ($i > max) max = $i; if ($i < min) min = $i; }; if (($col-min)/(max-min) <= t) { print $1+sz/2, col-1;}}' < $DIST_WREF
 		printf "\n"
 	done > $NEIGHBORHOODS
 }
@@ -153,7 +168,8 @@ declare -ri BOOTSTRAPS=10
 declare -r R_DISTANCE_THRESHOLD=0.4
 
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
-declare -r DIST_NOREF=$INPUT_FILE.dist
+declare -r DIST_NOREF=$INPUT_FILE.nrdist
+declare -r DIST_WREF=$INPUT_FILE.dist
 declare -r DIST_GNUPLOT=$INPUT_FILE.dist.plt
 declare -r DIST_IMAGE=$INPUT_FILE.dist.png
 declare -r NEIGHBORHOODS=$INPUT_FILE.nbhd
@@ -175,12 +191,13 @@ reroot_trees
 label_data
 
 echo "Extracting distances for ${labels[*]}"
-extract_distances
+extract_distances_noref
 echo "Plotting classic bootscan"
 plot_classic
 
 
 echo "Generating Neighborhoods file"
+extract_distances
 extract_neighborhoods
 echo "Plotting"
 plot_neighborhood
