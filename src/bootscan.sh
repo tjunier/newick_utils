@@ -27,12 +27,15 @@ declare -r REFERENCE=$3
 declare -ri SLICE_WIDTH=300	# residues
 declare -ri SLICE_STEP=50	# slice every SLICE_STEP residues
 declare -ri BOOTSTRAPS=10	
+declare -r R_DISTANCE_THRESHOLD=0.15
 
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
 declare -r DISTANCES=$INPUT_FILE.dist
-declare -r TOP_DIST=$INPUT_FILE.top.dist
-declare -r GNUPLOT=$INPUT_FILE.gplot
-declare -r IMAGE=$INPUT_FILE.png
+declare -r DIST_GNUPLOT=$INPUT_FILE.dist.plt
+declare -r DIST_IMAGE=$INPUT_FILE.dist.png
+declare -r NEIGHBORHOODS=$INPUT_FILE.nbhd
+declare -r NHBD_GNUPLOT=$INPUT_FILE.nbhd.plt
+declare -r NHBD_IMAGE=$INPUT_FILE.nbhd.png
 
 
 # Align sequences
@@ -104,18 +107,18 @@ done | cut -f1,3-12 | sort -k1n > $DISTANCES
 # Generate plot with GNUplot
 
 echo "Plotting"
-printf "set terminal png\n" > $GNUPLOT
-printf "set output '%s'\n" $IMAGE >> $GNUPLOT
+printf "set terminal png\n" > $DIST_GNUPLOT
+printf "set output '%s'\n" $DIST_IMAGE >> $DIST_GNUPLOT
 printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
-	$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $GNUPLOT
-printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $GNUPLOT
-printf "set ylabel 'distance to reference [subst./site]'\n" >> $GNUPLOT
-printf "plot '%s' using (\$1+($SLICE_WIDTH/2)):2 with lines title '%s'" $DISTANCES ${labels[0]} >> $GNUPLOT
+	$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $DIST_GNUPLOT
+printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $DIST_GNUPLOT
+printf "set ylabel 'distance to reference [subst./site]'\n" >> $DIST_GNUPLOT
+printf "plot '%s' using (\$1+($SLICE_WIDTH/2)):2 with lines title '%s'" $DISTANCES ${labels[0]} >> $DIST_GNUPLOT
 for i in $(seq 1 $nb_labels); do
 	printf ", '' using (\$1+($SLICE_WIDTH/2)):%d with lines title '%s'" $((i+1)) ${labels[$((i-1))]}
-done >> $GNUPLOT
+done >> $DIST_GNUPLOT
 
-gnuplot $GNUPLOT
+gnuplot $DIST_GNUPLOT
 
 
 # Topological bootscanning
@@ -130,6 +133,17 @@ for i in $(seq $nb_labels); do
 	# use i+1 for the corresponding column in the distances file (start at 2)
 	[[ $ref_ndx = $i ]] && continue	# Skip reference
 	printf "# column %d - %s\n" $((i+1)) ${labels[$((i-1))]}
-	awk "\$$i < 0.15 {printf \"%s\t%d\n\", \$1, $i}" < $DISTANCES
+	awk "\$$i < $R_DISTANCE_THRESHOLD {printf \"%s\t%d\n\", \$1, $i}" < $DISTANCES
 	printf "\n"
-done > $TOP_DIST
+done > $NEIGHBORHOODS
+
+echo "Plotting"
+printf "set terminal png\n" > $NHBD_GNUPLOT
+printf "set output '%s'\n" $NHBD_IMAGE >> $NHBD_GNUPLOT
+printf "set title 'Neighborhood Bootscanning of %s WRT %s, slice size %d nt'\n" \
+	$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $NHBD_GNUPLOT
+printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $NHBD_GNUPLOT
+printf "set ylabel 'neighbors at less than %g relative distance'\n" $R_DISTANCE_THRESHOLD >> $DIST_GNUPLOT
+printf "plot '$NEIGHBORHOODS'" >> $NHBD_GNUPLOT
+
+gnuplot $NHBD_GNUPLOT
