@@ -304,6 +304,8 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				r = unlink_rnode(current);
 				if (NULL != r) {
 					r->parent_edge = NULL;
+					// TODO: this causes a bug (try
+					// nw_ed data/completely_labeled.nw i d
 					tree->root = r;
 				} 
 				break;
@@ -334,6 +336,19 @@ int main(int argc, char* argv[])
 			printf("%s\n", newick);
 			free(newick);
 		}
+		// TODO: rm debug code
+		struct rnode *node;
+		struct list_elem *e;
+		for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
+			node = e->data;
+			printf ("node %p (%s), p edge: %p", node,
+					node->label, node->parent_edge);
+			if (node->parent_edge)
+				printf (" (%s)", node->parent_edge->parent_node->label);
+			printf ("\n");
+		}
+		fflush(stdout);
+		//
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
