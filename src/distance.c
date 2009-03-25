@@ -62,7 +62,7 @@ void help(char *argv[])
 "    o last common ancestor mode: print distances from the LCA of all nodes\n"
 "      in the selection to all nodes in the selection\n"
 "    o parent mode: print distances from each node in the selection\n"
-"      to its parent (0 for root the root node)\n"
+"      to its parent (0 for the root node)\n"
 "    o matrix mode: print distances from each node in the selection\n"
 "      to each node in the selection\n"
 "Valid selections are:\n"

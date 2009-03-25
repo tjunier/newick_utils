@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "enode.h"
 #include "rnode.h"
@@ -22,12 +23,16 @@ int adsparse();
 enum action { ACTION_DELETE, ACTION_SUBTREE, ACTION_SPLICE_OUT,
 	ACTION_PRINT_LABEL };
 
+enum order { POST_ORDER, PRE_ORDER };
+
 struct enode *expression_root;
 
 struct parameters {
 	char * address;
 	int action;
 	int show_tree;
+	int order;
+	int stop_clade_at_first_match;
 };
 
 void help(char *argv[])
@@ -135,6 +140,12 @@ void help(char *argv[])
 "    -h: print this help text, and exit\n"
 "    -n: do not print the (possibly modified) tree at the end of the run \n"
 "        (modeled after sed -n)\n"
+"    -r: visit tree in preorder (starting at root, and visiting a node\n"
+"        before any of its descendants). Default is post-order (ends at root\n"
+"        and visits a node after all its descendats).\n"
+"    -o: when visiting the tree in preorder, stop processing a clade after\n"
+"        the first match. That is, if a node matches, its descendants are\n"
+"        not processed.\n"
 "\n"
 "Bugs\n"
 "----\n"
@@ -168,15 +179,23 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	params.show_tree = TRUE;
+	params.order = POST_ORDER;
+	params.stop_clade_at_first_match = FALSE;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hn")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hnor")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'n':
 			params.show_tree = FALSE;
+			break;
+		case 'o':
+			params.stop_clade_at_first_match = TRUE;
+			break;
+		case 'r':
+			params.order = PRE_ORDER;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -275,6 +294,7 @@ void parse_order_traversal(struct rooted_tree *tree)
 
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
+	struct llist *nodes;
 	struct list_elem *el;
 	struct rnode *r;
 	char *newick;
@@ -283,8 +303,31 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	reverse_parse_order_traversal(tree);
 	parse_order_traversal(tree);
 
-	for (el = tree->nodes_in_order->head; NULL != el; el = el -> next) {
+	if (POST_ORDER == params.order)
+		nodes = tree->nodes_in_order;
+	else if (PRE_ORDER == params.order)
+		nodes = llist_reverse(tree->nodes_in_order);
+	else 
+		assert(0);	 /* programmer error... */
+
+
+	/* Main loop: Iterate over all nodes */
+	for (el = nodes->head; NULL != el; el = el -> next) {
 		struct rnode *current = (struct rnode *) el->data;
+
+		/* Check for stop mark in parent (see option -o) */
+		if (! is_root(current)) { 	/* root has no parent... */
+			if (((struct rnode_data *)
+				current->parent_edge->parent_node->data)->stop_mark) {
+				/* Stop-mark the current node and continue */ 
+				((struct rnode_data *) current->data)->stop_mark = TRUE;
+				continue;
+			}
+		} 
+
+		/* Set the current node for evaluation, and evaluate the
+		 * expression - if the current node matches, then perform the
+		 * specified action */
 		enode_eval_set_current_rnode(current);
 		if (eval_enode(expression_root)) {
 			switch (params.action) {
@@ -303,7 +346,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			case ACTION_DELETE:
 				r = unlink_rnode(current);
 				if (NULL != r) {
-					r->parent_edge = NULL;
+					r->parent_edge->parent_node = NULL;
 					// TODO: this causes a bug (try
 					// nw_ed data/completely_labeled.nw i d
 					tree->root = r;
@@ -316,8 +359,19 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				"Unknown action %d.\n", params.action);
 				 exit(EXIT_FAILURE);
 			}
-		}	
+
+			/* If -o switch is set, we stop processing this clade
+			 * since this node matches -  we set the stop mark on
+			 * this node */
+			if (params.stop_clade_at_first_match)
+				((struct rnode_data *) current->data)->stop_mark = TRUE;
+		} /* matching node */	
 	}
+
+	/* If order is PRE_ORDER, the list of nodes is an inverted copy, so we
+	 * need to free it. */
+	if (PRE_ORDER == params.order)
+		destroy_llist(nodes);
 }
 
 int main(int argc, char* argv[])
@@ -336,19 +390,6 @@ int main(int argc, char* argv[])
 			printf("%s\n", newick);
 			free(newick);
 		}
-		// TODO: rm debug code
-		struct rnode *node;
-		struct list_elem *e;
-		for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
-			node = e->data;
-			printf ("node %p (%s), p edge: %p", node,
-					node->label, node->parent_edge);
-			if (node->parent_edge)
-				printf (" (%s)", node->parent_edge->parent_node->label);
-			printf ("\n");
-		}
-		fflush(stdout);
-		//
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
 

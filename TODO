@@ -1,4 +1,5 @@
-nw_ed: nw_ed -n data/catarrhini i d segfaults
+
+[dropped] nw_ed: nw_ed data/catarrhini 'i & a > 2' s doesn't work properly -- WRONG, it works allright.
 
 nw_display: SVG ortho, align middle of label, rather than bottom, to branch.
 Try with some SVG property.
@@ -222,4 +223,6 @@ descendents).
 [dropped] test procedure: test program should FAIL if it segfaults
 (obviously...) - In fact I could not reproduce a case when it does not fail, so
 I'll leave this out for now.
+
+[done] nw_ed: nw_ed -n data/catarrhini i d segfaults
 

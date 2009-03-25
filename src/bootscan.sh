@@ -3,11 +3,33 @@
 # Thomas Junier, 2009
 
 # bootscan.sh - an example of bootscanning using the Newick Utilities in
-# cooperation with other command-line bioinformatics tools. Requires Muscle
-# [1], EMBOSS [2], and PhyML [3], GNUPlot [5]; as well as the GNU core
-# utilities [4] (which you probably already have if you're running Linux). The
-# PATH should be set so that these programs are found, as the script cannot use
-# absolute pathnames (for portability).
+# cooperation with other command-line bioinformatics tools.
+
+# The purpose of the program is to find recombination breakpoints in a sequence
+# (hereafter called the 'reference') by compring it to related sequences over
+# an alignment. If the reference's nearest neighbor changes, then there is
+# evidence of recombination.
+
+# The program takes a multiple sequence file (FastA, unaligned), the ID of the
+# outgroup, and the ID of the reference. Then i) it aligns the sequences; ii)
+# it slices the alignments into windows ('slices'); iii) it computes a tree for
+# each window. Then it makes two plots:
+
+# In the first plot, the distance (along the tree branches) between the
+# reference and all other sequences is plotted against alignment position. This
+# is similar to the classical bootscan, which plotted percent identity. If the
+# sequence with smallest distance changes drastically, you may have a
+# breakpoint.
+
+# The second plot shows which sequences are in a neighborhood of the reference,
+# where neighborhood is defined as a distance threshold (currently, 40% of the
+# difference between the most distant and closest sequences). If the set of
+# neighbors changes drastically, you may have a breakpoint.
+
+# Requires Muscle [1], EMBOSS [2], and PhyML [3], GNUPlot [5]; as
+# well as the GNU core utilities [4] (which you probably already have if you're
+# running Linux). The PATH should be set so that these programs are found, as
+# the script cannot use absolute pathnames (for portability).
 
 # Will create files (alignment, trees, etc) in the directory in which the input
 # file is found.
@@ -92,7 +114,7 @@ extract_distances_noref()
 
 plot_classic()
 {
-	printf "set terminal png\n" > $DIST_GNUPLOT
+	printf "set terminal png size 700, 450\n" > $DIST_GNUPLOT
 	printf "set output '%s'\n" $DIST_IMAGE >> $DIST_GNUPLOT
 	printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
 		$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $DIST_GNUPLOT
@@ -139,7 +161,7 @@ extract_neighborhoods()
 
 plot_neighborhood()
 {
-	printf "set terminal png\n" > $NHBD_GNUPLOT
+	printf "set terminal png size 700, 450\n" > $NHBD_GNUPLOT
 	printf "set output '%s'\n" $NHBD_IMAGE >> $NHBD_GNUPLOT
 	printf "set title 'Neighborhood Bootscanning of %s WRT %s, slice size %d nt'\n" \
 		$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $NHBD_GNUPLOT
@@ -160,6 +182,11 @@ plot_neighborhood()
 
 ################################################################
 # Parameters
+
+if [ $# != 3 ] ; then
+	echo "Usage: $0 <alignment> <outgroup ID> <reference ID>" >&2
+	exit 1
+fi
 
 declare -r INPUT_FILE=$1
 declare -r OUTGROUP=$2

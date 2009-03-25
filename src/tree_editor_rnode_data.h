@@ -8,5 +8,6 @@ struct rnode_data {
 	float support;	/* normally derived from label */
 	float depth;	/* from root; normally root's depth == 0 */
 	int nb_ancestors;	/* root has 0 */
-	int mark;	/* allows arbitrary marking of nodes */
+	int stop_mark;	/* to stop processing of a clade, see option -o */
+	int mark;	/* allows arbitrary marking of nodes */ // TODO: used?
 };
