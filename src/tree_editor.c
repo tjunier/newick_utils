@@ -143,9 +143,10 @@ void help(char *argv[])
 "    -r: visit tree in preorder (starting at root, and visiting a node\n"
 "        before any of its descendants). Default is post-order (ends at root\n"
 "        and visits a node after all its descendats).\n"
-"    -o: when visiting the tree in preorder, stop processing a clade after\n"
-"        the first match. That is, if a node matches, its descendants are\n"
-"        not processed.\n"
+"    -o: stop processing a clade after the first match - that is, if a node\n"
+"        matches, its descendants are not processed.\n"
+"        Note: this option will automatically set -r, as it makes no\n"
+"        sense in post-order.\n"
 "\n"
 "Bugs\n"
 "----\n"
@@ -165,7 +166,13 @@ void help(char *argv[])
 "# are directly attached to the ingroup's root. This effectively keeps only\n"
 "# leaves that are part of well-supported clades.\n"
 "\n"
-"%s data/big.rn.nw 'i & b < 750' o | %s - 'l & a == 2' d\n",
+"%s data/big.rn.nw 'i & b < 750' o | %s - 'l & a == 2' d\n"
+"\n"
+"# get all clades with at least one ancestor, 980 or better support. Do not\n"
+"# print subtrees of matching clades, even if they match (option -o)\n"
+"\n"
+"%s data/big.rn.nw -n -o 'a >= 1 & b >= 980' s\n",
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
@@ -193,6 +200,7 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'o':
 			params.stop_clade_at_first_match = TRUE;
+			params.order = PRE_ORDER;
 			break;
 		case 'r':
 			params.order = PRE_ORDER;
@@ -318,9 +326,10 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		/* Check for stop mark in parent (see option -o) */
 		if (! is_root(current)) { 	/* root has no parent... */
 			if (((struct rnode_data *)
-				current->parent_edge->parent_node->data)->stop_mark) {
+			current->parent_edge->parent_node->data)->stop_mark) {
 				/* Stop-mark the current node and continue */ 
-				((struct rnode_data *) current->data)->stop_mark = TRUE;
+				((struct rnode_data *)
+				current->data)->stop_mark = TRUE;
 				continue;
 			}
 		} 

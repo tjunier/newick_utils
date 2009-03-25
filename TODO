@@ -1,3 +1,4 @@
+nw_ed: ./src/nw_ed data/HRV.bs.nw 'b < 10' d segfaults
 
 [dropped] nw_ed: nw_ed data/catarrhini 'i & a > 2' s doesn't work properly -- WRONG, it works allright.
 
