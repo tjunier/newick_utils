@@ -1,5 +1,3 @@
-nw_ed: ./src/nw_ed data/HRV.bs.nw 'b < 10' d segfaults
-
 [dropped] nw_ed: nw_ed data/catarrhini 'i & a > 2' s doesn't work properly -- WRONG, it works allright.
 
 nw_display: SVG ortho, align middle of label, rather than bottom, to branch.
@@ -226,4 +224,6 @@ descendents).
 I'll leave this out for now.
 
 [done] nw_ed: nw_ed -n data/catarrhini i d segfaults
+
+[done] nw_ed: ./src/nw_ed data/HRV.bs.nw 'b < 10' d segfaults
 

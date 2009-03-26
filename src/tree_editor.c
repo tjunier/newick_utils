@@ -248,7 +248,9 @@ struct parameters get_params(int argc, char *argv[])
 
 /* This allocates the rnode_data structure for each node, and fills it with
  * "top-down" data,  i.e. data for which the parent's value needs to be known
- * (such as depth and number of ancestors). */
+ * (such as depth and number of ancestors). Some values do not depend on the
+ * parent nor on the children, I also set them here (this is arbitrary, I
+ * could set them in parse_order_traversal() below as well). */
 
 void reverse_parse_order_traversal(struct rooted_tree *tree)
 {
@@ -263,7 +265,11 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 	if (NULL == rndata) { perror(NULL); exit (EXIT_FAILURE); }
 	rndata->nb_ancestors = 0;
 	rndata->depth = 0;
+	rndata->stop_mark = FALSE;
 	node->data = rndata;
+
+	/* WARNING: don't forget to set values for the root's data, above. The
+	 * following loop starts at the first non-root node! */
 
 	for (el = rev_nodes->head->next; NULL != el; el = el -> next) {
 		node = (struct rnode *) el->data;
@@ -275,6 +281,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 		rndata->depth = parent_data->depth +
 			atof(node->parent_edge->length_as_string);
 
+		rndata->stop_mark = FALSE;
 		node->data = rndata;
 	}
 
