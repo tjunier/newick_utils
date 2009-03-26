@@ -1,3 +1,5 @@
+nw_ed: valgrind nw_ed data/catarrhini 'i & b < 10' d
+
 [dropped] nw_ed: nw_ed data/catarrhini 'i & a > 2' s doesn't work properly -- WRONG, it works allright.
 
 nw_display: SVG ortho, align middle of label, rather than bottom, to branch.
