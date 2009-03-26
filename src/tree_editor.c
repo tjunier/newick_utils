@@ -354,7 +354,9 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				break;
 			case ACTION_DELETE:
 				if (is_root(current)) {
-					// TODO: warn and skip
+					fprintf (stderr, "Warning: tried to delete root\n");
+					continue;	/* next node */
+
 				}
 				r = unlink_rnode(current);
 				if (NULL != r) {
