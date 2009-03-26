@@ -353,11 +353,12 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				}
 				break;
 			case ACTION_DELETE:
+				if (is_root(current)) {
+					// TODO: warn and skip
+				}
 				r = unlink_rnode(current);
 				if (NULL != r) {
 					r->parent_edge->parent_node = NULL;
-					// TODO: this causes a bug (try
-					// nw_ed data/completely_labeled.nw i d
 					tree->root = r;
 				} 
 				break;
