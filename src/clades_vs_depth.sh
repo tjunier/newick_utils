@@ -1,14 +1,13 @@
 #!/bin/bash
 
-# plateau.sh - computes the 'plateau function' for a phylogram. By 'plateau
-# function' I mean the number of clades as a function of tree depth.
+# clades_vs_depth.sh - plots the number of clades as a function of depth.
 
 shopt -s -o nounset
 
 declare -ri STEPS=10
 
 declare -r TREE=$1
-declare -r DATA=$1.plateau
+declare -r DATA=$1.cvd
 declare -r PLOT=$1.plt
 declare -r GRAPHICS=$1.png
 

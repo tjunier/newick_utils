@@ -1,4 +1,6 @@
-nw_ed: valgrind nw_ed data/catarrhini 'i & b < 10' d
+nw_topol: add a function for making a tree clocklike (ultrametric)
+
+nw_ed: valgrind nw_ed -no data/catarrhini 'i & b < 10' d
 
 [dropped] nw_ed: nw_ed data/catarrhini 'i & a > 2' s doesn't work properly -- WRONG, it works allright.
 
