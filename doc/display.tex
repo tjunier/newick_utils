@@ -20,7 +20,7 @@ You can use option \texttt{-w} (``width'') to set the number of columns availabl
 \verbatiminput{dspl2_txt.cmd}
 \verbatiminput{dspl2_txt.out}
 
-\subsection{As \svg}
+\subsection{As Scalable Vector Graphics (SVG)}
 \label{sct_display_svg}
 
 First, a disclaimer: there are dozens of tools for viewing trees out there, and I'm not interested in competing with them. The reason why I added \svg{} capabilities were:
@@ -28,8 +28,11 @@ First, a disclaimer: there are dozens of tools for viewing trees out there, and 
  \item I wanted to be able to produce reasonable graphics even if no other tool was at hand
  \item I wanted to be sure that large trees could be rendered\footnote{I have had serious problems visualising trees of more than 1,000 leaves using some popular software I will not name here - either it was painfully slow, or it simply crashed} 
 \end{itemize}
-The \svg{} is designed to be easy to edit in an interactive editor like
-Inkscape: the tree edges are in one group, and the text in another. So it is easy to change the line properties of the edges, or the font family of the text, for example (you can also do this from \display{} using a \css{} map, see \ref{sct_display_svg_css}).
+The \svg{} produced by \display{} is designed to be easy to edit in an
+interactive editor like Inkscape: the tree edges are in one group, and the text
+in another. So it is easy to change the line properties of the edges, or the
+font family of the text, for example (you can also do this from \display{}
+using a \css{} map, see \ref{sct_display_svg_css}).
 
 To produce \svg, pass option \texttt{-s}:
 \begin{verbatim}
@@ -45,6 +48,8 @@ $ inkscape -f catarrhini.svg -A catarrhini.pdf
 \begin{center}
  \includegraphics{dspl_svg1_svg.pdf}
 \end{center}
+
+All \svg{} images shown in this document were produced in the same way, although from now on we will generally omit the \svg{} to \textsc{pdf} conversion step.
 
 There are many options for \svg{} graphs.First, you can make radial trees, using option \texttt{-r} (from now on I will skip the redirection into an \svg{} file):
 
