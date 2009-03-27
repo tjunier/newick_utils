@@ -289,6 +289,8 @@ void set_svg_parameters(struct parameters params)
 {
 	set_svg_width(params.width);
 	set_svg_leaf_vskip(params.leaf_vskip);
+	// TODO: not sure if this should be parameterized. If so, add an
+	// option; if not, use a constant and get rid of the setter.
 	set_svg_whole_v_shift(20);	/* pixels */
 	set_svg_label_angle_correction(params.label_angle_correction);
 	set_svg_left_label_angle_correction(params.left_label_angle_correction);

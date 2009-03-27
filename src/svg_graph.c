@@ -593,10 +593,9 @@ void draw_scale_bar(int hpos, double vpos,
 	printf ("<g transform='translate(%d,%g)'>", hpos, vpos); 
 
 	if (2 * pot > d_max) {
-		/* print 1/10th tick marks */
-		printf ("<path style='stroke:black' d='M 0 %d l 0 %d "
-		       "l %g 0 l 0 %d'/>", vsep, big_tick_height, scale_length,
-		       -big_tick_height);
+		/* print base line and 1/10th tick marks */
+		printf ("<path style='stroke:black' d='M 0 0 h %g'/>",
+				scale_length);
 		int i;
 		for (i = 1; i < 10; i++)
 			printf ("<path d='M %g %d l 0 %d'/>",
@@ -621,7 +620,8 @@ void draw_scale_bar(int hpos, double vpos,
 		
 		/* Print base line and tick marks */
 		printf ("<g style='stroke:black;stroke-linecap:round'>");
-		printf ("<path d='M 0 0 h %g'/>", multiples * scale_length);
+		printf ("<path style='stroke:black' d='M 0 0 h %g'/>",
+				multiples * scale_length);
 		int i;
 		for (i = 0; i <= multiples; i++) {
 			printf ("<path style='stroke:black' d='M %g 0 v %d'/>",

@@ -170,10 +170,11 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	/* ... likewise for text */
 	draw_text_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
 	/* Draw scale bar if required */
-	double scalebar_vpos = (double)
-		graph_height(leaf_count(tree), with_scale_bar) - svg_whole_v_shift;
-	if (with_scale_bar)
+	if (with_scale_bar) {
+		double scalebar_vpos = (double) graph_height(leaf_count(tree),
+				with_scale_bar) - svg_whole_v_shift;
 		draw_scale_bar(ROOT_SPACE, scalebar_vpos, h_scale, hd.d_max,
 			branch_length_unit);
+	}
 	printf ("</g>");
 }

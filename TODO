@@ -1,3 +1,5 @@
+nw_display: scale bar is sometimes off the chart, try e.g. nw_display -s ../data/simiiformes_wrong_rr.nw
+
 all: replace 'parse order' by post-order
 
 nw_topol: add a function for making a tree clocklike (ultrametric)
