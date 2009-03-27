@@ -597,19 +597,19 @@ void draw_scale_bar(int hpos, double vpos,
 		printf ("<path style='stroke:black' d='M 0 0 h %g'/>",
 				scale_length);
 		int i;
-		for (i = 1; i < 10; i++)
-			printf ("<path d='M %g %d l 0 %d'/>",
-				i * (scale_length/10), 
-				vsep + big_tick_height - small_tick_height,
-				small_tick_height);
+		for (i = 0; i <= 10; i++)
+			printf ("<path style='stroke:black' d='M %g 0 v %d'/>",
+				i * (scale_length/10), -big_tick_height);
+		/* print 0, middle, and end labels */
 		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:start' x='0' y='0'>0</text>");
+			"text-anchor:start' x='0' y='%d'>0</text>",
+			-big_tick_height -lbl_vspace);
 		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:end' x='%g' y='0'>%g</text>",
-			scale_length, pot);
+			"text-anchor:end' x='%g' y='%d'>%g</text>",
+			scale_length, -big_tick_height - lbl_vspace, pot);
 		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:end' x='%g' y='0'>%g</text>",
-			scale_length/2, pot/2);
+			"text-anchor:end' x='%g' y='%d'>%g</text>",
+			scale_length/2, -big_tick_height - lbl_vspace, pot/2);
 	} else {
 		/* Print as many multiples of 'scale_length' as  will fit */
 
