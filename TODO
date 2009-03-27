@@ -1,21 +1,21 @@
+all: replace 'parse order' by post-order
+
 nw_topol: add a function for making a tree clocklike (ultrametric)
 
 nw_ed: valgrind nw_ed -no data/catarrhini 'i & b < 10' d
 
 [dropped] nw_ed: nw_ed data/catarrhini 'i & a > 2' s doesn't work properly -- WRONG, it works allright.
 
-nw_display: SVG ortho, align middle of label, rather than bottom, to branch.
+[partly done] nw_display: SVG ortho, align middle of label, rather than bottom, to branch.
 Try with some SVG property.
 
-nw_prune: reomve complement (i.e., keep specified nodes and prune the rest);  allow selection of a branch ba its LCA.
-
-nw_ed: make test for action 'l' (print label)
+nw_prune: reomve complement (i.e., keep specified nodes and prune the rest);  allow selection of a branch by its LCA.
 
 nw_display: craft test tree for numeric verification of lengths and positions
 
 nw_display: use CSS in scale bar
 
-nw_display: add scale bar to SVG radial -- in progress, but scale is too compressed in radial trees -- try with catarrhini.
+[partly done] nw_display: add scale bar to SVG radial -- in progress, but scale is too compressed in radial trees -- try with catarrhini.
 
 nw_display: add scale bar to text display
 
@@ -231,3 +231,4 @@ I'll leave this out for now.
 
 [done] nw_ed: ./src/nw_ed data/HRV.bs.nw 'b < 10' d segfaults
 
+[done] nw_ed: make test for action 'l' (print label)

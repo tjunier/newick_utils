@@ -4,3 +4,4 @@ ib_o:HRV.bs.nw 'i & b < 11' o
 top:top.nw i o
 nr_1s:-n -r catarrhini.nw '1 == 1' s
 no:-no catarrhini.nw 'd > 10' s
+n_l:-n catarrhini.nw '1 == 1' l

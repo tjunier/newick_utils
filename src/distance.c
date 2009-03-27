@@ -346,7 +346,7 @@ void print_distance_list (struct rnode *origin,
  * there is a better way, akin to dynamic programming (heck, maybe it *is*
  * dynamic programming): one can fill a table of LCAs in the following way:
  *
- * 1. for each inner node, in parse order:
+ * 1. for each inner node, in post-order:
  * 	1.1. store its leftmost and rightmost descendants's labels (leftmost
  * 	descendant is leftmost descendant of its left child, rightmost
  * 	descendant is rightmost descendant of its right child)
@@ -358,7 +358,7 @@ void print_distance_list (struct rnode *origin,
  * 	in the lower-left triangle): these cells are set to the same value,
  * 	UNLESS they are already set.
  *
- * Of course this only works if the matrix is ordered in parse order too.
+ * Of course this only works if the matrix is ordered in post-order too.
  * Moreover it only works when seeking the LCA of two leaves, but if one of the
  * descendants whose LCA we seek is an inner node, one can always fetch its
  * leftmost (or rightmost) descendant from the tree, and use this to get the
