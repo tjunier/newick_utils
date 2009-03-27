@@ -1,0 +1,2 @@
+nw_display -s -v 20 -b 'opacity:0' -i 'font-size:8' \
+	-l 'font-family:serif;font-style:italic' vertebrates.nw
