@@ -1,5 +1,5 @@
 
-\chapter{Introduction}
+\chapter*{Introduction}
 
 The \nutils{} are a set of \unix{} shell programs for working with Newick-formatted phylogenetic trees. Their main features are:
 \begin{itemize}
@@ -8,7 +8,11 @@ The \nutils{} are a set of \unix{} shell programs for working with Newick-format
  \item they perform reasonably well with large trees
  \item they are implemented as filters
 \end{itemize}
-They are not tools for \emph{making} phylogenies. Rather, they are for working with existing ones, by which I mean manipulating the tree or extracting information from it: rerooting, simplifying, extracting subtrees, printing branch lengths and distances, etc - a glance at the table of contents of this document should give you an idea.
+They are not tools for \emph{making} phylogenies. Rather, they are for working
+with existing ones, by which I mean manipulating the tree or extracting
+information from it: rerooting, simplifying, extracting subtrees, printing
+branch lengths and distances, etc - a glance at the table of contents of this
+document should give you an idea; see also table \ref{tbl_prog_list}.
 
 Each of the programs performs one task (with some variants). For example, here is how you would reroot a series of phylograms contained in file \texttt{mytrees.nw} using node \texttt{Dmelano} as outgroup:
 
@@ -23,3 +27,25 @@ As you can see, it is straightforward to pipe \nutils{} together, and of course 
 
 This document is organized as follows: chapter \ref{chap_general} discusses common features of the \nutils, chapter \ref{chap_simple} shows examples of simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks. 
 
+\begin{table}[b]
+\begin{tabular}{ll}
+{\bf Program} & {\bf Function } \\
+\hline
+\clade	&	Extracts subtrees defined by labels\\
+\condense	&	Condenses (simplifies) trees \\
+\display	&	Shows trees as graphs (\ascii{} art or \svg) \\
+\distance	&	Prints distances between nodes, in various ways \\
+\ed	&	Stream editor (\textit{\`{a} la} \texttt{sed} or \texttt{awk}) \\
+\gen	&	Random tree generator \\
+\labels	&	Prints node labels \\
+\match	&	Finds matches of a tree in another one \\
+\nwindent	&	Shows Newick in indented form \\ 
+\order	&	Orders tree (preserving topology) \\
+\prune	&	Removes branches based on labels \\ 
+\reroot	&	(Re)roots the tree \\
+\support	&	Computes bootstrap support of a tree given replicate trees \\
+\topology & Alters branch properties, preserving topology
+\end{tabular}	
+\caption{The \nutils{} and their functions}
+\label{tbl_prog_list}
+\end{table}
