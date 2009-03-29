@@ -1,4 +1,4 @@
-nw_display: scale bar is sometimes off the chart, try e.g. nw_display -s ../data/simiiformes_wrong_rr.nw
+all: review help pages (-h)
 
 all: replace 'parse order' by post-order
 
@@ -234,3 +234,5 @@ I'll leave this out for now.
 [done] nw_ed: ./src/nw_ed data/HRV.bs.nw 'b < 10' d segfaults
 
 [done] nw_ed: make test for action 'l' (print label)
+
+[done] nw_display: scale bar is sometimes off the chart, try e.g. nw_display -s ../data/simiiformes_wrong_rr.nw
