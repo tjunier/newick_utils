@@ -1,2 +1,3 @@
 simple:HRV.nw HRV_20reps.nw 
 percent:-p HRV.nw HRV_20reps.nw 
+multi: 3_HRV.nw HRV_20reps.nw

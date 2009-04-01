@@ -339,18 +339,17 @@ int main(int argc, char *argv[])
 
 	if (! params.use_percent) { rep_count = 0; }
 
-	/* Attribute counts to the target tree */
+	/* Attribute counts to the target trees */
 	nwsin = params.target_tree_file;
-	tree = parse_tree();
-	attribute_support_to_target_tree(tree, rep_count);
+	while ((tree = parse_tree()) != NULL) {
+		attribute_support_to_target_tree(tree, rep_count);
+		char *newick = to_newick(tree->root);
+		printf ("%s\n", newick);
+		free(newick);
+		if (params.show_label_numbers) show_label_numbers();
+		destroy_tree(tree, FREE_NODE_DATA);
+	}
 
-	char *newick = to_newick(tree->root);
-	printf ("%s\n", newick);
-	free(newick);
-
-	if (params.show_label_numbers) show_label_numbers();
-
-	destroy_tree(tree, FREE_NODE_DATA);
 	fclose(params.target_tree_file);
 	fclose(params.rep_trees_file);
 

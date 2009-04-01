@@ -139,6 +139,24 @@ ornament map is specified with option \texttt{-o}:
  \includegraphics{nw_display_sr_w450_oornmap_ccssmap_catarrhini_svg.pdf}
 \end{center}
 
+\subsubsection{Multiple \svg{} Trees}
+
+Like all \nutils, \display{} can handle multiple trees, even in \svg{} mode.
+The best way to do this is not evident: one can generate one file per tree (but
+then we break the rule that every program is a filter and so writes to standard
+output), or one can put all the trees in one \svg{} document (but then we have
+to impose tiling or some other arrangement), or one can just output one \svg{}
+document after another. This is what we do (this may change in the future). So
+if you have many trees in document \texttt{forest.nw}, you can say:
+\begin{quote}
+\verb+$ nw_display -s forest.nw > forest_svg+
+\end{quote}
+But \texttt{forest\_svg} isn't valid \svg{} -- it is a concatenation of many \svg{} documents. You can just extract them into individual files with \texttt{csplit}:
+\begin{quote}
+\verb+$ csplit -sz -f tree_ -b '%02d.svg' forest_svg '/<?xml/' {*}+
+\end{quote}
+This will produce one \svg{} file per tree in \texttt{forest.nw}, named \texttt{tree\_01.svg}, \texttt{tree\_02.svg}, etc.
+
 \subsection{Options not Covered}
 
 \display{} has many options, and we will not describe them all here - all of
