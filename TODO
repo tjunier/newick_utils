@@ -1,3 +1,5 @@
+nw_ed: add a function for replacing an inner node with a leaf (TODO: useful?)
+
 all: review help pages (-h)
 
 all: replace 'parse order' by post-order

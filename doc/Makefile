@@ -16,5 +16,5 @@ tutorial.pdf: tutorial.tex intro.tex general_remarks.tex simple_tasks.tex displa
 	pdflatex tutorial.tex
 
 clean:
-	$(RM) *.{pdf,out,cmd,aux,log,dvi,toc,_svg.svg}
+	$(RM) *.{pdf,out,cmd,aux,log,dvi,toc} *_svg.svg
 

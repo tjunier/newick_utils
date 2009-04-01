@@ -6,7 +6,8 @@
 
 char * masprintf(const char *fmt, ...)
 {
-	/* Guess we need no more than 100 bytes. */
+	/* Guess we need no more than 100 bytes - in fact we could use 0 and
+	 * let vsnprintf() tell us... */
 	int n, size = 100;
 	char *p, *np;
 	va_list ap;
@@ -34,5 +35,19 @@ char * masprintf(const char *fmt, ...)
 		       p = np;
 		   }
 	}
+}
+
+char * mastrcat(char *dest, const char *src)
+{
+	size_t dest_len = strlen(dest);
+	size_t src_len = strlen(src);
+	
+	/* 'dest' MUST have been allocated by malloc() etc */
+	char * result = realloc(dest, dest_len + src_len + 1);
+	if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
+
+	strncpy(result + dest_len, src, src_len + 1);
+
+	return result;
 }
 

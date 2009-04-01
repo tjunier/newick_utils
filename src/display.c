@@ -112,8 +112,16 @@ void help(char* argv[])
 "       works like for CSS.\n"
 "    -R <integer>: use that many pixels for the root [only SVG]\n"
 "    -r: draw a radial tree (default: orthogonal) [only SVG]\n"
-"    -s: output graph as SVG (default: text). SVG output is currently limited\n"
-"       to one tree - any trees beyond the first one are ignored.\n"
+"    -s: output graph as SVG (default: ASCII graphics). All output is on\n"
+"       stdout, so if there is more than one tree, stdout will be a\n"
+"       concatenation of SVG documents. These can be split into individual\n"
+"       files with the csplit(1) command:\n"
+"\n"
+"       $ nw_display -s many_trees.nw > multiple_svg\n"
+"       $ csplit -zs -f tree_ -b '%%02d.svg' multiple_svg '/<?xml/' {*}\n"
+"\n"
+"       will generate as many SVG files as there are Newick trees in\n"
+"       many_trees.nw. The files will be named tree_01.svg, tree_02.svg, etc.\n"
 "    -u <string>: string is used as unit name for scale bar (ignored\n"
 "       if no scale bar is drawn).\n"
 "    -U <URL_filename>: use specified URL map [only SVG]. A URL map\n"
@@ -335,26 +343,24 @@ int main(int argc, char *argv[])
 	if (params.svg) {
 		set_svg_parameters(params);
 		svg_init();
-		tree = parse_tree();
-		align_leaves = is_cladogram(tree);
-		/* show scale bar IFF tree is NOT a cladogram. Since
-		 * is_cladogram() takes some time to run, we just look up
-		 * 'align_leaves' which has the same value. */
-		with_scale_bar = !align_leaves;
-		/* NOTE: do NOT refactor svg_header() into display_svg_tree() -
-		 * maybe one day we'll allow >1 tree per graph. */
-		svg_header(leaf_count(tree), with_scale_bar);
-		svg_run_params_comment(argc, argv);
-		display_svg_tree(tree, align_leaves, with_scale_bar,
-				params.branch_length_unit);
-		svg_footer();
-		exit(EXIT_SUCCESS);
 	}
 
 	while (NULL != (tree = parse_tree())) {
 		align_leaves = is_cladogram(tree);
-		prettify_labels(tree);
-		display_tree(tree, params.width, align_leaves);
+		if (params.svg) {
+			/* show scale bar IFF tree is NOT a cladogram. Since
+			 * is_cladogram() takes some time to run, we just look
+			 * up  'align_leaves' which has the same value. */
+			with_scale_bar = !align_leaves;
+			svg_header(leaf_count(tree), with_scale_bar);
+			svg_run_params_comment(argc, argv);
+			display_svg_tree(tree, align_leaves, with_scale_bar,
+					params.branch_length_unit);
+			svg_footer();
+		} else {
+			prettify_labels(tree);
+			display_tree(tree, params.width, align_leaves);
+		}
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
 

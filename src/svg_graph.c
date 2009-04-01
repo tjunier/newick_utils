@@ -671,4 +671,4 @@ void display_svg_tree(struct rooted_tree *tree, int align_leaves,
 		fprintf (stderr, "Unknown tree style %d\n", graph_style);
 }
 
-void svg_footer() { printf ("</svg>"); }
+void svg_footer() { printf ("</svg>\n"); }
