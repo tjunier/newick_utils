@@ -15,3 +15,4 @@ css_multi: -s -c bacteria_css.map bacteria.nw
 css_multi_def: -s -c bacteria_css.map -d 'stroke:grey' bacteria.nw
 rl: -sr -R 50 -w 500 catarrhini.nw
 sbar: -s simiiformes.nw
+multi_svg:-s forest.nw
