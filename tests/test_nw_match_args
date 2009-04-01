@@ -1,2 +1,3 @@
 def: 10vrt.nw '(Vulpes,(Tamias,Homo));'
 inv: -v 10vrt.nw '(Vulpes,(Tamias,Homo));'
+multi:forest.nw '(Homo,(Pan,Gorilla));'

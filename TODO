@@ -1,3 +1,5 @@
+all: check that all programs support multiple trees in input.
+
 nw_ed: add a function for replacing an inner node with a leaf (TODO: useful?)
 
 all: review help pages (-h)

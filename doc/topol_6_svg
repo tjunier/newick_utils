@@ -1,1 +1,1 @@
-nw_topology -IL vrt2.nw | nw_display -sr -
+nw_topology -IL vrt1.nw | nw_display -sr -

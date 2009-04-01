@@ -1,6 +1,6 @@
 AM_CFLAGS = -I ../src
 
-TESTS = test_rnode test_redge test_list test_link \
+TESTS = test_rnode test_redge test_list test_link test_masprintf \
 	test_canvas test_concat test_hash test_lca test_enode \
 	test_nodemap test_to_newick test_tree test_node_set \
 	test_rnode_iterator test_tree_models test_xml_utils \
@@ -8,7 +8,7 @@ TESTS = test_rnode test_redge test_list test_link \
 	test_nw_display.sh test_nw_indent.sh test_nw_support.sh \
 	test_nw_ed.sh test_nw_topology.sh test_nw_clade.sh \
 	test_nw_distance.sh test_nw_labels.sh test_nw_prune.sh \
-	test_nw_order.sh test_nw_match.sh test_masprintf
+	test_nw_order.sh test_nw_match.sh 
 
 check_PROGRAMS = test_rnode test_redge test_list test_link \
 		 test_canvas test_concat test_hash test_lca \
