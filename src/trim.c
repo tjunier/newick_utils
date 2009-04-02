@@ -4,10 +4,13 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <assert.h>
 
 #include "to_newick.h"
 #include "tree.h"
 #include "parser.h"
+#include "masprintf.h"
 /*
 #include "nodemap.h"
 #include "link.h"
@@ -20,6 +23,7 @@
 enum {DEPTH_DISTANCE, DEPTH_ANCESTORS};
 
 struct node_data {
+	bool trimmed;
 	int ancestry_depth;
 	double distance_depth;
 };
@@ -114,6 +118,24 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+void trim(struct rnode *node, struct parameters params)
+{
+	struct node_data *ndata = node->data;
+
+	/* Just shrink parent edge length */
+	double excess = ndata->distance_depth - params.threshold;
+	struct redge *parent_edge = node->parent_edge;
+	double trimmed_edge_length = parent_edge->length - excess;
+	free(parent_edge->length_as_string);
+	char *new_length = masprintf("%g", trimmed_edge_length);
+	if (NULL == new_length) { perror(NULL); exit(EXIT_FAILURE); }
+	parent_edge->length_as_string = new_length;
+
+	clear_llist(node->children);	/* no effect on leaves */
+
+	ndata->trimmed = true;
+}
+
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct llist *nodes_in_preorder;
@@ -126,6 +148,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	if (NULL == ndata) { perror(NULL); exit(EXIT_FAILURE); }
 	ndata->distance_depth = 0.0;
 	ndata->ancestry_depth = 0;
+	ndata->trimmed = false;
 	node->data = ndata;
 
 	/* This starts just AFTER the root! */
@@ -135,25 +158,65 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		struct redge *parent_edge = node->parent_edge;
 		struct rnode *parent = parent_edge->parent_node;
 		struct node_data *parent_data = parent->data;
-
-		/* compute this node's depth measures */
-		double parent_edge_length = atof(parent_edge->length_as_string);
-
-		/* fill this node's data structure */
+		/* allocate this node's data structure */
 		ndata = malloc(sizeof(struct node_data));
 		if (NULL == ndata) { perror(NULL); exit(EXIT_FAILURE); }
+		node->data = ndata;
+
+		//printf ("%p (%s): ", node, node->label);
+		/* See if parent has been trimmed */
+		if (parent_data->trimmed) {
+			// printf ("trimmed.\n");
+			ndata->trimmed = true; 	/* inherit trimmed status */
+			continue;
+		} else {
+			/* If we don't do this, ndata->trimmed may
+			 * contain garbage!  (thanks Valgrind :-) */
+			ndata->trimmed = false;
+		}
+
+
+		/* Parent not trimmed: See if we must trim this node. */
+	
+		/* compute this node's depth measures */
+		double parent_edge_length = atof(parent_edge->length_as_string);
+		parent_edge->length = parent_edge_length;
 		ndata->distance_depth = parent_edge_length +
 			parent_data->distance_depth;
 		ndata->ancestry_depth = 1 + parent_data->ancestry_depth;
-		node->data = ndata;
 
-		printf ("%p (%s): %g (%d ancestors)\n", node, node->label,
-				((struct node_data*)node->data)->distance_depth,
-				((struct node_data*)node->data)->ancestry_depth
+		/*
+		printf ("%g (%d ancestors)\n", 
+			((struct node_data*)node->data)->distance_depth,
+			((struct node_data*)node->data)->ancestry_depth
 		       );
+		       */
 
+		/* To trim or not to trim? */
+		bool to_trim = false;
+		switch (params.depth_type) {
+		case DEPTH_DISTANCE:
+			if (ndata->distance_depth > params.threshold)
+				to_trim = true;
+			break;
+		case DEPTH_ANCESTORS:
+			if (ndata->ancestry_depth > params.threshold)
+				to_trim = true;
+			break;
+		default:
+			assert (false);	/* programmer error */
+			exit(EXIT_FAILURE);
+		}
+
+		if (to_trim) {
+			// printf ("\tto trim.\n");
+			/* sets the trimmed flag in node data */
+			trim(node, params);
+		}
 	
 	}
+
+	destroy_llist(nodes_in_preorder);
 
 }
 
@@ -169,7 +232,7 @@ int main(int argc, char *argv[])
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	return 0;
