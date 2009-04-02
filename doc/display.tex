@@ -2,12 +2,18 @@
 \section{Displaying Trees}
 \label{sct_display}
 
-Perhaps the simplest and most common operation on a \nw{} tree is just to look at it. The \nw{} format is not very easy to understand for us humans, so we have to produce a graphical representation from it. This is the purpose of the \display{} program. 
+Perhaps the simplest and most common operation on a \nw{} tree is just to look
+at it. The \nw{} format is not very easy to understand for us humans, so we
+have to produce a graphical representation from it. This is the purpose of the
+\display{} program. 
 
 \subsection{As Text}
 \label{sct_display_text}
 
-At the simplest, \display{} just outputs a text graph:
+At the simplest, \display{} just outputs a text graph. Here is a
+Newick-formatted tree in file \texttt{catarrhini}:
+\verbatiminput{catarrhini}
+And here is the same tree shown with \display{}:
 \verbatiminput{dspl1_txt.cmd}
 \begin{samepage}
 \verbatiminput{dspl1_txt.out}
@@ -15,7 +21,8 @@ At the simplest, \display{} just outputs a text graph:
 That's pretty low-tech compared to interactive, colorful graphical displays,
 but if you use the shell a lot (like I do), you may find it useful.
 
-You can use option \texttt{-w} (``width'') to set the number of columns available for display:
+You can use option \texttt{-w} (``width'') to set the number of columns
+available for display (the default is 80):
 
 \verbatiminput{dspl2_txt.cmd}
 \begin{samepage}
@@ -25,22 +32,24 @@ You can use option \texttt{-w} (``width'') to set the number of columns availabl
 \subsection{As Scalable Vector Graphics (SVG)}
 \label{sct_display_svg}
 
-First, a disclaimer: there are dozens of tools for viewing trees out there, and I'm not interested in competing with them. The reason why I added \svg{} capabilities were:
-\begin{itemize}
- \item I wanted to be able to produce reasonable graphics even if no other tool was at hand
- \item I wanted to be sure that large trees could be rendered\footnote{I have had serious problems visualising trees of more than 1,000 leaves using some popular software I will not name here - either it was painfully slow, or it simply crashed} 
-\end{itemize}
-The \svg{} produced by \display{} is designed to be easy to edit in an
-interactive editor like Inkscape: the tree edges are in one group, and the text
-in another. So it is easy to change the line properties of the edges, or the
-font family of the text, for example (you can also do this from \display{}
-using a \css{} map, see \ref{sct_display_svg_css}).
+First, a disclaimer: there are dozens of tools for viewing trees out there, and
+I'm not interested in competing with them. The reason why I added \svg{}
+capabilities to \display{} were: \begin{itemize} \item I wanted to be able to
+produce reasonable graphics even if no other tool was at hand \item I wanted to
+be sure that large trees could be rendered\footnote{I have had serious problems
+visualising trees of more than 1,000 leaves using some popular software I will
+not name here - either it was painfully slow, or it simply crashed}
+\end{itemize} The \svg{} produced by \display{} is designed to be easy to edit
+in an interactive editor like Inkscape (\url{http://www.inkscape.org}): the
+tree edges are in one group, and the text in another. So it is easy to change
+the line properties of the edges, or the font family of the text, for example
+(you can also do this from \display{} using a \css{} map, see
+\ref{sct_display_svg_css}).
 
 To produce \svg, pass option \texttt{-s}:
 \begin{verbatim}
 $ nw_display -s catarrhini > catarrhini.svg
 \end{verbatim}
-
 Now you can visualize the result using any \svg-enabled tool (all good Web browsers can do it), or convert it to another format with, say \texttt{rsvg} or Inkscape. The following image was produced like this:
 
 \begin{verbatim}
@@ -50,20 +59,20 @@ $ inkscape -f catarrhini.svg -A catarrhini.pdf
 \begin{center}
  \includegraphics{dspl_svg1_svg.pdf}
 \end{center}
+All \svg{} images shown in this document were produced in the same way. In the
+rest of this document we will usually skip the redirection into an \svg{} file
+and omit the \svg{}-to-\textsc{pdf} conversion step.
 
-All \svg{} images shown in this document were produced in the same way, although from now on we will generally omit the \svg{} to \textsc{pdf} conversion step.
-
-There are many options for \svg{} graphs.First, you can make radial trees, using option \texttt{-r} (from now on I will skip the redirection into an \svg{} file):
-
+There are many options for \svg{} graphs. First, you can make radial trees,
+using option \texttt{-r} 
 \verbatiminput{dspl_sr_w450_catarrhini_svg.cmd}
-
 You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
 
 \begin{center}
 \includegraphics{dspl_sr_w450_catarrhini_svg.pdf}
 \end{center}
 
-\subsubsection{Using \css}
+\subsubsection{Using CSS}
 \label{sct_display_svg_css}
 
 You can modify node style using \css. This is done by specifying a
@@ -78,7 +87,22 @@ the tree above:
  \includegraphics{nw_display_sr_w450_ccssmap_catarrhini_svg.pdf}
 \end{center}
 
-The syntax of the \css{} map is as follows. Each line describes one style and the set of nodes to which it applies. The first line in \texttt{css.map} says that the style \texttt{stroke-width:2;stroke:blue} must be applied to the \texttt{Clade} defined by \texttt{Homo} and \texttt{Pan}, which comprises \texttt{Homo}, \texttt{Pan}, and \texttt{Hominini}. The \texttt{Clade} keyword can be abbreviated to \texttt{C}, as in the next two lines. The style of an inner clade overrides styles of an outer clade, \textit{e.g.}, although the \texttt{Homo} - \texttt{Pan} clade is nested inside the \texttt{Homo} - \texttt{Hylobates} clade, it has its own style (blue, wide lines) which overrides the containing clade's style (pinkish with normal width).
+The syntax of the \css{} map file is as follows. Each line describes one style
+and the set of nodes to which it applies. A line contains elements separated by
+whitespace (whitespace between quotes does not count). The first element of the
+line is the style, and it is a snippet of \css{} code. The second element
+states whether the following nodes are to be treated individually or as a
+clade. The next element(s) are the nodes to which the style must be applied. 
+
+In our example, first line in \texttt{css.map} says that the style
+\texttt{stroke-width:2;stroke:blue} must be applied to the \texttt{Clade}
+defined by \texttt{Homo} and \texttt{Pan}, which comprises \texttt{Homo},
+\texttt{Pan}, and \texttt{Hominini}. The \texttt{Clade} keyword can be
+abbreviated to \texttt{C}, as in the next two lines. The style of an inner
+clade overrides styles of an outer clade, \textit{e.g.}, although the
+\texttt{Homo} - \texttt{Pan} clade is nested inside the \texttt{Homo} -
+\texttt{Hylobates} clade, it has its own style (blue, wide lines) which
+overrides the containing clade's style (pinkish with normal width).
 
 The \texttt{Individual} keyword specifies that the style is to be applied to all nodes who match the labels on the line, but individually, that is, the program does not propagate the style to the whole clade defined by the labels. This is why only \texttt{Colobus} and \texttt{Cercopithecus} appear in green; with the \texttt{Clade} keyword the whole \texttt{Macaca} - \texttt{Colobus} clade (that is, all Old-World monkeys) would be green. Note that \texttt{Individual} overrides \texttt{Clade}, which is why \texttt{Cercopithecus} is green even though it belongs to a red clade.
 

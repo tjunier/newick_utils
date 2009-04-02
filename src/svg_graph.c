@@ -197,7 +197,7 @@ struct llist *read_css_map()
 		 * */
 		struct llist *label_list = create_llist();
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
-		char *style = wt_next(wtok);
+		char *style = wt_next_noquote(wtok);
 		char *type = wt_next(wtok);
 		char *label;
 		while ((label = wt_next(wtok)) != NULL) {

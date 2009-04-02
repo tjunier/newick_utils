@@ -34,18 +34,23 @@ structure. The default output is valid Newick.
 [...]
 \end{verbatim}
 \end{samepage}
-The help page describes the program's purpose, its input and output, and its options, in a format reminiscent of \unix{} manpages. It also shows a few examples. All examples can be tried out using files in the \texttt{data} directory.
+The help page describes the program's purpose, its input and output, and its
+options, in a format reminiscent of \unix{} manpages. It also shows a few
+examples. All examples can be tried out using files in the \texttt{data}
+directory.
 
 \section{Input}
 \label{sct_input}
 
-Since the \nutils{} are for working with trees, it should not be a surprise
-that all programs take Newick as input.\footnote{Except \gen{}, which is a tree generator and doesn't input anything.} The Newick format is a file format for
-(phylogenetic) trees. It is one of the most widely used and uderstood formats.
-A complete description can be found at
+Since the \nutils{} are for working with trees, it should be no surprise
+that the main input is a file containing Newick trees. The Newick format is a
+file format for (phylogenetic) trees. It is one of the most widely used and
+uderstood formats.  A complete description can be found at
 \url{http://evolution.genetics.washington.edu/phylip/newicktree.html}.
 
-The input tree(s) are always the first argument to the program (after any options). They may either be stored in a file, or piped on \stdin{}. In the latter case, the filename is replaced by a '\texttt{-}' (dash):
+The input file is always the first argument to the program (after any
+options). It may be a file stored on the filesystem, or \stdin{}. In the
+latter case, the filename is replaced by a '\texttt{-}' (dash):
 
 \begin{samepage}
 \begin{verbatim}
@@ -60,13 +65,12 @@ Of course the second form is only really useful when chaining several programs i
 
 \subsection{Multiple Trees in Input}
 
-Most programs can work on any number of trees. That is, in the example above
-the file \texttt{mytrees.nw} may contain one or more trees, preferably one tree
-per line\footnote{It may also work if the trees are formatted differently, but
-the programs were only tested on input files with one tree per line.}. The
-task will be performed on each tree in the input. So if you need to reroot
-1,000 trees on the same outgroup, you can do it all in a single step (see
-\ref{sct_reroot}).
+The input file can contain one or more trees, preferably one tree per
+line\footnote{It may also work if the trees are formatted differently, but the
+programs were only tested on input files with one tree per line.}. The task
+will be performed on each tree in the input. So if you need to reroot 1,000
+trees on the same outgroup, you can do it all in a single step (see
+\ref{sct_reroot}). 
 
 \section{Output}
 \label{sct_output}

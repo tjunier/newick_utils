@@ -1,15 +1,15 @@
 
 \chapter*{Introduction}
 
-The \nutils{} are a set of \unix{} shell programs for working with Newick-formatted phylogenetic trees. Their main features are:
+The \nutils{} are a set of \unix{} shell programs for working with phylogenetic trees. Their main features are:
 \begin{itemize}
  \item they require no user interaction.\footnote{Why this is a good thing is not the focus of this document: I shall assume that if you are reading this, you already know when a command-line interface is better than an interactive interface.}
- \item they can work on any number of trees at a time\footnote{Strictly speaking, a few applications are limited to one input tree because working on more than one is not practical}
+ \item they can work on any number of trees at a time
  \item they perform reasonably well with large trees
  \item they are implemented as filters
 \end{itemize}
-They are not tools for \emph{making} phylogenies. Rather, they are for working
-with existing ones, by which I mean manipulating the tree or extracting
+They are not tools for \emph{making} phylogenies. Rather, they are for
+processing existing ones, by which I mean manipulating the tree or extracting
 information from it: rerooting, simplifying, extracting subtrees, printing
 branch lengths and distances, etc - a glance at the table of contents of this
 document should give you an idea; see also table \ref{tbl_prog_list}.
@@ -25,7 +25,15 @@ $ nw_reroot mytrees.nw Dmelano | nw_topology -
 \end{verbatim}
 As you can see, it is straightforward to pipe \nutils{} together, and of course they can be mixed freely with any other shell tool (see e.g. \ref{sct_counting_leaves}).
 
-This document is organized as follows: chapter \ref{chap_general} discusses common features of the \nutils, chapter \ref{chap_simple} shows examples of simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks. 
+This document is organized as follows: chapter \ref{chap_general} discusses
+common features of the \nutils, chapter \ref{chap_simple} shows examples of
+simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks. 
+
+It is not necessary to read this material in order: you can pretty much jump to
+any section in chapters \ref{chap_simple} and \ref{chap_adv}, they do not
+require reading previous sections. I would suggest reading chapter
+\ref{chap_general}, then section \ref{sct_display} because it explains how all
+the tree graphics were produced.
 
 \begin{table}[b]
 \begin{tabular}{ll}
@@ -37,9 +45,9 @@ This document is organized as follows: chapter \ref{chap_general} discusses comm
 \distance	&	Prints distances between nodes, in various ways \\
 \ed	&	Stream editor (\textit{\`{a} la} \texttt{sed} or \texttt{awk}) \\
 \gen	&	Random tree generator \\
+\nwindent	&	Shows Newick in indented form \\ 
 \labels	&	Prints node labels \\
 \match	&	Finds matches of a tree in another one \\
-\nwindent	&	Shows Newick in indented form \\ 
 \order	&	Orders tree (preserving topology) \\
 \prune	&	Removes branches based on labels \\ 
 \reroot	&	(Re)roots the tree \\
