@@ -1,3 +1,9 @@
+tree.c: rename nodes_in_order to nodes_in_postorder
+
+new program nw_trim: cuts branches at a certain depth or number of ancestors. optionally prints out the trimmed branches.
+
+new program: nw_info: prints a summary (number of leaves, number of inner nodes, overall depth, whether the tree is a cladogram, etc.
+
 all: check that all programs support multiple trees in input.
 
 nw_ed: add a function for replacing an inner node with a leaf (TODO: useful?)

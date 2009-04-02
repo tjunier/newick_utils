@@ -4,7 +4,7 @@ BUILT_SOURCES = newick_parser.h newick_scanner.c newick_parser.c \
 
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 	       nw_condense nw_support nw_ed nw_topology nw_distance \
-	       nw_labels nw_prune nw_order nw_match nw_gen
+	       nw_labels nw_prune nw_order nw_match nw_gen nw_trim
 
 # All headers
 HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
@@ -79,6 +79,9 @@ nw_match_SOURCES = match.c $(NW_CORE) $(NW_OUT) order_tree.c
 nw_match_LDADD = @LEXLIB@
 
 nw_gen_SOURCES = generate.c $(NW_CORE) $(NW_OUT) tree_models.c
+
+nw_trim_SOURCES = trim.c $(NW_CORE) $(NW_OUT)
+nw_trim_LDADD = @LEXLIB@
 
 # Removes automatically generated C code (Lex & YACC)
 #

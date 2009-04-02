@@ -35,7 +35,7 @@ bin_PROGRAMS = nw_indent$(EXEEXT) nw_display$(EXEEXT) \
 	nw_condense$(EXEEXT) nw_support$(EXEEXT) nw_ed$(EXEEXT) \
 	nw_topology$(EXEEXT) nw_distance$(EXEEXT) nw_labels$(EXEEXT) \
 	nw_prune$(EXEEXT) nw_order$(EXEEXT) nw_match$(EXEEXT) \
-	nw_gen$(EXEEXT)
+	nw_gen$(EXEEXT) nw_trim$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	address_parser.c address_parser.h address_scanner.c \
@@ -121,6 +121,9 @@ am_nw_topology_OBJECTS = $(am__objects_2) $(am__objects_3) \
 	topology.$(OBJEXT)
 nw_topology_OBJECTS = $(am_nw_topology_OBJECTS)
 nw_topology_DEPENDENCIES =
+am_nw_trim_OBJECTS = trim.$(OBJEXT) $(am__objects_2) $(am__objects_3)
+nw_trim_OBJECTS = $(am_nw_trim_OBJECTS)
+nw_trim_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -136,13 +139,15 @@ SOURCES = $(nw_clade_SOURCES) $(nw_condense_SOURCES) \
 	$(nw_gen_SOURCES) $(nw_indent_SOURCES) $(nw_labels_SOURCES) \
 	$(nw_match_SOURCES) $(nw_order_SOURCES) $(nw_prune_SOURCES) \
 	$(nw_rename_SOURCES) $(nw_reroot_SOURCES) \
-	$(nw_support_SOURCES) $(nw_topology_SOURCES)
+	$(nw_support_SOURCES) $(nw_topology_SOURCES) \
+	$(nw_trim_SOURCES)
 DIST_SOURCES = $(nw_clade_SOURCES) $(nw_condense_SOURCES) \
 	$(nw_display_SOURCES) $(nw_distance_SOURCES) $(nw_ed_SOURCES) \
 	$(nw_gen_SOURCES) $(nw_indent_SOURCES) $(nw_labels_SOURCES) \
 	$(nw_match_SOURCES) $(nw_order_SOURCES) $(nw_prune_SOURCES) \
 	$(nw_rename_SOURCES) $(nw_reroot_SOURCES) \
-	$(nw_support_SOURCES) $(nw_topology_SOURCES)
+	$(nw_support_SOURCES) $(nw_topology_SOURCES) \
+	$(nw_trim_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -235,6 +240,7 @@ sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
@@ -297,6 +303,8 @@ nw_indent_LDADD = @LEXLIB@
 nw_match_SOURCES = match.c $(NW_CORE) $(NW_OUT) order_tree.c
 nw_match_LDADD = @LEXLIB@
 nw_gen_SOURCES = generate.c $(NW_CORE) $(NW_OUT) tree_models.c
+nw_trim_SOURCES = trim.c $(NW_CORE) $(NW_OUT)
+nw_trim_LDADD = @LEXLIB@
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -409,6 +417,9 @@ nw_support$(EXEEXT): $(nw_support_OBJECTS) $(nw_support_DEPENDENCIES)
 nw_topology$(EXEEXT): $(nw_topology_OBJECTS) $(nw_topology_DEPENDENCIES) 
 	@rm -f nw_topology$(EXEEXT)
 	$(LINK) $(nw_topology_OBJECTS) $(nw_topology_LDADD) $(LIBS)
+nw_trim$(EXEEXT): $(nw_trim_OBJECTS) $(nw_trim_DEPENDENCIES) 
+	@rm -f nw_trim$(EXEEXT)
+	$(LINK) $(nw_trim_OBJECTS) $(nw_trim_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -462,6 +473,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tree.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tree_editor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tree_models.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xml_utils.Po@am__quote@
 
 .c.o:

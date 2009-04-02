@@ -196,6 +196,9 @@ struct llist *get_labels(struct rooted_tree *tree)
 	return labels;
 }
 
+/* TODO: this could be derived by the parser and stored in a member of the
+ * rooted_tree structure. */
+
 int is_cladogram(struct rooted_tree *tree)
 {
 	struct list_elem *el;
