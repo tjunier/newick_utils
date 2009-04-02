@@ -87,6 +87,7 @@ struct parameters get_params(int argc, char *argv[])
 		switch (opt_char) {
 		case 'a':
 			params.depth_type = DEPTH_ANCESTORS;
+			break;
 		case 'h':
 			help(argv);
 			exit (EXIT_SUCCESS);
@@ -109,6 +110,9 @@ struct parameters get_params(int argc, char *argv[])
 		}
 		optind++;	/* optind is now index of 2nd arg - depth */
 		params.threshold = atof(argv[optind]);
+		/* A value of n means "n ancestors or less" */
+		if (DEPTH_ANCESTORS == params.depth_type)
+			params.threshold -= 1;
 	} else {
 		fprintf(stderr, "Usage: %s [-ah] <filename|-> <depth>\n",
 				argv[0]);
@@ -122,14 +126,16 @@ void trim(struct rnode *node, struct parameters params)
 {
 	struct node_data *ndata = node->data;
 
-	/* Just shrink parent edge length */
-	double excess = ndata->distance_depth - params.threshold;
-	struct redge *parent_edge = node->parent_edge;
-	double trimmed_edge_length = parent_edge->length - excess;
-	free(parent_edge->length_as_string);
-	char *new_length = masprintf("%g", trimmed_edge_length);
-	if (NULL == new_length) { perror(NULL); exit(EXIT_FAILURE); }
-	parent_edge->length_as_string = new_length;
+	if (DEPTH_DISTANCE == params.depth_type) {
+		/* Shrink parent edge length */
+		double excess = ndata->distance_depth - params.threshold;
+		struct redge *parent_edge = node->parent_edge;
+		double trimmed_edge_length = parent_edge->length - excess;
+		free(parent_edge->length_as_string);
+		char *new_length = masprintf("%g", trimmed_edge_length);
+		if (NULL == new_length) { perror(NULL); exit(EXIT_FAILURE); }
+		parent_edge->length_as_string = new_length;
+	}
 
 	clear_llist(node->children);	/* no effect on leaves */
 
@@ -208,6 +214,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			exit(EXIT_FAILURE);
 		}
 
+		// TODO: handle this in switch() clause above
 		if (to_trim) {
 			// printf ("\tto trim.\n");
 			/* sets the trimmed flag in node data */
