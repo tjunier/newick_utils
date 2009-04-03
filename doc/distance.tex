@@ -24,6 +24,44 @@ This means that the distance from the root to \texttt{Gorilla} is 56, etc. Optio
 \verbatiminput{dist_2_txt.out}
 \end{samepage}
 
+There are two main parameters to \distance: the \emph{method} and the
+\emph{selection}. The method determines how to compute the distance (from what
+node to what node), and the selection determines for which nodes the program is
+to compute distances. Let's look at examples.
+
+\subsection{Selection}
+
+In this section we will show the different selections, using the default
+distance method. The selection is set by option \texttt{-s}. The argument to
+this option is the selection type (see melow), it can be abbreviated to a
+single letter (case is not significant). To illustrate the selection, we need a tree that has both labeled and unlabeled leaves and inner nodes:
+
+\begin{center}
+\includegraphics{dist_3_svg.pdf}
+\end{center}
+
+\subsubsection{All labeled Leaves}
+
+The selection consists of all leaves with a label. This is the default, as
+leaves will mostly be labeled and we're generally more interested in leaves
+than inner nodes.
+
+\verbatiminput{dist_4_txt.cmd}
+\verbatiminput{dist_4_txt.out}
+
+\subsubsection{All leaves}
+
+Option \texttt{-s l}, \texttt{-s leaves}, etc. This takes all leaves into account, whether they are labeled or not.
+
+\subsection{Methods}
+
+In this section we will take the default selection and vary the method.
+
+\subsubsection{Distance from the Tree's Root}
+
+This is the default method: for each node in the selection, the program prints
+the distance from the tree's root to the node. This was shown in the example above, so I won't repeat it here.
+
 
 
 

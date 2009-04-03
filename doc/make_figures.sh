@@ -13,16 +13,19 @@
 # These just generate text
 
 for cmd in *_{txt,nw} ; do
+	echo $cmd
 	# prefix a '$' for inputting into LaTeX
 	echo -n "$ "  > $cmd.cmd
 	cat $cmd >> $cmd.cmd
-	# run command
-	sh < $cmd > $cmd.out
+	# run command, pipe through expand b/c LaTeX's verbatiminput does not
+	# handle TABs correctly, fold because it may exceed page width.
+	sh < $cmd | fold | expand > $cmd.out
 done
 
 # These generate SVG
 
 for cmd in *_svg ; do
+	echo $cmd
 	# prefix a '$' for inputting into LaTeX
 	echo -n "$ "  > $cmd.cmd
 	cat $cmd >> $cmd.cmd

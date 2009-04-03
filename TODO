@@ -1,3 +1,5 @@
+nw_distance: doesnt' work with doc/dist_sel_xpl.nw (parent edge of inner node C has length 5, should have length 4).
+
 tree.c: rename nodes_in_order to nodes_in_postorder
 
 new program nw_trim: cuts branches at a certain depth or number of ancestors. optionally prints out the trimmed branches.
