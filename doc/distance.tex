@@ -1,0 +1,29 @@
+\section{Extracting Distances}
+
+There are many ways of defining distances in a tree. First, we have to consider
+whether the tree is a cladogram or a phylogram: in the former case, the
+distances will be measured in whatever units the tree was built with (usually
+substitutions per site), in the latter, it will just be the number of ancestors.
+
+Then we can measure distance in a variety of ways. This is the job of
+\distance. By default, it prints the distance from the root of the tree to all
+labeled leaves, in the order in which they appear in the Newick. Let's look at
+distances in the monkeys tree:
+
+\begin{center}
+\includegraphics{dspl_svg1_svg.pdf}
+\end{center}
+
+\verbatiminput{dist_1_txt.cmd}
+\begin{samepage}
+\verbatiminput{dist_1_txt.out}
+\end{samepage}
+This means that the distance from the root to \texttt{Gorilla} is 56, etc. Option \texttt{-n} shows the labels:
+\verbatiminput{dist_2_txt.cmd}
+\begin{samepage}
+\verbatiminput{dist_2_txt.out}
+\end{samepage}
+
+
+
+
