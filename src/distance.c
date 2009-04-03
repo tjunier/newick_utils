@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -25,7 +26,7 @@ enum {ALL_NODES, ALL_LABELS, ALL_LEAF_LABELS, ARGV_LABELS, ALL_INNER_NODES,
 	ALL_LEAVES};
 
 struct parameters {
-	int distance_type;
+	int distance_type;	// TODO: rename to 'method'
 	int selection;
 	struct llist *labels;
 	char separator;
@@ -90,8 +91,8 @@ void help(char *argv[])
 "        the argument: 'a' for all nodes, 'l' for labeled nodes,\n"
 "        'i' for inner nodes, 'f' for leaves.\n"
 "        E.g. '-s a' and '-s all' both select all nodes.\n"
-"    -t: tab-separated - prints values on one line, separated by tabs.\n"
-"        Ignored in matrix mode.\n"
+"    -t: in matrix mode, print a triangular matrix. In other modes,\n"
+"        print values on a line, separated by TABs.\n"
 "\n"
 "Assumptions and Limitations\n"
 "---------------------------\n"
@@ -172,6 +173,8 @@ struct parameters get_params(int argc, char *argv[])
 	params.list_orientation = VERTICAL;
 	params.matrix_shape = SQUARE;
 
+	bool alternative_format = false;
+
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "hm:ns:t")) != -1) {
 		switch (opt_char) {
@@ -188,7 +191,7 @@ struct parameters get_params(int argc, char *argv[])
 			params.selection = get_selection();
 			break;
 		case 't':
-			params.list_orientation = HORIZONTAL;
+			alternative_format = true;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -221,6 +224,13 @@ struct parameters get_params(int argc, char *argv[])
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}
+
+	if (alternative_format)
+		if (MATRIX == params.distance_type)
+			params.matrix_shape = TRIANGLE;
+		else
+			params.list_orientation = HORIZONTAL;
+
 
 	return params;
 }
@@ -412,12 +422,9 @@ double ** fill_matrix (struct rooted_tree *tree, struct llist *selected_nodes)
 /* Prints a table of distances (square for now, parameter 'shape' will be used
  * later e.g. to specify triangular form. */
 
-void print_distance_matrix (struct rooted_tree *tree,
-		struct llist *selected_nodes, int show_headers, int shape)
+void print_square_distance_matrix (struct rooted_tree *tree,
+		struct llist *selected_nodes, int show_headers)
 {
-	// TODO: implement triangular matrix
-	shape = shape;	// suppresses warnings
-
 	double **matrix = fill_matrix(tree, selected_nodes);
 
 	struct list_elem *h_el, *v_el;
@@ -434,6 +441,38 @@ void print_distance_matrix (struct rooted_tree *tree,
 
 			printf("%g", matrix[j][i]);
 			if (h_el == selected_nodes->tail) 
+				putchar('\n');
+			else
+				putchar('\t');
+		}
+	}	
+
+	/* free matrix's rows, then matrix itself */
+	for (j = 0; j < selected_nodes->count; j++) {
+		free(matrix[j]);
+	}
+	free(matrix);
+}
+
+void print_triangular_distance_matrix (struct rooted_tree *tree,
+		struct llist *selected_nodes, int show_headers)
+{
+	double **matrix = fill_matrix(tree, selected_nodes);
+
+	struct list_elem *h_el, *v_el;
+	int i, j;
+	
+	for (j = 0, v_el = selected_nodes->head; NULL != v_el;
+		v_el = v_el->next, j++) {
+
+		if (show_headers) printf ("%s\t",
+			((struct rnode *) v_el->data)->label);
+
+		for (i = 0, h_el = selected_nodes->head; i < j;
+			h_el = h_el->next , i++) {
+
+			printf("%g", matrix[j][i]);
+			if (i == j-1)
 				putchar('\n');
 			else
 				putchar('\t');
@@ -491,8 +530,19 @@ int main(int argc, char *argv[])
 				params.list_orientation, params.show_header);
 			break;
 		case MATRIX:
-			print_distance_matrix(tree, selected_nodes,
-				params.show_header, params.matrix_shape);
+			switch (params.matrix_shape) {
+			case SQUARE:
+				print_square_distance_matrix(tree,
+					selected_nodes, params.show_header);
+				break;
+			case TRIANGLE:
+				print_triangular_distance_matrix(tree,
+					selected_nodes, params.show_header);
+				break;
+			default:
+				fprintf(stderr, "ERROR: unknown matrix form %d\n", params.matrix_shape);
+				exit(EXIT_FAILURE);
+			}
 			break;
 		case FROM_PARENT:
 			print_distance_list(NULL, selected_nodes,

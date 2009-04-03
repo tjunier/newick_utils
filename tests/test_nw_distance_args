@@ -14,3 +14,4 @@ par_all: -m p -s all dist.nw
 par_all_nam: -m p -s a -n dist.nw
 all_nam_tab: -sa -nt dist.nw
 multi: -tn forest_ind.nw
+mt: -mm -t catarrhini.nw
