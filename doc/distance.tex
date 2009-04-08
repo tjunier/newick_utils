@@ -32,35 +32,66 @@ to compute distances. Let's look at examples.
 \subsection{Selection}
 
 In this section we will show the different selections, using the default
-distance method. The selection is set by option \texttt{-s}. The argument to
-this option is the selection type (see melow), it can be abbreviated to a
-single letter (case is not significant). To illustrate the selection, we need a tree that has both labeled and unlabeled leaves and inner nodes:
+distance method. The selection type is the argument to option \texttt{-s}.
+The nodes appear in the same order as in the Newick tree, except when they are
+specified on the command line (see below).
 
+To illustrate the selection types, we need a tree that has both labeled and
+unlabeled leaves and inner nodes. Here it is in Newick format (I indented it
+with \nwindent{} - see \ref{sct_indent}):
+\verbatiminput{dist_sel_xpl.nw}
+And here it is in graphical form:
 \begin{center}
 \includegraphics{dist_3_svg.pdf}
 \end{center}
+We will use option \texttt{-n} to see the node labels.
 
-\subsubsection{All labeled Leaves}
+\subsubsection{All labeled leaves}
 
 The selection consists of all leaves with a label. This is the default, as
 leaves will mostly be labeled and we're generally more interested in leaves
 than inner nodes.
-
 \verbatiminput{dist_4_txt.cmd}
 \verbatiminput{dist_4_txt.out}
 
+\subsubsection{All labeled nodes}
+
+Option \texttt{-s l}. This takes all labeled nodes into account, whether they are leaves or inner nodes.
+\verbatiminput{dist_5_txt.cmd}
+\verbatiminput{dist_5_txt.out}
+
 \subsubsection{All leaves}
 
-Option \texttt{-s l}, \texttt{-s leaves}, etc. This takes all leaves into account, whether they are labeled or not.
+Option \texttt{-s f}. Selects all leaves, whether they are
+labeled or not.
+\verbatiminput{dist_6_txt.cmd}
+\verbatiminput{dist_6_txt.out}
+
+\subsubsection{All nodes}
+
+Option \texttt{-s a}. All nodes are selected.
+\verbatiminput{dist_7_txt.cmd}
+\verbatiminput{dist_7_txt.out}
+
+\subsubsection{Command line selection}
+
+The selection consists of the nodes whose labels are passed as arguments on
+the command line (after the file name). 
+\verbatiminput{dist_8_txt.cmd}
+\verbatiminput{dist_8_txt.out}
 
 \subsection{Methods}
 
-In this section we will take the default selection and vary the method.
+In this section we will take the default selection and vary the method. The
+method is te argument to option \texttt{-m}.
 
 \subsubsection{Distance from the Tree's Root}
 
 This is the default method: for each node in the selection, the program prints
-the distance from the tree's root to the node. This was shown in the example above, so I won't repeat it here.
+the distance from the tree's root to the node. This was shown above, so I
+won't repeat it here.
+
+\subsubsection{Distance from last common ancestor}
 
 
 

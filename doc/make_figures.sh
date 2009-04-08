@@ -32,4 +32,5 @@ for cmd in *_svg ; do
 	# run command
 	sh < $cmd > $cmd.svg
 	inkscape -f $cmd.svg -A $cmd.pdf
+	#inkscape -f $cmd.svg -e $cmd.pdf	# When PDFs are too big, do PNGs
 done

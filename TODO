@@ -1,4 +1,6 @@
-nw_distance: doesnt' work with doc/dist_sel_xpl.nw (parent edge of inner node C has length 5, should have length 4).
+nw_display: problem with -m l doc/dist_meth_xpl.nw. Selection should be just
+nodes A and B (labeled leaves) but then the LCA should be node d, yet it seems
+to be the root.
 
 tree.c: rename nodes_in_order to nodes_in_postorder
 
@@ -248,3 +250,7 @@ I'll leave this out for now.
 [done] nw_ed: make test for action 'l' (print label)
 
 [done] nw_display: scale bar is sometimes off the chart, try e.g. nw_display -s ../data/simiiformes_wrong_rr.nw
+
+[solved] nw_distance: doesnt' work with doc/dist_sel_xpl.nw (parent edge of
+inner node C has length 5, should have length 4). -- tree had wrong format. 
+

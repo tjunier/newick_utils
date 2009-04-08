@@ -133,7 +133,7 @@ int get_selection()
 		return ALL_LABELS;
 	default:
 		fprintf (stderr, 
-		"ERROR: unknown selection '%s'\nvalid values: a(ll nodes), l(abeled nodes)", optarg);
+		"ERROR: unknown selection '%s'\nvalid values: a(ll nodes), l(abeled nodes) f (leaves), i(nner nodes)\n", optarg);
 		exit(EXIT_FAILURE);
 	}
 }
