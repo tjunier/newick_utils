@@ -3,6 +3,8 @@
 .PHONY: clean
 .PHONY: distclean
 .PHONY: distdir
+.PHONY: install
+.PHONY: check
 
 doc: article.pdf tutorial.pdf
 
