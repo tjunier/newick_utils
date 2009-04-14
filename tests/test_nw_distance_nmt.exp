@@ -1,0 +1,10 @@
+Gorilla	0
+Pan	36	0
+Homo	36	20	0
+Pongo	61	65	65	0
+Hylobates	66	70	70	65	0
+Macaca	121	125	125	120	95	0
+Papio	121	125	125	120	95	20	0
+Cercopithecus	101	105	105	100	75	40	40	0
+Simias	81	85	85	80	55	70	70	50	0
+Colobus	78	82	82	77	52	67	67	47	17	0
