@@ -469,19 +469,17 @@ void print_triangular_distance_matrix (struct rooted_tree *tree,
 	for (j = 0, v_el = selected_nodes->head; NULL != v_el;
 		v_el = v_el->next, j++) {
 
-		if (show_headers) {
-			printf ("%s", ((struct rnode *) v_el->data)->label);
-			if (0 == j) 
-				putchar ('\n');
-			else
-				putchar ('\t');
-			
+		if (show_headers)
+			printf ("%s\t", ((struct rnode *) v_el->data)->label);
 
-		for (i = 0, h_el = selected_nodes->head; i < j;
+		/* Shows the diagonal when we print headers */
+		int limit = (show_headers ? j+1 : j);
+
+		for (i = 0, h_el = selected_nodes->head; i < limit;
 			h_el = h_el->next , i++) {
 
 			printf("%g", matrix[j][i]);
-			if (i == j-1)
+			if (i == limit-1)
 				putchar('\n');
 			else
 				putchar('\t');
