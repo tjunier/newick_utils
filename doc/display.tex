@@ -10,7 +10,7 @@ have to produce a graphical representation from it. This is the purpose of the
 \subsection{As Text}
 \label{sct_display_text}
 
-At the simplest, \display{} just outputs a text graph. Here is a
+At its simplest, \display{} just outputs a text graph. Here is a
 Newick-formatted tree in file \texttt{catarrhini}:
 \verbatiminput{catarrhini}
 And here is the same tree shown with \display{}:
@@ -33,24 +33,20 @@ available for display (the default is 80):
 \label{sct_display_svg}
 
 First, a disclaimer: there are dozens of tools for viewing trees out there, and
-I'm not interested in competing with them. The reason why I added \svg{}
-capabilities to \display{} were: \begin{itemize} \item I wanted to be able to
-produce reasonable graphics even if no other tool was at hand \item I wanted to
-be sure that large trees could be rendered\footnote{I have had serious problems
+I'm not interested in competing with them. The reasons why I added \svg{}
+capabilities to \display{} were:
+\begin{itemize}
+\item I wanted to be able to produce reasonably good graphics even if no other
+tool was at hand
+\item I wanted to be sure that large trees could be rendered\footnote{I have had serious problems
 visualising trees of more than 1,000 leaves using some popular software I will
 not name here - either it was painfully slow, or it simply crashed}
-\end{itemize} The \svg{} produced by \display{} is designed to be easy to edit
-in an interactive editor like Inkscape (\url{http://www.inkscape.org}): the
-tree edges are in one group, and the text in another. So it is easy to change
-the line properties of the edges, or the font family of the text, for example
-(you can also do this from \display{} using a \css{} map, see
-\ref{sct_display_svg_css}).
-
+\end{itemize}
 To produce \svg, pass option \texttt{-s}:
 \begin{verbatim}
 $ nw_display -s catarrhini > catarrhini.svg
 \end{verbatim}
-Now you can visualize the result using any \svg-enabled tool (all good Web browsers can do it), or convert it to another format with, say \texttt{rsvg} or Inkscape. The following image was produced like this:
+Now you can visualize the result using any \svg-enabled tool (all good Web browsers can do it), or convert it to another format with, say \texttt{rsvg} or Inkscape. The following \pdf{} image was produced like this:
 
 \begin{verbatim}
 $ inkscape -f catarrhini.svg -A catarrhini.pdf
@@ -62,6 +58,13 @@ $ inkscape -f catarrhini.svg -A catarrhini.pdf
 All \svg{} images shown in this document were produced in the same way. In the
 rest of this document we will usually skip the redirection into an \svg{} file
 and omit the \svg{}-to-\textsc{pdf} conversion step.
+
+The \svg{} produced by \display{} is designed to be easy to edit
+in an interactive editor like Inkscape (\url{http://www.inkscape.org}): the
+tree edges are in one group, and the text in another. So it is easy to change
+the line properties of the edges, or the font family of the text, for example
+(you can also do this from \display{} using a \css{} map, see
+\ref{sct_display_svg_css}).
 
 There are many options for \svg{} graphs. First, you can make radial trees,
 using option \texttt{-r} 
@@ -90,9 +93,14 @@ the tree above:
 The syntax of the \css{} map file is as follows. Each line describes one style
 and the set of nodes to which it applies. A line contains elements separated by
 whitespace (whitespace between quotes does not count). The first element of the
-line is the style, and it is a snippet of \css{} code. The second element
-states whether the following nodes are to be treated individually or as a
-clade. The next element(s) are the nodes to which the style must be applied. 
+line is the style, and it is a snippet of \css{} code. The second element is
+either \texttt{Clade} or \texttt{Individual} and states whether the following
+nodes are to be treated individually or as a clade. The next element(s) are
+node labels and specify the nodes to which the style must be applied: if the
+second element was \texttt{Clade}, the program finds the last common ancestor
+of the nodes and applies the style to that node and all its descendants. If the
+second element was \texttt{Individual}, then the style is only applied to the
+nodes themselves.
 
 In our example, the first line in \texttt{css.map} says that the style
 \texttt{stroke:red} must be applied to the \texttt{Clade} defined by
@@ -102,13 +110,14 @@ keyword can be abbreviated to \texttt{C}, as in the next line. Line 2
 prescribes that style \texttt{stroke:\#fa7} (an \svg{} hexadecimal color
 specification) must be applied to the clade defined by \texttt{Homo} and
 \texttt{Hylobates}, which consists of these two nodes, their last common
-ancestor, and all its descendants (that is, \texttt{Homo}, \texttt{Pan},
-\texttt{Gorilla}, \texttt{Pongo}, and \texttt{Hylobates}, as well as the inner
-nodes \texttt{Hominini}, \texttt{Homininae} and \texttt{Hominidae}). Line 4
-says that the clade defined by \texttt{Homo} and \texttt{Pan} should receive
-style \texttt{stroke-width:2;~stroke:blue} - note that the quotes have been
-removed: they are not part of the style, rather they allow us to improve
-readability by adding some whitespace.
+ancestor (unlabeled), and all its descendants (that is, \texttt{Homo},
+\texttt{Pan}, \texttt{Gorilla}, \texttt{Pongo}, and \texttt{Hylobates}, as well
+as the inner nodes \texttt{Hominini}, \texttt{Homininae} and
+\texttt{Hominidae}). Line 3 says that the style \texttt{stroke:green} is to be applied to nodes \texttt{Colobus} and \texttt{Cercopithecus}, and only these nodes - not to the clade that they define. 
+Line 4 says that the clade defined by \texttt{Homo} and
+\texttt{Pan} should receive style \texttt{stroke-width:2;~stroke:blue} - note
+that the quotes have been removed: they are not part of the style, rather they
+allow us to improve readability by adding some whitespace.
 
 The style of an inner clade overrides that of an outer clade, \textit{e.g.},
 although the \texttt{Homo} - \texttt{Pan} clade is nested inside the
@@ -116,18 +125,11 @@ although the \texttt{Homo} - \texttt{Pan} clade is nested inside the
 lines) which overrides the containing clade's style (pinkish with normal
 width).
 
-The \texttt{Individual} keyword specifies that the style is to be applied to
-all nodes who match the labels on the line, but individually, that is, the
-program does not propagate the style to the whole clade defined by the labels.
-This is why only \texttt{Colobus} and \texttt{Cercopithecus} appear in green;
-with the \texttt{Clade} keyword the whole \texttt{Macaca} - \texttt{Colobus}
-clade (that is, all Old-World monkeys) would be green\footnote{Although the
-inner clade defined by \texttt{Cercopithecus}-\texttt{Macaca} would override
-the green color, and turn it red}. Note that \texttt{Individual} overrides
-\texttt{Clade}, which is why \texttt{Cercopithecus} is green even though it
-belongs to a red clade.
+Also, note that \texttt{Individual} overrides \texttt{Clade}, which is why
+\texttt{Cercopithecus} is green even though it belongs to a red clade.
 
-The \texttt{Clade} and \texttt{Individual} keywords are not case-sensitive and can be abbreviated - in fact only the first letter counts.
+The \texttt{Clade} and \texttt{Individual} keywords are not case-sensitive and
+can be abbreviated - in fact only the first letter counts.
 
 Styles can also be applied to labels. Option \texttt{-l} specifies the leaf
 label style, option \texttt{-i} the inner node label style, and option
