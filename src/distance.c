@@ -70,13 +70,17 @@ void help(char *argv[])
 "    o all labeled leaves (default): selection is formed by all labeled\n"
 "      leaf nodes, in the order in which they appear in the Newick string\n"
 "      (= Newick order)\n"
-"    o command line arguments: labels are passed on the command line,\n"
-"      and the selection is formed by the corresponding nodes, in the\n"
-"      same order.\n"
 "    o all labeled nodes: selection is formed by all labeled nodes, in\n"
+"      Newick order (see Option -s)\n"
+"    o all leaves: selection is formed by all leaves nodes, in\n"
+"      Newick order (see Option -s)\n"
+"    o all internal nodes: selection is formed by all internal nodes, in\n"
 "      Newick order (see Option -s)\n"
 "    o all nodes: selection is formed by all nodes, in Newick order\n"
 "      (see Option -s)\n"
+"    o command line arguments: labels are passed on the command line,\n"
+"      and the selection is formed by the corresponding nodes, in the\n"
+"      same order.\n"
 "\n"
 "Options\n"
 "-------\n"
@@ -465,8 +469,13 @@ void print_triangular_distance_matrix (struct rooted_tree *tree,
 	for (j = 0, v_el = selected_nodes->head; NULL != v_el;
 		v_el = v_el->next, j++) {
 
-		if (show_headers) printf ("%s\t",
-			((struct rnode *) v_el->data)->label);
+		if (show_headers) {
+			printf ("%s", ((struct rnode *) v_el->data)->label);
+			if (0 == j) 
+				putchar ('\n');
+			else
+				putchar ('\t');
+			
 
 		for (i = 0, h_el = selected_nodes->head; i < j;
 			h_el = h_el->next , i++) {
@@ -484,6 +493,38 @@ void print_triangular_distance_matrix (struct rooted_tree *tree,
 		free(matrix[j]);
 	}
 	free(matrix);
+}
+
+/* Debugging functions */
+
+void show_selection (struct llist *selection)
+{
+	printf("Selection:\n");
+	struct list_elem *el;
+	for (el = selection->head; NULL != el; el = el->next) {
+		struct rnode *current;
+		current = el->data;
+		printf ("%p (%s)\n", current, current->label);
+	}
+	printf("--\n");
+}
+
+void show_method (int method)
+{
+	printf ("Method: ");
+	switch (method) {
+	case FROM_ROOT: printf ("from root");
+		break;
+	case FROM_LCA: printf ("from LCA");
+		break;
+	case FROM_PARENT: printf ("from parent");
+		break;
+	case MATRIX: printf ("matrix");
+		break;
+	default:
+		printf ("Unknown!");
+	}
+	printf ("\n");
 }
 
 int main(int argc, char *argv[])
@@ -520,12 +561,17 @@ int main(int argc, char *argv[])
 			break;
 		case FROM_LCA:
 			/* if no lbl given, use root as LCA */
+			/* I don't remember why I did it like that, and I
+			 * don't see what it is good for, so I discard it. */
+			/*
 			if (0 == params.labels->count)  {
 				lca_node = tree->root;
 			}
 			else {
 				lca_node = lca_from_nodes(tree, selected_nodes);
 			}
+			*/
+			lca_node = lca_from_nodes(tree, selected_nodes);
 			print_distance_list(lca_node, selected_nodes,
 				params.list_orientation, params.show_header);
 			break;

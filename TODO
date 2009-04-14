@@ -1,4 +1,4 @@
-nw_display: problem with -m l doc/dist_meth_xpl.nw. Selection should be just
+nw_distance: problem with -m l doc/dist_meth_xpl.nw. Selection should be just
 nodes A and B (labeled leaves) but then the LCA should be node d, yet it seems
 to be the root.
 
