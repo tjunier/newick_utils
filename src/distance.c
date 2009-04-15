@@ -434,6 +434,12 @@ void print_square_distance_matrix (struct rooted_tree *tree,
 	struct list_elem *h_el, *v_el;
 	int i, j;
 	
+	if (show_headers) { /* Header line */
+		for (h_el = selected_nodes->head; NULL != h_el; h_el = h_el->next)
+			printf ("\t%s", ((struct rnode *) h_el->data)->label);
+		putchar('\n');
+	}
+			
 	for (j = 0, v_el = selected_nodes->head; NULL != v_el;
 		v_el = v_el->next, j++) {
 
