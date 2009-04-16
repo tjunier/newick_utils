@@ -108,7 +108,7 @@ extract_distances_noref()
 		echo -n "$position	"	# TAB!
 		# We compute a matrix of all-vs-all distances, but only keep the line for
 		# reference vs. all
-		nw_distance -mm -n $rooted_tree ${labels[*]} | grep $REFERENCE
+		nw_distance -mm -n $rooted_tree ${labels[*]} | sed -n '2,$p' | grep $REFERENCE
 	done | cut -f1,3- | cut -f 1-$((ref_col-1)),$((ref_col+1))- | sort -k1n > $DIST_NOREF
 }
 
@@ -140,7 +140,7 @@ extract_distances()
 		echo -n "$position	"	# TAB!
 		# We compute a matrix of all-vs-all distances, but only keep the line for
 		# reference vs. all
-		nw_distance -mm -n $rooted_tree ${labels[*]} | grep $REFERENCE
+		nw_distance -mm -n $rooted_tree ${labels[*]} | sed -n '2,$p' | grep $REFERENCE
 	done | cut -f1,3- | sort -k1n > $DIST_WREF
 }
 
