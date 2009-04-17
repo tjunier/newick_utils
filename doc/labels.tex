@@ -5,19 +5,25 @@
 
 To get a list of all labels in a tree, use \labels:
 
+\begin{samepage}
 \verbatiminput{labels_xpl1_txt.cmd}
 \verbatiminput{labels_xpl1_txt.out}
+\end{samepage}
 
 \noindent{}The labels are printed out in post-order. To get rid of internal labels, use \texttt{-I}:
 
+\begin{samepage}
 \verbatiminput{labels_xpl2_txt.cmd}
 \verbatiminput{labels_xpl2_txt.out}
+\end{samepage}
 
 \noindent{}Likewise, you can use \texttt{-L} to get rid of leaf labels, and
 with \texttt{-t} the labels are printed on a single line, separated by tabs (here the line is folded due to lack of space).
 
+\begin{samepage}
 \verbatiminput{labels_xpl3_txt.cmd}
 \verbatiminput{labels_xpl3_txt.out}
+\end{samepage}
 
 \subsection{Counting Leaves in a Tree}
 \label{sct_counting_leaves}
@@ -25,6 +31,7 @@ with \texttt{-t} the labels are printed on a single line, separated by tabs (her
 A simple application of \labels{} is a leaf count (assuming each leaf is
 labeled - \nw{} does not require labels):
 
+\begin{samepage}
 \verbatiminput{labels_xpl4_txt.cmd}
 \verbatiminput{labels_xpl4_txt.out}
-
+\end{samepage}
