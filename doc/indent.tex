@@ -2,8 +2,12 @@
 \section{Indenting}
 \label{sct_indent}
 
-\nwindent{} shows a \nw{} tree in indented form. This shows the structure more
-clearly than the compact form. For example, this is a tree in compact form, in
+\nwindent{} reformats the \nw{} on several lines, with one node per line,
+nodes of the same depth in the same column, and children nodes to the right of
+their parent. This shows the structure more
+clearly than the compact form, but since whitespace is ignored in the Newick
+format\footnote{except between quotes}, the
+indented form is still valid. For example, this is a tree in compact form, in
 file \texttt{falconiformes}:
 \verbatiminput{falconiformes}
 And this is the same tree, indented:

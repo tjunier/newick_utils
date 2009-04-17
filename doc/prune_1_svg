@@ -1,1 +1,1 @@
-nw_display -s vrt2_top.nw
+nw_display -s -v 20 vrt2_top.nw

@@ -1,1 +1,2 @@
-nw_prune vrt2_top.nw Tetraodon Danio Bombina Didelphis | nw_display -s -
+nw_prune vrt2_top.nw Tetraodon Danio Bombina Didelphis \
+| nw_display -s -v 20 -
