@@ -2,6 +2,23 @@
 \label{sct_bootscanning}
 
 Bootscanning is a technique for finding recombination breakpoints in a
-sequence. It involves aligning the sequence of interest (called \emph{query}
-or \emph{reference}) with related sequences (including the putative
-recombinant's parents) and studying how the 
+sequence. It involves aligning the sequence of interest (called \emph{query} or
+\emph{reference}) with related sequences (including the putative recombinant's
+parents) and computing phylogenies locally over the alignment. Recombination is
+expected to cause changes in topology.  The tasks involved are shown below:
+\begin{enumerate}
+\item align the sequences $\rightarrow$ multiple alignment
+\item slice the multiple alignment $\rightarrow$ slices
+\item build a tree for each slice $\rightarrow$ trees
+\item extract distance from query to other sequences (each tree) $\rightarrow$ tabular data
+\item plot data $\rightarrow$ graphics
+\end{enumerate}
+The distribution contains a script, \texttt{bootscan.sh}, that performs the whole process. Here is an example run:
+\begin{verbatim}
+bootscan.sh HRV_3UTR.dna HRV-93 CL073908
+\end{verbatim}
+And here is the result:
+
+\begin{centering}
+\includegraphics[scale=0.7]{bootscan_1.pdf}
+\end{centering}
