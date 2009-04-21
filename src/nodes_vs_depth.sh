@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# clades_vs_depth.sh - plots the number of clades as a function of depth.
+# nodes_vs_depth.sh - plots the number of nodes as a function of depth.
 
 shopt -s -o nounset
 

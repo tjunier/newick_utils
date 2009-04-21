@@ -13,24 +13,27 @@
 # These just generate text
 
 for cmd in *_{txt,nw} ; do
-	echo $cmd
-	# prefix a '$' for inputting into LaTeX
-	echo -n "$ "  > $cmd.cmd
-	cat $cmd >> $cmd.cmd
-	# run command, pipe through expand b/c LaTeX's verbatiminput does not
-	# handle TABs correctly, fold because it may exceed page width.
-	sh < $cmd | fold | expand > $cmd.out
+	if [ $cmd -nt $cmd.out ] ; then
+		echo $cmd
+		# prefix a '$' for inputting into LaTeX
+		echo -n "$ "  > $cmd.cmd
+		cat $cmd >> $cmd.cmd
+		# run command, pipe through expand b/c LaTeX's verbatiminput does not
+		# handle TABs correctly, fold because it may exceed page width.
+		sh < $cmd | fold | expand > $cmd.out
+	fi
 done
 
 # These generate SVG
 
 for cmd in *_svg ; do
-	echo $cmd
-	# prefix a '$' for inputting into LaTeX
-	echo -n "$ "  > $cmd.cmd
-	cat $cmd >> $cmd.cmd
-	# run command
-	sh < $cmd > $cmd.svg
-	inkscape -f $cmd.svg -A $cmd.pdf
-	#inkscape -f $cmd.svg -e $cmd.pdf	# When PDFs are too big, do PNGs
+	if [ $cmd -nt $cmd.svg ]; then
+		echo $cmd
+		# prefix a '$' for inputting into LaTeX
+		echo -n "$ "  > $cmd.cmd
+		cat $cmd >> $cmd.cmd
+		# run command
+		sh < $cmd > $cmd.svg
+		inkscape -f $cmd.svg -A $cmd.pdf
+	fi
 done
