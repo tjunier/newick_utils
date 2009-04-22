@@ -6,9 +6,11 @@
 .PHONY: install
 .PHONY: check
 
-doc: tutorial.pdf
+TEX_SOURCES = advanced_tasks.tex bootscanning.tex clades_vs_depth.tex clade.tex condense.tex def_clades.tex display.tex distance.tex general_remarks.tex higher_lvl.tex indent.tex installing.tex intro.tex labels.tex prune.tex reroot.tex simple_tasks.tex support.tex topology.tex tree_axioms.tex tree_properties.tex tutorial.tex
 
-tutorial.pdf: tutorial.tex intro.tex general_remarks.tex simple_tasks.tex display.tex indent.tex reroot.tex clade.tex installing.tex def_clades.tex tree_axioms.tex tree_properties.tex 
+all: tutorial.pdf
+
+tutorial.pdf: $(TEX_SOURCES)
 	./make_figures.sh
 	pdflatex tutorial.tex
 	pdflatex tutorial.tex
