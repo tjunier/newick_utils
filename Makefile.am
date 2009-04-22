@@ -6,4 +6,6 @@ EXTRA_DIST = \
 	tests/*.sh \
 	tests/*.map \
 	tests/*.cmap \
-	src/*.sh
+	src/*.sh \
+	doc/tutorial.pdf \
+	data/*
