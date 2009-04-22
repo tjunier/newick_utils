@@ -4,8 +4,33 @@
 A simple measure of a tree's shape can be obtained by computing the number of
 nodes as a function of depth. Consider the following trees:
 
+\smallskip{}
 \begin{tabular}{ccc}
-\includegraphics{clades_vs_depth_1_svg.pdf}
-\includegraphics{clades_vs_depth_2_svg.pdf}
+\texttt{star.nw} & \texttt{balanced.nw} & \texttt{short\_leaves.nw} \\
+\hline \\
+\includegraphics{clades_vs_depth_1_svg.pdf} &
+\includegraphics{clades_vs_depth_2_svg.pdf} &
 \includegraphics{clades_vs_depth_3_svg.pdf}
 \end{tabular}
+\smallskip{}
+
+\noindent{}they have the same depth and the same number of
+leaves.  But their shapes are very different, and they tell different
+biological stories. If we assume that they are clock-like (i.e., that the
+mutation rate is constant over the whole tree), \texttt{star.nw} shows an early
+radiation, \texttt{short\_leaves.nw} shows two stable branches ending in
+recent branching, while \texttt{balanced.nw} shows branching spread over time.
+
+The nodes-vs-depth graphs for these trees are as follows: \\
+\includegraphics[width=12cm]{star_nw.pdf} \\
+\includegraphics[width=12cm]{balanced_nw.pdf} \\
+\includegraphics[width=12cm]{short_leaves_nw.pdf} \\
+
+The graphs show the (normalized) area under the curve: it is close to 1 for star-like trees, close to 0 for trees with very short leaves, and intermdiary for more balanced trees.
+
+The images were made with the \texttt{bootscan.sh} script (in directory \texttt{src}), in the following way:
+\begin{verbatim}
+$ nodes_vs_clades.sh star.nw 40
+\end{verbatim}
+where 40 is just the sampling density (how many points to take on the $x$
+axis). The script uses \distance{} to get the tree's depth, \ed{} to sample the number of nodes at a given depth, and \nwindent{} to count the leaves, plus the usual \texttt{awk} and friends. The plot is done with gnuplot.
