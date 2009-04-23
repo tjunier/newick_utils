@@ -1,0 +1,2 @@
+nw_rename falconiformes falconiformes_vern1.map \
+| nw_condense - | nw_display -s -v 20 -

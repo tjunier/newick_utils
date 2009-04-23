@@ -1,3 +1,95 @@
-\section{Higher Level Trees from Lower Level Ones}
+\section{Checking Consistency with other Data}
 \label{sct_higher_lvl}
 
+\subsection{By condensing}
+
+One can check the consistency of a tree with respect to additional information
+by renaming and condensing. For example, I have the following tree of
+Falconiformes (diurnal raptors: eagles, falcons, etc):
+
+\includegraphics{higher_lvl_1_svg.pdf} \\
+
+\noindent{}Now I also have the following information about the family to which each genus belongs:
+
+\bigskip{}
+\begin{tabular}{ll}
+\textbf{Genus} & \textbf{Family} \\
+\textit{Accipiter} & Accipitridae \\
+\textit{Aquila} & Accipitridae \\
+\textit{Buteo} & Accipitridae \\
+\textit{Elanus} & Accipitridae \\
+\textit{Falco} & Falconidae \\
+\textit{Haliaeetus} & Accipitridae \\
+\textit{Micrastur} & Falconidae \\
+\textit{Milvago} & Falconidae \\
+\textit{Milvus} & Accipitridae \\
+\textit{Pandion} & Pandionidae \\
+\textit{Polyborus} & Falconidae \\
+\textit{Sagittarius} & Sagittariidae
+\end{tabular}
+\bigskip{}
+
+Let's see if the tree is consistent with this information. If it is, all
+families should form clades. To check this, I will rename each leaf by
+replacing the genus name by the family name, then condense the tree. If the
+original) tree is consistent, the final tree should have one leaf per family.
+
+First, I create a renaming map (see \ref{sct_rename}) based on the above
+information (here are the first three lines):
+\verbatiminput{higher_lvl_2_txt.cmd}
+\verbatiminput{higher_lvl_2_txt.out}
+Then I use it to rename, and then I condense the tree:
+\verbatiminput{higher_lvl_3_svg.cmd}
+\includegraphics{higher_lvl_3_svg.pdf}
+
+\bigskip{}
+\noindent{}As we can see, there is one leaf per family, so the above
+information is consistent with the tree.
+
+Let's see if common English names are also consistent with the tree. Here is
+one possible table of vernacular names of the raptor genera: 
+
+\bigskip{}
+\begin{tabular}{ll}
+\textbf{Genus} & \textbf{English name} \\
+\textit{Accipiter} & hawk (sparrowhawk, goshawk, etc)\\
+\textit{Aquila} & eagle  \\
+\textit{Buteo} & hawk \\
+\textit{Elanus} & kite \\
+\textit{Falco} & falcon \\
+\textit{Haliaeetus} & eagle (sea eagle) \\
+\textit{Micrastur} & falcon (forest falcon)\\
+\textit{Milvago} & caracara \\
+\textit{Milvus} & kite \\
+\textit{Pandion} & osprey \\
+\textit{Polyborus} & caracara \\
+\textit{Sagittarius} & secretary bird
+\end{tabular}
+\bigskip{}
+
+And here is the corresponding tree:
+
+\verbatiminput{higher_lvl_4_svg.cmd}
+\includegraphics{higher_lvl_4_svg.pdf}
+\bigskip{}
+
+So the above common names are consistent with the tree. However, some species
+have many common names. For example, the \textit{Buteo} hawks are often called
+"buzzards" (in Europe), and two species of falcons have been called "hawks" (in
+North America): the peregrine falcon (\textit{Falco peregrinus}) was called the
+"duck hawk", and the American kestrel (\textit{Falco sparverius}) was called
+the "sparrow hawk".\footnote{This is confusing because there are true hawks
+called "sparrow hawks", \emph{e.g.} the Eurasian sparrow hawk \textit{Accipiter
+nisus}. To add to the confusion, the specific name \textit{sparverius} looks
+like the English word "sparrow", and also resembles the common name of
+\textit{Accipiter nisus} in many other languages: \'{e}pervier (fr), Sperber
+(de), sparviere (it). Oh well. Let's not drop scientific names just yet!} If we
+map these common names to the tree and condense, we get this:
+
+\verbatiminput{higher_lvl_5_svg.cmd}
+\includegraphics{higher_lvl_5_svg.pdf}
+\bigskip{}
+
+\noindent{}Distinguishing buzzards from other hawks fits well with the tree. On
+the other hand, calling a falcon a hawk does not, and the name "hawk" appears
+in two different places.

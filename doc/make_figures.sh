@@ -24,7 +24,7 @@ for cmd in *_{txt,nw} ; do
 	fi
 done
 
-# These generate SVG
+# These generate PDF from SVG
 
 for cmd in *_svg ; do
 	if [ $cmd -nt $cmd.svg ]; then
