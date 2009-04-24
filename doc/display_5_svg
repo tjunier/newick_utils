@@ -1,1 +1,1 @@
-nw_display -sr -w 450 -c css.map catarrhini
+nw_display -sr -S -w 450 -c css.map catarrhini

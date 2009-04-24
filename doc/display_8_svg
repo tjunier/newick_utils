@@ -1,1 +1,1 @@
-nw_display -sr -w 450 -o ornament.map catarrhini
+nw_display -sr -S -w 450 -o ornament.map catarrhini

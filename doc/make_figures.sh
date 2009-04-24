@@ -10,6 +10,8 @@
 # \verbatiminput{my_command_txt.cmd}
 # \verbatiminput{my_command_txt.out}
 
+PATH=../src:$PATH # try the latest versions of the utils first
+
 # These just generate text
 
 for cmd in *_{txt,nw} ; do
