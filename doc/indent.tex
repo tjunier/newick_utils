@@ -12,8 +12,8 @@ file \texttt{falconiformes}:
 \verbatiminput{falconiformes}
 And this is the same tree, indented:
 \begin{samepage}
-\verbatiminput{indent1_nw.cmd}
-\verbatiminput{indent1_nw.out}
+\verbatiminput{indent_1_nw.cmd}
+\verbatiminput{indent_1_nw.out}
 \end{samepage}
 The structure is much more clear, it is also relatively easy to edit manually
 in a text editor - while still being valid \nw.
@@ -26,7 +26,7 @@ syntactically correct tree.} For example, there is an error in this tree:
 yet it is hard to spot, and trying \display{} won't help as it will abort with a
 parse error. With \nwindent{}, however, you can at least look at the tree:
 \begin{samepage}
-\verbatiminput{indent4_nw.out}
+\verbatiminput{indent_4_nw.out}
 \end{samepage}
 While the error is not exactly obvious, you can at least view the Newick. It turns out there is a comma missing after \texttt{Sagittarius:5}.
 
@@ -34,13 +34,13 @@ The indentation can be varied by supplying a string (option \texttt{-t}) that
 will be used instead of the default (which is two spaces). If you want to
 indent by four spaces instead of two, you could say this:
 \begin{samepage}
-\verbatiminput{indent2_nw.cmd}
-\verbatiminput{indent2_nw.out}
+\verbatiminput{indent_2_nw.cmd}
+\verbatiminput{indent_2_nw.out}
 \end{samepage}
 Option \texttt{-t} can also be used to highlight indentation:
 \begin{samepage}
-\verbatiminput{indent3_txt.cmd}
-\verbatiminput{indent3_txt.out}
+\verbatiminput{indent_3_txt.cmd}
+\verbatiminput{indent_3_txt.out}
 \end{samepage}
 Now the indentation levels are easier to see, but at the expense of the tree no
 longer being valid \nw.

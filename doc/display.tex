@@ -14,9 +14,9 @@ At its simplest, \display{} just outputs a text graph. Here is a
 Newick-formatted tree in file \texttt{catarrhini}:
 \verbatiminput{catarrhini}
 And here is the same tree shown with \display{}:
-\verbatiminput{dspl1_txt.cmd}
+\verbatiminput{display_1_txt.cmd}
 \begin{samepage}
-\verbatiminput{dspl1_txt.out}
+\verbatiminput{display_1_txt.out}
 \end{samepage}
 That's pretty low-tech compared to interactive, colorful graphical displays,
 but if you use the shell a lot (like I do), you may find it useful.
@@ -24,9 +24,9 @@ but if you use the shell a lot (like I do), you may find it useful.
 You can use option \texttt{-w} (``width'') to set the number of columns
 available for display (the default is 80):
 
-\verbatiminput{dspl2_txt.cmd}
+\verbatiminput{display_2_txt.cmd}
 \begin{samepage}
-\verbatiminput{dspl2_txt.out}
+\verbatiminput{display_2_txt.out}
 \end{samepage}
 
 \subsection[As SVG]{As Scalable Vector Graphics}
@@ -53,7 +53,7 @@ $ inkscape -f catarrhini.svg -A catarrhini.pdf
 \end{verbatim}
 
 \begin{center}
- \includegraphics{dspl_svg1_svg.pdf}
+ \includegraphics{display_3_svg.pdf}
 \end{center}
 All \svg{} images shown in this document were produced in the same way. In the
 rest of this document we will usually skip the redirection into an \svg{} file
@@ -68,12 +68,24 @@ the line properties of the edges, or the font family of the text, for example
 
 There are many options for \svg{} graphs. First, you can make radial trees,
 using option \texttt{-r} 
-\verbatiminput{dspl_sr_w450_catarrhini_svg.cmd}
+\verbatiminput{display_4_svg.cmd}
 You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
 
 \begin{center}
-\includegraphics{dspl_sr_w450_catarrhini_svg.pdf}
+\includegraphics{display_4_svg.pdf}
 \end{center}
+
+\subsubsection{Scale Bar}
+
+If the tree is a phylogram, \display{} prints a scale bar.\footnote{The
+positioning of the scale bar is a bit crude, especially for radial trees. This
+is mainly because of the "\svg{} string length curse", that is, the
+impossibility of finding out the length of a text string in \svg. This means it
+is hard to ensure the scale bar will not overlap with a node label, unless one
+places it far away in a corner, which is what I do for now. An improvement of
+this is on my TODO list.} Its units can be specified with option \texttt{-u},
+the default is substitutions per site. To suppress the scale bar, pass the
+\texttt{-S} switch.
 
 \subsubsection{Using CSS}
 \label{sct_display_svg_css}
@@ -84,10 +96,10 @@ applied to which node. If file \texttt{css.map} contains the following
 \begin{quote} \verbatiminput{css.map} \end{quote} we can apply the style map to
 the tree above:
 
-\verbatiminput{nw_display_sr_w450_ccssmap_catarrhini_svg.cmd}
+\verbatiminput{display_5_svg.cmd}
 
 \begin{center}
- \includegraphics{nw_display_sr_w450_ccssmap_catarrhini_svg.pdf}
+ \includegraphics{display_5_svg.pdf}
 \end{center}
 
 The syntax of the \css{} map file is as follows. Each line describes one style
@@ -136,17 +148,17 @@ label style, option \texttt{-i} the inner node label style, and option
 \texttt{-b} the branch length style. For example, the following tree, which was
 produced using defaults, could be improved a bit:
 
-\verbatiminput{nw_display_s_vertebrata_svg.cmd}
+\verbatiminput{display_6_svg.cmd}
 \begin{center}
-  \includegraphics{nw_display_s_vertebrata_svg.pdf}
+  \includegraphics{display_6_svg.pdf}
 \end{center}
 
 \noindent{}Let's remove the branch length labels, reduce
 the vertical spacing, reduce the size of inner node labels (bootstrap values),
 and write the leaf labels in italics, using a font with serifs:
-\verbatiminput{nw_display_s_vertebrata_styled_svg.cmd}
+\verbatiminput{display_7_svg.cmd}
 \begin{center}
-  \includegraphics{nw_display_s_vertebrata_styled_svg.pdf}
+  \includegraphics{display_7_svg.pdf}
 \end{center}
 Option \texttt{-v} specifies the vertical spacing, in pixels, between two
 successive leaves (the default is 40). Option \texttt{-b} sets the style of
@@ -175,14 +187,14 @@ specified with option \texttt{-o}:
 \begin{quote}
  \verbatiminput{ornament.map}
 \end{quote}
-\verbatiminput{nw_display_sr_w450_oornmap_catarrhini_svg.cmd}
+\verbatiminput{display_8_svg.cmd}
 \begin{center}
- \includegraphics{nw_display_sr_w450_oornmap_catarrhini_svg.pdf}
+ \includegraphics{display_8_svg.pdf}
 \end{center}
 Ornaments and \css{} can be combined:
-\verbatiminput{nw_display_sr_w450_oornmap_ccssmap_catarrhini_svg.cmd}
+\verbatiminput{display_9_svg.cmd}
 \begin{center}
- \includegraphics{nw_display_sr_w450_oornmap_ccssmap_catarrhini_svg.pdf}
+ \includegraphics{display_9_svg.pdf}
 \end{center}
 
 \subsubsection{Example: Mapping GC Content}
@@ -192,8 +204,8 @@ also computed the \gc{} content of all sequences, and mapped it into a color
 map that goes from {\color{Blue} blue} (33.3\%) to {\color{Red} red} (44.5\%).
 \texttt{b2r.map}. Then:
 
-\verbatiminput{display_20_svg.cmd}
-\includegraphics{display_20_svg.pdf}
+\verbatiminput{display_10_svg.cmd}
+\includegraphics{display_10_svg.pdf}
 \bigskip{}
 
 \noindent{}As we can see, the high-\gc{} sequences are all found in the same main clade.

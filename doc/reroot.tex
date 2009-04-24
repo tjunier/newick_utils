@@ -10,23 +10,23 @@ Rooting a tree is usually done by specifying an \textit{outgroup}. In the simple
 
 Consider the following primate tree, \texttt{simiiformes\_wrong}:
 
-\includegraphics{reroot_1og_orig_svg.pdf}
+\includegraphics{reroot_1_svg.pdf}
 
 \noindent{}It is wrong because \texttt{Cebus}, which is a New World monkey (capuchin), should be the sister group of all the rest (Old World monkeys and apes, technically Catarrhini), whereas it is shown as the sister group of the macaque-colobus family, Cercopithecidae. We can correct this by re-rooting the tree using \texttt{Cebus} as outgroup:
-\verbatiminput{reroot_1og_corr_svg.cmd}
+\verbatiminput{reroot_2_svg.cmd}
 which produces:
 
-\includegraphics{reroot_1og_corr_svg.pdf}
+\includegraphics{reroot_2_svg.pdf}
 
 The outgroup does not need to be a single leaf. The following tree is wrong for the same reason as the one before, except that is has three New World monkey species instead of one, and they appear as a clade (Platyrrhini) in the wrong place:
 
-\includegraphics{reroot_3og_orig_svg.pdf}
+\includegraphics{reroot_3_svg.pdf}
 
 \noindent{}We can correct this by specifying the New World monkey clade as outgroup:
 
-\verbatiminput{reroot_3og_result_svg.cmd}
+\verbatiminput{reroot_4_svg.cmd}
 
-\includegraphics{reroot_3og_result_svg.pdf}
+\includegraphics{reroot_4_svg.pdf}
 
 \noindent{}Note that I did not include all three New World monkeys, only \texttt{Cebus} and \texttt{Allouatta}. This is because it is always possible to define a clade using only two leaves. The result would be the same if I had included all three, though. You can use inner labels too, if there are any:
 \begin{verbatim}
