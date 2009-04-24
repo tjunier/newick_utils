@@ -31,6 +31,7 @@ struct parameters {
 	double left_label_angle_correction;
 	int root_length;
 	double label_char_width;	/* for estimating label length */
+	int no_scale_bar;		/* suppresses scale bar if true */
 };
 
 void help(char* argv[])
@@ -122,6 +123,7 @@ void help(char* argv[])
 "\n"
 "       will generate as many SVG files as there are Newick trees in\n"
 "       many_trees.nw. The files will be named tree_01.svg, tree_02.svg, etc.\n"
+"    -S: suppress scale bar (ignored for cladograms)\n"
 "    -u <string>: string is used as unit name for scale bar (ignored\n"
 "       if no scale bar is drawn).\n"
 "    -U <URL_filename>: use specified URL map [only SVG]. A URL map\n"
@@ -182,13 +184,14 @@ struct parameters get_params(int argc, char *argv[])
 	params.left_label_angle_correction = 0.0;
 	params.root_length = ROOT_SPACE;
 	params.label_char_width = 8.0;
+	params.no_scale_bar = FALSE;
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
 	const int DEFAULT_WIDTH_CHARS = 80;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:l:o:rR:su:U:v:w:W:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:l:o:rR:sSu:U:v:w:W:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -231,6 +234,9 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 's':
 			params.svg = TRUE;
+			break;
+		case 'S':
+			params.no_scale_bar = TRUE;
 			break;
 		case 'u':
 			params.branch_length_unit = optarg;
@@ -352,6 +358,9 @@ int main(int argc, char *argv[])
 			 * is_cladogram() takes some time to run, we just look
 			 * up  'align_leaves' which has the same value. */
 			with_scale_bar = !align_leaves;
+			/* User can also suppress scale bar */
+			if (params.no_scale_bar) with_scale_bar = FALSE;
+
 			svg_header(leaf_count(tree), with_scale_bar);
 			svg_run_params_comment(argc, argv);
 			display_svg_tree(tree, align_leaves, with_scale_bar,

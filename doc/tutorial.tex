@@ -8,11 +8,11 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{color}
+\usepackage[margin=1.5in]{geometry}
 
-% Title Page
-\title{Newick Utilities Tutorial}
-\author{Thomas Junier}
-
+% Colors
+\definecolor{Blue}{rgb}{0,0,1}
+\definecolor{Red}{rgb}{1,0,0}
 
 \newcommand{\nutils}{Newick Utilities}
 \newcommand{\unix}{\textsc{Unix}}
@@ -56,8 +56,24 @@
 \theoremstyle{definition}
 \newtheorem{axiom}{Axiom}
 
+% Arbitrary-size horizontal rules - good for titles
+\newcommand{\Hrule}[1]{\rule{\linewidth}{#1}}
+
 \begin{document}
-\maketitle
+
+\begin{titlepage}
+\begin{center}
+\Hrule{0.5mm} \\[0.8cm]
+{\Huge Newick Utilities Tutorial} \\[0.5cm]
+Thomas Junier \texttt{thomas.junier@unige.ch} \\
+Computational Evolutionary Genomics Group \\
+Department of Genetic Medicine and Development \\
+University of Geneva, Switzerland
+\Hrule{0.5mm}
+\includegraphics{display_20_svg.pdf}
+\end{center}
+\end{titlepage}
+
 \tableofcontents
 
 \include{intro}

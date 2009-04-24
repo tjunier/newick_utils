@@ -17,3 +17,5 @@ rl: -sr -R 50 -w 500 catarrhini.nw
 sbar: -s simiiformes.nw
 multi_svg:-s forest.nw
 cssquot: -sr -w 450 -c quotcss.map catarrhini.nw
+sS: -sS catarrhini.nw
+srS: -srS catarrhini.nw
