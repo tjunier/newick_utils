@@ -39,3 +39,13 @@ for cmd in *_svg ; do
 		inkscape -f $cmd.svg -A $cmd.pdf
 	fi
 done
+
+# These run ../src/nodes_vs_depth.sh on the relevant files
+
+for nvsd in star balanced short_leaves; do
+	if [ ../src/nodes_vs_depth.sh -nt $nvsd.eps ]; then
+		echo $nvsd.eps
+		../src/nodes_vs_depth.sh $nvsd 40
+		epstopdf $nvsd.eps
+	fi
+done
