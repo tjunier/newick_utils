@@ -1,18 +1,12 @@
-nw_distance: problem with -m l doc/dist_meth_xpl.nw. Selection should be just
-nodes A and B (labeled leaves) but then the LCA should be node d, yet it seems
-to be the root.
+nw_reroot: option -l should accept outgroup nodes and automatically complement
+the selection. In fact, what happens if we pass ingroup labels but not -l?
+Actually it doesn't change anything. Fix this before the release.
 
 tree.c: rename nodes_in_order to nodes_in_postorder
 
-new program nw_trim: cuts branches at a certain depth or number of ancestors. optionally prints out the trimmed branches.
-
 new program: nw_info: prints a summary (number of leaves, number of inner nodes, overall depth, whether the tree is a cladogram, etc.
 
-all: check that all programs support multiple trees in input.
-
 nw_ed: add a function for replacing an inner node with a leaf (TODO: useful?)
-
-all: review help pages (-h)
 
 all: replace 'parse order' by post-order
 
@@ -254,3 +248,12 @@ I'll leave this out for now.
 [solved] nw_distance: doesnt' work with doc/dist_sel_xpl.nw (parent edge of
 inner node C has length 5, should have length 4). -- tree had wrong format. 
 
+[fixed] nw_distance: problem with -m l doc/dist_meth_xpl.nw. Selection should
+be just nodes A and B (labeled leaves) but then the LCA should be node d, yet
+it seems to be the root.
+
+[done] new program nw_trim: cuts branches at a certain depth or number of ancestors. optionally prints out the trimmed branches.
+
+[done] all: check that all programs support multiple trees in input.
+
+[done] all: review help pages (-h)

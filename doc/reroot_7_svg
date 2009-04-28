@@ -1,0 +1,4 @@
+nw_reroot vrt1cg.nw -l Orcinus Vulpes Bradypus Tetrao Lepus \
+	Didelphis Bombina Sorex Hylobates Homo Papio Procavia \
+	Tamias Mesocricetus \
+| nw_display -s -v 20 -

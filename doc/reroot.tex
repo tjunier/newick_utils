@@ -38,4 +38,25 @@ wrong place:
 \begin{verbatim}
 $ nw_reroot simiiformes_wrong_3og Platyrrhini
 \end{verbatim}
-will reroot in the same way (not shown). Beware that inner labels are often used for support values (as in bootstrapping), which are generally not useful for defining clades.
+will reroot in the same way (not shown). Beware that inner labels are often
+used for support values (as in bootstrapping), which are generally not useful
+for defining clades.
+
+\subsection{Rerooting on the ingroup}
+
+Sometimes the desired species cannot be used for rooting, as their last common ancestor is the tree's root. For example, consider the following tree:
+
+\includegraphics{reroot_5_svg.pdf}
+
+\noindent{}It is wrong because \textit{Danio} (a ray-finned fish) is shown closer to tetrapods than to other ray-finnned fishes (\textit{Fugu} and \textit{Tetraodon}). So we should reroot it, specifying that the fishes should form the outgroup. We could try this:
+
+\verbatiminput{reroot_6_txt.cmd}
+
+\noindent{}But this will fail:
+
+\verbatiminput{reroot_6_txt.out}
+
+\noindent{}This fails because the last common ancestor of the two pufferfish is the root itself. The workaround in this case is to try the ingroup. This is done by passing option \texttt{-l} (lax), along with all species in the ingroup:\footnote{As the list of ingroup species can be rather long, future versions will invert the selection automatically}
+
+\verbatiminput{reroot_7_svg.cmd}
+\includegraphics{reroot_7_svg.pdf}

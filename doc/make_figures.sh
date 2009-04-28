@@ -22,7 +22,7 @@ for cmd in *_{txt,nw} ; do
 		cat $cmd >> $cmd.cmd
 		# run command, pipe through expand b/c LaTeX's verbatiminput does not
 		# handle TABs correctly, fold because it may exceed page width.
-		sh < $cmd | fold | expand > $cmd.out
+		sh < $cmd 2>&1 | fold | expand > $cmd.out
 	fi
 done
 
