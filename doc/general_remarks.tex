@@ -22,13 +22,13 @@ directory.
 \label{sct_input}
 
 Since the \nutils{} are for working with trees, it should be no surprise
-that the main input is a file containing Newick trees. The trees must be in
+that the main input is a file containing trees. The trees must be in
 Newick format, which is one of the most widely used and uderstood formats. A
-complete description can be found at
+complete description of this format can be found at
 \url{http://evolution.genetics.washington.edu/phylip/newicktree.html}.
 
 The input file is always the first argument to the program (after any options).
-It may be a file stored in a:w filesystem, or \stdin{}. In the latter case, the
+It may be a file stored in a filesystem, or \stdin{}. In the latter case, the
 filename is replaced by a '\texttt{-}' (dash):
 \begin{samepage}
 \begin{verbatim}
@@ -46,7 +46,7 @@ Of course the second form is only really useful when chaining several programs i
 The input file can contain one or more trees, preferably one tree per
 line\footnote{It may also work if the trees are formatted differently, but the
 programs were only tested on input files with one tree per line.}. The task
-will be performed on each tree in the input. So if you need to reroot 1,000
+will be performed\footnote{well, attempted\ldots} on each tree in the input. So if you need to reroot 1,000
 trees on the same outgroup, you can do it all in a single step (see
 \ref{sct_reroot}). 
 
@@ -63,7 +63,7 @@ always text (\textsc{ascii} graphics, \svg, numeric data, textual data, etc.).
 
 Options change program behaviour and/or allow extra arguments to be passed.
 They are all passed on the command line, before the mandatory argument(s),
-using a single letter preceded by a dash - in the usual \unix{} way. There are
+using a single letter preceded by a dash, in the usual \unix{} way. There are
 no mandatory control files, although some tasks require additional files (\eg{}
 \ref{sct_display_svg_css}). For example, we saw above that \display{} produces
 graphs. By default the graph is \ascii{} graphics, but with option \texttt{-s},

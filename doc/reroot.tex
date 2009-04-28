@@ -2,7 +2,7 @@
 \section{Rooting and Rerooting}
 \label{sct_reroot}
 
-Rooting transforms an unrooted tree into a rooted one, and rerooting changes a rooted tree's root. Some tree-building methods produce rooted trees (e.g., \textsc{UPGMA}), others produce unrooted ones (neighbor-joining, maximum-likelihood). 
+Rooting transforms an unrooted tree into a rooted one, and rerooting changes a rooted tree's root. Some tree-building methods produce rooted trees (e.g., \textsc{upgma}), others produce unrooted ones (neighbor-joining, maximum-likelihood). 
 
 The Newick format is implicitly rooted, in the sense that there is a 'top' node from which all other nodes descend. Some applications regard a tree with a trifuraction at the top node as unrooted. 
 
@@ -48,7 +48,10 @@ Sometimes the desired species cannot be used for rooting, as their last common a
 
 \includegraphics{reroot_5_svg.pdf}
 
-\noindent{}It is wrong because \textit{Danio} (a ray-finned fish) is shown closer to tetrapods than to other ray-finnned fishes (\textit{Fugu} and \textit{Tetraodon}). So we should reroot it, specifying that the fishes should form the outgroup. We could try this:
+\noindent{}It is wrong because \textit{Danio} (a ray-finned fish) is shown
+closer to tetrapods than to other ray-finnned fishes (\textit{Fugu} and
+\textit{Tetraodon}). So we should reroot it, specifying that the fishes should
+form the outgroup. We could try this:
 
 \verbatiminput{reroot_6_txt.cmd}
 
@@ -56,7 +59,14 @@ Sometimes the desired species cannot be used for rooting, as their last common a
 
 \verbatiminput{reroot_6_txt.out}
 
-\noindent{}This fails because the last common ancestor of the two pufferfish is the root itself. The workaround in this case is to try the ingroup. This is done by passing option \texttt{-l} (lax), along with all species in the ingroup:\footnote{As the list of ingroup species can be rather long, future versions will invert the selection automatically}
+\noindent{}This fails because the last common ancestor of the two pufferfish is
+the root itself. The workaround in this case is to try the ingroup. This is
+done by passing option \texttt{-l} (lax), along with \emph{all} species in the
+outgroup (this is because \reroot{} finds the ingroup by complementing the outgroup):
 
 \verbatiminput{reroot_7_svg.cmd}
 \includegraphics{reroot_7_svg.pdf}
+
+\noindent{}To repeat: all outgroup labels were passed, not just the two
+normally needed to find the last common ancestor -- since, precisely, we can't
+use the \lca.

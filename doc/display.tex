@@ -33,8 +33,8 @@ available for display (the default is 80):
 \label{sct_display_svg}
 
 First, a disclaimer: there are dozens of tools for viewing trees out there, and
-I'm not interested in competing with them. The reasons why I added \svg{}
-capabilities to \display{} were:
+I'm not interested in competing with them. The reasons why I included \svg{}
+capabilities (besides automation, etc.) were:
 \begin{itemize}
 \item I wanted to be able to produce reasonably good graphics even if no other
 tool was at hand
@@ -46,7 +46,16 @@ To produce \svg, pass option \texttt{-s}:
 \begin{verbatim}
 $ nw_display -s catarrhini > catarrhini.svg
 \end{verbatim}
-Now you can visualize the result using any \svg-enabled tool (all good Web browsers can do it), or convert it to another format with, say \texttt{rsvg} or Inkscape. The following \pdf{} image was produced like this:
+Now you can visualize the result using any \svg-enabled tool (all good Web
+browsers can do it), or convert it to another format with, say \texttt{rsvg} or
+Inkscape.  The \svg{} produced by \display{} is designed to be easy to edit
+in an interactive editor like Inkscape (\url{http://www.inkscape.org}): for
+example, the tree edges are in one group, and the text in another, so it is
+easy to change the line properties of the edges, or the font family of the
+text, for example (you can also do this from \display{} using a \css{} map, see
+\ref{sct_display_svg_css}).
+
+The following \pdf{} image was produced like this:
 
 \begin{verbatim}
 $ inkscape -f catarrhini.svg -A catarrhini.pdf
@@ -55,25 +64,20 @@ $ inkscape -f catarrhini.svg -A catarrhini.pdf
 \begin{center}
  \includegraphics{display_3_svg.pdf}
 \end{center}
-All \svg{} images shown in this document were produced in the same way. In the
+All \svg{} images shown in this document were processed in the same way. In the
 rest of this document we will usually skip the redirection into an \svg{} file
 and omit the \svg{}-to-\textsc{pdf} conversion step.
 
-The \svg{} produced by \display{} is designed to be easy to edit
-in an interactive editor like Inkscape (\url{http://www.inkscape.org}): the
-tree edges are in one group, and the text in another. So it is easy to change
-the line properties of the edges, or the font family of the text, for example
-(you can also do this from \display{} using a \css{} map, see
-\ref{sct_display_svg_css}).
 
-There are many options for \svg{} graphs. First, you can make radial trees,
-using option \texttt{-r} 
+\subsubsection{Radial trees}
+
+You can make radial trees by passing the \texttt{-r} switch:
 \verbatiminput{display_4_svg.cmd}
-You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
-
 \begin{center}
 \includegraphics{display_4_svg.pdf}
 \end{center}
+You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
+
 
 \subsubsection{Scale Bar}
 
@@ -82,7 +86,7 @@ positioning of the scale bar is a bit crude, especially for radial trees. This
 is mainly because of the "\svg{} string length curse", that is, the
 impossibility of finding out the length of a text string in \svg. This means it
 is hard to ensure the scale bar will not overlap with a node label, unless one
-places it far away in a corner, which is what I do for now. An improvement of
+places it far away in a corner, which is what I do for now. An improvement to
 this is on my TODO list.} Its units can be specified with option \texttt{-u},
 the default is substitutions per site. To suppress the scale bar, pass the
 \texttt{-S} switch.
@@ -94,7 +98,8 @@ You can modify node style using \css. This is done by specifying a
 \textit{\css{} map}, which is just a text file that says which style should be
 applied to which node. If file \texttt{css.map} contains the following
 \begin{quote} \verbatiminput{css.map} \end{quote} we can apply the style map to
-the tree above:
+the tree above by passing \texttt{-c}, which takes the name of the \css{} file
+as argument:
 
 \verbatiminput{display_5_svg.cmd}
 
@@ -102,34 +107,41 @@ the tree above:
  \includegraphics{display_5_svg.pdf}
 \end{center}
 
-The syntax of the \css{} map file is as follows. Each line describes one style
-and the set of nodes to which it applies. A line contains elements separated by
-whitespace (whitespace between quotes does not count). The first element of the
-line is the style, and it is a snippet of \css{} code. The second element is
-either \texttt{Clade} or \texttt{Individual} and states whether the following
-nodes are to be treated individually or as a clade. The next element(s) are
-node labels and specify the nodes to which the style must be applied: if the
-second element was \texttt{Clade}, the program finds the last common ancestor
-of the nodes and applies the style to that node and all its descendants. If the
-second element was \texttt{Individual}, then the style is only applied to the
-nodes themselves.
+The syntax of the \css{} map file is as follows.
+\begin{itemize}
+	\item Each line describes one style and the set of nodes to which it applies.
+	A line contains elements separated by whitespace (whitespace between quotes
+	does not count). 
+	\item The first element of the line is the style, and it is a snippet of
+	\css{} code. 
+	\item The second element states whether the following nodes are to be treated
+	individually or as a clade. It is either \texttt{Clade} or
+	\texttt{Individual} (which can be abbreviated to \texttt{C} or \texttt{I},
+	respectively).
+	\item The remaining element(s) are node labels and specify the nodes to which
+	the style must be applied: if the second element was \texttt{Clade}, the
+	program finds the last common ancestor of the nodes and applies the style to
+	that node and all its descendants. If the second element was
+	\texttt{Individual}, then the style is only applied to the nodes themselves.
+\end{itemize}
 
 In our example, the first line in \texttt{css.map} says that the style
 \texttt{stroke:red} must be applied to the \texttt{Clade} defined by
 \texttt{Macaca} and \texttt{Cercopithecus}, which consists of these two nodes,
-their ancestor \texttt{Cercopithecinae}, and \texttt{Papio}. The \texttt{Clade}
-keyword can be abbreviated to \texttt{C}, as in the next line. Line 2
+their ancestor \texttt{Cercopithecinae}, and \texttt{Papio}. Line 2
 prescribes that style \texttt{stroke:\#fa7} (an \svg{} hexadecimal color
 specification) must be applied to the clade defined by \texttt{Homo} and
 \texttt{Hylobates}, which consists of these two nodes, their last common
 ancestor (unlabeled), and all its descendants (that is, \texttt{Homo},
 \texttt{Pan}, \texttt{Gorilla}, \texttt{Pongo}, and \texttt{Hylobates}, as well
 as the inner nodes \texttt{Hominini}, \texttt{Homininae} and
-\texttt{Hominidae}). Line 3 says that the style \texttt{stroke:green} is to be applied to nodes \texttt{Colobus} and \texttt{Cercopithecus}, and only these nodes - not to the clade that they define. 
-Line 4 says that the clade defined by \texttt{Homo} and
-\texttt{Pan} should receive style \texttt{stroke-width:2;~stroke:blue} - note
-that the quotes have been removed: they are not part of the style, rather they
-allow us to improve readability by adding some whitespace.
+\texttt{Hominidae}). Line 3 says that the style \texttt{stroke:green} is to be
+applied individually to nodes \texttt{Colobus} and \texttt{Cercopithecus}, and
+only these nodes - not to the clade that they define.  Line 4 says that the
+clade defined by \texttt{Homo} and \texttt{Pan} should receive style
+\texttt{stroke-width:2;~stroke:blue} - note that the quotes have been removed:
+they are not part of the style, rather they allow us to improve readability by
+adding some whitespace.
 
 The style of an inner clade overrides that of an outer clade, \textit{e.g.},
 although the \texttt{Homo} - \texttt{Pan} clade is nested inside the
@@ -137,11 +149,8 @@ although the \texttt{Homo} - \texttt{Pan} clade is nested inside the
 lines) which overrides the containing clade's style (pinkish with normal
 width).
 
-Also, note that \texttt{Individual} overrides \texttt{Clade}, which is why
+Likewise, \texttt{Individual} overrides \texttt{Clade}, which is why
 \texttt{Cercopithecus} is green even though it belongs to a red clade.
-
-The \texttt{Clade} and \texttt{Individual} keywords are not case-sensitive and
-can be abbreviated - in fact only the first letter counts.
 
 Styles can also be applied to labels. Option \texttt{-l} specifies the leaf
 label style, option \texttt{-i} the inner node label style, and option
@@ -173,10 +182,10 @@ style to \texttt{opacity:0} (\texttt{visibility:hidden} also works).
 Ornaments are arbitrary snippets of \svg{} code that are displayed at specified
 node positions. As for \css, this is done with a map. The ornament map has the
 same syntax as the \css{} map, except that you specify \svg{} elements rather
-than \css{} styles. The \texttt{Individual} keyword means that all nodes are
-sport the ornament, while \texttt{Clade} means that only the clade's \lca{}
-must be adorned. The ornament is translated in such a way that its (0,0)
-coordinate corresponds to the position of the node.
+than \css{} styles. The \texttt{Individual} keyword means that all nodes named
+on a given line sport the corresponding ornament, while \texttt{Clade} means
+that only the clade's \lca{} must be adorned. The ornament is translated in
+such a way that its (0,0) coordinate corresponds to the position of the node (for now it is not rotated, but this may come in a future release).
 
 The following file, \texttt{ornament.map}, instructs to draw a red circle with
 a black border on \texttt{Homo} and \texttt{Pan}, and a cyan circle with a blue
@@ -200,20 +209,26 @@ Ornaments and \css{} can be combined:
 \subsubsection{Example: Mapping GC Content}
 
 In a study of human rhinoviruses, I have produced a phylogenetic tree. I have
-also computed the \gc{} content of all sequences, and mapped it into a color
-map that goes from {\color{Blue} blue} (33.3\%) to {\color{Red} red} (44.5\%).
-\texttt{b2r.map}. Then:
+also computed the \gc{} content of the sequences, and mapped it into a gradient
+that goes from {\color{Blue} blue} (33.3\%) to {\color{Red} red} (44.5\%). I
+used this gradient to produce a \css{} map, \texttt{b2r.map}:
+
+\verbatiminput{display_11_txt.cmd}
+\verbatiminput{display_11_txt.out}
+
+\noindent{}Then:
 
 \verbatiminput{display_10_svg.cmd}
 \includegraphics{display_10_svg.pdf}
 \bigskip{}
 
-\noindent{}As we can see, the high-\gc{} sequences are all found in the same main clade.
+\noindent{}As we can see, the high-\gc{} sequences are all found in the same
+main clade (some leaves have no ornament because I couldn't find the sequences).
 
 \subsubsection{Multiple SVG Trees}
 
 Like all \nutils, \display{} can handle multiple trees, even in \svg{} mode.
-The best way to do this is not evident: one can generate one file per tree (but
+The best way to do this was not evident: one can generate one file per tree (but
 then we break the rule that every program is a filter and so writes to standard
 output), or one can put all the trees in one \svg{} document (but then we have
 to impose tiling or some other arrangement), or one can just output one \svg{}
@@ -232,5 +247,5 @@ This will produce one \svg{} file per tree in \texttt{forest.nw}, named \texttt{
 
 \display{} has many options, and we will not describe them all here - all of
 them are described when you pass option \texttt{-h}. They include support for
-clickable images (with URLs to arbitrary Web pages), setting the scale bar
-units, changing the root length, etc. 
+clickable images (with URLs to arbitrary Web pages), nudging labels, changing
+the root length, etc. 

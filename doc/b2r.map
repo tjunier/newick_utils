@@ -28,3 +28,7 @@
 "<circle r='4' style='fill:#e60018;stroke:black'/>"	I	POLIO3
 "<circle r='4' style='fill:#d90025;stroke:black'/>"	I	POLIO1A
 "<circle r='4' style='fill:#dc0022;stroke:black'/>"	I	POLIO2
+"<circle r='4' style='fill:#3000ce;stroke:black'/>"	I	HRV17
+"<circle r='4' style='fill:#3000ce;stroke:black'/>"	I	HRV52
+"<circle r='4' style='fill:#3000ce;stroke:black'/>"	I	HRV11
+"<circle r='4' style='fill:#3000ce;stroke:black'/>"	I	HRV24
