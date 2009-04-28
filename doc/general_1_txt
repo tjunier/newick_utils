@@ -1,0 +1,2 @@
+nw_indent -h | head -25
+echo "[...]"

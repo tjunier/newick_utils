@@ -7,32 +7,11 @@ The following applies to all programs in the \nutils{} package.
 \section{Help}
 \label{sct_help}
 
-All programs print a help message if passed option \texttt{-h}:
-
+All programs print a help message if passed option \texttt{-h}. Here are the
+first 25 lines of \nwindent{}'s help, which you obtain by typig
+\verb+nw_indent -h+:
 \begin{samepage}
-\begin{verbatim}
-$ nw_indent -h
-Indents the Newick, making structure more clear.
-
-Synopsis
---------
-
-nw_indent [-cht:] <newick trees filename|->
-
-Input
------
-
-Argument is the name of a file that contains Newick trees, or '-' (in
-which case trees are read from standard input).
-
-Output
-------
-
-By default, prints the input tree, with each parenthesis and each leaf on a
-line of its own, and indented a multiple of '  ' (two spaces) to reflect
-structure. The default output is valid Newick.
-[...]
-\end{verbatim}
+\verbatiminput{general_1_txt.out}
 \end{samepage}
 The help page describes the program's purpose, its input and output, and its
 options, in a format reminiscent of \unix{} manpages. It also shows a few
