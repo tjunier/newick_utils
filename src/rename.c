@@ -65,18 +65,18 @@ void help(char *argv[])
 "# \"Foot_and_Mouth\" is longer than 10 characters. The number->label mapping\n"
 "# was stored in file data/HRV.map. Now we can rename the whole tree:\n"
 "\n"
-"%s data/HRV_numeric data/HRV.map\n"
+"$ %s data/HRV_numeric data/HRV.map\n"
 "\n"
 "# We can construct a tree of families from a genus tree and a genus->family\n"
 "# map. File data/falconiformes is a tree of diurnal raptor genera, and\n"
 "# data/falc_map maps the genera to families. To produce a family tree, we do: \n"
 "\n"
-"%s data/falconiformes data/falc_map\n"
+"$ %s data/falconiformes data/falc_map\n"
 "\n"
 "# In fact, we could directly condense the tree, so that only one leaf per\n"
 "# family is left:\n"
 "\n"
-"%s data/falconiformes data/falc_map | nw_condense -\n",
+"$ %s data/falconiformes data/falc_map | nw_condense -\n",
 	argv[0],
 	argv[0],
 	argv[0],

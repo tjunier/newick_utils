@@ -160,18 +160,18 @@ void help(char *argv[])
 "# \"open\" all nodes with bootstrap support <= 10 (assuming support is coded\n"
 "# in internal node labels)\n"
 "\n"
-"%s data/HRV.bs.nw 'i & b <= 10' o \n"
+"$ %s data/HRV.bs.nw 'i & b <= 10' o \n"
 "\n"
 "# \"open\" all nodes with bootstrap support < 750, then discard leaves that\n"
 "# are directly attached to the ingroup's root. This effectively keeps only\n"
 "# leaves that are part of well-supported clades.\n"
 "\n"
-"%s data/big.rn.nw 'i & b < 750' o | %s - 'l & a == 2' d\n"
+"$ %s data/big.rn.nw 'i & b < 750' o | %s - 'l & a == 2' d\n"
 "\n"
 "# get all clades with at least one ancestor, 980 or better support. Do not\n"
 "# print subtrees of matching clades, even if they match (option -o)\n"
 "\n"
-"%s data/big.rn.nw -n -o 'a >= 1 & b >= 980' s\n",
+"$ %s data/big.rn.nw -n -o 'a >= 1 & b >= 980' s\n",
 	argv[0],
 	argv[0],
 	argv[0],

@@ -69,10 +69,10 @@ void help(char *argv[])
 "--------\n"
 "\n"
 "# Cut tree at depth 20\n"
-"%s data/catarrhini 20\n"
+"$ %s data/catarrhini 20\n"
 "\n"
 "# Discard nodes with more than 3 ancestors\n"
-"%s -a data/catarrhini 3\n",
+"$ %s -a data/catarrhini 3\n",
 	argv[0],
 	argv[0],
 	argv[0]

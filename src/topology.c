@@ -55,11 +55,11 @@ void help(char *argv[])
 "# Make a cladogram of Old-World monkeys and apes by discarding branch\n"
 "# length data:\n"
 "\n"
-"%s data/catarrhini\n"
+"$ %s data/catarrhini\n"
 "\n"
 "# Make a purely structural tree (still valid Newick!)\n"
 "\n"
-"%s -IL data/catarrhini\n",
+"$ %s -IL data/catarrhini\n",
 	argv[0],
 	argv[0],
 	argv[0]

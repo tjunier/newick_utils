@@ -52,10 +52,10 @@ void help(char *argv[])
 "--------\n"
 "\n"
 "# Indent\n"
-"%s data/catarrhini\n"
+"$ %s data/catarrhini\n"
 "\n"
 "# Indent, with visual guides for indentation (NOT valid Newick anymore)\n"
-"%s -t '|  ' data/catarrhini\n",
+"$ %s -t '|  ' data/catarrhini\n",
 	argv[0],
 	argv[0],
 	argv[0]

@@ -51,7 +51,7 @@ void help(char *argv[])
 "\n"
 "# Generate a random tree\n"
 "\n"
-"%s\n",
+"$ %s\n",
 	argv[0],
 	argv[0]
 	);

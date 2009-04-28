@@ -65,11 +65,11 @@ void help(char *argv[])
 "# This tree is rooted on humans, but the outgroup should be Cebus (New\n"
 "# World monkey) - let's fix that: \n"
 "\n"
-"%s data/catarrhini_wrong Cebus\n"
+"$ %s data/catarrhini_wrong Cebus\n"
 "\n"
 "# We can reroot on more than one node:\n"
 "\n"
-"%s data/catarrhini_wrong_3og Cebus Aotus \n",
+"$ %s data/catarrhini_wrong_3og Cebus Aotus \n",
 	argv[0],
 	argv[0],
 	argv[0]

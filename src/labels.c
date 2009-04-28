@@ -52,10 +52,10 @@ void help(char *argv[])
 "--------\n"
 "\n"
 "# just show labels\n"
-"%s data/catarrhini\n"
+"$ %s data/catarrhini\n"
 "\n"
 "# count leaves\n"
-"%s -I data/catarrhini | wc -l\n",
+"$ %s -I data/catarrhini | wc -l\n",
 	argv[0],
 	argv[0],
 	argv[0]

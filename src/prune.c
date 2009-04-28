@@ -58,13 +58,13 @@ void help(char *argv[])
 "--------\n"
 "\n"
 "# Remove humans and gorilla\n"
-"%s data/catarrhini Homo Gorilla\n"
+"$ %s data/catarrhini Homo Gorilla\n"
 "\n"
 "# Remove humans, chimp, and gorilla\n"
-"%s data/catarrhini Homo Gorilla Pan\n"
+"$ %s data/catarrhini Homo Gorilla Pan\n"
 "\n"
 "# the same, but using the clade's label\n"
-"%s data/catarrhini Homininae\n",
+"$ %s data/catarrhini Homininae\n",
 	argv[0],
 	argv[0],
 	argv[0],
