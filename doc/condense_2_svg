@@ -1,1 +1,1 @@
-nw_condense condense1.nw | nw_display -s -
+nw_condense condense1.nw | nw_display -s -w 200 -v 30 -

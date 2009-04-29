@@ -15,15 +15,16 @@ Consider the following tree:
 
 Suppose we want to specify the Hominoidea clade - the apes. It is the clade
 that contains \texttt{Homo}, \texttt{Pan} (chimps), \texttt{Gorilla},
-     \texttt{Pongo} (orangutan), and \texttt{Hylobates} (gibbons). The clade is
-     not labeled in this tree, but this list of labels defines it without
-     ambiguity. In fact, we can define it unambiguously using just
-     \texttt{Hylobates} and \texttt{Homo} - or \texttt{Hylobates} and any other
-     label. The point is that \emph{you never need more than two labels to
-     unambiguously define a clade}.
+\texttt{Pongo} (orangutan), and \texttt{Hylobates} (gibbons). The clade is not
+labeled in this tree, but this list of labels defines it without ambiguity. In
+fact, we can define it unambiguously using just \texttt{Hylobates} and
+\texttt{Homo} - or \texttt{Hylobates} and any other label. The point is that
+\emph{you never need more than two labels to unambiguously define a clade}.
 
 You cannot choose any two nodes, however: the condition is that the last
-common ancestor of the two nodes be the root of the desired clade.
+common ancestor of the two nodes be the root of the desired clade. For
+instance, if you used \texttt{Pongo} instead of \texttt{Hylobates}, you would
+define the Hominidae clade, leaving out the gibbons.
 
 \section{Why not just use node numbers?}
 

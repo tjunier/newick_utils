@@ -3,18 +3,26 @@
 
 Condensing a tree means reducing its size in a systematic, meaningful way
 (compare this to \emph{pruning} (\ref{sct_prune}) which arbitrarily removes
-branches). Currently the only condensing method available is simplifying
-clades in which all leaves have the same label - perhaps because they belong
-to the same taxon, etc.. Consider this tree:
+branches, and to \textit{trimming} (\ref{sct_trim}) which cuts a tree at a
+specified depth). Currently the only condensing method available is
+simplifying clades in which all leaves have the same label - for example
+because they belong to the same taxon, etc. Consider this tree:
 
+\begin{center}
 \includegraphics{condense_1_svg.pdf}
+\end{center}
 
-it has a clade that consists only of A, another of only C, plus a B leaf.
-Condensation will replace those clades by an A and a C leaf, respectively:
+\noindent{}it has a clade that consists only of A, another of only C, plus a B
+leaf.  Condensation will replace those clades by an A and a C leaf,
+respectively:
 
 \verbatiminput{condense_2_svg.cmd}
+\begin{center}
 \includegraphics{condense_2_svg.pdf}
+\end{center}
 
-Now the A and B leaves stand for whole clades.  A typical use of this is
-producing genus trees from species trees, or any higher-level tree from a
-lower-level one - see \ref{sct_higher_lvl}).
+\noindent{}Now the A and B leaves stand for whole clades. The tree is simpler,
+but the information about th erelationships of A, B and C is conserved, while
+the details of the A and C clades is not.  A typical use of this is producing
+genus trees from species trees (or any higher-level tree from a lower-level
+one), or checking consistency with other data -- see \ref{sct_higher_lvl}).

@@ -1,9 +1,9 @@
 \section{Computing Bootstrap Support}
 
 \support{} computes bootstrap support values from a target tree and a file of
-replicates. Say the target tree is in file \texttt{HRV.nw} and the replicates
-(20 of them) are in \texttt{HRV\_20reps.nw}. You can attribute support values
-to the target tree like this:
+replicate trees. Say the target tree is in file \texttt{HRV.nw} and the
+replicates (20 of them) are in \texttt{HRV\_20reps.nw}. You can attribute
+support values to the target tree like this:
 
 \verbatiminput{support_1_svg.cmd}
 \includegraphics{support_1_svg.pdf}
@@ -14,7 +14,7 @@ percentages instead of absolute counts.
 \subsubsection{Notes}
 
 There are many tree-building programs that compute bootstrap support. For
-example, PhyML can do it, but for large trees I typically have to distribute
+example, PhyML can do it, but for large tasks I typically have to distribute
 the replicates over several jobs (say, 100 jobs of 10 replicates each). I then
 collect all replicates files, concatenate them, and use \support{} to attribute
 the values to the target tree.

@@ -1,0 +1,12 @@
+\chapter{Newick order}
+\label{newick_order}
+
+There are many ways of visiting a tree. One can start from the root and
+proceed to the leaves, or the other way around. One can visit a node before
+its children (if any), or after them. Unless specified otherwise, the
+\nutils{} process trees as they appear in the \nw{} data. That is, for
+tree \texttt{(A,(B,C)d)e;} the order will be A, B, C, d, e.
+
+This means that a child always comes before its parent, and in particular,
+that the root comes last. This is known as reverse post-order traversali, but
+we'll just call it "\nw{} order".

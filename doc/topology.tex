@@ -3,7 +3,8 @@
 
 There are cases when one is more interested in the tree's structure than in the
 branch lengths, maybe because lengths are irrelevant or just because they are
-so short that they obscure the branching order. Consider the following tree:
+so short that they obscure the branching order. Consider the following tree,
+\texttt{vrt1.nw}:
 \begin{samepage}
 \verbatiminput{topol_1_txt.out}
 \end{samepage}
@@ -16,9 +17,9 @@ lengths altogether:
 \verbatiminput{topol_2_txt.out}
 \end{samepage}
 This effectively produces a \emph{cladogram}, that is, a tree that represents
-ancestry relationships but not rates of evolutionary change. The inner nodes are
-evenly spaced over the depth of the tree, and the leaves are aligned, so the
-branching order is more apparent.
+ancestry relationships but not amounts of evolutionary change. The inner nodes
+are evenly spaced over the depth of the tree, and the leaves are aligned, so
+the branching order is more apparent.
 
 Of course, \ascii{} trees have low resolution in the first place, so I'll show
 both trees look in \svg. First the original: 
@@ -29,7 +30,7 @@ both trees look in \svg. First the original:
 \verbatiminput{topol_4_svg.cmd}
 \includegraphics{topol_4_svg.pdf} \\
 As you can see, even with \svg{}'s much better resolution, it can be useful to
-display a tree as a cladogram.
+display the tree as a cladogram.
 
 \topology{} has the following options: \texttt{-b} keeps the branch lengths (obvioulsy, using this option alone has no effect); \texttt{-I} discards inner node labels, and \texttt{-L} discards leaf labels. An extreme example is the following, which discards everything \emph{but} topology:
 \verbatiminput{topol_5_txt.cmd}
@@ -37,5 +38,7 @@ This produces the following tree, which is still valid Newick:
 \verbatiminput{topol_5_txt.out}
 Let's look at it as a radial tree, for a change:
 \verbatiminput{topol_6_svg.cmd}
+\begin{center}
 \includegraphics{topol_6_svg.pdf}
+\end{center}
 

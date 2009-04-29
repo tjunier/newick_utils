@@ -1,25 +1,35 @@
 \section{Pruning}
 \label{sct_prune}
 
-Pruning is simply removing leaves or branches. Say you have the following
-tree:
+Pruning is simply removing arbitrary nodes. Say you have the following tree:
 
+\begin{center}
 \includegraphics{prune_1_svg.pdf}
+\end{center}
 
-and say you only need a subset of the species, perhaps because you want to
-compare this tree to another tree with fewer species. Specifically, let's say
-you don't need to show \textit{Tetraodon}, \textit{Danio}, \textit{Bombina},
-and \textit{Didelphis}. You just pass those labels to \prune:
+\noindent{}and say you only need a subset of the species, perhaps because you
+want to compare this tree to another tree with fewer species. Specifically,
+let's say you don't need to show \textit{Tetraodon}, \textit{Danio},
+\textit{Bombina}, and \textit{Didelphis}. You just pass those labels to
+\prune:
+
 \verbatiminput{prune_2_svg.cmd}
-\includegraphics{prune_2_svg.pdf} \\
-Note that each label is removed individually. The discarding of
+\begin{center}
+\includegraphics{prune_2_svg.pdf}
+\end{center}
+
+\noindent{}Note that each label is removed individually. The discarding of
 \textit{Didelphis} is the cause of the disappearance of the node labeled
 Mammalia.
 
 You can also discard internal nodes, if they are labeled (in future versions
 it will be possible to discard a clade by specifying descendants, just like
 \clade). For example, you can discard the whole mammalian clade like this:
+
 \verbatiminput{prune_3_svg.cmd}
-\includegraphics{prune_3_svg.pdf} \\
+\begin{center}
+\includegraphics{prune_3_svg.pdf} 
+\end{center}
+
 By the way, \textit{Tetrao} and \textit{Tetraodon} are not the same thing, the
-first is a bird (capercaillie), the second is a pufferfish.
+first is a bird (grouse), the second is a pufferfish.

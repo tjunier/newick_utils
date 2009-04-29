@@ -31,16 +31,15 @@ to compute distances. Let's look at examples.
 
 \subsection{Selection}
 
-In this section we will show the different selections, using the default
-distance method. The selection type is the argument to option \texttt{-s}.
-The nodes appear in the same order as in the Newick tree, except when they are
-specified on the command line (see below).
+In this section we will show the different selection types, using the default
+distance method (\ie{}, from the tree's root -- see below). The selection type
+is the argument to option \texttt{-s}.  The nodes appear in the same order as
+in the Newick tree, except when they are specified on the command line (see
+below).
 
 To illustrate the selection types, we need a tree that has both labeled and
-unlabeled leaves and inner nodes. Here it is in Newick format (I indented it
-with \nwindent{} - see \ref{sct_indent}):
-\verbatiminput{dist_sel_xpl.nw}
-And here it is in graphical form:
+unlabeled leaves and inner nodes. Here it is 
+\verbatiminput{dist_3_svg.cmd}
 \begin{center}
 \includegraphics{dist_3_svg.pdf}
 \end{center}
@@ -92,7 +91,13 @@ In this section we will take the default selection and vary the method. The
 method is passed as argument to option \texttt{-m}. I will also use an
 \emph{ad hoc} tree to ilustrate the methods:
 
+\verbatiminput{dist_11_svg.cmd}
+\begin{center}
 \includegraphics{dist_11_svg.pdf}
+\end{center}
+
+\noindent{}As explained above, the default selection consists of all labeled
+leaves -- in our case, nodes \texttt{A}, \texttt{B} and \texttt{C}. 
 
 \subsubsection{Distance from the tree's root}
 
