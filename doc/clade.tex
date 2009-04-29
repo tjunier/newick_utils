@@ -39,4 +39,57 @@ node is unlabeled in our tree (it should be \texttt{Hominoidea}), so we need to 
   \includegraphics{clade_4_svg.pdf}
 \end{center}
 
+\subsection{Monophyly}
 
+You can check if a set of leaves\footnote{In future versions I
+may extend this to inner nodes} form a monophyletic group by passing option
+\texttt{-m}: \clade{} will report the subtree only if it has no descendant leaf other than those specified.  For example, we can ask if the African apes (humans, chimp, gorilla) form a monophyletic group:
+
+\verbatiminput{clade_7_svg.cmd}
+\begin{center}
+  \includegraphics{clade_7_svg.pdf}
+\end{center}
+
+\noindent{}Yes, they do -- it's subfamily Homininae. On the other hand, the Asian apes (orangutan and gibbon) do not:
+
+\verbatiminput{clade_8_txt.cmd}
+\verb+[no output]+ \\
+
+\noindent{}Maybe early hominines split from orangs in South Asia before moving to Africa.
+
+\subsection{Context}
+
+You can ask for $n$ levels above the clade by passing option \texttt{-c}: 
+
+\verbatiminput{clade_5_svg.cmd}
+\begin{center}
+  \includegraphics{clade_5_svg.pdf}
+\end{center}
+
+\noindent{}In this case, \clade{} computed the \lca{} of \texttt{Gorilla} and
+\texttt{Homo}, "climbed up" two levels, and output the subtree at that point.
+This is useful when you want to extract a clade with its nearest neighbor(s). I
+use this when I have several trees in a file and my clade's nearest neighbors
+aren't always the same.
+
+\subsection{Siblings}
+
+You can also ask for the siblings of the specified clade. What, for example, is
+the sister clade of the cercopithecids? Ask for \texttt{Cercopithecidae} and
+pass option \texttt{-s}:
+
+\verbatiminput{clade_6_svg.cmd}
+\begin{center}
+  \includegraphics{clade_6_svg.pdf}
+\end{center}
+
+\noindent{}Why, it's the good old apes, of course. I use this a lot when I
+want to get rid of the outgroup: specify the outgroup and pass \texttt{-s} --
+behold!, you have the ingroup.
+
+Finally, although we are usually dealing with bifurcating trees, \texttt{-s}
+also applies to multifurcations: if a node has more than one sibling, \clade{} reports them all, in \nw{} order.
+
+\subsection{Limits}
+
+\clade{} assumes that node labels are unique. This should change in the future.

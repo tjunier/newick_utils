@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="300"
+   height="430"
+   version="1.1"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="trim_1.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <metadata
+     id="metadata183">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:window-height="856"
+     inkscape:window-width="891"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:zoom="1.5128796"
+     inkscape:cx="136.16443"
+     inkscape:cy="193.73103"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:current-layer="svg2" />
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 215 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="300 : 215 : 1"
+       inkscape:persp3d-origin="150 : 143.33333 : 1"
+       id="perspective185" />
+    <style
+       type="text/css"
+       id="style6">
+ .leaf-label {font-size:medium;font-family:sans}
+ .inner-label {font-size:small;font-family:sans}
+ .edge-label {font-size:small;font-family:sans}
+</style>
+  </defs>
+<!-- nw_display -s catarrhini  -->  <g
+     transform="translate(0,20)"
+     id="g8">
+    <g
+       style="stroke:black;fill:none;stroke-width:1;stroke-linecap:round"
+       id="g10">
+      <line
+         class="clade_0"
+         x1="118.3077"
+         y1="0.0000"
+         x2="161.6308"
+         y2="0.0000"
+         id="line12" />
+      <line
+         class="clade_0"
+         x1="145.3846"
+         y1="40.0000"
+         x2="172.4615"
+         y2="40.0000"
+         id="line14" />
+      <line
+         class="clade_0"
+         x1="145.3846"
+         y1="80.0000"
+         x2="172.4615"
+         y2="80.0000"
+         id="line16" />
+      <line
+         class="clade_0"
+         x1="145.3846"
+         y1="40.0000"
+         x2="145.3846"
+         y2="80.0000"
+         id="line18" />
+      <line
+         class="clade_0"
+         x1="118.3077"
+         y1="60.0000"
+         x2="145.3846"
+         y2="60.0000"
+         id="line20" />
+      <line
+         class="clade_0"
+         x1="118.3077"
+         y1="0.0000"
+         x2="118.3077"
+         y2="60.0000"
+         id="line22" />
+      <line
+         class="clade_0"
+         x1="77.6923"
+         y1="30.0000"
+         x2="118.3077"
+         y2="30.0000"
+         id="line24" />
+      <line
+         class="clade_0"
+         x1="77.6923"
+         y1="120.0000"
+         x2="158.9231"
+         y2="120.0000"
+         id="line26" />
+      <line
+         class="clade_0"
+         x1="77.6923"
+         y1="30.0000"
+         x2="77.6923"
+         y2="120.0000"
+         id="line28" />
+      <line
+         class="clade_0"
+         x1="37.0769"
+         y1="75.0000"
+         x2="77.6923"
+         y2="75.0000"
+         id="line30" />
+      <line
+         class="clade_0"
+         x1="37.0769"
+         y1="160.0000"
+         x2="91.2308"
+         y2="160.0000"
+         id="line32" />
+      <line
+         class="clade_0"
+         x1="37.0769"
+         y1="75.0000"
+         x2="37.0769"
+         y2="160.0000"
+         id="line34" />
+      <line
+         class="clade_0"
+         x1="10.0000"
+         y1="117.5000"
+         x2="37.0769"
+         y2="117.5000"
+         id="line36" />
+      <line
+         class="clade_0"
+         x1="158.9231"
+         y1="200.0000"
+         x2="186.0000"
+         y2="200.0000"
+         id="line38" />
+      <line
+         class="clade_0"
+         x1="158.9231"
+         y1="240.0000"
+         x2="186.0000"
+         y2="240.0000"
+         id="line40" />
+      <line
+         class="clade_0"
+         x1="158.9231"
+         y1="200.0000"
+         x2="158.9231"
+         y2="240.0000"
+         id="line42" />
+      <line
+         class="clade_0"
+         x1="104.7692"
+         y1="220.0000"
+         x2="158.9231"
+         y2="220.0000"
+         id="line44" />
+      <line
+         class="clade_0"
+         x1="104.7692"
+         y1="280.0000"
+         x2="131.8462"
+         y2="280.0000"
+         id="line46" />
+      <line
+         class="clade_0"
+         x1="104.7692"
+         y1="220.0000"
+         x2="104.7692"
+         y2="280.0000"
+         id="line48" />
+      <line
+         class="clade_0"
+         x1="37.0769"
+         y1="250.0000"
+         x2="104.7692"
+         y2="250.0000"
+         id="line50" />
+      <line
+         class="clade_0"
+         x1="50.6154"
+         y1="320.0000"
+         x2="77.6923"
+         y2="320.0000"
+         id="line52" />
+      <line
+         class="clade_0"
+         x1="50.6154"
+         y1="360.0000"
+         x2="69.5692"
+         y2="360.0000"
+         id="line54" />
+      <line
+         class="clade_0"
+         x1="50.6154"
+         y1="320.0000"
+         x2="50.6154"
+         y2="360.0000"
+         id="line56" />
+      <line
+         class="clade_0"
+         x1="37.0769"
+         y1="340.0000"
+         x2="50.6154"
+         y2="340.0000"
+         id="line58" />
+      <line
+         class="clade_0"
+         x1="37.0769"
+         y1="250.0000"
+         x2="37.0769"
+         y2="340.0000"
+         id="line60" />
+      <line
+         class="clade_0"
+         x1="10.0000"
+         y1="295.0000"
+         x2="37.0769"
+         y2="295.0000"
+         id="line62" />
+      <line
+         class="clade_0"
+         x1="10.0000"
+         y1="117.5000"
+         x2="10.0000"
+         y2="295.0000"
+         id="line64" />
+      <line
+         x1="0"
+         y1="206.2500"
+         x2="10.0000"
+         y2="206.2500"
+         id="line66" />
+    </g>
+    <g
+       style="stroke:none"
+       id="g68">
+      <text
+         class="leaf-label"
+         x="171.6308"
+         y="4.0000"
+         id="text70">Gorilla</text>
+      <text
+         class="edge-label"
+         x="139.969231"
+         y="-4.000000"
+         id="text72">16</text>
+      <text
+         class="leaf-label"
+         x="182.4615"
+         y="44.0000"
+         id="text74">Pan</text>
+      <text
+         class="edge-label"
+         x="158.923077"
+         y="36.000000"
+         id="text76">10</text>
+      <text
+         class="leaf-label"
+         x="182.4615"
+         y="84.0000"
+         id="text78">Homo</text>
+      <text
+         class="edge-label"
+         x="158.923077"
+         y="76.000000"
+         id="text80">10</text>
+      <text
+         class="inner-label"
+         x="155.3846"
+         y="64.0000"
+         id="text82">Hominini</text>
+      <text
+         class="edge-label"
+         x="131.846154"
+         y="56.000000"
+         id="text84">10</text>
+      <text
+         class="inner-label"
+         x="128.3077"
+         y="34.0000"
+         id="text86">Homininae</text>
+      <text
+         class="edge-label"
+         x="98.000000"
+         y="26.000000"
+         id="text88">15</text>
+      <text
+         class="leaf-label"
+         x="168.9231"
+         y="124.0000"
+         id="text90">Pongo</text>
+      <text
+         class="edge-label"
+         x="118.307692"
+         y="116.000000"
+         id="text92">30</text>
+      <text
+         class="inner-label"
+         x="87.6923"
+         y="79.0000"
+         id="text94">Hominidae</text>
+      <text
+         class="edge-label"
+         x="57.384615"
+         y="71.000000"
+         id="text96">15</text>
+      <text
+         class="leaf-label"
+         x="101.2308"
+         y="164.0000"
+         id="text98">Hylobates</text>
+      <text
+         class="edge-label"
+         x="64.153846"
+         y="156.000000"
+         id="text100">20</text>
+      <text
+         class="inner-label"
+         x="47.0769"
+         y="121.5000"
+         id="text102" />
+      <text
+         class="edge-label"
+         x="23.538462"
+         y="113.500000"
+         id="text104">10</text>
+      <text
+         class="leaf-label"
+         x="196.0000"
+         y="204.0000"
+         id="text106">Macaca</text>
+      <text
+         class="edge-label"
+         x="172.461538"
+         y="196.000000"
+         id="text108">10</text>
+      <text
+         class="leaf-label"
+         x="196.0000"
+         y="244.0000"
+         id="text110">Papio</text>
+      <text
+         class="edge-label"
+         x="172.461538"
+         y="236.000000"
+         id="text112">10</text>
+      <text
+         class="inner-label"
+         x="168.9231"
+         y="224.0000"
+         id="text114" />
+      <text
+         class="edge-label"
+         x="131.846154"
+         y="216.000000"
+         id="text116">20</text>
+      <text
+         class="leaf-label"
+         x="141.8462"
+         y="284.0000"
+         id="text118">Cercopithecus</text>
+      <text
+         class="edge-label"
+         x="118.307692"
+         y="276.000000"
+         id="text120">10</text>
+      <text
+         class="inner-label"
+         x="114.7692"
+         y="254.0000"
+         id="text122">Cercopithecinae</text>
+      <text
+         class="edge-label"
+         x="70.923077"
+         y="246.000000"
+         id="text124">25</text>
+      <text
+         class="leaf-label"
+         x="87.6923"
+         y="324.0000"
+         id="text126">Simias</text>
+      <text
+         class="edge-label"
+         x="64.153846"
+         y="316.000000"
+         id="text128">10</text>
+      <text
+         class="leaf-label"
+         x="79.5692"
+         y="364.0000"
+         id="text130">Colobus</text>
+      <text
+         class="edge-label"
+         x="60.092308"
+         y="356.000000"
+         id="text132">7</text>
+      <text
+         class="inner-label"
+         x="60.6154"
+         y="344.0000"
+         id="text134">Colobinae</text>
+      <text
+         class="edge-label"
+         x="43.846154"
+         y="336.000000"
+         id="text136">5</text>
+      <text
+         class="inner-label"
+         x="47.0769"
+         y="299.0000"
+         id="text138">Cercopithecidae</text>
+      <text
+         class="edge-label"
+         x="23.538462"
+         y="291.000000"
+         id="text140">10</text>
+      <text
+         class="inner-label"
+         x="20.0000"
+         y="210.2500"
+         id="text142" />
+    </g>
+    <g
+       transform="translate(10,410)"
+       id="g144">
+      <g
+         style="stroke:black;stroke-linecap:round"
+         id="g146">
+        <path
+           style="stroke:black"
+           d="M 0 0 h 162.462"
+           id="path148" />
+        <path
+           style="stroke:black"
+           d="M 0 0 v -5"
+           id="path150" />
+        <path
+           style="stroke:black"
+           d="M 27.0769 0 v -5"
+           id="path152" />
+        <path
+           style="stroke:black"
+           d="M 54.1538 0 v -5"
+           id="path154" />
+        <path
+           style="stroke:black"
+           d="M 81.2308 0 v -5"
+           id="path156" />
+        <path
+           style="stroke:black"
+           d="M 108.308 0 v -5"
+           id="path158" />
+        <path
+           style="stroke:black"
+           d="M 135.385 0 v -5"
+           id="path160" />
+        <path
+           style="stroke:black"
+           d="M 162.462 0 v -5"
+           id="path162" />
+      </g>
+      <g
+         style="font-size:small;stroke:none;text-anchor:end"
+         id="g164">
+        <text
+           x="2"
+           y="-7"
+           id="text166">0</text>
+        <text
+           x="29.0769"
+           y="-7"
+           id="text168">10</text>
+        <text
+           x="56.1538"
+           y="-7"
+           id="text170">20</text>
+        <text
+           x="83.2308"
+           y="-7"
+           id="text172">30</text>
+        <text
+           x="110.308"
+           y="-7"
+           id="text174">40</text>
+        <text
+           x="137.385"
+           y="-7"
+           id="text176">50</text>
+        <text
+           x="164.462"
+           y="-7"
+           id="text178">60</text>
+      </g>
+      <text
+         style="font-size:small;stroke:none"
+         x="0"
+         y="-18"
+         id="text180">substitutions/site</text>
+    </g>
+  </g>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:4,4;stroke-dashoffset:0"
+     d="M 90.555784,22.829469 C 90.555784,396.95044 90.555784,396.95044 90.555784,396.95044"
+     id="path2562"
+     sodipodi:nodetypes="cc" />
+</svg>

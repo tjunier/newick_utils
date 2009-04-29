@@ -1,11 +1,20 @@
 \chapter{Installing the \nutils}
 
-The \nutils{} use the \textsc{gnu} autotools, like many other open source
-software packages. So all you need to do is
+I have tested the \nutils{} on various distributions of Linux, as well as on
+Mac OS X. On Linux, chances are you already have development tools
+preinstalled, but some distributions (\eg, Ubuntu) do not install \textsc{gcc},
+etc. by default. Check that you have \textsc{gcc},
+Bison, Flex, and the \textsc{gnu} autotools. On MacOS X, you just need to
+install XCode (\url{http://developer.apple.com/tools/xcode}). 
+
+The package uses the \textsc{gnu} autotools, like many other open source
+software packages. So all you need to do is the usual
 \begin{verbatim}
+$ tar xzf newick-utils-x.y.z.tar.gz
+$ cd newick-utils-x.y.z
 $ ./configure
 $ make
 $ make check
 # make install
 \end{verbatim}
-at the top of the distribution directory. The \texttt{make check} is optional, but you should try it anyway.
+The \texttt{make check} is optional, but you should try it anyway.

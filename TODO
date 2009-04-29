@@ -1,3 +1,7 @@
+nw_clade -m should consider single leaves as monophyletic
+
+nw_clade (and computing LCAs in general): deal with non-unique node labels. Use regexps wherever it makes sense.
+
 nw_reroot: option -l should accept outgroup nodes and automatically complement
 the selection. In fact, what happens if we pass ingroup labels but not -l?
 Actually it doesn't change anything. Fix this before the release.
