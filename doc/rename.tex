@@ -5,14 +5,15 @@ Renaming nodes is the rather boring operation of changing a node's label. It
 can be done \eg{} for the following reasons:
 \begin{itemize}
 	\item building a higher-level tree (\ie, a families tree from a tree of genera, etc)
-	\item mapping one namespace into another
+	\item mapping one namespace into another (see \ref{sct_10_char_limit})
 	\item correcting wrong names
 \end{itemize}
 
-Renaming is done with \rename. This takes a \emph{renaming map}, which is just
-a text file with the old and new names on the same line.
+\noindent{}Renaming is done with \rename. This takes a \emph{renaming map},
+which is just a text file with the old and new names on the same line.
 
 \subsection{Breaking the 10-character limit in \phylip{} alignments}
+\label{sct_10_char_limit}
 
 A technical hurdle with phylogenies is that some programs do not accept names
 longer than, say, 10 characters in the \phylip{} alignment. But of
@@ -40,7 +41,10 @@ make a tree. It will look something like this:
 \includegraphics{rename_1_svg.pdf}
 \end{center}
 
-\noindent{}Not very informative, huh? But we can put back the original, long names:
+\noindent{}Not very informative, huh? But we can put back the original, long
+names (option \texttt{-W} specifies the mean width of label characters, in
+pixels -- use it when the default is wrong, as in this case with very long
+labels and small characters):
 
 \verbatiminput{rename_2_svg.cmd}
 \begin{center}
@@ -56,7 +60,38 @@ tree a second time on the fly:
 \includegraphics{rename_3_svg.pdf}
 \end{center}
 
+\subsection{Higher-rank trees}
 
+Here is a tree of a few dozen enterovirus and rhinovirus isolates. I show it as
+a cladogram (using \topology, see \ref{sct_topology}) because branch lengths do
+not matter here. I know that these isolates belong to three species in two
+genera: human rhinovirus A (\texttt{hrv-a}), human rhinovirus B
+(\texttt{hrv-b}, and enterovirus (\texttt{hev}). 
 
+\verbatiminput{rename_4_svg.cmd}
+\begin{center}
+\includegraphics{rename_4_svg.pdf}
+\end{center}
 
+\noindent{}I want to see if the tree correctly groups isolates of the same
+species together. So I use a renaming map that maps an isolate name to its
+species:
+\begin{verbatim}
+HRV16 HRV-A
+HRV1B HRV-A
+...
+HRV37 HRV-B
+HRV14 HRV-B
+...
+POLIO1A HEV
+COXA17 HEV
+\end{verbatim}
 
+\verbatiminput{rename_5_svg.cmd}
+\begin{center}
+\includegraphics{rename_5_svg.pdf}
+\end{center}
+
+As we can see, they do. This would be even better if we could somehow simplify
+the tree so that clades of the same species were reduced to a single leaf. And,
+that's exactly what \condense{} does (see below).
