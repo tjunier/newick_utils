@@ -1,2 +1,53 @@
 \section{Renaming nodes}
 \label{sct_rename}
+
+Renaming nodes is the rather boring operation of changing a node's label. It
+can be done \eg{} for the following reasons:
+\begin{itemize}
+	\item building a higher-level tree (\ie, a families tree from a tree of genera, etc)
+	\item mapping one namespace into another
+	\item correcting wrong names
+\end{itemize}
+
+Renaming is done with \rename. This takes a \emph{renaming map}, which is just
+a text file with the old and new names on the same line.
+
+\subsection{Breaking the 10-character limit in \phylip{} alignments}
+
+A technical hurdle with phylogenies is that some programs do not accept names
+longer than, say, 10 characters in the \phylip{} alignment. But of
+course, many scientific names or sequence \textsc{ID}s are longer than that.
+One solution is to rename the sequences, before constructing the tree, using a
+numerical scheme, \eg{}, \textit{Strongylocentrotus purpuratus} $\rightarrow$
+\texttt{ID\_01}, etc. This means we have an alignment of the following form:
+\begin{verbatim}
+ 154 259
+ID_01     PTTSNSAPAL DAAETGHTSG ...
+ID_02     SVSSHSVPAL DAAETGHTSS ...
+...
+\end{verbatim}
+together with a renaming map, \texttt{id2longname.map}:
+\begin{verbatim}
+ID_01	Strongylocentrotus_purpuratus
+ID_02	Harpagofututor_volsellorhinus
+...
+\end{verbatim}
+The alignment's \textsc{ID}s are now sufficiently short, and we can use it to
+make a tree. It will look something like this:
+
+\verbatiminput{rename_1_svg.cmd}
+\begin{center}
+\includegraphics{rename_1_svg.pdf}
+\end{center}
+
+\noindent{}Not very informative, huh? But we can put back the original, long names:
+
+\verbatiminput{rename_2_svg.cmd}
+\begin{center}
+\includegraphics{rename_2_svg.pdf}
+\end{center}
+
+[TODO: transform again with longname2english.map]
+
+
+

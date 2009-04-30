@@ -1,0 +1,2 @@
+nw_rename short_IDs.nw id2longname.map \
+| nw_display -s -l 'font-size:small;font-style:italic' -w 500 -W 6 -
