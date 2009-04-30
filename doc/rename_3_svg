@@ -1,0 +1,3 @@
+nw_rename short_IDs.nw id2longname.map \
+| nw_rename - longname2english.map \
+| nw_display -s -v 30 -W 10 -
