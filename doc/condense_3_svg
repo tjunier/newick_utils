@@ -1,0 +1,2 @@
+nw_rename HRV_FMDV.nw HRV_FMDV.map \
+| nw_topology - | nw_condense - | nw_display -s -
