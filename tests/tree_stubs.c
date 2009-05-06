@@ -382,3 +382,69 @@ struct rooted_tree tree_9()
 	return tree;
 }
 
+/* A completely linear tree */
+/* (((((Homo_sapiens)Homo)Hominini)Homininae)Hominidae)Hominoidea; */
+struct rooted_tree tree_10()
+{
+	struct rnode *homo_sapiens = create_rnode("Homo_sapiens");
+	struct rnode *homo = create_rnode("Homo");
+	struct rnode *hominini = create_rnode("Hominini");
+	struct rnode *homininae = create_rnode("Homininae");
+	struct rnode *hominidae = create_rnode("Hominidae");
+	struct rnode *hominoidea = create_rnode("Hominoidea");
+	struct llist *nodes_in_order = create_llist();
+	struct rooted_tree tree;
+
+	link_p2c(hominoidea, hominidae, "");	
+	link_p2c(hominidae, homininae, "");	
+	link_p2c(homininae, hominini, "");	
+	link_p2c(hominini, homo, "");
+	link_p2c(homo, homo_sapiens, "");
+
+	append_element(nodes_in_order, homo_sapiens);
+	append_element(nodes_in_order, homo);
+	append_element(nodes_in_order, hominini);
+	append_element(nodes_in_order, homininae);
+	append_element(nodes_in_order, hominidae);
+	append_element(nodes_in_order, hominoidea);
+
+	tree.root = hominoidea;
+	tree.nodes_in_order = nodes_in_order;
+
+	return tree;
+}
+
+/* A partially linear tree */
+/* ((((Gorilla,(Pan,Homo)Hominini)Homininae)Hominidae)Hominoidea); */
+struct rooted_tree tree_11()
+{
+	struct rnode *homo = create_rnode("Homo");
+	struct rnode *pan = create_rnode("Pan");
+	struct rnode *gorilla = create_rnode("Gorilla");
+	struct rnode *hominini = create_rnode("Hominini");
+	struct rnode *homininae = create_rnode("Homininae");
+	struct rnode *hominidae = create_rnode("Hominidae");
+	struct rnode *hominoidea = create_rnode("Hominoidea");
+	struct llist *nodes_in_order = create_llist();
+	struct rooted_tree tree;
+
+	link_p2c(hominoidea, hominidae, "");	
+	link_p2c(hominidae, homininae, "");	
+	link_p2c(homininae, gorilla, "");
+	link_p2c(homininae, hominini, "");	
+	link_p2c(hominini, pan, "");
+	link_p2c(hominini, homo, "");
+
+	append_element(nodes_in_order, gorilla);
+	append_element(nodes_in_order, pan);
+	append_element(nodes_in_order, homo);
+	append_element(nodes_in_order, hominini);
+	append_element(nodes_in_order, homininae);
+	append_element(nodes_in_order, hominidae);
+	append_element(nodes_in_order, hominoidea);
+
+	tree.root = hominoidea;
+	tree.nodes_in_order = nodes_in_order;
+
+	return tree;
+}

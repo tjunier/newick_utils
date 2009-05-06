@@ -37,3 +37,11 @@ struct rooted_tree tree_8();
 /* A tree with several redundant labels */
 /* (((D,D)e,D)f,((C,B)g,(B,A)h)i)j; */
 struct rooted_tree tree_9();
+
+/* A completely linear tree */
+/* (((((Homo_sapiens)Homo)Hominini)Homininae)Hominidae)Hominoidea; */
+struct rooted_tree tree_10();
+
+/* A partially linear tree */
+/* ((((Gorilla,(Pan,Homo)Hominini)Homininae)Hominidae)Hominoidea); */
+struct rooted_tree tree_11();

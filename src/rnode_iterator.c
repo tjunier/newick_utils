@@ -106,31 +106,41 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	}
 }
 
-// TODO: fix this, it doesn't work. We probably need to implement a function
-// that peeks the next unvisited child, i.e.  without free()ing it from the
-// 'seen' hash.
+/* Computes the list by doing a tree traversal, then reversing it, printing out
+ * each node the first time it sees it. */
 
 struct llist *get_nodes_in_order(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);
 	struct hash *seen = create_hash(INIT_HASH_SIZE);
 	struct rnode *current;
-	struct llist *nodes_in_order = create_llist();
-	char *node_hash_key;
+	struct llist *traversal = create_llist();
+	struct llist *reverse_traversal;
+	struct llist *nodes_in_reverse_order = create_llist();
+	struct llist *nodes_in_order;
+	char *current_hash_key;
 
-       	node_hash_key = make_hash_key(root);
-	hash_set(seen, node_hash_key, SEEN);
-	prepend_element(nodes_in_order, root);
 	while ((current = rnode_iterator_next(it)) != NULL) {
-		char *node_hash_key = make_hash_key(current);
-		printf ("current node: %s\n", current->label);
-		if (NULL == hash_get(seen, node_hash_key)) {
-			printf ("appending %s\n", current->label);
-			prepend_element(nodes_in_order, current);
-			hash_set(seen, node_hash_key, SEEN);
-		}
+		append_element (traversal, current);
 	}
 	destroy_rnode_iterator(it);
+
+	reverse_traversal = llist_reverse(traversal);
+	destroy_llist(traversal);
+
+	struct list_elem *el;
+	for (el = reverse_traversal->head; NULL != el; el = el->next) {
+		current = el->data;
+		current_hash_key = make_hash_key(current);
+		if (NULL == hash_get(seen, current_hash_key)) {
+			append_element (nodes_in_reverse_order, current);
+			/* Could use anything - existential hash */
+			hash_set(seen, current_hash_key, current);
+		}
+	}
+
+	nodes_in_order = llist_reverse(nodes_in_reverse_order);
+	destroy_llist(nodes_in_reverse_order);
 
 	return nodes_in_order;
 }

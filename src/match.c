@@ -23,6 +23,8 @@
 #include "nodemap.h"
 #include "common.h"
 #include "redge.h"
+#include "rnode_iterator.h"
+#include "masprintf.h"
 
 void newick_scanner_set_string_input(char *);
 void newick_scanner_clear_string_input();
@@ -177,9 +179,7 @@ void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 		if (NULL == hash_get(kept, current->label)) {
 			/* not in 'kept': remove */
 			struct rnode *new_root;
-			new_root = unlink_rnode(current);
-			if (NULL != new_root)
-				target_tree->root = new_root;
+			unlink_rnode(current);
 		}
 	}
 }
@@ -198,6 +198,24 @@ void remove_branch_lengths(struct rooted_tree *target_tree)
 			// WRONG! cur_edge->length_as_string = ""
 			cur_edge->length_as_string = strdup("");
 		}
+	}
+}
+
+void remove_knee_nodes(struct rooted_tree *tree)
+{
+	/* tree was modified -> can't use its ordered node list */
+	struct llist *nodes_in_order = get_nodes_in_order(tree->root);
+	struct list_elem *el;
+
+	for (el = nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+		if (is_inner_node(current))
+			if (1 == children_count(current))
+				splice_out_rnode(current);
+	}
+	if (1 == children_count(tree->root)) {
+		struct redge *edge = tree->root->children->head->data;
+		tree->root = edge->child_node;
 	}
 }
 
@@ -226,6 +244,7 @@ int main(int argc, char *argv[])
 		char *original_newick = to_newick(tree->root);
 		remove_inner_node_labels(tree);
 		prune_extra_labels(tree, pattern_labels);
+		remove_knee_nodes(tree);
 		remove_branch_lengths(tree);	
 		order_tree(tree);
 		char *processed_newick = to_newick(tree->root);
