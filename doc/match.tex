@@ -1,4 +1,8 @@
 \section{Matching subtrees}
 \label{sct_match}
 
-To see if a tree "contains" a smaller tree, use \match.
+\match{} tries to match a (smaller) "pattern" tree to the target tree(s). If
+the pattern matches the target, the target tree is printed. This is typically
+used to select trees that match a certain structure. For example, file
+\texttt{hominoidea.nw} contains seven trees corresponding to successive
+theories about the phylogeny of apes. We wish to know which of them group humans and chimpanzees as a sister clade of gorillas (which is the current hypothesis).

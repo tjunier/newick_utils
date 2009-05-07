@@ -4,9 +4,11 @@ tree. Also, introduce a limit on node number, so we can grow a tree until it
 reaches N leaves, etc.
 
 nw_match: review how it works; see if we could extract subtree (by LCA) and
-then prune instead of pruning th etarget tree first. Also, consider the
-possibility of not pruning the extracted tree: thi swould be considered an
-inexact match, or "compatibility" match.
+then prune instead of pruning the target tree first (this would mean cloning a
+(sub)tree). Explore the possibility of pruning without altering topology, then
+reducing knee nodes and nameless nodes in subsequent passes (using
+get_nodes_in_order()). Also, consider not pruning the extracted tree: this
+would be considered an inexact match, or "compatibility" match. 
 
 nw_clade -m should consider single leaves as monophyletic
 

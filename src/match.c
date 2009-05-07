@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 		remove_branch_lengths(tree);	
 		order_tree(tree);
 		char *processed_newick = to_newick(tree->root);
-		// printf ("%s\n", processed_newick);
+		printf ("%s\n", processed_newick);
 		int match = (0 == strcmp(processed_newick, pattern_newick));
 		match = params.reverse ? !match : match;
 		if (match) printf ("%s\n", original_newick);
