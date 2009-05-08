@@ -60,9 +60,8 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 struct llist *nodes_from_regexp(struct rooted_tree *tree,
 		char *regexp_string);
 
-/* Clones a tree (allocates storage) */
-/* TODO - not implemented yet - I'm putting this declaration here so that if
- * ever this is needed, I'll remember to use the rnode_iterator for this, as
- * half the job  will already have been done */
+/* Clones a (sub)tree, given the root node of the subtree. All nodes and edges
+ * are new: one can modify or delete the clone without affecting the original
+ * in any way. */
 
-struct rooted_tree *clone_tree(struct rooted_tree*);
+struct rooted_tree *clone_subtree(struct rnode *);

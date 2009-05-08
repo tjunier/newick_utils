@@ -11,6 +11,7 @@
 #include "list.h"
 #include "nodemap.h"
 #include "hash.h"
+#include "rnode_iterator.h"
 
 const int FREE_NODE_DATA = 1;
 const int DONT_FREE_NODE_DATA = 0;
@@ -273,4 +274,34 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree,
 	free(preg);
 
 	return result;
+}
+
+/* Clones a clade (recursively) */
+// TODO: try an iterative version using a rnode_iterator
+static struct rnode *clone_clade(struct rnode *root)
+{
+	struct rnode *root_clone = create_rnode(root->label);
+	struct list_elem *el;
+	for (el = root->children->head; NULL != el; el = el->next) {
+		struct redge *kid_edge = el->data;
+		struct rnode *kid = kid_edge->child_node;
+		struct rnode *kid_clone = clone_clade(kid);
+		link_p2c(root_clone, kid_clone, kid_edge->length_as_string);
+	}
+
+	return root_clone;
+}
+
+struct rooted_tree* clone_subtree(struct rnode *root)
+{
+	struct rnode *root_clone = clone_clade(root);
+	struct llist *nodes_in_order_clone = get_nodes_in_order(root_clone);
+
+	struct rooted_tree *clone = malloc(sizeof(struct rooted_tree));
+	if (NULL == clone) { perror(NULL); exit(EXIT_FAILURE); }
+
+	clone->root = root_clone;
+	clone->nodes_in_order = nodes_in_order_clone;
+
+	return clone;
 }
