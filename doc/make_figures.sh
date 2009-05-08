@@ -40,6 +40,8 @@ for cmd in *_svg ; do
 	fi
 done
 
+# Special tasks
+
 # These run ../src/nodes_vs_depth.sh on the relevant files
 
 for nvsd in star balanced short_leaves; do
@@ -49,3 +51,13 @@ for nvsd in star balanced short_leaves; do
 		epstopdf $nvsd.eps
 	fi
 done
+
+# These make files from a multiple SVG
+if [ hominoidea.nw -nt homino_0.pdf ]; then
+	nw_display -s -w 300 -v 30  -l 'font-size:14;font-style:italic' \
+	hominoidea.nw | csplit -sz -f homino_ -b '%d.svg' - '/<?xml/' {*}
+	for homsvg in homino_?.svg ; do
+		echo $homsvg
+		inkscape -f $homsvg -A ${homsvg/svg/pdf}
+	done
+fi

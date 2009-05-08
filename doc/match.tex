@@ -5,4 +5,23 @@
 the pattern matches the target, the target tree is printed. This is typically
 used to select trees that match a certain structure. For example, file
 \texttt{hominoidea.nw} contains seven trees corresponding to successive
-theories about the phylogeny of apes. We wish to know which of them group humans and chimpanzees as a sister clade of gorillas (which is the current hypothesis).
+theories about the phylogeny of apes. Let us see which of them group humans and
+chimpanzees as a sister clade of gorillas (which is the current hypothesis).
+
+Here are small images of each of the tree in \texttt{hominoidea.nw}: \\
+\bigskip{} \\
+\begin{tabular}{cc}
+1 (until 1960) & 2 (Goodman, 1964) \\
+\includegraphics[scale=0.7]{homino_0.pdf} & \includegraphics[scale=0.7]{homino_1.pdf} \\
+3 (gibbons as outgroup) & 4 (Goodman, 1974: orangs as outgroup) \\
+\includegraphics[scale=0.7]{homino_2.pdf} & \includegraphics[scale=0.7]{homino_3.pdf} \\
+5 (resolving trichotomy) & 6 (Goodman, 1990: gorillas as outgroup) \\
+\includegraphics[scale=0.7]{homino_4.pdf} & \includegraphics[scale=0.7]{homino_5.pdf} \\
+7 (split of \emph{Hylobates}) \\
+\includegraphics[scale=0.7]{homino_6.pdf} & 
+\end{tabular}
+
+\noindent{}Trees \#6 and \#7 match our criterion, the rest do not. To look for matching trees in \texttt{hominoidea.nw}, we pass the pattern on the command line:
+
+\verbatiminput{match_1_txt.cmd}
+\verbatiminput{match_1_txt.out}

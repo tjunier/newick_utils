@@ -128,6 +128,18 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+/* A debugging function */
+
+void show_node_children_numbers(struct rooted_tree *tree)
+{
+	struct list_elem *el;
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+		printf ("node %p (%s): %d children\n", current,
+			current->label, children_count(current));
+	}
+}
+
 /* Get pattern tree and order it */
 
 struct rooted_tree *get_ordered_pattern_tree(char *pattern)
@@ -178,8 +190,23 @@ void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 		if (is_root(current)) continue;
 		if (NULL == hash_get(kept, current->label)) {
 			/* not in 'kept': remove */
-			struct rnode *new_root;
 			unlink_rnode(current);
+		}
+	}
+}
+
+void prune_empty_labels(struct rooted_tree *target_tree)
+{
+	/* I'm getting the lilst of nodes dynamically, because the tree has
+	 * been altered. */
+	struct llist *nodes_in_order = get_nodes_in_order(target_tree->root);
+	struct list_elem *el;
+	for (el=nodes_in_order->head; NULL != el; el=el->next) {
+		struct rnode *current = el->data;
+		char *label = current->label;
+		if (is_leaf(current)) {
+			if (0 == strcmp("", label))
+				unlink_rnode(current);
 		}
 	}
 }
@@ -219,6 +246,34 @@ void remove_knee_nodes(struct rooted_tree *tree)
 	}
 }
 
+void process_tree(struct rooted_tree *tree, struct hash *pattern_labels,
+		char *pattern_newick, struct parameters params)
+{
+	// show_node_children_numbers(tree);
+	char *original_newick = to_newick(tree->root);
+	//printf ("%s\n", to_newick(tree->root));
+	remove_inner_node_labels(tree);
+	//printf ("%s\n", to_newick(tree->root));
+	prune_extra_labels(tree, pattern_labels);
+	/* NOTE prune_extra_labels() has altered topology! tree->nodes_in_order
+	 * is now invalid. */
+	//printf ("%s\n", to_newick(tree->root));
+	prune_empty_labels(tree);
+	//printf ("%s\n", to_newick(tree->root));
+	remove_knee_nodes(tree);
+	//printf ("%s\n", to_newick(tree->root));
+	remove_branch_lengths(tree);	
+	//printf ("%s\n", to_newick(tree->root));
+	order_tree(tree);
+	char *processed_newick = to_newick(tree->root);
+	//printf ("%s\n", processed_newick);
+	int match = (0 == strcmp(processed_newick, pattern_newick));
+	match = params.reverse ? !match : match;
+	if (match) printf ("%s\n", original_newick);
+	free(processed_newick);
+	free(original_newick);
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *pattern_tree;	
@@ -241,19 +296,7 @@ int main(int argc, char *argv[])
 	newick_scanner_set_file_input(params.target_trees);
 
 	while (NULL != (tree = parse_tree())) {
-		char *original_newick = to_newick(tree->root);
-		remove_inner_node_labels(tree);
-		prune_extra_labels(tree, pattern_labels);
-		remove_knee_nodes(tree);
-		remove_branch_lengths(tree);	
-		order_tree(tree);
-		char *processed_newick = to_newick(tree->root);
-		printf ("%s\n", processed_newick);
-		int match = (0 == strcmp(processed_newick, pattern_newick));
-		match = params.reverse ? !match : match;
-		if (match) printf ("%s\n", original_newick);
-		free(processed_newick);
-		free(original_newick);
+		process_tree(tree, pattern_labels, pattern_newick, params);
 		destroy_tree(tree, DONT_FREE_NODE_DATA);
 	}
 

@@ -9,6 +9,10 @@
 #include "node_pos_alloc.h"
 #include "svg_graph_common.h"
 
+/* Prevents labels of single-child nodes from being crossed over by the child
+ * branch. */
+const int KNEE_NODE_V_NUDGE = 6;
+
 double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
 
 void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
@@ -112,13 +116,17 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 
 		/* draw label IFF it is nonempty */
 
-		if (0 != strcmp(node->label, ""))
+		if (0 != strcmp(node->label, "")) {
 			if (url) printf ("<a %s>", url);
+			double vpos = svg_mid_pos + LBL_VOFFSET; 
+			if (1 == children_count(node))
+				vpos -= KNEE_NODE_V_NUDGE;
 			printf("<text class='%s' "
 			       "x='%.4f' y='%.4f'>%s</text>",
 				class, svg_h_pos + LBL_SPACE,
-				svg_mid_pos + LBL_VOFFSET, node->label);
+				vpos, node->label);
 			if (url) printf ("</a>");
+		}
 
 		/* Branch lengths */
 

@@ -1,0 +1,1 @@
+nw_match hominoidea.nw '(Gorilla,(Pan,Homo));' | nw_display -w 60 -

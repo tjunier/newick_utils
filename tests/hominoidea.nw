@@ -1,0 +1,7 @@
+((Homo)Hominidae,(Pan,Gorilla,Pongo,Hylobates)Pongidae)Hominoidea;
+((Homo)Hominidae,(Pan,Gorilla,Pongo)Pongidae,(Hylobates)Hylobatidae)Hominoidea;
+(((Homo)Homininae,(Pan,Gorilla,Pongo)Ponginae)Hominidae,(Hylobates)Hylobatidae)Hominoidea;
+(((Homo,Pan,Gorilla)Homininae,(Pongo)Ponginae)Hominidae,(Hylobates)Hylobatidae)Hominoidea;
+((((Homo)Hominini,(Pan,Gorilla)Gorillini)Homininae,(Pongo)Ponginae)Hominidae,(Hylobates)Hylobatidae)Hominoidea;
+((((Homo,Pan)Hominini,(Gorilla)Gorillini)Homininae,(Pongo)Ponginae)Hominidae,(Hylobates)Hylobatidae)Hominoidea;
+((((Homo,Pan)Hominini,(Gorilla)Gorillini)Homininae,(Pongo)Ponginae)Hominidae,(Hylobates,Hoolock,Symphalangus,Nomascus)Hylobatidae)Hominoidea;
