@@ -25,3 +25,14 @@ Here are small images of each of the tree in \texttt{hominoidea.nw}: \\
 
 \verbatiminput{match_1_txt.cmd}
 \verbatiminput{match_1_txt.out}
+
+\noindent{}Note that only the pattern tree's topology matters: we would get the
+same results with pattern \texttt{((Homo,Pan),Gorilla);},
+\texttt{((Pan,Homo),Gorilla);}, etc., but not with
+\texttt{((Gorilla,Pan),Homo);} (which would select trees \#1, 2, 3, and 5. In
+future versions I might add an option for strict matching.
+
+The behaviour of \match{} can be reversed by passing option \texttt{-v} (like
+\texttt{grep -v}): it will print trees that \emph{do not} match the pattern.
+Finally, note that \match{} only works on leaf labels (for now), and assumes
+that labels are unique in both the pattern and the target tree.

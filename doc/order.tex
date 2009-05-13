@@ -1,13 +1,10 @@
 \section{Ordering Nodes}
 \label{sct_ordering}
 
-Ordering nodes means changing the order of a nodes's children (without altering
-the tree's topology). The reason for doing this can be to check if 
-different \nw{} strings represent different trees, or to ensure that
-they do. Program \order{} performs this task.
-
-For example, files \texttt{falconiformes} and \texttt{falconiformes\_2} are
-different, and they yield different graphs:
+Two trees that differ only by the order of children nodes within the parent
+convey the same biological information, even if the text (\nw) and graphical
+representations differ.  For example, files \texttt{falconiformes} and
+\texttt{falconiformes\_2} are different, and they yield different graphs:
 
 \verbatiminput{order_1_svg.cmd}
 \begin{center}
@@ -20,6 +17,8 @@ different, and they yield different graphs:
 \end{center}
 
 \noindent{}But do they represent different phylogenies? In other words, do they
-differ by more than just the ordering of nodes? To check this, we pass them to \order:
+differ by more than just the ordering of nodes? To check this, we pass them to
+\order:
 
-\verbatiminput{order_2_svg.cmd}
+\verbatiminput{order_3_txt.cmd}
+\verbatiminput{order_3_txt.out}
