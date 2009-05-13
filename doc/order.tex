@@ -4,4 +4,22 @@
 Ordering nodes means changing the order of a nodes's children (without altering
 the tree's topology). The reason for doing this can be to check if 
 different \nw{} strings represent different trees, or to ensure that
-they do.
+they do. Program \order{} performs this task.
+
+For example, files \texttt{falconiformes} and \texttt{falconiformes\_2} are
+different, and they yield different graphs:
+
+\verbatiminput{order_1_svg.cmd}
+\begin{center}
+\includegraphics{order_1_svg.pdf}
+\end{center}
+
+\verbatiminput{order_2_svg.cmd}
+\begin{center}
+\includegraphics{order_2_svg.pdf}
+\end{center}
+
+\noindent{}But do they represent different phylogenies? In other words, do they
+differ by more than just the ordering of nodes? To check this, we pass them to \order:
+
+\verbatiminput{order_2_svg.cmd}
