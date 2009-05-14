@@ -8,15 +8,13 @@
 
 #include "tree_models.h"
 
-#define DEFAULT_PROB_HAS_CHILDREN 0.4
-#define DEFAULT_PROB_EXTINCTION 0.1
-#define DEFAULT_DURATION 3
+const double	DEFAULT_MEAN_BRANCH_LENGTH = 1.0;
+const double	DEFAULT_DURATION = 3;
 
 struct parameters {
 	int seed;
-	double prob_node_has_children;
 	double duration;
-	double prob_extinction;
+	double mean_branch_length;
 };
 
 void help(char *argv[])
@@ -27,7 +25,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hs]\n"
+"%s [-cdhsx]\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -37,14 +35,18 @@ void help(char *argv[])
 "Output\n"
 "------\n"
 "\n"
-"The generated tree.\n"
+"The generated tree. Branches are \"grown\" using exponentially distributed\n"
+"lengths. If the length exceeds the time limit, growth stops; otherwise the\n"
+"lineage splits in two, and the process is repeated on the children.\n"
 "\n"
 "Options\n"
 "-------\n"
 "\n"
-"    -c <float> sets the probability that a node has children\n"
+"    -d <float>: sets the maximum depth (time limit). Default: 3.0\n"
 "    -h: print this message and exit\n"
+"    -l <float>: sets the average branch length (default: 1.0)\n"
 "    -s  <int>: sets the pseudorandom number generator's seed\n"
+"    0.1)\n"
 "\n"
 "Examples\n"
 "--------\n"
@@ -62,27 +64,23 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 	params.seed = time(NULL);
-	params.prob_node_has_children = DEFAULT_PROB_HAS_CHILDREN;
 	params.duration = DEFAULT_DURATION;
-	params.prob_extinction = DEFAULT_PROB_EXTINCTION;
+	params.mean_branch_length = DEFAULT_MEAN_BRANCH_LENGTH;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "c:d:hs:x:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "d:hl:s:")) != -1) {
 		switch (opt_char) {
-		case 'c':
-			params.prob_node_has_children = atof(optarg);	
-			break;
 		case 'd':
 			params.duration = atof(optarg);	
 			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
+		case 'l':
+			params.mean_branch_length = atof(optarg);	
+			break;
 		case 's':
 			params.seed = atoi(optarg);
-			break;
-		case 'x':
-			params.prob_extinction = atof(optarg);
 			break;
 		}
 	}
@@ -103,7 +101,11 @@ int main(int argc, char *argv[])
 	srand(params.seed);
 
 	// geometric_tree(params.prob_node_has_children);
-	time_limited_tree(params.prob_extinction+params.prob_node_has_children, params.duration);
+
+	// The 1st parameter is the exponential distribution's rate parameter,
+	// which is the inverse of the mean.
+	time_limited_tree(1.0 / params.mean_branch_length,
+			params.duration);
 	
 	exit(EXIT_SUCCESS);
 }

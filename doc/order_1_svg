@@ -1,1 +1,1 @@
-nw_display -sS falconiformes
+nw_display -sS -v 30 falconiformes_1

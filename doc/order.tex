@@ -3,8 +3,8 @@
 
 Two trees that differ only by the order of children nodes within the parent
 convey the same biological information, even if the text (\nw) and graphical
-representations differ.  For example, files \texttt{falconiformes} and
-\texttt{falconiformes\_2} are different, and they yield different graphs:
+representations differ.  For example, files \texttt{falconiformes\_1} and
+\texttt{falconiformes\_2} are different, and they yield different images:
 
 \verbatiminput{order_1_svg.cmd}
 \begin{center}
@@ -18,7 +18,13 @@ representations differ.  For example, files \texttt{falconiformes} and
 
 \noindent{}But do they represent different phylogenies? In other words, do they
 differ by more than just the ordering of nodes? To check this, we pass them to
-\order:
+\order and use \texttt{diff} to compare the results\footnote{One could also compute a checksum using \texttt{md5sum}, etc}:
 
 \verbatiminput{order_3_txt.cmd}
 \verbatiminput{order_3_txt.out}
+
+So, after ordering, the trees are the same: they tell the same biological
+story. Note that these trees are cladograms. If you have trees with branch
+lengths, this apprach will only work if the lengths are identical, which may or
+may not be what you want. You can get rid of the branch lengths using
+\topology{} (see \ref{sct_topology}).
