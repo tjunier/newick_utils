@@ -1,0 +1,1 @@
+nw_ed -n vrt2cg.nw 'b >= 95' s | nw_display -w 65 -

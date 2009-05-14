@@ -1,4 +1,33 @@
 \section{Stream-editing}
 \label{sct_ed}
 
+\ed{} is one of the more experimental programs in the \nutils{} package. It was
+inpired by \unix{} utilities like \texttt{sed} and \texttt{awk}, which perform
+an action on the parts of input (usually lines) that meet some condition: 
+\ed{} iterates over tree nodes, evaluates a user-provided expression involving
+the node, and perfoms the specified action on those nodes that match. By
+default, the (possibly modified) tree is printed at the end of the run.
+
+Let's look at an example before we jump into the details. Here is a tree of vertebrate genera, showing support values:
+
+\verbatiminput{ed_1_svg.cmd}
+\begin{center}
+\includegraphics{ed_1_svg.pdf}
+\end{center}
+
+\noindent{}Let's extract all well-supported clades, using a support value of 95\% or more as the criterion for being well-supported:
+
+\verbatiminput{ed_2_txt.cmd}
+\verbatiminput{ed_2_txt.out}
+
+\noindent{}This instructs \ed{} to iterate over the nodes, in \no{}, and to
+print the subtree (action \texttt{s}) for all nodes that match the expression
+\texttt{b >= 95}, which means "intepret the node label as a (bootstrap) support
+value, and evaluate to true if that value is greater than 95". As we can see,
+\ed{} reports the three well-supported clades (primates, tetrapods, and
+ray-finned fishes), in \no. We also remark that one of the clades
+(primates) is contained in another one (tetrapods). Finally, option \texttt{-n}
+suppresses the printing of the whole tree at the end of the run, which isn't
+useful here.
+
 \subsection{Opening Poorly-supported Nodes}
