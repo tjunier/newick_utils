@@ -1,3 +1,7 @@
+general: do a fork of the project, and get rid of the redge structure. All data
+pertaining to a node's parent edge can be stored in the node itself. This
+should simplify things and speed them up a little.
+
 nw_gen: review the usefulness of time-limited trees in light of nw_trim: we can
 now use nw_trim to cut a tree at any desired length, yielding a time-limited
 tree. Also, introduce a limit on node number, so we can grow a tree until it

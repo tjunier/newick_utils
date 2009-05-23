@@ -8,11 +8,13 @@ The following applies to all programs in the \nutils{} package.
 \label{sct_help}
 
 All programs print a help message if passed option \texttt{-h}. Here are the
-first 25 lines of \nwindent{}'s help, which you obtain by typig
-\verb+nw_indent -h+:
+first 25 lines of \nwindent{}'s help:
+
+\verbatiminput{general_1_txt.cmd}
 \begin{samepage}
 \verbatiminput{general_1_txt.out}
 \end{samepage}
+
 The help page describes the program's purpose, its input and output, and its
 options, in a format reminiscent of \unix{} manpages. It also shows a few
 examples. All examples can be tried out using files in the \texttt{data}
@@ -23,8 +25,8 @@ directory.
 
 Since the \nutils{} are for working with trees, it should be no surprise
 that the main input is a file containing trees. The trees must be in
-Newick format, which is one of the most widely used and uderstood formats. A
-complete description of this format can be found at
+Newick format, which is one of the most widely used tree formats. Its
+complete description can be found at
 \url{http://evolution.genetics.washington.edu/phylip/newicktree.html}.
 
 The input file is always the first argument to the program (after any options).
@@ -41,22 +43,23 @@ $ cat mytrees.nw | nw_display -
 \end{samepage}
 Of course the second form is only really useful when chaining several programs into pipelines.
 
-\subsection{Multiple Trees in Input}
+\subsection{Multiple Input Trees}
 
-The input file can contain one or more trees, preferably one tree per
-line\footnote{It may also work if the trees are formatted differently, but the
-programs were only tested on input files with one tree per line.}. The task
-will be performed\footnote{well, attempted\ldots} on each tree in the input. So if you need to reroot 1,000
-trees on the same outgroup, you can do it all in a single step (see
-\ref{sct_reroot}). 
+The input file can contain one or more trees. When there is more than one, I
+prefer to have one tree per line, but this is not a requirement: they can be
+separated by any amount of whitespace, including none at all. The task will be
+performed\footnote{well, attempted\ldots} on each tree in the input. So if you
+need to reroot 1,000 trees on the same outgroup, you can do it all in a single
+step (see \ref{sct_reroot}). 
 
 \section{Output}
 \label{sct_output}
 
-All output is printed on \stdout{} (error messages go to \stderr). The \nutils{}
-either print trees or information about trees. In the first case, the output is
-also Newick. In the second case, the format depends on the program, but it is
-always text (\textsc{ascii} graphics, \svg, numeric data, textual data, etc.).
+All output is printed on \stdout{} (warnings and error messages go to \stderr).
+The \nutils{} either print trees or information about trees. In the first case,
+the output is also Newick, one tree per line. In the second case, the format
+depends on the program, but it is always text (\textsc{ascii} graphics, \svg,
+numeric data, textual data, etc.).
 
 \section{Options}
 \label{sct_options}

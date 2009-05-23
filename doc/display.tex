@@ -3,17 +3,21 @@
 \label{sct_display}
 
 Perhaps the simplest and most common operation on a \nw{} tree is just to look
-at it. The \nw{} format is not very easy to understand for us humans, so we
-have to produce a graphical representation from it. This is the purpose of the
-\display{} program. 
+at it. But a \nw{} tree is not very intuitive for us humans, as we can quickly
+see by looking \eg{} at a tree of Old World primates:
+
+\verbatiminput{display_12_txt.cmd}
+\begin{samepage}
+\verbatiminput{display_12_txt.out}
+\end{samepage}
+
+\noindent{}So we want to make a graphical representation from it. This is the purpose of
+the \display{} program. 
 
 \subsection{As Text}
 \label{sct_display_text}
 
-At its simplest, \display{} just outputs a text graph. Here is a
-Newick-formatted tree in file \texttt{catarrhini}:
-\verbatiminput{catarrhini}
-And here is the same tree shown with \display{}:
+At its simplest, \display{} just outputs a text graph. Here is the primates tree, shown with \display{}:
 \verbatiminput{display_1_txt.cmd}
 \begin{samepage}
 \verbatiminput{display_1_txt.out}
@@ -48,12 +52,12 @@ $ nw_display -s catarrhini > catarrhini.svg
 \end{verbatim}
 Now you can visualize the result using any \svg-enabled tool (all good Web
 browsers can do it), or convert it to another format with, say \texttt{rsvg} or
-Inkscape.  The \svg{} produced by \display{} is designed to be easy to edit
-in an interactive editor like Inkscape (\url{http://www.inkscape.org}): for
-example, the tree edges are in one group, and the text in another, so it is
-easy to change the line properties of the edges, or the font family of the
-text, for example (you can also do this from \display{} using a \css{} map, see
-\ref{sct_display_svg_css}).
+Inkscape (\url{http://www.inkscape.org}).  The \svg{} produced by \display{} is
+designed to be easy to edit in an interactive editor (Inkscape, Adobe
+Illustrator, etc.): for example, the tree edges are in one group, and the text
+in another, so it is easy to change the line width of the edges, or the font
+family of the text (you can also do this from \display{} using a \css{} map,
+see \ref{sct_display_svg_css}).
 
 The following \pdf{} image was produced like this:
 
@@ -107,7 +111,7 @@ as argument:
  \includegraphics{display_5_svg.pdf}
 \end{center}
 
-The syntax of the \css{} map file is as follows.
+The syntax of the \css{} map file is as follows:
 \begin{itemize}
 	\item Each line describes one style and the set of nodes to which it applies.
 	A line contains elements separated by whitespace (whitespace between quotes
