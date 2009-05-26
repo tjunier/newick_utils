@@ -1,0 +1,1 @@
+nw_ed HRV_cg.nw 'i & b < 50' o | nw_display -sr -w 450 -

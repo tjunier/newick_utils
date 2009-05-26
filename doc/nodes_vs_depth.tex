@@ -17,9 +17,9 @@ nodes as a function of depth. Consider the following trees:
 \noindent{}they have the same depth and the same number of
 leaves.  But their shapes are very different, and they tell different
 biological stories. If we assume that they are clock-like (i.e., that the
-mutation rate is constant over the whole tree), \texttt{star.nw} shows an early
-radiation, \texttt{short\_leaves.nw} shows two stable branches ending in
-recent branching, while \texttt{balanced.nw} shows branching spread over time.
+mutation rate is constant over the whole tree), \texttt{star} shows an early
+radiation, \texttt{short\_leaves} shows two stable lineages ending in
+recent branching, while \texttt{balanced} shows branching spread over time.
 
 The nodes-vs-depth graphs for these trees are as follows: \\
 \includegraphics[width=12cm]{star.pdf} \\
@@ -30,7 +30,7 @@ The graphs show the (normalized) area under the curve: it is close to 1 for star
 
 The images were made with the \texttt{bootscan.sh} script (in directory \texttt{src}), in the following way:
 \begin{verbatim}
-$ nodes_vs_clades.sh star.nw 40
+$ nodes_vs_clades.sh star 40
 \end{verbatim}
 where 40 is just the sampling density (how many points to take on the $x$
 axis). The script uses \distance{} to get the tree's depth, \ed{} to sample the number of nodes at a given depth, and \nwindent{} to count the leaves, plus the usual \texttt{awk} and friends. The plot is done with gnuplot.

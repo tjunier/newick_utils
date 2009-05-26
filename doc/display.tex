@@ -72,17 +72,6 @@ All \svg{} images shown in this document were processed in the same way. In the
 rest of this document we will usually skip the redirection into an \svg{} file
 and omit the \svg{}-to-\textsc{pdf} conversion step.
 
-
-\subsubsection{Radial trees}
-
-You can make radial trees by passing the \texttt{-r} switch:
-\verbatiminput{display_4_svg.cmd}
-\begin{center}
-\includegraphics{display_4_svg.pdf}
-\end{center}
-You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
-
-
 \subsubsection{Scale Bar}
 
 If the tree is a phylogram, \display{} prints a scale bar.\footnote{The
@@ -94,6 +83,15 @@ places it far away in a corner, which is what I do for now. An improvement to
 this is on my TODO list.} Its units can be specified with option \texttt{-u},
 the default is substitutions per site. To suppress the scale bar, pass the
 \texttt{-S} switch.
+
+\subsubsection{Radial trees}
+
+You can make radial trees by passing the \texttt{-r} switch:
+\verbatiminput{display_4_svg.cmd}
+\begin{center}
+\includegraphics{display_4_svg.pdf}
+\end{center}
+You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
 
 \subsubsection{Using CSS}
 \label{sct_display_svg_css}
@@ -151,10 +149,10 @@ The style of an inner clade overrides that of an outer clade, \textit{e.g.},
 although the \texttt{Homo} - \texttt{Pan} clade is nested inside the
 \texttt{Homo} - \texttt{Hylobates} clade, it has its own style (blue, wide
 lines) which overrides the containing clade's style (pinkish with normal
-width).
-
-Likewise, \texttt{Individual} overrides \texttt{Clade}, which is why
+width).  Likewise, \texttt{Individual} overrides \texttt{Clade}, which is why
 \texttt{Cercopithecus} is green even though it belongs to a red clade.
+
+\bigskip
 
 Styles can also be applied to labels. Option \texttt{-l} specifies the leaf
 label style, option \texttt{-i} the inner node label style, and option
@@ -184,7 +182,7 @@ style to \texttt{opacity:0} (\texttt{visibility:hidden} also works).
 \subsection{Ornaments}
 
 Ornaments are arbitrary snippets of \svg{} code that are displayed at specified
-node positions. As for \css, this is done with a map. The ornament map has the
+node positions. Like \css, this is done with a map. The ornament map has the
 same syntax as the \css{} map, except that you specify \svg{} elements rather
 than \css{} styles. The \texttt{Individual} keyword means that all nodes named
 on a given line sport the corresponding ornament, while \texttt{Clade} means
@@ -220,7 +218,8 @@ used this gradient to produce a \css{} map, \texttt{b2r.map}:
 \verbatiminput{display_11_txt.cmd}
 \verbatiminput{display_11_txt.out}
 
-\noindent{}Then:
+\noindent{}in which the \texttt{fill} values are hexadecimal color codes along
+the gradient. Then:
 
 \verbatiminput{display_10_svg.cmd}
 \includegraphics{display_10_svg.pdf}
