@@ -1,8 +1,8 @@
-\section{Matching subtrees}
+\section{Finding subtrees in other trees}
 \label{sct_match}
 
-\match{} tries to match a (smaller) "pattern" tree to the target tree(s). If
-the pattern matches the target, the target tree is printed. This is typically
+\match{} tries to match a (typically smaller) "pattern" tree to the target
+tree(s). If the pattern matches the target, the target tree is printed. This is
 used to select trees that match a certain structure. For example, file
 \texttt{hominoidea.nw} contains seven trees corresponding to successive
 theories about the phylogeny of apes (these were taken from
@@ -10,8 +10,9 @@ theories about the phylogeny of apes (these were taken from
 humans and chimpanzees as a sister clade of gorillas (which is the current
 hypothesis).
 
-Here are small images of each of the tree in \texttt{hominoidea.nw}: \\
-\bigskip{}
+\begin{samepage}
+Here are small images of each of the trees in \texttt{hominoidea.nw}: \\
+
 \begin{tabular}{cc}
 1 (until 1960) & 2 (Goodman, 1964) \\
 \includegraphics[scale=0.7]{homino_0.pdf} & \includegraphics[scale=0.7]{homino_1.pdf} \\
@@ -22,6 +23,7 @@ Here are small images of each of the tree in \texttt{hominoidea.nw}: \\
 7 (split of \emph{Hylobates}) \\
 \includegraphics[scale=0.7]{homino_6.pdf} & 
 \end{tabular}
+\end{samepage}
 
 \noindent{}Trees \#6 and \#7 match our criterion, the rest do not. To look for matching trees in \texttt{hominoidea.nw}, we pass the pattern on the command line:
 

@@ -1,14 +1,8 @@
 \section{Extracting Distances}
 
-There are many ways of defining distances in a tree. First, we have to consider
-whether the tree is a cladogram or a phylogram: in the former case, the
-distances will be measured in whatever units the tree was built with (usually
-substitutions per site), in the latter, it will just be the number of ancestors.
-
-Then we can measure distance in a variety of ways. This is the job of
-\distance. By default, it prints the distance from the root of the tree to all
-labeled leaves, in the order in which they appear in the Newick. Let's look at
-distances in the monkeys tree:
+\distance{} prints distances between nodes, in various ways.  By default, it
+prints the distance from the root of the tree to each labeled leaf, in \nw{}
+order. Let's look at distances in the catarrhinian tree:
 
 \begin{center}
 \includegraphics{display_3_svg.pdf}
@@ -18,7 +12,13 @@ distances in the monkeys tree:
 \begin{samepage}
 \verbatiminput{dist_1_txt.out}
 \end{samepage}
-This means that the distance from the root to \texttt{Gorilla} is 56, etc. Option \texttt{-n} shows the labels:
+
+\noindent{}This means that the distance from the root to \texttt{Gorilla} is
+56, etc. The distances are in the same units as the tree's branch lengths --
+usually substitutions per site, but this is not specified in the tree itself.
+If the tree is a cladogram, the distances are expressed in numbers of
+ancestors.  Option \texttt{-n} shows the labels:
+
 \verbatiminput{dist_2_txt.cmd}
 \begin{samepage}
 \verbatiminput{dist_2_txt.out}
@@ -80,8 +80,10 @@ Option \texttt{-s a}. All nodes are selected.
 
 \subsubsection{Command line selection}
 
-The selection consists of the nodes whose labels are passed as arguments on
-the command line (after the file name). 
+The selection consists of the nodes whose labels are passed as arguments on the
+command line (after the file name). The distances are printed in the same
+order.
+
 \verbatiminput{dist_8_txt.cmd}
 \verbatiminput{dist_8_txt.out}
 

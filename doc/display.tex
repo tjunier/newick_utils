@@ -25,7 +25,7 @@ At its simplest, \display{} just outputs a text graph. Here is the primates tree
 That's pretty low-tech compared to interactive, colorful graphical displays,
 but if you use the shell a lot (like I do), you may find it useful.
 
-You can use option \texttt{-w} (``width'') to set the number of columns
+You can use option \texttt{-w} to set the number of columns
 available for display (the default is 80):
 
 \verbatiminput{display_2_txt.cmd}
@@ -127,30 +127,34 @@ The syntax of the \css{} map file is as follows:
 	\texttt{Individual}, then the style is only applied to the nodes themselves.
 \end{itemize}
 
-In our example, the first line in \texttt{css.map} says that the style
-\texttt{stroke:red} must be applied to the \texttt{Clade} defined by
-\texttt{Macaca} and \texttt{Cercopithecus}, which consists of these two nodes,
-their ancestor \texttt{Cercopithecinae}, and \texttt{Papio}. Line 2
-prescribes that style \texttt{stroke:\#fa7} (an \svg{} hexadecimal color
-specification) must be applied to the clade defined by \texttt{Homo} and
-\texttt{Hylobates}, which consists of these two nodes, their last common
-ancestor (unlabeled), and all its descendants (that is, \texttt{Homo},
-\texttt{Pan}, \texttt{Gorilla}, \texttt{Pongo}, and \texttt{Hylobates}, as well
-as the inner nodes \texttt{Hominini}, \texttt{Homininae} and
-\texttt{Hominidae}). Line 3 says that the style \texttt{stroke:green} is to be
-applied individually to nodes \texttt{Colobus} and \texttt{Cercopithecus}, and
-only these nodes - not to the clade that they define.  Line 4 says that the
-clade defined by \texttt{Homo} and \texttt{Pan} should receive style
-\texttt{stroke-width:2;~stroke:blue} - note that the quotes have been removed:
-they are not part of the style, rather they allow us to improve readability by
-adding some whitespace.
+\noindent{}In our example, \texttt{css.map}:
+\begin{itemize}
+	\item the first line states that the style \texttt{stroke:red} must be applied
+		to the \texttt{Clade} defined by \texttt{Macaca} and
+		\texttt{Cercopithecus}, which consists of these two nodes, their ancestor
+		\texttt{Cercopithecinae}, and \texttt{Papio}. 
+	\item Line 2 prescribes that style \texttt{stroke:\#fa7} (an \svg{}
+		hexadecimal color specification) must be applied to the clade defined by
+		\texttt{Homo} and \texttt{Hylobates}, which consists of these two nodes,
+		their last common ancestor (unlabeled), and all its descendants (that is,
+		\texttt{Homo}, \texttt{Pan}, \texttt{Gorilla}, \texttt{Pongo}, and
+		\texttt{Hylobates}, as well as the inner nodes \texttt{Hominini},
+		\texttt{Homininae} and \texttt{Hominidae}). 
+	\item Line 3 instructs that the style \texttt{stroke:green} be applied
+		individually to nodes \texttt{Colobus} and \texttt{Cercopithecus}, and only
+		these nodes - not to the clade that they define.  
+	\item Line 4 says that style \texttt{stroke-width:2;~stroke:blue} should be
+		applied to the clade defined by \texttt{Homo} and \texttt{Pan} - note that
+		the quotes have been removed: they are not part of the style, rather they
+		allow us to improve readability by adding some whitespace.
+\end{itemize}
 
 The style of an inner clade overrides that of an outer clade, \textit{e.g.},
 although the \texttt{Homo} - \texttt{Pan} clade is nested inside the
 \texttt{Homo} - \texttt{Hylobates} clade, it has its own style (blue, wide
 lines) which overrides the containing clade's style (pinkish with normal
 width).  Likewise, \texttt{Individual} overrides \texttt{Clade}, which is why
-\texttt{Cercopithecus} is green even though it belongs to a red clade.
+\texttt{Cercopithecus} is green even though it belongs to a "red" clade.
 
 \bigskip
 
@@ -167,17 +171,20 @@ produced using defaults, could be improved a bit:
 \noindent{}Let's remove the branch length labels, reduce
 the vertical spacing, reduce the size of inner node labels (bootstrap values),
 and write the leaf labels in italics, using a font with serifs:
+
 \verbatiminput{display_7_svg.cmd}
 \begin{center}
   \includegraphics{display_7_svg.pdf}
 \end{center}
-Option \texttt{-v} specifies the vertical spacing, in pixels, between two
-successive leaves (the default is 40). Option \texttt{-b} sets the style of
-branch labels, option \texttt{-l} sets the style of leaf labels, and option
-\texttt{-i} sets the style of inner node labels. Note that we did not
-\emph{discard} the branch lengths (we could do this with \topology), because
-doing so would reduce the tree to a cladogram. Instead, we set their \css{}
-style to \texttt{opacity:0} (\texttt{visibility:hidden} also works).
+
+\noindent{}Still not perfect, but much better. Option \texttt{-v} specifies the
+vertical spacing, in pixels, between two successive leaves (the default is 40).
+Option \texttt{-b} sets the style of branch labels, option \texttt{-l} sets the
+style of leaf labels, and option \texttt{-i} sets the style of inner node
+labels. Note that we did not \emph{discard} the branch lengths (we could do
+this with \topology), because doing so would reduce the tree to a cladogram.
+Instead, we set their \css{} style to \texttt{opacity:0}
+(\texttt{visibility:hidden} also works).
 
 \subsection{Ornaments}
 
@@ -210,10 +217,11 @@ Ornaments and \css{} can be combined:
 
 \subsubsection{Example: Mapping GC Content}
 
-In a study of human rhinoviruses, I have produced a phylogenetic tree. I have
-also computed the \gc{} content of the sequences, and mapped it into a gradient
-that goes from {\color{Blue} blue} (33.3\%) to {\color{Red} red} (44.5\%). I
-used this gradient to produce a \css{} map, \texttt{b2r.map}:
+In a study of human rhinoviruses, I have produced a phylogenetic tree,
+\texttt{HRV\_ingrp.nw}. I have also computed the \gc{} content of the sequences,
+and mapped it into a gradient that goes from {\color{Blue} blue} (33.3\%) to
+{\color{Red} red} (44.5\%). I used this gradient to produce a \css{} map,
+\texttt{b2r.map}:
 
 \verbatiminput{display_11_txt.cmd}
 \verbatiminput{display_11_txt.out}

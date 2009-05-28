@@ -25,7 +25,7 @@ cercopithecid subtree (Old World monkeys) using just that label:
 
 Now suppose I want to extract the apes subtree. These are the Hominidae
 ("great apes") plus the gibbons (\textit{Hylobates}). But the corresponding
-node is unlabeled in our tree (it should be \texttt{Hominoidea}), so we need to specify (at least) two descendants:
+node is unlabeled in our tree (it would be \texttt{Hominoidea}), so we need to specify (at least) two descendants:
 
 \verbatiminput{clade_3_svg.cmd}
 \begin{center}
@@ -41,9 +41,11 @@ node is unlabeled in our tree (it should be \texttt{Hominoidea}), so we need to 
 
 \subsection{Monophyly}
 
-You can check if a set of leaves\footnote{In future versions I
-may extend this to inner nodes} form a monophyletic group by passing option
-\texttt{-m}: \clade{} will report the subtree only if it has no descendant leaf other than those specified.  For example, we can ask if the African apes (humans, chimp, gorilla) form a monophyletic group:
+You can check if a set of leaves\footnote{In future versions I may extend this
+to inner nodes} form a monophyletic group by passing option \texttt{-m}:
+\clade{} will report the subtree only if the \lca{} has no descendant leaf
+other than those specified.  For example, we can ask if the African apes
+(humans, chimp, gorilla) form a monophyletic group:
 
 \verbatiminput{clade_7_svg.cmd}
 \begin{center}
