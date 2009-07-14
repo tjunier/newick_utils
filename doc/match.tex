@@ -1,12 +1,25 @@
 \section{Finding subtrees in other trees}
 \label{sct_match}
 
-\match{} tries to match a (typically smaller) "pattern" tree to the target
-tree(s). If the pattern matches the target, the target tree is printed. This is
-used to select trees that match a certain structure. For example, file
-\texttt{hominoidea.nw} contains seven trees corresponding to successive
+\match{} tries to match a (typically smaller) "pattern" tree to one or more
+"target" tree(s). If the pattern matches the target, the target tree is
+printed. Intuitively, a pattern matches a target if one can superimpose it onto
+the target without "breaking" either. More accurately, the following happens
+(in both trees):
+\begin{enumerate}
+	\item leaves with labels found in both trees are kept, the other ones are
+		pruned
+	\item inner labels are discarded
+	\item both trees are ordered (as done by \order{}, see  \ref{sct_order})
+	\item branch lengths are discarded
+\end{enumerate}
+At this point, the modifed pattern tree is compared to the modified target, and if the \nw{} strings are identical, the match is successful.
+
+\subsubsection{Example: finding trees with a specified  subtree topology}
+
+File \texttt{hominoidea.nw} contains seven trees corresponding to successive
 theories about the phylogeny of apes (these were taken from
-\url{http://en.wikipedia.org/wiki/Hominoidea}. Let us see which of them group
+\url{http://en.wikipedia.org/wiki/Hominoidea}). Let us see which of them group
 humans and chimpanzees as a sister clade of gorillas (which is the current
 hypothesis).
 
@@ -28,7 +41,9 @@ Here are small images of each of the trees in \texttt{hominoidea.nw}: \\
 \noindent{}Trees \#6 and \#7 match our criterion, the rest do not. To look for matching trees in \texttt{hominoidea.nw}, we pass the pattern on the command line:
 
 \verbatiminput{match_1_txt.cmd}
+\begin{samepage}
 \verbatiminput{match_1_txt.out}
+\end{samepage}
 
 \noindent{}Note that only the pattern tree's topology matters: we would get the
 same results with pattern \texttt{((Homo,Pan),Gorilla);},
