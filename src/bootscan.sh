@@ -5,6 +5,9 @@
 # bootscan.sh - an example of bootscanning using the Newick Utilities in
 # cooperation with other command-line bioinformatics tools.
 
+# To try it out, set your PATH (see below), go to ../data and do:
+# ../src/bootscan.sh HRV_3UTR.dna HRV-93 CL073908
+
 # The purpose of the program is to find recombination breakpoints in a sequence
 # (hereafter called the 'reference') by comparing it to related sequences over
 # an alignment. If the reference's nearest neighbor changes, then there is
