@@ -106,7 +106,7 @@ extract_distances_noref()
 
 plot_classic()
 {
-	printf "set terminal postscript eps color\n" > $DIST_GNUPLOT
+	printf "set terminal postscript eps color size 5,2.5 \n" > $DIST_GNUPLOT
 	printf "set output '%s'\n" $DIST_IMAGE >> $DIST_GNUPLOT
 	printf "set key outside\n" >> $DIST_GNUPLOT 
 	printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
