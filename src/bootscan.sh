@@ -106,8 +106,9 @@ extract_distances_noref()
 
 plot_classic()
 {
-	printf "set terminal png size 700, 450\n" > $DIST_GNUPLOT
+	printf "set terminal postscript eps color\n" > $DIST_GNUPLOT
 	printf "set output '%s'\n" $DIST_IMAGE >> $DIST_GNUPLOT
+	printf "set key outside\n" >> $DIST_GNUPLOT 
 	printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
 		$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $DIST_GNUPLOT
 	printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $DIST_GNUPLOT
@@ -145,7 +146,7 @@ declare -r R_DISTANCE_THRESHOLD=0.4
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
 declare -r DIST_NOREF=$INPUT_FILE.nrdist
 declare -r DIST_GNUPLOT=$INPUT_FILE.dist.plt
-declare -r DIST_IMAGE=$INPUT_FILE.dist.png
+declare -r DIST_IMAGE=$INPUT_FILE.dist.eps
 
 ################################################################
 # Main
