@@ -8,4 +8,5 @@ EXTRA_DIST = \
 	tests/*.cmap \
 	src/*.sh \
 	doc/tutorial.pdf \
+	doc/Makefile \
 	data/*

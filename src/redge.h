@@ -30,6 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode;
 
+/* WARNING: struct redge is is obsolete, in the future versions everything will
+ * be part of struct rnode (like in data structure textbooks :-) */
+
 struct redge {
 	struct rnode * parent_node;
 	struct rnode * child_node;
