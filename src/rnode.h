@@ -57,11 +57,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-struct redge;
 struct llist;
+struct rnode;
 
 struct rnode {
-	struct redge *parent_edge;
+	struct rnode *parent;
+	/* When we speak of 'the' edge of a node, we mean the edge that leads to its parent. */
+	char *edge_length_as_string;	/* Most of the time this is enough, but... */
+	double edge_length; 		/* ...use this when numerical value is needed */
 	struct llist *children;
 	char *label;
 	void *data;	/* app-dependent data for this node */
