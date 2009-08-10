@@ -39,18 +39,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct rnode;
 struct redge;
 
-/* Adds edge 'edge' to 'parent''s list of children edges */
+/* Adds 'child' to 'parent''s list of children nodes */
 
-void add_child_edge(struct rnode *parent, struct redge *edge);
+void add_child(struct rnode *parent, struct rnode *child);
 
 /* sets 'edge' as 'child''s parent edge, and 'child' as 'edge''s child
  * node. */
 
 void set_parent_edge(struct rnode *child, struct redge *edge);
 
-/* Links 'parent' and 'child'. An edge of length 'length' is created. */
-
-void link_p2c(struct rnode *parent, struct rnode *child, char *length);
+// OBSOLETE - use add_child() 
+// void link_p2c(struct rnode *parent, struct rnode *child, char *length);
 
 /* Inserts a node withe label 'label' in this node's parent edge. The two
  * resulting edges will each have a length of half the original's, if
@@ -78,10 +77,9 @@ void splice_out_rnode(struct rnode *node);
 
 void reverse_redge(struct redge *edge);
 
-/* Removes a node from its parent's children list (more precisely, remove the
- * node's parent_edge from the children list). The edge and node are not freed.
- * If the removed node had more than one sibling, the tree is in a coherent
- * state and the function stops here. If not, the tree is incoherent because
+/* Removes a node from its parent's children list. The node is not freed.
+ * If the removed node had more than one sibling, the tree is in a normal
+ * state and the function stops here. If not, the tree is abnormal because
  * the parent has only one child. There are two possibilities: i) the parent is
  * the root - the function stops there and returns the root's (only) child so
  * that it may become the tree's root (we cannot do this here, since we're

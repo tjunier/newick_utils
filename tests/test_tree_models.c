@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 #include "rnode.h"
-#include "redge.h"
 #include "list.h"
 #include "link.h"
 #include "tree_models.h"
@@ -51,13 +50,13 @@ int test_tlt_grow_node()
 {
 	const char *test_name = "test_tlt_grow_node";
 	double prior_remaining_time = 12.3; 	/* arbitrary units */
-	struct rnode *parent = create_rnode("parent");
-	struct rnode *kid = create_rnode("kid");
+	struct rnode *parent = create_rnode("parent", "");
+	struct rnode *kid = create_rnode("kid", "");
 	kid->data = &prior_remaining_time;
-	link_p2c(parent, kid, NULL);
+	add_child(parent, kid);
 
 	double posterior_remaining_time = tlt_grow_node(kid, 1.0, 0.5);
-	double grown_length = strtod(kid->parent_edge->length_as_string, NULL);
+	double grown_length = strtod(kid->edge_length_as_string, NULL);
 
 	double exp = prior_remaining_time - posterior_remaining_time;
 	if (cabs(grown_length - exp) > TOLERANCE) {

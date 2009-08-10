@@ -12,16 +12,16 @@ struct rooted_tree tree_1()
 	struct llist *nodes_in_order;
 	struct rooted_tree result;
 	
-	node_A = create_rnode("A");
-	node_B = create_rnode("B");
-	node_C = create_rnode("C");
-	node_e = create_rnode("");
-	node_d = create_rnode("");
+	node_A = create_rnode("A", "");
+	node_B = create_rnode("B", "");
+	node_C = create_rnode("C", "");
+	node_e = create_rnode("", "");
+	node_d = create_rnode("", "");
 
-	link_p2c(node_d, node_A, NULL);
-	link_p2c(node_d, node_B, NULL);
-	link_p2c(node_e, node_d, NULL);
-	link_p2c(node_e, node_C, NULL);
+	add_child(node_d, node_A);
+	add_child(node_d, node_B);
+	add_child(node_e, node_d);
+	add_child(node_e, node_C);
 
 	nodes_in_order = create_llist();
 	append_element(nodes_in_order, node_A);
@@ -44,24 +44,24 @@ struct rooted_tree tree_2()
 	struct llist *nodes_in_order;
 	struct rooted_tree result;
 	
-	node_A = create_rnode("A");
-	node_B = create_rnode("B");
-	node_C = create_rnode("C");
-	node_D = create_rnode("D");
-	node_E = create_rnode("E");
-	node_f = create_rnode("f");
-	node_g = create_rnode("g");
-	node_h = create_rnode("h");
-	node_i = create_rnode("i");
+	node_A = create_rnode("A", "");
+	node_B = create_rnode("B", "");
+	node_C = create_rnode("C", "");
+	node_D = create_rnode("D", "");
+	node_E = create_rnode("E", "");
+	node_f = create_rnode("f", "");
+	node_g = create_rnode("g", "");
+	node_h = create_rnode("h", "");
+	node_i = create_rnode("i", "");
 
-	link_p2c(node_f, node_A, NULL);
-	link_p2c(node_f, node_B, NULL);
-	link_p2c(node_g, node_D, NULL);
-	link_p2c(node_g, node_E, NULL);
-	link_p2c(node_h, node_C, NULL);
-	link_p2c(node_h, node_g, NULL);
-	link_p2c(node_i, node_f, NULL);
-	link_p2c(node_i, node_h, NULL);
+	add_child(node_f, node_A);
+	add_child(node_f, node_B);
+	add_child(node_g, node_D);
+	add_child(node_g, node_E);
+	add_child(node_h, node_C);
+	add_child(node_h, node_g);
+	add_child(node_i, node_f);
+	add_child(node_i, node_h);
 
 	nodes_in_order = create_llist();
 	append_element(nodes_in_order, node_A);
@@ -88,24 +88,24 @@ struct rooted_tree tree_3()
 	struct llist *nodes_in_order;
 	struct rooted_tree result;
 	
-	node_A = create_rnode("A");
-	node_B = create_rnode("B");
-	node_C = create_rnode("C");
-	node_D = create_rnode("D");
-	node_E = create_rnode("E");
-	node_f = create_rnode("f");
-	node_g = create_rnode("g");
-	node_h = create_rnode("h");
-	node_i = create_rnode("i");
+	node_A = create_rnode("A", "1");
+	node_B = create_rnode("B", "1.0");
+	node_C = create_rnode("C", "1");
+	node_D = create_rnode("D", "1");
+	node_E = create_rnode("E", "1");
+	node_f = create_rnode("f", "2");
+	node_g = create_rnode("g", "2.0");
+	node_h = create_rnode("h", "3");
+	node_i = create_rnode("i", "");
 
-	link_p2c(node_f, node_A, "1");
-	link_p2c(node_f, node_B, "1.0");
-	link_p2c(node_g, node_D, "1");
-	link_p2c(node_g, node_E, "1");
-	link_p2c(node_h, node_C, "1");
-	link_p2c(node_h, node_g, "2");
-	link_p2c(node_i, node_f, "2.0");
-	link_p2c(node_i, node_h, "3");
+	add_child(node_f, node_A);
+	add_child(node_f, node_B);
+	add_child(node_g, node_D);
+	add_child(node_g, node_E);
+	add_child(node_h, node_C);
+	add_child(node_h, node_g);
+	add_child(node_i, node_f);
+	add_child(node_i, node_h);
 
 	nodes_in_order = create_llist();
 	append_element(nodes_in_order, node_A);
@@ -134,24 +134,24 @@ struct rooted_tree tree_4()
 	struct llist *nodes_in_order;
 	struct rooted_tree result;
 	
-	node_A = create_rnode("A");
-	node_B = create_rnode("B");
-	node_C = create_rnode("C");
-	node_D = create_rnode("C");	/* intentional */
-	node_E = create_rnode("C");	/* intentional */
-	node_f = create_rnode("f");
-	node_g = create_rnode("g");
-	node_h = create_rnode("h");
-	node_i = create_rnode("i");
+	node_A = create_rnode("A", "1");
+	node_B = create_rnode("B", "1.0");
+	node_C = create_rnode("C", "1");
+	node_D = create_rnode("C", "1");	/* intentional */
+	node_E = create_rnode("C", "1");	/* intentional */
+	node_f = create_rnode("f", "2.0");
+	node_g = create_rnode("g", "2");
+	node_h = create_rnode("h", "3");
+	node_i = create_rnode("i", "");
 
-	link_p2c(node_f, node_A, "1");
-	link_p2c(node_f, node_B, "1.0");
-	link_p2c(node_g, node_D, "1");
-	link_p2c(node_g, node_E, "1");
-	link_p2c(node_h, node_C, "1");
-	link_p2c(node_h, node_g, "2");
-	link_p2c(node_i, node_f, "2.0");
-	link_p2c(node_i, node_h, "3");
+	add_child(node_f, node_A);
+	add_child(node_f, node_B);
+	add_child(node_g, node_D);
+	add_child(node_g, node_E);
+	add_child(node_h, node_C);
+	add_child(node_h, node_g);
+	add_child(node_i, node_f);
+	add_child(node_i, node_h);
 
 	nodes_in_order = create_llist();
 	append_element(nodes_in_order, node_A);
@@ -178,22 +178,22 @@ struct rooted_tree tree_5()
 	struct llist *nodes_in_order;
 	struct rooted_tree result;
 	
-	node_A = create_rnode("A");
-	node_B = create_rnode("B");
-	node_C = create_rnode("C");
-	node_D = create_rnode("D");
-	node_E = create_rnode("E");
-	node_f = create_rnode("f");
-	node_g = create_rnode("g");
-	node_h = create_rnode("h");
+	node_A = create_rnode("A", "1");
+	node_B = create_rnode("B", "3");
+	node_C = create_rnode("C", "2");
+	node_D = create_rnode("D", "1");
+	node_E = create_rnode("E", "1");
+	node_f = create_rnode("f", "1");
+	node_g = create_rnode("g", "1");
+	node_h = create_rnode("h", "");
 
-	link_p2c(node_f, node_D, "1");
-	link_p2c(node_f, node_E, "1");
-	link_p2c(node_g, node_C, "2");
-	link_p2c(node_g, node_f, "1");
-	link_p2c(node_h, node_A, "3");
-	link_p2c(node_h, node_B, "3");
-	link_p2c(node_h, node_g, "1");
+	add_child(node_f, node_D);
+	add_child(node_f, node_E);
+	add_child(node_g, node_C);
+	add_child(node_g, node_f);
+	add_child(node_h, node_A);
+	add_child(node_h, node_B);
+	add_child(node_h, node_g);
 
 	nodes_in_order = create_llist();
 	append_element(nodes_in_order, node_A);
@@ -220,18 +220,18 @@ struct rooted_tree tree_6()
 	struct llist *nodes_in_order;
 	struct rooted_tree result;
 	
-	node_A = create_rnode("A");
-	node_B = create_rnode("B");
-	node_C = create_rnode("C");
-	node_D = create_rnode("D");
-	node_e = create_rnode("e");
-	node_f = create_rnode("f");
+	node_A = create_rnode("A", "1");
+	node_B = create_rnode("B", "1");
+	node_C = create_rnode("C", "1");
+	node_D = create_rnode("D", "2");
+	node_e = create_rnode("e", "1");
+	node_f = create_rnode("f", "");
 
-	link_p2c(node_e, node_A, "1");
-	link_p2c(node_e, node_B, "1");
-	link_p2c(node_e, node_C, "1");
-	link_p2c(node_f, node_e, "1");
-	link_p2c(node_f, node_D, "2");
+	add_child(node_e, node_A);
+	add_child(node_e, node_B);
+	add_child(node_e, node_C);
+	add_child(node_f, node_e);
+	add_child(node_f, node_D);
 
 	nodes_in_order = create_llist();
 	append_element(nodes_in_order, node_A);
@@ -256,24 +256,24 @@ struct rooted_tree tree_7()
 	struct llist *nodes_in_order;
 	struct rooted_tree result;
 	
-	node_A = create_rnode("A");
-	node_B = create_rnode("");
-	node_C = create_rnode("C");
-	node_D = create_rnode("D");
-	node_E = create_rnode("E");
-	node_f = create_rnode("f");
-	node_g = create_rnode("");
-	node_h = create_rnode("h");
-	node_i = create_rnode("i");
+	node_A = create_rnode("A", "1");
+	node_B = create_rnode("", "1.0");
+	node_C = create_rnode("C", "1");
+	node_D = create_rnode("D", "1");
+	node_E = create_rnode("E", "1");
+	node_f = create_rnode("f", "2.0");
+	node_g = create_rnode("", "2");
+	node_h = create_rnode("h", "3");
+	node_i = create_rnode("i", "");
 
-	link_p2c(node_f, node_A, "1");
-	link_p2c(node_f, node_B, "1.0");
-	link_p2c(node_g, node_D, "1");
-	link_p2c(node_g, node_E, "1");
-	link_p2c(node_h, node_C, "1");
-	link_p2c(node_h, node_g, "2");
-	link_p2c(node_i, node_f, "2.0");
-	link_p2c(node_i, node_h, "3");
+	add_child(node_f, node_A);
+	add_child(node_f, node_B);
+	add_child(node_g, node_D);
+	add_child(node_g, node_E);
+	add_child(node_h, node_C);
+	add_child(node_h, node_g);
+	add_child(node_i, node_f);
+	add_child(node_i, node_h);
 
 	nodes_in_order = create_llist();
 	append_element(nodes_in_order, node_A);
@@ -295,24 +295,24 @@ struct rooted_tree tree_7()
 /* ((HRV_A1:1,HRV_A2:1.0)HRV_A:2.0,(HRV_C:1,(HRV_B1:1,HRV_B2:1)HRV_B:2):3)HRV; */
 struct rooted_tree tree_8()
 {
-	struct rnode *hrva1 = create_rnode("HRV_A1");
-	struct rnode *hrva2 = create_rnode("HRV_A2");
-	struct rnode *hrvb1 = create_rnode("HRV_B1");
-	struct rnode *hrvb2 = create_rnode("HRV_B2");
-	struct rnode *hrva = create_rnode("HRV_A");
-	struct rnode *hrvb = create_rnode("HRV_B");
-	struct rnode *hrvc = create_rnode("HRV_C");
-	struct rnode *hrvcb = create_rnode("");
-	struct rnode *root = create_rnode("");
+	struct rnode *hrva1 = create_rnode("HRV_A1", "1");
+	struct rnode *hrva2 = create_rnode("HRV_A2", "1.0");
+	struct rnode *hrvb1 = create_rnode("HRV_B1", "1");
+	struct rnode *hrvb2 = create_rnode("HRV_B2", "1");
+	struct rnode *hrva = create_rnode("HRV_A", "2.0");
+	struct rnode *hrvb = create_rnode("HRV_B", "2");
+	struct rnode *hrvc = create_rnode("HRV_C", "1");
+	struct rnode *hrvcb = create_rnode("", "3");
+	struct rnode *root = create_rnode("", "");
 
-	link_p2c (hrva, hrva1, "1");
-	link_p2c (hrva, hrva2, "1.0");
-	link_p2c (hrvb, hrvb1, "1");
-	link_p2c (hrvb, hrvb2, "1");
-	link_p2c (hrvcb, hrvc, "1");
-	link_p2c (hrvcb, hrvb, "2");
-	link_p2c (root, hrva, "2.0");
-	link_p2c (root, hrvcb, "3");
+	add_child (hrva, hrva1);
+	add_child (hrva, hrva2);
+	add_child (hrvb, hrvb1);
+	add_child (hrvb, hrvb2);
+	add_child (hrvcb, hrvc);
+	add_child (hrvcb, hrvb);
+	add_child (root, hrva);
+	add_child (root, hrvcb);
 
 	struct llist *nodes_in_order = create_llist();
 	append_element(nodes_in_order, hrva1);
@@ -341,32 +341,32 @@ struct rooted_tree tree_9()
 	struct llist *nodes_in_order = create_llist();
 	struct rooted_tree tree;
 
-	nA = create_rnode("A");
-	nB1 = create_rnode("B");
-	nB2 = create_rnode("B");
-	nC = create_rnode("C");
-	nD1 = create_rnode("D");
-	nD2 = create_rnode("D");
-	nD3 = create_rnode("D");
-	ne = create_rnode("e");	
-	nf = create_rnode("f");	
-	ng = create_rnode("g");	
-	nh = create_rnode("h");	
-	ni = create_rnode("i");	
-	nj = create_rnode("j");	
+	nA = create_rnode("A", "");
+	nB1 = create_rnode("B", "");
+	nB2 = create_rnode("B", "");
+	nC = create_rnode("C", "");
+	nD1 = create_rnode("D", "");
+	nD2 = create_rnode("D", "");
+	nD3 = create_rnode("D", "");
+	ne = create_rnode("e", "");	
+	nf = create_rnode("f", "");	
+	ng = create_rnode("g", "");	
+	nh = create_rnode("h", "");	
+	ni = create_rnode("i", "");	
+	nj = create_rnode("j", "");	
 
-	link_p2c(ne, nD1, "");	
-	link_p2c(ne, nD2, "");	
-	link_p2c(nf, ne, "");
-	link_p2c(nf, nD3, "");
-	link_p2c(ng, nC, "");	
-	link_p2c(ng, nB1, "");	
-	link_p2c(nh, nB2, "");
-	link_p2c(nh, nA, "");
-	link_p2c(ni, ng, "");
-	link_p2c(ni, nh, "");
-	link_p2c(nj, nf, "");
-	link_p2c(nj, ni, "");
+	add_child(ne, nD1);	
+	add_child(ne, nD2);	
+	add_child(nf, ne);
+	add_child(nf, nD3);
+	add_child(ng, nC);	
+	add_child(ng, nB1);	
+	add_child(nh, nB2);
+	add_child(nh, nA);
+	add_child(ni, ng);
+	add_child(ni, nh);
+	add_child(nj, nf);
+	add_child(nj, ni);
 
 	append_element(nodes_in_order, nD1);
 	append_element(nodes_in_order, nD2);
@@ -386,20 +386,20 @@ struct rooted_tree tree_9()
 /* (((((Homo_sapiens)Homo)Hominini)Homininae)Hominidae)Hominoidea; */
 struct rooted_tree tree_10()
 {
-	struct rnode *homo_sapiens = create_rnode("Homo_sapiens");
-	struct rnode *homo = create_rnode("Homo");
-	struct rnode *hominini = create_rnode("Hominini");
-	struct rnode *homininae = create_rnode("Homininae");
-	struct rnode *hominidae = create_rnode("Hominidae");
-	struct rnode *hominoidea = create_rnode("Hominoidea");
+	struct rnode *homo_sapiens = create_rnode("Homo_sapiens", "");
+	struct rnode *homo = create_rnode("Homo", "");
+	struct rnode *hominini = create_rnode("Hominini", "");
+	struct rnode *homininae = create_rnode("Homininae", "");
+	struct rnode *hominidae = create_rnode("Hominidae", "");
+	struct rnode *hominoidea = create_rnode("Hominoidea", "");
 	struct llist *nodes_in_order = create_llist();
 	struct rooted_tree tree;
 
-	link_p2c(hominoidea, hominidae, "");	
-	link_p2c(hominidae, homininae, "");	
-	link_p2c(homininae, hominini, "");	
-	link_p2c(hominini, homo, "");
-	link_p2c(homo, homo_sapiens, "");
+	add_child(hominoidea, hominidae);	
+	add_child(hominidae, homininae);	
+	add_child(homininae, hominini);	
+	add_child(hominini, homo);
+	add_child(homo, homo_sapiens);
 
 	append_element(nodes_in_order, homo_sapiens);
 	append_element(nodes_in_order, homo);
@@ -418,22 +418,22 @@ struct rooted_tree tree_10()
 /* ((((Gorilla,(Pan,Homo)Hominini)Homininae)Hominidae)Hominoidea); */
 struct rooted_tree tree_11()
 {
-	struct rnode *homo = create_rnode("Homo");
-	struct rnode *pan = create_rnode("Pan");
-	struct rnode *gorilla = create_rnode("Gorilla");
-	struct rnode *hominini = create_rnode("Hominini");
-	struct rnode *homininae = create_rnode("Homininae");
-	struct rnode *hominidae = create_rnode("Hominidae");
-	struct rnode *hominoidea = create_rnode("Hominoidea");
+	struct rnode *homo = create_rnode("Homo", "");
+	struct rnode *pan = create_rnode("Pan", "");
+	struct rnode *gorilla = create_rnode("Gorilla", "");
+	struct rnode *hominini = create_rnode("Hominini", "");
+	struct rnode *homininae = create_rnode("Homininae", "");
+	struct rnode *hominidae = create_rnode("Hominidae", "");
+	struct rnode *hominoidea = create_rnode("Hominoidea", "");
 	struct llist *nodes_in_order = create_llist();
 	struct rooted_tree tree;
 
-	link_p2c(hominoidea, hominidae, "");	
-	link_p2c(hominidae, homininae, "");	
-	link_p2c(homininae, gorilla, "");
-	link_p2c(homininae, hominini, "");	
-	link_p2c(hominini, pan, "");
-	link_p2c(hominini, homo, "");
+	add_child(hominoidea, hominidae);	
+	add_child(hominidae, homininae);	
+	add_child(homininae, gorilla);
+	add_child(homininae, hominini);	
+	add_child(hominini, pan);
+	add_child(hominini, homo);
 
 	append_element(nodes_in_order, gorilla);
 	append_element(nodes_in_order, pan);

@@ -14,9 +14,9 @@ int test_create_label2node_map()
 	struct llist *node_list;
 	struct hash *map;
 
-	n1 = create_rnode("n1");
-	n2 = create_rnode("n2");
-	n3 = create_rnode("n3");
+	n1 = create_rnode("n1", "");
+	n2 = create_rnode("n2", "");
+	n3 = create_rnode("n3", "");
 	node_list = create_llist();
 	append_element(node_list, n1);
 	append_element(node_list, n2);
@@ -63,14 +63,14 @@ int test_create_label2node_list_map()
 	struct llist *nodes_of_label;
 	struct list_elem *el;
 
-	a1 = create_rnode("a");
-	a2 = create_rnode("a");
-	a3 = create_rnode("a");
-	b1 = create_rnode("b");
-	b2 = create_rnode("b");
-	c1 = create_rnode("c");
-	d1 = create_rnode("d");
-	d2 = create_rnode("d");
+	a1 = create_rnode("a", "");
+	a2 = create_rnode("a", "");
+	a3 = create_rnode("a", "");
+	b1 = create_rnode("b", "");
+	b2 = create_rnode("b", "");
+	c1 = create_rnode("c", "");
+	d1 = create_rnode("d", "");
+	d2 = create_rnode("d", "");
 
 	node_list = create_llist();
 	/* The order in which the nodes appear is unimportant, but it should be

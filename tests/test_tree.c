@@ -2,7 +2,6 @@
 #include <string.h>
 
 #include "rnode.h"
-#include "redge.h"
 #include "link.h"
 #include "list.h"
 #include "tree_stubs.h"
@@ -339,31 +338,29 @@ int test_clone_subtree()
 				test_name, orig_node->label, clone_node->label);
 			return 1;
 		}
-		if (NULL == orig_node->parent_edge) {
-			if (NULL != clone_node->parent_edge) {
-				printf ("%s: original parent edge is NULL,"
+		if (NULL == orig_node->parent) {
+			if (NULL != clone_node->parent) {
+				printf ("%s: original's parent is NULL,"
 					" but clone's is not (%p).\n",
-					test_name, clone_node->parent_edge);
+					test_name, clone_node->parent);
 				return 1;
 			}
 		}
 		else {
-			if (orig_node->parent_edge == clone_node->parent_edge) {
+			if (orig_node->parent == clone_node->parent) {
 				printf ("%s: parent edges are non-NULL yet "
 					"identical (%p, %p).\n", test_name,
-					orig_node->parent_edge,
-					clone_node->parent_edge);
+					orig_node->parent,
+					clone_node->parent);
 				return 1;
 			}
-			if (strcmp(orig_node->parent_edge->length_as_string,
-				   clone_node->parent_edge->length_as_string)
+			if (strcmp(orig_node->edge_length_as_string,
+				   clone_node->edge_length_as_string)
 				!= 0) {
 				printf ("%s: parent edges have different "
 					"lengths (%s, %s)\n", test_name,
-					orig_node->parent_edge->
-						length_as_string,
-					clone_node->parent_edge->
-						length_as_string);
+					orig_node->edge_length_as_string,
+					clone_node->edge_length_as_string);
 				return 1;
 			}
 		}

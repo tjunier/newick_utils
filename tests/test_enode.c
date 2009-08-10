@@ -13,7 +13,7 @@ static const int NB_ANCESTORS = 3;
 
 void setup_current_rnode()
 {
-	struct rnode *node = create_rnode("any");
+	struct rnode *node = create_rnode("any", "");
 	struct rnode_data *data = malloc(sizeof(struct rnode_data));
 	if (NULL == data) { perror(NULL); exit(EXIT_FAILURE); }
 	data->nb_ancestors = NB_ANCESTORS;
@@ -329,14 +329,14 @@ int test_is_leaf()
 {
 	const char *test_name = "test_is_leaf";
 
-	struct rnode *root = create_rnode("root");
-	struct rnode *inner = create_rnode("inner");
-	struct rnode *leaf = create_rnode("leaf");
+	struct rnode *root = create_rnode("root", "");
+	struct rnode *inner = create_rnode("inner", "");
+	struct rnode *leaf = create_rnode("leaf", "");
 
 	struct enode *is_leaf = create_enode_func(ENODE_IS_LEAF);
 
-	link_p2c(root, inner, NULL);
-	link_p2c(inner, leaf, NULL);
+	add_child(root, inner);
+	add_child(inner, leaf);
 
 	enode_eval_set_current_rnode(root);
 	if (eval_enode(is_leaf)) {
@@ -362,14 +362,14 @@ int test_is_inner()
 {
 	const char *test_name = "test_is_inner";
 
-	struct rnode *root = create_rnode("root");
-	struct rnode *inner = create_rnode("inner");
-	struct rnode *leaf = create_rnode("leaf");
+	struct rnode *root = create_rnode("root", "");
+	struct rnode *inner = create_rnode("inner", "");
+	struct rnode *leaf = create_rnode("leaf", "");
 
 	struct enode *is_inner_func = create_enode_func(ENODE_IS_INNER);
 
-	link_p2c(root, inner, NULL);
-	link_p2c(inner, leaf, NULL);
+	add_child(root, inner);
+	add_child(inner, leaf);
 
 	enode_eval_set_current_rnode(root);
 	if (eval_enode(is_inner_func)) {
@@ -395,14 +395,14 @@ int test_is_root()
 {
 	const char *test_name = "test_is_root";
 
-	struct rnode *root = create_rnode("root");
-	struct rnode *inner = create_rnode("inner");
-	struct rnode *leaf = create_rnode("leaf");
+	struct rnode *root = create_rnode("root", "");
+	struct rnode *inner = create_rnode("inner", "");
+	struct rnode *leaf = create_rnode("leaf", "");
 
 	struct enode *is_root_func = create_enode_func(ENODE_IS_ROOT);
 
-	link_p2c(root, inner, NULL);
-	link_p2c(inner, leaf, NULL);
+	add_child(root, inner);
+	add_child(inner, leaf);
 
 	enode_eval_set_current_rnode(root);
 	if (!eval_enode(is_root_func)) {
