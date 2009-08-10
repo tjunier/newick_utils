@@ -93,8 +93,8 @@ struct rooted_tree tree_3()
 	node_C = create_rnode("C", "1");
 	node_D = create_rnode("D", "1");
 	node_E = create_rnode("E", "1");
-	node_f = create_rnode("f", "2");
-	node_g = create_rnode("g", "2.0");
+	node_f = create_rnode("f", "2.0");
+	node_g = create_rnode("g", "2");
 	node_h = create_rnode("h", "3");
 	node_i = create_rnode("i", "");
 

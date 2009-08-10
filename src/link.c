@@ -96,23 +96,19 @@ char * compute_new_edge_length(char * length_as_string)
 
 void insert_node_above(struct rnode *this, char *label)
 {
-	struct redge *parent_edge;
 	struct rnode *parent;
 	struct rnode *new;
-	struct redge *new_node_parent_edge;
 	char * new_edge_length;	/* both new edges have 1/2 the length of the old one */
 
 	/* find parent edge and parent node */
 	parent = this->parent;
-	new_edge_length = compute_new_edge_length(parent->edge_length_as_string);
+	new_edge_length = compute_new_edge_length(this->edge_length_as_string);
 	/* create new node */
 	new = create_rnode(label, new_edge_length);
 	/* link new node to this node */
-	// link_p2c(new, this, new_edge_length);
-	/* for the new node's parent edge, we can't just call link_p2c(),
-	   because we need to replace the old child edge with the new. */
-	// new_node_parent_edge = create_redge(new_edge_length);
-	// set_parent_edge(new, new_node_parent_edge);
+	add_child(new, this);
+	free(this->edge_length_as_string);
+	this->edge_length_as_string = strdup(new_edge_length);
 	replace_child(parent, this, new);
 
 	free(new_edge_length);
@@ -125,9 +121,11 @@ void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
 	for (el = node->children->head; NULL != el; el = el->next) { 
 		if (el->data == old) {
 			el->data = new;
+			new->parent = node; /* only if old was found... */
 			return;
 		}
 	}
+
 	/* not found - do nothing */
 }
 
@@ -156,7 +154,6 @@ char *add_len_strings(char *ls1, char *ls2)
 
 void splice_out_rnode(struct rnode *this)
 {
-	/* get this node parent edge and its length */
 	struct rnode *parent = this->parent;
 	struct list_elem *elem;
 
@@ -164,9 +161,9 @@ void splice_out_rnode(struct rnode *this)
 	 * 'grandparent', and the length from their parent to their grandparent
 	 * must be added. */
 	for (elem = this->children->head; NULL != elem; elem = elem->next) {
-		struct rnode *child = (struct rnode *) elem->data;
+		struct rnode *child = elem->data;
 		char *new_edge_len_s = add_len_strings(
-			parent->edge_length_as_string,
+			this->edge_length_as_string,
 			child->edge_length_as_string);
 		free(child->edge_length_as_string);
 		child->edge_length_as_string = new_edge_len_s;
@@ -175,7 +172,7 @@ void splice_out_rnode(struct rnode *this)
 	struct llist *kids_copy = shallow_copy(this->children);
 
 	/* find where this node's parent edge is in parent */
-	int i = llist_index_of(parent->children, parent);
+	int i = llist_index_of(parent->children, this);
 
 	/* delete old edge from parent's children list */
 	struct llist *del = delete_after(parent->children, i-1, 1);
@@ -217,7 +214,7 @@ struct rnode * unlink_rnode(struct rnode *node)
 {
 	struct rnode *parent = node->parent;
 	struct llist *siblings = parent->children; 	/* includes 'node'! */
-	int index = llist_index_of(siblings, parent);
+	int index = llist_index_of(siblings, node);
 	/* This removes this node from its parent's list of children.  We get
 	 * the resulting list only so we can free it. */
 	struct llist *del = delete_after(siblings, index-1, 1);

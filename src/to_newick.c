@@ -79,7 +79,8 @@ char *subtree(struct rnode *node)
 		result = append_to(result, "(");
 
 		/* first child */
-		child = node->children->head->data;
+		elem = node->children->head;
+		child = elem->data;
 		child_node_s = subtree(child);
 		result = append_to(result, child_node_s);
 		free(child_node_s);

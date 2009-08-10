@@ -268,6 +268,7 @@ int test_insert_node_above_wlen()
 				test_name, node_k->parent, root);
 		return 1;
 	}
+	/* NOTE: Edge length is tested by comparing Newick strings */
 	char *obt = to_newick(root);
 	if (0 != strcmp(exp, obt)) {
 		printf ("%s: expected tree '%s', got '%s'.\n",
