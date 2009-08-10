@@ -6,7 +6,10 @@
 .PHONY: install
 .PHONY: check
 
-all: tutorial.pdf
+all:
+	
+check:
+
 
 tutorial.pdf: tutorial.tex
 	./make_figures.sh

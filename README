@@ -1,12 +1,19 @@
 The Newick Utilities are a suite of programs for working with Newick-formatted
 phylogenetic trees.
 
-See INSTALL for installing. Basically, it's the familiar
+See INSTALL for installing. The package uses the GNU autotools, so basically,
+it's the familiar
 
 $ ./configure
 $ make
 $ make check
 $ sudo make install
 
-There are no fancy options. I still use a few nonstandard GNU extensions like
-asprintf(), I will work towards removing them if there is demand for this.
+There are no fancy options. 
+
+You need a C compiler (C99; I use GCC). You also need Flex and Bison, but
+chances are they're already installed if you have GCC.
+
+MacOS users need to install Xcode. Some spurious error messages may be
+reported, and a nw_gen test may fail - AFAICT this is due to differences in the
+random number generators between MacOS and Linux.
