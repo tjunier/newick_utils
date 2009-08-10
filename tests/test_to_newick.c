@@ -34,7 +34,7 @@ int test_simple_1()
 	struct rnode *node_b;
 	char *exp = "(a:12);";
 
-	node_a = create_rnode("a", "");
+	node_a = create_rnode("a", "12");
 	node_b = create_rnode("", "");
 	add_child(node_b, node_a);
 
