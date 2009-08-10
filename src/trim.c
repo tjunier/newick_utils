@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "rnode.h"
 #include "list.h"
-#include "redge.h"
 
 enum {DEPTH_DISTANCE, DEPTH_ANCESTORS};
 
@@ -160,12 +159,11 @@ void trim(struct rnode *node, struct parameters params)
 	if (DEPTH_DISTANCE == params.depth_type) {
 		/* Shrink parent edge length */
 		double excess = ndata->distance_depth - params.threshold;
-		struct redge *parent_edge = node->parent_edge;
-		double trimmed_edge_length = parent_edge->length - excess;
-		free(parent_edge->length_as_string);
+		double trimmed_edge_length = node->edge_length - excess;
+		free(node->edge_length_as_string);
 		char *new_length = masprintf("%g", trimmed_edge_length);
 		if (NULL == new_length) { perror(NULL); exit(EXIT_FAILURE); }
-		parent_edge->length_as_string = new_length;
+		node->edge_length_as_string = new_length;
 	}
 
 	clear_llist(node->children);	/* no effect on leaves */
@@ -192,9 +190,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	for (elem = nodes_in_preorder->head->next;
 			NULL != elem; elem = elem->next) {
 		node = (struct rnode *) elem->data;
-		struct redge *parent_edge = node->parent_edge;
-		struct rnode *parent = parent_edge->parent_node;
-		struct node_data *parent_data = parent->data;
+		struct node_data *parent_data = node->parent->data;
 		/* allocate this node's data structure */
 		ndata = malloc(sizeof(struct node_data));
 		if (NULL == ndata) { perror(NULL); exit(EXIT_FAILURE); }
@@ -216,10 +212,9 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		/* Parent not trimmed: See if we must trim this node. */
 	
 		/* compute this node's depth measures */
-		double parent_edge_length = atof(parent_edge->length_as_string);
-		parent_edge->length = parent_edge_length;
-		ndata->distance_depth = parent_edge_length +
-			parent_data->distance_depth;
+		double edge_length = atof(node->edge_length_as_string);
+		node->edge_length = edge_length;
+		ndata->distance_depth = edge_length + parent_data->distance_depth;
 		ndata->ancestry_depth = 1 + parent_data->ancestry_depth;
 
 		/*

@@ -8,7 +8,7 @@ bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 
 # All headers
 HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
-	node_pos_alloc.h node_set.h parser.h readline.h redge.h rnode.h \
+	node_pos_alloc.h node_set.h parser.h readline.h rnode.h \
 	rnode_iterator.h simple_node_pos.h svg_graph.h text_graph.h \
 	to_newick.h tree.h tree_editor_rnode_data.h common.h order_tree.h \
 	tree_models.h xml_utils.h graph_common.h svg_graph_common.h \
@@ -17,7 +17,7 @@ HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
 # I mention all headers here, so they're included in the distro (otherwise this
 # is not necessary, it builds just fine)
 NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
-	link.c tree.c redge.c nodemap.c hash.c rnode_iterator.c \
+	link.c tree.c nodemap.c hash.c rnode_iterator.c \
 	masprintf.c $(HDR)
 
 NW_OUT = to_newick.c concat.c

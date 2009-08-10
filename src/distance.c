@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "lca.h"
 #include "simple_node_pos.h"
 #include "rnode.h"
-#include "redge.h"
 #include "node_pos_alloc.h"
 #include "common.h"
 
@@ -335,7 +334,7 @@ double distance_to_descendant(struct rnode *ancestor, struct rnode *descendant)
 		return 0.0;
 
 	if (NULL == ancestor) {
-		ancestor = descendant->parent_edge->parent_node;
+		ancestor = descendant->parent;
 	}
 
 	double ancestor_depth =

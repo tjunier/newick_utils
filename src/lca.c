@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree.h"
 #include "rnode.h"
 #include "list.h"
-#include "redge.h"
 #include "hash.h"
 #include "nodemap.h"
 
@@ -103,7 +102,7 @@ struct rnode *lca2(struct rooted_tree *tree, struct rnode *desc_A,
 		key = make_hash_key(desc_A);
 		hash_set(seen_nodes, key, SEEN);
 		free(key);
-		desc_A = desc_A->parent_edge->parent_node;
+		desc_A = desc_A->parent;
 	}
 	key = make_hash_key(desc_A);
 	hash_set(seen_nodes, key, SEEN);
@@ -116,7 +115,7 @@ struct rnode *lca2(struct rooted_tree *tree, struct rnode *desc_A,
 			break;
 		}
 		free(key);
-		desc_B = desc_B->parent_edge->parent_node;
+		desc_B = desc_B->parent;
 	}
 
 	destroy_hash(seen_nodes);

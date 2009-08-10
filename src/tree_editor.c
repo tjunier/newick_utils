@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "enode.h"
 #include "rnode.h"
-#include "redge.h"
 #include "link.h"
 #include "list.h"
 #include "tree.h"
@@ -302,13 +301,12 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 
 	for (el = rev_nodes->head->next; NULL != el; el = el -> next) {
 		node = (struct rnode *) el->data;
-		struct rnode *parent = node->parent_edge->parent_node;
-		struct rnode_data *parent_data = (struct rnode_data *) parent->data;
+		struct rnode_data *parent_data = node->parent->data;
 		rndata = malloc(sizeof(struct rnode_data));
 		if (NULL == rndata) { perror(NULL); exit (EXIT_FAILURE); }
 		rndata->nb_ancestors = parent_data->nb_ancestors + 1;
 		rndata->depth = parent_data->depth +
-			atof(node->parent_edge->length_as_string);
+			atof(node->edge_length_as_string);
 
 		rndata->stop_mark = FALSE;
 		node->data = rndata;
@@ -361,8 +359,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 
 		/* Check for stop mark in parent (see option -o) */
 		if (! is_root(current)) { 	/* root has no parent... */
-			if (((struct rnode_data *)
-			current->parent_edge->parent_node->data)->stop_mark) {
+			if (((struct rnode_data *) current->parent->data)->stop_mark) {
 				/* Stop-mark the current node and continue */ 
 				((struct rnode_data *)
 				current->data)->stop_mark = TRUE;
@@ -396,7 +393,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				}
 				r = unlink_rnode(current);
 				if (NULL != r) {
-					r->parent_edge->parent_node = NULL;
+					r->parent = NULL;
 					tree->root = r;
 				} 
 				break;

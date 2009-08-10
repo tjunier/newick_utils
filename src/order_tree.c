@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <stdlib.h>
 
-#include "redge.h"
 #include "rnode.h"
 #include "tree.h"
 #include "list.h"
@@ -44,8 +43,8 @@ int lbl_comparator(const void *a, const void *b)
 	/* I really have trouble understanding how qsort() passes the
 	 * comparands to the comparator... but thanks to GDB I figured out this
 	 * one. */	
-	char *a_lbl = (*(struct redge **)a)->child_node->data;
-	char *b_lbl = (*(struct redge **)b)->child_node->data;
+	char *a_lbl = (*(struct rnode **)a)->data;
+	char *b_lbl = (*(struct rnode **)b)->data;
 
 	int cmp = strcmp(a_lbl, b_lbl);
 	// printf ("%s <=> %s: %d\n", a_lbl, b_lbl, cmp);
@@ -70,9 +69,9 @@ void order_tree(struct rooted_tree *tree)
 			 * traversing the tree in parse order), we can just
 			 * order the children on their sort field. */
 
-			struct redge ** kids_array;
+			struct rnode ** kids_array;
 			int count = current->children->count;
-			kids_array = (struct redge **)
+			kids_array = (struct rnode **)
 				llist_to_array(current->children);
 			destroy_llist(current->children);
 			qsort(kids_array, count, sizeof(struct redge *),
@@ -83,7 +82,7 @@ void order_tree(struct rooted_tree *tree)
 			current->children = ordered_kids_list;
 
 			// Get sort field from first child ("back-inherit") [?]
-			current->data = kids_array[0]->child_node->data;
+			current->data = kids_array[0]->data;
 			free(kids_array);
 		}
 	}

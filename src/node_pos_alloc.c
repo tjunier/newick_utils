@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "tree.h"
 #include "list.h"
-#include "redge.h"
 #include "node_pos_alloc.h"
 
 int set_node_vpos_cb(struct rooted_tree *t,
@@ -58,19 +57,16 @@ int set_node_vpos_cb(struct rooted_tree *t,
 			set_node_bottom(node, leaf_count);
 			leaf_count++;
 		} else {
-			struct redge *edge;
 			struct rnode *top_child, *bottom_child;
 			/* top of this node is average of top and bottom of its
 			 * top child node */
-			edge = (struct redge *) node->children->head->data;
-		       	top_child = edge->child_node;
+		       	top_child = node->children->head->data;
 			set_node_top(node, 0.5 * (
 					get_node_top(top_child) +
 					get_node_bottom(top_child))
 					);
 			/* same idea for bottom */
-			edge = (struct redge *) node->children->tail->data;
-		       	bottom_child = edge->child_node;
+		       	bottom_child = node->children->tail->data;
 			set_node_bottom(node, 0.5 * (
 					get_node_top(bottom_child) +
 					get_node_bottom(bottom_child))
@@ -103,17 +99,15 @@ struct h_data set_node_depth_cb(struct rooted_tree *tree,
 	 * parent edge's length and its parent node's depth. */
 	elem = elem->next;
 	for (; NULL != elem; elem = elem->next) {
-		struct rnode *parent_node;
-		node = (struct rnode *) elem->data;
-		parent_node = node->parent_edge->parent_node;
+		node =  elem->data;
+		struct rnode *parent_node = node->parent;
 
-		if (0 == strcmp("", node->parent_edge->length_as_string))
-			node->parent_edge->length = 1.0;
+		if (0 == strcmp("", node->edge_length_as_string))
+			node->edge_length = 1.0;
 		else
-			node->parent_edge->length = atof(node->parent_edge->length_as_string);
+			node->edge_length = atof(node->edge_length_as_string);
 
-		double node_depth = node->parent_edge->length +
-				get_node_depth(parent_node);
+		double node_depth = node->edge_length + get_node_depth(parent_node);
 
 		set_node_depth(node, node_depth);
 		

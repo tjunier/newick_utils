@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodemap.h"
 #include "parser.h"
 #include "to_newick.h"
-#include "redge.h"
 #include "rnode.h"
 #include "link.h"
 #include "hash.h"

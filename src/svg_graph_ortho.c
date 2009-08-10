@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree.h"
 #include "list.h"
 #include "rnode.h"
-#include "redge.h"
 #include "hash.h"
 #include "node_pos_alloc.h"
 #include "svg_graph_common.h"
@@ -95,8 +94,7 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 				svg_mid_pos, svg_h_pos, svg_mid_pos);
 
 		} else {
-			struct rnode *parent = node->parent_edge->parent_node;
-			struct svg_data *parent_data = parent->data;
+			struct svg_data *parent_data = node->parent->data;
 			double svg_parent_h_pos = ROOT_SPACE + (
 				h_scale * parent_data->depth);
 			printf ("<line class='clade_%d' "
@@ -160,19 +158,18 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 		/* Branch lengths */
 
 		if (! is_root(node)) {
-			struct rnode *parent = node->parent_edge->parent_node;
-			struct svg_data *parent_data = parent->data;
+			struct svg_data *parent_data = node->parent->data;
 			double svg_parent_h_pos = ROOT_SPACE + (
 				h_scale * parent_data->depth);
 			/* Print branch length IFF it is nonempty AND 
 			 * requested size is not 0 */
-			if (0 != strcmp(node->parent_edge->length_as_string,
+			if (0 != strcmp(node->edge_length_as_string,
 						"")) {
 				printf("<text class='edge-label' "
 					"x='%4f' y='%4f'>%s</text>",
 					(svg_h_pos + svg_parent_h_pos) / 2.0,
 					edge_length_v_offset + svg_mid_pos,
-					node->parent_edge->length_as_string);
+					node->edge_length_as_string);
 			}
 		}
 

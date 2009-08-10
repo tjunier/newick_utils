@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "lca.h"
 #include "rnode_iterator.h"
 #include "rnode.h"
-#include "redge.h"
 #include "common.h"
 #include "link.h"
 
@@ -264,7 +263,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	int context;
 	for (context = params.context; context > 0; context--)
 		if (! is_root(subtree_root))
-			subtree_root = subtree_root->parent_edge->parent_node;
+			subtree_root = subtree_root->parent;
 
 
 	if (NULL != subtree_root) {

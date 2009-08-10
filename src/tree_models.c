@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "link.h"
 #include "to_newick.h"
 #include "tree_models.h"
-#include "redge.h"
 #include "masprintf.h"
 
 #define UNUSED -1
@@ -78,10 +77,10 @@ static void geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 	// printf ("visiting leaf %p (%s)\n", leaf, leaf->label);
 	if (geo_has_children(prob_node_has_children)) {
 		// printf (" gets children\n");
-		struct rnode *kid1 = create_rnode("kid1");	
-		struct rnode *kid2 = create_rnode("kid2");	
-		link_p2c(leaf, kid1, "");
-		link_p2c(leaf, kid2, "");
+		struct rnode *kid1 = create_rnode("kid1", "");	
+		struct rnode *kid2 = create_rnode("kid2", "");	
+		add_child(leaf, kid1);
+		add_child(leaf, kid2);
 		append_element(leaves_queue, kid1);
 		append_element(leaves_queue, kid2);
 	} else {
@@ -94,7 +93,7 @@ static void geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 void geometric_tree(double prob_node_has_children)
 {
 	struct llist *leaves_queue = create_llist();
-	struct rnode *root = create_rnode("root");
+	struct rnode *root = create_rnode("root", "");
 
 	append_element(leaves_queue, root);
 
@@ -171,8 +170,8 @@ double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 
 	char *length_s = masprintf("%g", length);
 	if (NULL == length_s) { perror(NULL); exit(EXIT_FAILURE); }
-	free(leaf->parent_edge->length_as_string);
-	leaf->parent_edge->length_as_string = length_s;
+	free(leaf->edge_length_as_string);
+	leaf->edge_length_as_string = length_s;
 
 	/* Return the remaining time so caller f() can take action based on
 	 * whether there is time left or not */
@@ -185,7 +184,7 @@ struct rnode *create_child_with_time_limit(double time_limit)
 {
 	char *label = masprintf("n%d", running_number());
 	if (NULL == label) { perror(NULL); exit(EXIT_FAILURE); }
-	struct rnode *kid = create_rnode(label);
+	struct rnode *kid = create_rnode(label, "");
 	free(label);
 	double *limit_p = malloc(sizeof(double));
 	if (NULL == limit_p) {
@@ -213,9 +212,7 @@ void free_data(char *newick, struct llist *leaves_queue,
 	struct list_elem *elem;
 	for (elem = all_children->head; NULL != elem; elem = elem->next) {
 		kid = elem->data;
-		struct redge *parent = kid->parent_edge;
-		free(parent->length_as_string);
-		free(parent);
+		free(kid->edge_length_as_string);
 		free(kid->label);
 	       	free(kid->data);
 		destroy_llist(kid->children);
@@ -229,7 +226,7 @@ void time_limited_tree(double branch_termination_rate, double duration)
 	/* create root */
 	char *label = masprintf("n%d", running_number());
 	if (NULL == label) { perror(NULL); exit(EXIT_FAILURE); }
-	struct rnode *root = create_rnode(label);
+	struct rnode *root = create_rnode(label, "");
 	free(label);
 
 	/* This list remembers all children nodes created, for purposes of
@@ -243,13 +240,13 @@ void time_limited_tree(double branch_termination_rate, double duration)
 
 	/* 1st child */
 	kid = create_child_with_time_limit(duration);
-	link_p2c(root, kid, NULL);	/* length is determined below */
+	add_child(root, kid);	/* length is determined below */
 	append_element(leaves_queue, kid);
 	append_element(all_children, kid);
 
 	/* 2nd child */
 	kid = create_child_with_time_limit(duration);
-	link_p2c(root, kid, NULL);	
+	add_child(root, kid);	
 	append_element(leaves_queue, kid);
 	append_element(all_children, kid);
 
@@ -260,12 +257,12 @@ void time_limited_tree(double branch_termination_rate, double duration)
 				branch_termination_rate, UNUSED); 
 		if (remaining_time > 0) {
 			kid = create_child_with_time_limit(remaining_time);
-			link_p2c(current, kid, NULL);
+			add_child(current, kid);
 			append_element(leaves_queue, kid);
 			append_element(all_children, kid);
 
 			kid = create_child_with_time_limit(remaining_time);
-			link_p2c(current, kid, NULL);
+			add_child(current, kid);
 			append_element(leaves_queue, kid);
 			append_element(all_children, kid);
 		} 

@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "parser.h"
 #include "tree.h"
-#include "redge.h"
 #include "rnode.h"
 #include "list.h"
 #include "common.h"

@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "list.h"
 #include "rnode.h"
-#include "redge.h"
 #include "tree.h"
 #include "hash.h"
 #include "node_pos_alloc.h"
@@ -122,8 +121,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			printf("<line x1='0' y1='0' x2='%.4f' y2='%.4f'/>",
 				svg_mid_x_pos, svg_mid_y_pos);
 		} else {
-			struct rnode *parent = node->parent_edge->parent_node;
-			struct svg_data *parent_data = parent->data;
+			struct svg_data *parent_data = node->parent->data;
 			double svg_parent_radius = svg_root_length + (
 				r_scale * parent_data->depth);
 			double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);

@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "link.h"
 #include "nodemap.h"
 #include "common.h"
-#include "redge.h"
 #include "rnode_iterator.h"
 #include "masprintf.h"
 
@@ -244,15 +243,14 @@ void remove_branch_lengths(struct rooted_tree *target_tree)
 {
 	struct list_elem *el;
 
-	for (el=target_tree->nodes_in_order->head; NULL != el; el=el->next) {
+	for (el = target_tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = el->data;
-		struct redge *cur_edge = current->parent_edge;
-		if (strcmp("", cur_edge->length_as_string) != 0) {
-			free(cur_edge->length_as_string);
+		if (strcmp("", current->edge_length_as_string) != 0) {
+			free(current->edge_length_as_string);
 			// We need to allocate dynamically, since this will
 			// later be passed to free():
 			// WRONG! cur_edge->length_as_string = ""
-			cur_edge->length_as_string = strdup("");
+			current->edge_length_as_string = strdup("");
 		}
 	}
 }
@@ -269,9 +267,10 @@ void remove_knee_nodes(struct rooted_tree *tree)
 			if (1 == children_count(current))
 				splice_out_rnode(current);
 	}
+	/* If the root has only one child, make that child the new root */
 	if (1 == children_count(tree->root)) {
-		struct redge *edge = tree->root->children->head->data;
-		tree->root = edge->child_node;
+		struct rnode *roots_first_child = tree->root->children->head->data;
+		tree->root = roots_first_child;
 	}
 }
 

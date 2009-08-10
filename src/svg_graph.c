@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "node_pos_alloc.h"
 #include "nodemap.h"
 #include "readline.h"
-#include "redge.h"
 #include "rnode.h"
 #include "svg_graph_common.h"
 #include "svg_graph.h"
@@ -406,7 +405,7 @@ void set_group_numbers(struct rooted_tree *tree)
 	for (;  NULL != el; el = el->next) {
 		struct rnode *node = el->data;
 		struct svg_data *node_data = node->data;
-		struct rnode *parent = node->parent_edge->parent_node;
+		struct rnode *parent = node->parent;
 		struct svg_data *parent_data = parent->data;
 		/* Inherit parent node's style (clade number) IFF 
 		    node has no style of its own */

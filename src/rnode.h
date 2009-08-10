@@ -70,10 +70,12 @@ struct rnode {
 	void *data;	/* app-dependent data for this node */
 };
 
-/* allocates a rnode and returns a pointer to it, or exits. If 'label' is NULL,
- * the node will have an empty string for a label.*/
+/* allocates a rnode and returns a pointer to it, or exits. If 'label' is NULL
+ * or empty, the node will have an empty string for a label. If
+ * 'length_as_string' is NULL or empty, the node's branch will have no length
+ * */
 
-struct rnode *create_rnode(char *label);
+struct rnode *create_rnode(char *label, char *length_as_string);
 
 /* Destroys the rnode, including the parent edge (if any). If free_data is not
  * NULL, it is called to free the node's data */

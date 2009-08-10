@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "parser.h"
 #include "to_newick.h"
 #include "tree.h"
-#include "redge.h"
 #include "rnode.h"
 #include "list.h"
 #include "common.h"
@@ -153,8 +152,8 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
 		struct rnode *current = (struct rnode *) elem->data;
 		if (! params.show_branch_lengths) {
-			if (NULL != current->parent_edge) {
-				char *length = current->parent_edge->length_as_string;
+			if (NULL != current->parent) {
+				char *length = current->edge_length_as_string;
 				length[0] = '\0';
 			}
 		}

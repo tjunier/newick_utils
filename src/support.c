@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 #include "hash.h"
 #include "rnode.h"
-#include "redge.h"
 #include "node_set.h"
 #include "to_newick.h"
 #include "common.h"
@@ -181,8 +180,7 @@ node_set union_of_child_node_sets(struct rnode *node)
 	struct list_elem *el;
 
 	for (el = node->children->head; NULL != el; el = el->next) {
-		struct redge *edge = (struct redge *) el->data;
-		struct rnode *child = edge->child_node;
+		struct rnode *child = el->data;
 		node_set child_node_set = (node_set) child->data;
 		node_set_add_set(result, child_node_set, num_leaves);
 	}

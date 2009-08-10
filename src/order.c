@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "to_newick.h"
 #include "list.h"
 #include "rnode.h"
-#include "redge.h"
 #include "order_tree.h"
 
 void help (char *argv[])

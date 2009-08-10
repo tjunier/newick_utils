@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 
 #include "rnode.h"
-#include "redge.h"
 #include "list.h"
 #include "concat.h"
 
@@ -47,13 +46,11 @@ char *length(struct rnode *node)
 	}
 	*result = '\0';
 
-	if (NULL != node->parent_edge) {
-		if (NULL != node->parent_edge->length_as_string) {
-			if (strlen(node->parent_edge->length_as_string) > 0) {
-				result = append_to(result, ":");
-				result = append_to(result,
-					       node->parent_edge->length_as_string);	
-			}
+	if (NULL != node->parent) {
+		if (strlen(node->edge_length_as_string) > 0) {
+			result = append_to(result, ":");
+			result = append_to(result,
+				       node->edge_length_as_string);	
 		}
 	}
 
@@ -75,23 +72,22 @@ char *subtree(struct rnode *node)
 		result = append_to(result, length_s);
 		free(length_s);
 	} else {
+		struct rnode *child;
 		struct list_elem *elem;
-		struct redge *edge;
 		char * child_node_s;
 
 		result = append_to(result, "(");
 
 		/* first child */
-		elem = node->children->head;
-		edge = (struct redge *) elem->data;
-		child_node_s = subtree(edge->child_node);
+		child = node->children->head->data;
+		child_node_s = subtree(child);
 		result = append_to(result, child_node_s);
 		free(child_node_s);
 		/* other children, comma-separated */
-		for (elem=elem->next; elem!=NULL; elem=elem->next) {
+		for (elem = elem->next; elem != NULL; elem = elem->next) {
 			result = append_to(result, ",");
-			edge = (struct redge *) elem->data;
-			child_node_s = subtree(edge->child_node);
+			child = elem->data;
+			child_node_s = subtree(child);
 			result = append_to(result, child_node_s);
 			free(child_node_s);
 		}

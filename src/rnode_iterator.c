@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hash.h"
 #include "list.h"
 #include "rnode.h"
-#include "redge.h"
 
 #define SEEN "SEEN"
 
@@ -94,8 +93,7 @@ static struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 
 	for (elem = iter->current->children->head; NULL != elem;
 			elem = elem->next) {
-		struct redge *child_edge = (struct redge *) elem->data;
-		struct rnode *child = child_edge->child_node;
+		struct rnode *child = elem->data;
 		char *node_hash_key = make_hash_key(child);
 		if (NULL == hash_get(iter->seen, node_hash_key)) {
 			free(node_hash_key);
@@ -112,7 +110,7 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 
 	if (is_leaf(iter->current)) {
 		hash_set(iter->seen, current_node_hash_key, SEEN);
-		iter->current = iter->current->parent_edge->parent_node;
+		iter->current = iter->current->parent;
 		free(current_node_hash_key);
 		return iter->current;
 	} else {
@@ -128,7 +126,7 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 			if (iter->current == iter->root) {
 				return NULL;
 			} else {
-				iter->current=iter->current->parent_edge->parent_node;
+				iter->current = iter->current->parent;
 				return iter->current;
 			}
 		}

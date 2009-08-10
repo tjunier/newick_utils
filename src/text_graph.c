@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 #include "simple_node_pos.h"
 #include "rnode.h"
-#include "redge.h"
 #include "node_pos_alloc.h"
 
 static const int LBL_SPACE = 2;
@@ -73,8 +72,7 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 		if (is_root(node)) {
 			canvas_write(canvas, 0, mid, "=");
 		} else {
-			struct rnode *parent = node->parent_edge->parent_node;
-			struct simple_node_pos *parent_data = parent->data;
+			struct simple_node_pos *parent_data = node->parent->data;
 			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		}

@@ -30,7 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %{
 #include <stdio.h>
 #include "rnode.h"
-#include "redge.h"
 #include "list.h"
 #include "link.h"
 #include "to_newick.h"
@@ -66,7 +65,7 @@ void nwserror(char *s)
 
 %union {
 	char *sval;
-	struct redge *edgep;
+	struct rnode *nodep;
 	struct llist *llistp;
 }
 
@@ -74,16 +73,16 @@ void nwserror(char *s)
 %token <sval> LABEL
 %token TOK_EOF	0
 
-%type <edgep> leaf
-%type <edgep> node
+%type <nodep> leaf
+%type <nodep> node
 %type <llistp> nodelist
-%type <edgep> inner_node
+%type <nodep> inner_node
 
 %%
 
 tree: /* empty */	{ root = NULL; YYACCEPT; }
     | node SEMICOLON {
-    		root = (struct rnode *)$1->child_node; 
+    		root = $1;
 		YYACCEPT;
     }
 
@@ -98,65 +97,53 @@ tree: /* empty */	{ root = NULL; YYACCEPT; }
     }
     ;
 
-node: leaf { append_element(nodes_in_order, (struct rnode*) $1->child_node); }
-    | inner_node { append_element(nodes_in_order, (struct rnode*) $1->child_node); }
+node: leaf { append_element(nodes_in_order, $1); }
+    | inner_node { append_element(nodes_in_order, $1); }
     ;
 
 inner_node: O_PAREN nodelist C_PAREN {
 		struct list_elem* lep;
 		struct rnode *np;
-		struct redge *ep;
-		np = create_rnode("");
+		np = create_rnode("","");
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			add_child_edge(np, (struct redge*) lep->data);
+			add_child(np, (struct rnode*) lep->data);
 		}
 		destroy_llist($2);
-		ep = create_redge(NULL);
-		set_parent_edge(np, ep);
-		$$ = ep;
+		$$ = np;
     }
     | O_PAREN nodelist C_PAREN LABEL {
 		struct list_elem* lep;
 		struct rnode *np;
-		struct redge *ep;
-		np = create_rnode($4);
+		np = create_rnode($4,"");
 		free($4);
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			add_child_edge(np, (struct redge*) lep->data);
+			add_child(np, (struct rnode*) lep->data);
 		}
 		destroy_llist($2);
-		ep = create_redge(NULL);
-		set_parent_edge(np, ep);
-		$$ = ep;
+		$$ = np;
     }
     | O_PAREN nodelist C_PAREN LABEL COLON LABEL {
 		struct list_elem* lep;
 		struct rnode *np;
-		struct redge *ep;
-		np = create_rnode($4);
+		np = create_rnode($4,$6);
 		free($4);
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			add_child_edge(np, (struct redge*) lep->data);
+			add_child(np, (struct rnode*) lep->data);
 		}
 		destroy_llist($2);
-		ep = create_redge($6);
-		set_parent_edge(np, ep);
 		free($6);
-		$$ = ep;
+		$$ = np;
     }	
     | O_PAREN nodelist C_PAREN COLON LABEL {
 		struct list_elem* lep;
 		struct rnode *np;
-		struct redge *ep;
-		np = create_rnode("");
+		np = create_rnode("",$5);
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			add_child_edge(np, (struct redge*) lep->data);
+			add_child(np, (struct rnode*) lep->data);
 		}
 		destroy_llist($2);
-		ep = create_redge($5);
-		set_parent_edge(np, ep);
 		free($5);
-		$$ = ep;
+		$$ = np;
     }
     | O_PAREN nodelist { 
 	fprintf (stderr, "ERROR: missing ')' at line %d near '%s'\n",
@@ -180,36 +167,26 @@ nodelist: node {
 	;
 
 leaf: LABEL {
-		struct redge *ep;
 		struct rnode *np;
-		ep = create_redge(NULL);
-		np = create_rnode($1);
+		np = create_rnode($1,"");
 		free($1);
-		set_parent_edge(np, ep);
-		$$ = ep;
+		$$ = np;
 	}
     | LABEL COLON LABEL {
-		struct redge *ep;
 		struct rnode *np;
-		ep = create_redge($3);
 		free($3);
-		np = create_rnode($1);
+		np = create_rnode($1,$3);
 		free($1);
-		set_parent_edge(np, ep);
-		$$ = ep;
+		$$ = np;
 	}
     | COLON LABEL {
-		struct redge *ep = create_redge($2);
 		free($2);
-		struct rnode *np = create_rnode("");
-		set_parent_edge(np, ep);
-		$$ = ep;
+		struct rnode *np = create_rnode("",$2);
+		$$ = np;
 	}
     | /* empty */ {
-		struct redge *ep = create_redge(NULL);
-		struct rnode *np = create_rnode("");
-		set_parent_edge(np, ep);
-		$$ = ep;
+		struct rnode *np = create_rnode("","");
+		$$ = np;
 	}
     ;
 

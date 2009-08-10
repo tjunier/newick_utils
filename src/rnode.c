@@ -34,11 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "rnode.h"
 #include "list.h"
-#include "redge.h"
 #include "rnode_iterator.h"
 #include "hash.h"
 
-struct rnode *create_rnode(char *label)
+struct rnode *create_rnode(char *label, char *length_as_string)
 {
 	struct rnode *node_p;
 
@@ -50,10 +49,13 @@ struct rnode *create_rnode(char *label)
 	if (NULL == label) {
 		label = "";
 	}
+	if (NULL == length_as_string) {
+		length_as_string = "";
+	}
 	node_p->label = strdup(label);
+	node_p->edge_length_as_string = strdup(length_as_string);
 	node_p->children = create_llist();	
-	node_p->parent_edge = NULL;
-
+	node_p->parent = NULL;
 	node_p->data = NULL;
 
 #ifdef SHOW_RNODE_CREATE
@@ -68,8 +70,6 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void*))
 #ifdef SHOW_RNODE_DESTROY
 	fprintf (stderr, " freeing rnode %p '%s'\n", node, node->label);
 #endif
-	if (NULL != node->parent_edge)
-		destroy_redge(node->parent_edge);
 	destroy_llist(node->children);
 	free(node->label);
 	if (NULL != free_data)
@@ -89,11 +89,7 @@ int is_leaf(struct rnode *node)
 
 int is_root(struct rnode *node)
 {
-	if (NULL == node->parent_edge)
-		return 1;
-	if (NULL == node->parent_edge->parent_node)
-		return 1;
-	return 0;
+	return (NULL == node->parent);
 }
 
 int is_inner_node(struct rnode *node)

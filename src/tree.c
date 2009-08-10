@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "tree.h"
 #include "link.h"
-#include "redge.h"
 #include "rnode.h"
 #include "list.h"
 #include "nodemap.h"
@@ -57,7 +56,7 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 
 	/* Insert node (will be the new root) above outgroup */
 	insert_node_above(outgroup, "");
-	new_root = outgroup->parent_edge->parent_node;
+	new_root = outgroup->parent;
 
 	/* Invert edges from old root to new root (i.e., the tree is always in
 	 * a consistent state) */
@@ -66,23 +65,14 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	 * the tree from the soon-to-be new root to the old (which is still the
 	 * root) */
 	revert_list = create_llist();
-	for (node = new_root; ! is_root(node);
-	node = node->parent_edge->parent_node) {
-		struct redge *edge = node->parent_edge;
+	for (node = new_root; ! is_root(node); node = node->parent) {
 		/* order of reversals is important: tree is always consistent */
-		prepend_element(revert_list, edge);
+		prepend_element(revert_list, node);
 	}
-	/* If old_root has a parent edge (this can happen), we free it now,
-	 * because any pointers to it will now be lost. */
-	if (NULL != old_root->parent_edge) {
-                //fprintf(stderr, " freeing redge %p (length %s at %p)\n", old_root->parent_edge, old_root->parent_edge->length_as_string, old_root->parent_edge->length_as_string);
-                free(old_root->parent_edge->length_as_string);
-		free(old_root->parent_edge);
-	}
-	/* Then, we reverse the edges in the list. */
+	/* Now, we reverse the edges in the list. */ // TODO: may bot be needed w/o redges
 	for (elem = revert_list->head; NULL != elem; elem = elem->next) {
 		struct redge *edge = (struct redge*) elem->data;
-		reverse_redge(edge);
+		// reverse_redge(edge);
 	}
         destroy_llist(revert_list);
 
@@ -106,7 +96,7 @@ int all_children_are_leaves(struct rnode *n)
 {
 	struct list_elem *el;
 	for (el = n->children->head; NULL != el; el = el->next) {
-		struct rnode *child = ((struct redge *)el->data)->child_node;
+		struct rnode *child = el->data;
 		if (! is_leaf(child)) return 0;
 	}
 
@@ -122,13 +112,13 @@ int all_children_have_same_label(struct rnode *n, char **label)
 	/* get first child's label */
 
 	struct list_elem *el = n->children->head;
-	struct rnode *child = ((struct redge *)el->data)->child_node;
+	struct rnode *child = el->data;
 	char *ref_label = child->label;
 
 	/* iterate over other children, and compare their label to the first's */
 
 	for (el = el->next; NULL != el; el = el->next) {
-		child = ((struct redge *)el->data)->child_node;
+		child = el->data;
 		if (0 != strcmp(ref_label, child->label))
 			return 0; /* found a different label */
 	}
@@ -169,9 +159,8 @@ void destroy_tree(struct rooted_tree *tree, int free_node_data)
 	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
 		struct rnode *current = e->data;
 		destroy_llist(current->children);
-		free(current->parent_edge->length_as_string);
-		free(current->parent_edge);
 		free(current->label);
+		free(current->edge_length_as_string);
 		/* only works if data can be free()d, i.e. has no pointer to
 		 * allocated storage. Otherwise free the data "manually". */
 		if (free_node_data)
@@ -234,10 +223,8 @@ int is_cladogram(struct rooted_tree *tree)
 	struct list_elem *el;
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = el->data;
-		struct redge *parent_edge = current->parent_edge;
-		if (NULL != parent_edge)
-			if (strcmp(parent_edge->length_as_string, "") != 0)
-				return 0;
+		if (strcmp(current->edge_length_as_string, "") != 0)
+			return 0;
 	}
 
 	return 1;
@@ -309,13 +296,12 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree,
 // TODO: try an iterative version using a rnode_iterator
 static struct rnode *clone_clade(struct rnode *root)
 {
-	struct rnode *root_clone = create_rnode(root->label);
+	struct rnode *root_clone = create_rnode(root->label,"");
 	struct list_elem *el;
 	for (el = root->children->head; NULL != el; el = el->next) {
-		struct redge *kid_edge = el->data;
-		struct rnode *kid = kid_edge->child_node;
+		struct rnode *kid = el->data;
 		struct rnode *kid_clone = clone_clade(kid);
-		link_p2c(root_clone, kid_clone, kid_edge->length_as_string);
+		add_child(root_clone, kid_clone); // TODO: handle length?
 	}
 
 	return root_clone;
