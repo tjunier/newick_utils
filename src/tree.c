@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodemap.h"
 #include "hash.h"
 #include "rnode_iterator.h"
+#include "to_newick.h" // TODO: rm when debugged
 
 const int FREE_NODE_DATA = 1;
 const int DONT_FREE_NODE_DATA = 0;
@@ -55,7 +56,7 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	struct list_elem *elem;
 
 	/* Insert node (will be the new root) above outgroup */
-	insert_node_above(outgroup, "");
+	insert_node_above(outgroup, "NEW");
 	new_root = outgroup->parent;
 
 	/* Invert edges from old root to new root (i.e., the tree is always in

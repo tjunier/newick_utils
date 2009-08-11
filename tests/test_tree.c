@@ -16,7 +16,7 @@ int test_reroot()
 	const char *test_name = "test_reroot";
 	struct rooted_tree tree = tree_3();	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 	struct hash *map = create_label2node_map(tree.nodes_in_order);	
-	struct rnode *node_g = (struct rnode *) hash_get(map, "g");
+	struct rnode *node_g = hash_get(map, "g");
 	const char *exp = "((D:1,E:1)g:1,(C:1,(A:1,B:1.0)f:5)h:1);";
 
 	reroot_tree(&tree, node_g);

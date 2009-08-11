@@ -67,9 +67,9 @@ int test_is_leaf()
 	return 0;
 }
 
-int test_add_3_child_edges()
+int test_add_3_children()
 {
-	const char *test_name = "test_add_3_child_edges";
+	const char *test_name = "test_add_3_children";
 
 	char *length1 = "12.34";
 	char *length2 = "2.345";
@@ -634,11 +634,103 @@ int test_siblings()
 	return 0;
 }
 
+int test_insert_remove_child()
+{
+	char * test_name = "test_insert_remove_child";
+
+	struct rnode *mum = create_rnode("mum","");
+	struct rnode *kid1 = create_rnode("kid1","");
+	struct rnode *kid2 = create_rnode("kid2","");
+	struct rnode *kid3 = create_rnode("kid3","");
+	struct rnode *kid4 = create_rnode("kid4","");
+	struct rnode *kid5 = create_rnode("kid5","");
+	struct rnode *kid6 = create_rnode("kid6","");
+	struct rnode *node;
+	int index = -1;
+
+	add_child(mum, kid1);
+	add_child(mum, kid2);
+	add_child(mum, kid3);
+
+	index = remove_child(kid2);
+	if (index != 1) {
+		printf("%s: expected index 1, got %d\n", test_name, index);
+		return 1;
+	}
+	if (children_count(mum) != 2) {
+		printf("%s: expected 2 children, got %d\n", test_name,
+				children_count(mum));
+		return 1;
+	}
+	insert_child(mum, kid4, 1);
+	node = mum->children->head->next->data;	
+	if (node != kid4) {
+		printf("%s: expected node %p, got %p.\n", test_name, kid4, node);
+		return 1;
+	}
+	index = remove_child(kid1);
+	if (index != 0) {
+		printf("%s: expected index 0, got %d\n", test_name, index);
+		return 1;
+	}
+	insert_child(mum, kid5, 0);
+	node = mum->children->head->data;	
+	if (node != kid5) {
+		printf("%s: expected node %p, got %p.\n", test_name, kid5, node);
+		return 1;
+	}
+	index = remove_child(kid3);
+	if (index != 2) {
+		printf("%s: expected index 2, got %d\n", test_name, index);
+		return 1;
+	}
+	insert_child(mum, kid6, 2);
+	node = mum->children->tail->data;	
+	if (node != kid6) {
+		printf("%s: expected node %p, got %p.\n", test_name, kid6, node);
+		return 1;
+	}
+
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_swap_nodes()
+{
+	char * test_name = "test_swap_nodes";
+
+	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
+	struct rooted_tree tree3 = tree_3(); 
+	struct hash *map = create_label2node_map(tree3.nodes_in_order);
+	struct rnode *node_h = hash_get(map, "h");
+	struct rnode *node_i = hash_get(map, "i"); /* h's parent is i (== root) */
+
+	if (node_i != node_h->parent) {
+		printf ("%s: h's parent expected to be i, got %s\n", test_name,
+				node_h->parent->label);
+		return 1;
+	}
+
+	swap_nodes(node_h);
+
+	/* Now things must be the other way around */
+
+	if (node_h != node_i->parent) {
+		printf ("%s: i's parent expected to be h, got %s\n", test_name,
+				node_h->parent->label);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
 	printf("Starting linking test...\n");
-	failures += test_add_3_child_edges();
+	failures += test_add_3_children();
 	failures += test_children_count();
 	failures += test_simple_tree();
 	failures += test_is_leaf();
@@ -651,6 +743,8 @@ int main()
 	failures += test_unlink_rnode_rad_leaf();
 	failures += test_unlink_rnode_3sibs();
 	failures += test_siblings();
+	failures += test_insert_remove_child();
+	failures += test_swap_nodes();
 	// failures += test_is_stair();
 	if (0 == failures) {
 		printf("All tests ok.\n");

@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 
 // TODO: Check this!
 #ifndef RNODE_DEF
@@ -209,6 +210,34 @@ void reverse_redge(struct redge *edge)
 	destroy_redge(edge);
 }
 */
+
+int remove_child(struct rnode *child)
+{
+	if (is_root(child)) return -1;
+
+	struct rnode *parent = child->parent;
+	struct llist *kids = parent->children;
+	int n = llist_index_of(kids, child);
+	assert(n != -1);
+	delete_after(kids, n-1, 1);
+
+	return n;
+}
+
+void insert_child(struct rnode *parent, struct rnode *child, int index)
+{
+	struct llist *kids = parent->children;
+	struct llist *insert = create_llist();
+	append_element(insert, child);
+	insert_after(kids, index-1, insert);
+}
+
+void swap_nodes(struct rnode *node)
+{
+	if (is_root(node)) return; /* can't swap root: no parent */
+
+	struct rnode *parent = node->parent;
+}
 
 struct rnode * unlink_rnode(struct rnode *node)
 {

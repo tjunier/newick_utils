@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * anyway since you need it to free the spliced-out node).*/
 
 struct rnode;
-struct redge;
 
 /* Adds 'child' to 'parent''s list of children nodes */
 
@@ -46,7 +45,8 @@ void add_child(struct rnode *parent, struct rnode *child);
 /* sets 'edge' as 'child''s parent edge, and 'child' as 'edge''s child
  * node. */
 
-void set_parent_edge(struct rnode *child, struct redge *edge);
+// OBSOLETE
+// void set_parent_edge(struct rnode *child, struct redge *edge);
 
 // OBSOLETE - use add_child() 
 // void link_p2c(struct rnode *parent, struct rnode *child, char *length);
@@ -75,7 +75,22 @@ void splice_out_rnode(struct rnode *node);
  * call) should be the tree's root (and the edge's child node will be the new
  * root). It is the caller's responsibility to ensure this. */
 
-void reverse_redge(struct redge *edge);
+// OBSOLETE - use swap_nodes()
+
+// void reverse_redge(struct redge *edge);
+
+/* deletes child from parent's children list; returns the index of the child in
+ * the list prior to removal. */
+
+int remove_child(struct rnode *child);
+
+/* Inserts child into parent's children list, at the specified index. */
+
+void insert_child(struct rnode *parent, struct rnode *child, int index);
+
+/* Swaps 'node' and its parent, i.e, parent becomes a child of 'node' */
+
+void swap_nodes(struct rnode *node);
 
 /* Removes a node from its parent's children list. The node is not freed.
  * If the removed node had more than one sibling, the tree is in a normal
