@@ -178,7 +178,7 @@ struct rooted_tree tree_5()
 	struct llist *nodes_in_order;
 	struct rooted_tree result;
 	
-	node_A = create_rnode("A", "1");
+	node_A = create_rnode("A", "3");
 	node_B = create_rnode("B", "3");
 	node_C = create_rnode("C", "2");
 	node_D = create_rnode("D", "1");
