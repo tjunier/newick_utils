@@ -37,7 +37,8 @@ int test_reroot_2()
 {
 	const char *test_name = "test_reroot_2";
 
-	/* A tree whose root has 3 children: (A:3,B:3,(C:2,(D:1,E:1)f)g)h; */
+	/* A tree whose root has 3 children:
+	 * (A:3,B:3,(C:2,(D:1,E:1)f:1)g:1)h; */
 
 	struct rooted_tree tree = tree_5();	
 	struct hash *map = create_label2node_map(tree.nodes_in_order);	
@@ -322,7 +323,8 @@ int test_clone_subtree()
 	}
 
 	/* Check all nodes */
-	for (orig_el = tree.nodes_in_order->head, clone_el = clone->nodes_in_order->head;
+	for (orig_el = tree.nodes_in_order->head,
+			clone_el = clone->nodes_in_order->head;
 			NULL != orig_el;
 			orig_el = orig_el->next, clone_el = clone_el->next) {
 		orig_node = orig_el->data;

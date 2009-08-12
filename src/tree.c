@@ -298,12 +298,13 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree,
 // TODO: try an iterative version using a rnode_iterator
 static struct rnode *clone_clade(struct rnode *root)
 {
-	struct rnode *root_clone = create_rnode(root->label,"");
+	struct rnode *root_clone = create_rnode(root->label,
+			root->edge_length_as_string);
 	struct list_elem *el;
 	for (el = root->children->head; NULL != el; el = el->next) {
 		struct rnode *kid = el->data;
 		struct rnode *kid_clone = clone_clade(kid);
-		add_child(root_clone, kid_clone); // TODO: handle length?
+		add_child(root_clone, kid_clone); 
 	}
 
 	return root_clone;
