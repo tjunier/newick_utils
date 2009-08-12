@@ -51,31 +51,32 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 {
 	struct rnode *old_root = tree->root;
 	struct rnode *new_root;
-	struct llist *revert_list;
+	struct llist *swap_list;
 	struct rnode *node;
 	struct list_elem *elem;
 
 	/* Insert node (will be the new root) above outgroup */
-	insert_node_above(outgroup, "NEW");
+	insert_node_above(outgroup, "");
 	new_root = outgroup->parent;
 
-	/* Invert edges from old root to new root (i.e., the tree is always in
-	 * a consistent state) */
+	/* We need to swap the nodes from new root to the old root (i.e., swap
+	 * a node with its parent), so the tree is always in a consistent
+	 * state */
 
-	/* First, we make a list of the edges we need to revert, by visiting
+	/* First, we make a list of the nodes we need to swap, by visiting
 	 * the tree from the soon-to-be new root to the old (which is still the
 	 * root) */
-	revert_list = create_llist();
+	swap_list = create_llist();
 	for (node = new_root; ! is_root(node); node = node->parent) {
-		/* order of reversals is important: tree is always consistent */
-		prepend_element(revert_list, node);
+		/* order of swaps is important: tree is always consistent */
+		prepend_element(swap_list, node);
 	}
-	/* Now, we reverse the edges in the list. */ // TODO: may bot be needed w/o redges
-	for (elem = revert_list->head; NULL != elem; elem = elem->next) {
-		struct redge *edge = (struct redge*) elem->data;
-		// reverse_redge(edge);
+	/* Now, we swap the nodes in the list. */ 
+	for (elem = swap_list->head; NULL != elem; elem = elem->next) {
+		struct rnode *to_swap = elem->data;
+		swap_nodes(to_swap);
 	}
-        destroy_llist(revert_list);
+        destroy_llist(swap_list);
 
 	if (children_count(old_root) == 1) {
 		splice_out_rnode(old_root);

@@ -652,6 +652,7 @@ int test_insert_remove_child()
 	add_child(mum, kid2);
 	add_child(mum, kid3);
 
+	/* Removal and insertion in the middle of the list, checking parent links */
 	index = remove_child(kid2);
 	if (index != 1) {
 		printf("%s: expected index 1, got %d\n", test_name, index);
@@ -662,12 +663,23 @@ int test_insert_remove_child()
 				children_count(mum));
 		return 1;
 	}
+	if (kid2->parent != NULL) {
+		printf("%s: kid2 should have no parent (has %p)\n", test_name,
+				kid2->parent);
+		return 1;
+	}
 	insert_child(mum, kid4, 1);
 	node = mum->children->head->next->data;	
 	if (node != kid4) {
 		printf("%s: expected node %p, got %p.\n", test_name, kid4, node);
 		return 1;
 	}
+	if (kid4->parent != mum) {
+		printf("%s: kid4 should have %p for parent, got %p\n", test_name,
+				mum, kid4->parent);
+		return 1;
+	}
+	/* Removal and insertion at the beginning of the list */
 	index = remove_child(kid1);
 	if (index != 0) {
 		printf("%s: expected index 0, got %d\n", test_name, index);
@@ -679,6 +691,7 @@ int test_insert_remove_child()
 		printf("%s: expected node %p, got %p.\n", test_name, kid5, node);
 		return 1;
 	}
+	/* Removal and insertion at the end of the list */
 	index = remove_child(kid3);
 	if (index != 2) {
 		printf("%s: expected index 2, got %d\n", test_name, index);
@@ -705,12 +718,14 @@ int test_swap_nodes()
 	struct hash *map = create_label2node_map(tree3.nodes_in_order);
 	struct rnode *node_h = hash_get(map, "h");
 	struct rnode *node_i = hash_get(map, "i"); /* h's parent is i (== root) */
+	char * h_length;
 
 	if (node_i != node_h->parent) {
 		printf ("%s: h's parent expected to be i, got %s\n", test_name,
 				node_h->parent->label);
 		return 1;
 	}
+	h_length = strdup(node_h->edge_length_as_string);	/* will be free()d during swap */
 
 	swap_nodes(node_h);
 
@@ -721,6 +736,17 @@ int test_swap_nodes()
 				node_h->parent->label);
 		return 1;
 	}
+	if (node_h->parent != NULL) {
+		printf ("%s: h is expected to be root, but has a parent (%s)\n", test_name,
+				node_h->parent->label);
+		return 1;
+	}
+	if (strcmp(node_i->edge_length_as_string, h_length) != 0) {
+		printf ("%s: i's length should be %s, but is %s\n", test_name,
+				h_length, node_i->edge_length_as_string);
+		return 1;
+	}
+
 
 	printf("%s ok.\n", test_name);
 	return 0;

@@ -220,6 +220,7 @@ int remove_child(struct rnode *child)
 	int n = llist_index_of(kids, child);
 	assert(n != -1);
 	delete_after(kids, n-1, 1);
+	child->parent = NULL;
 
 	return n;
 }
@@ -230,13 +231,23 @@ void insert_child(struct rnode *parent, struct rnode *child, int index)
 	struct llist *insert = create_llist();
 	append_element(insert, child);
 	insert_after(kids, index-1, insert);
+	child->parent = parent;
 }
 
 void swap_nodes(struct rnode *node)
 {
-	if (is_root(node)) return; /* can't swap root: no parent */
+	assert(NULL != node->parent);
+	assert(is_root(node->parent));  /* must swap below root */
 
 	struct rnode *parent = node->parent;
+	char *length = strdup(node->edge_length_as_string);
+	remove_child(node);
+	add_child(node, parent);
+
+	free(node->edge_length_as_string);
+	node->edge_length_as_string = strdup("");
+	free(parent->edge_length_as_string);
+	parent->edge_length_as_string = length;
 }
 
 struct rnode * unlink_rnode(struct rnode *node)

@@ -80,11 +80,12 @@ void splice_out_rnode(struct rnode *node);
 // void reverse_redge(struct redge *edge);
 
 /* deletes child from parent's children list; returns the index of the child in
- * the list prior to removal. */
+ * the list prior to removal. Child's parent is set to NULL. */
 
 int remove_child(struct rnode *child);
 
-/* Inserts child into parent's children list, at the specified index. */
+/* Inserts child into parent's children list, at the specified index. Sets the
+ * child's parent. */
 
 void insert_child(struct rnode *parent, struct rnode *child, int index);
 
