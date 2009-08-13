@@ -174,9 +174,9 @@ leaf: LABEL {
 	}
     | LABEL COLON LABEL {
 		struct rnode *np;
-		free($3);
 		np = create_rnode($1,$3);
 		free($1);
+		free($3);
 		$$ = np;
 	}
     | COLON LABEL {

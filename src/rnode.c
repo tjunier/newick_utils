@@ -72,6 +72,7 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void*))
 #endif
 	destroy_llist(node->children);
 	free(node->label);
+	free(node->edge_length_as_string);
 	if (NULL != free_data)
 		free_data(node->data);
 	free(node);

@@ -219,8 +219,9 @@ int remove_child(struct rnode *child)
 	struct llist *kids = parent->children;
 	int n = llist_index_of(kids, child);
 	assert(n != -1);
-	delete_after(kids, n-1, 1);
+	struct llist *deleted = delete_after(kids, n-1, 1);
 	child->parent = NULL;
+	destroy_llist(deleted);
 
 	return n;
 }

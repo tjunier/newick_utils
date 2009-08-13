@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "parser.h"
 #include "masprintf.h"
 /*
-#include "nodemap.h"
 #include "link.h"
 #include "hash.h"
 */
@@ -196,7 +195,6 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		if (NULL == ndata) { perror(NULL); exit(EXIT_FAILURE); }
 		node->data = ndata;
 
-		//printf ("%p (%s): ", node, node->label);
 		/* See if parent has been trimmed */
 		if (parent_data->trimmed) {
 			// printf ("trimmed.\n");
@@ -216,13 +214,6 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		node->edge_length = edge_length;
 		ndata->distance_depth = edge_length + parent_data->distance_depth;
 		ndata->ancestry_depth = 1 + parent_data->ancestry_depth;
-
-		/*
-		printf ("%g (%d ancestors)\n", 
-			((struct node_data*)node->data)->distance_depth,
-			((struct node_data*)node->data)->ancestry_depth
-		       );
-		       */
 
 		/* To trim or not to trim? */
 		bool to_trim = false;
