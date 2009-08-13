@@ -237,6 +237,7 @@ void prune_empty_labels(struct rooted_tree *target_tree)
 				unlink_rnode(current);
 		}
 	}
+	destroy_llist(nodes_in_order);
 }
 
 void remove_branch_lengths(struct rooted_tree *target_tree)
@@ -267,6 +268,8 @@ void remove_knee_nodes(struct rooted_tree *tree)
 			if (1 == children_count(current))
 				splice_out_rnode(current);
 	}
+	destroy_llist(nodes_in_order);
+
 	/* If the root has only one child, make that child the new root */
 	if (1 == children_count(tree->root)) {
 		struct rnode *roots_first_child = tree->root->children->head->data;

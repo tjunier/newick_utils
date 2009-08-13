@@ -46,7 +46,8 @@ struct key_val_pair {
 
 struct hash * create_hash(int n);
 
-/* Inserts a (key, value) pair into a hash. Increments count. */
+/* Inserts a (key, value) pair into a hash. Increments count. The 'key' will be
+ * duplicated. */
 
 void hash_set(struct hash *, const char *key, void *value);
 
