@@ -76,8 +76,8 @@ struct llist *llist_reverse(struct llist *list);
 
 struct llist *shallow_copy(struct llist *list);
 
-/* Pops the last element (tail) off the list, and returns its data. The element
- * itself is free()d. */
+/* Shifts the first element (head) off the list, and returns its data. The
+ * list_elem structure is freed. */
 
 void *shift(struct llist *);
 

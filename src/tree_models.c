@@ -206,9 +206,7 @@ void free_data(char *newick, struct llist *leaves_queue,
 	free(newick);
 	destroy_llist(leaves_queue);
 
-	destroy_llist(root->children);
-	free(root->label);
-	free(root);
+	destroy_rnode(root, NULL);
 	struct list_elem *elem;
 	for (elem = all_children->head; NULL != elem; elem = elem->next) {
 		kid = elem->data;

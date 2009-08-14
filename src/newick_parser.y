@@ -180,8 +180,8 @@ leaf: LABEL {
 		$$ = np;
 	}
     | COLON LABEL {
-		free($2);
 		struct rnode *np = create_rnode("",$2);
+		free($2);
 		$$ = np;
 	}
     | /* empty */ {

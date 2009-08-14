@@ -1,6 +1,4 @@
-general: do a fork of the project, and get rid of the redge structure. All data
-pertaining to a node's parent edge can be stored in the node itself. This
-should simplify things and speed them up a little.
+general: add parser for NEXUS (http://sysbio.oxfordjournals.org/cgi/reprint/46/4/590) and PhyloXML (http://www.phyloxml.org/).
 
 nw_gen: review the usefulness of time-limited trees in light of nw_trim: we can
 now use nw_trim to cut a tree at any desired length, yielding a time-limited
@@ -34,7 +32,7 @@ nw_ed: valgrind nw_ed -no data/catarrhini 'i & b < 10' d
 [partly done] nw_display: SVG ortho, align middle of label, rather than bottom, to branch.
 Try with some SVG property.
 
-nw_prune: reomve complement (i.e., keep specified nodes and prune the rest);  allow selection of a branch by its LCA.
+nw_prune: remove complement (i.e., keep specified nodes and prune the rest);  allow selection of a branch by its LCA.
 
 nw_display: craft test tree for numeric verification of lengths and positions
 
@@ -272,3 +270,7 @@ it seems to be the root.
 [done] all: check that all programs support multiple trees in input.
 
 [done] all: review help pages (-h)
+
+[done] general: do a fork of the project, and get rid of the redge structure.
+All data pertaining to a node's parent edge can be stored in the node itself.
+This should simplify things and speed them up a little.
