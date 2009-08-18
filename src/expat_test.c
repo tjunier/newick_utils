@@ -8,60 +8,61 @@
 #include "masprintf.h"
 #include "to_newick.h"
 
-static struct llist *clade_stack;
-static void *text_buf;
-static size_t text_buf_size;
+enum elem {CLADE, NAME};
+
+typedef struct {
+	enum elem type;
+	void *data;
+	char *text;
+	unsigned int text_length;
+} StackElem;
+
+static struct llist *stack;
 static size_t XML_Char_size = sizeof(XML_Char);
 
 static void XMLCALL startElement(void *userData, const char *name,
 		const char **atts)
 {
-	static int num = 0;
-	if (strcmp("clade", name) == 0) {
-		char *num_s = masprintf("node_%d", num);
-		struct rnode *clade = create_rnode(num_s, "");
-		prepend_element(clade_stack, clade);
-		printf ("pushed %s\n", num_s);
-		free(num_s);
-		num++;
-	}
-	if (strcmp("name", name) == 0) {
-		text_buf = calloc(0, XML_Char_size);
-		text_buf_size = 0;
-		if (NULL == text_buf) {perror(NULL), exit(EXIT_FAILURE);}
-	}
+	StackElem *st_elem = malloc(sizeof(StackElem));
+	if (NULL == st_elem) {perror(NULL), exit(EXIT_FAILURE);}
+	st_elem->text= NULL;
+	st_elem->text_length = 0;
+	int i;
+	for (i = 0; i < stack->count; i++) putchar(' ');
+	prepend_element(stack, st_elem);
+	printf("unshifted <%s>, count is %d\n", name, stack->count);
 }
 
 static void XMLCALL textData (void *userData, const XML_Char *s,
 		int len)
 {
-	memcpy((text_buf + text_buf_size), s, len * XML_Char_size);
-	text_buf_size += len;
+	StackElem *st_elem = stack->head->data;
+	int new_text_length = st_elem->text_length + len;
+	st_elem->text = realloc(st_elem->text, new_text_length);
+	if (NULL == st_elem->text) { perror(NULL); exit(EXIT_FAILURE); }
+	memcpy((st_elem->text+st_elem->text_length), s, len);
 }
 
 static void XMLCALL endElement(void *userData, const char *name)
 {
-	if (strcmp("clade", name) == 0) {
-		struct rnode *child = shift(clade_stack);
-		if (clade_stack->count > 0) {
-			struct rnode *parent = clade_stack->head->data;
-			printf ("popped %s\n", child->label);
-			add_child(parent, child);
-			printf ("added to %s\n", parent->label);
-		} else {
-			printf ("%s\n", to_newick(child));
-		}
-	} else if (strcmp("name", name) == 0) {
-		free(text_buf);
-	}
-
+		
+	StackElem *st_elem = shift(stack);
+	int i;
+	st_elem->text = realloc(st_elem->text, st_elem->text_length+1);
+	if (NULL == st_elem->text) { perror(NULL); exit(EXIT_FAILURE); }
+	st_elem->text[st_elem->text_length] = '\0';
+	for (i = 0; i < stack->count; i++) putchar(' ');
+	printf("shifted </%s>, count is %d, text is '%s'\n",
+			name, stack->count, st_elem->text);
+	free(st_elem->text);
+	free(st_elem);
 }
 
 int main(int argc, char* argv[])
 {
 	const int BUF_SIZE = 1024;
 
-	clade_stack = create_llist();
+	stack = create_llist();
 
 	char buf[BUF_SIZE];
 	XML_Parser parser = XML_ParserCreate(NULL);
@@ -85,7 +86,7 @@ int main(int argc, char* argv[])
 	} while (!end);
 	XML_ParserFree(parser);
 
-	destroy_llist(clade_stack);
+	destroy_llist(stack);
 
 	return 0;
 }
