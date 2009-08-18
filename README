@@ -1,18 +1,46 @@
 The Newick Utilities are a suite of programs for working with Newick-formatted
 phylogenetic trees.
 
-See INSTALL for installing. The package uses the GNU autotools, so basically,
+Documentation
+=============
+
+See in subdirectory 'doc'.
+
+Installing
+==========
+
+Binaries
+--------
+
+If you have a binaries distribution (that is, with a name like
+newick-utils-x.y.z-bin-x86-64.tar.gz), you do not have to compile. The binaries
+are in ./src ; they all have names that start with nw_, so you can do 
+
+$ sudo cp src/nw_* /usr/local/bin	# or wherever you want
+
+You can test the programs by cd'ing to ./tests, and doing the following:
+
+$ for test in test*.sh; do ./$test; done
+
+
+Source
+------
+
+If you have a source-only distribution, or if you want to build the binaries,
 it's the familiar
 
 $ ./configure
 $ make
-$ make check
+$ make check	# optional
 $ sudo make install
 
-There are no fancy options. 
+There are no fancy options.  See INSTALL for details. 
 
 You need a C compiler (C99; I use GCC). You also need Flex and Bison, but
-chances are they're already installed if you have GCC.
+chances are they're already installed if you have GCC. Otherwise, it's something like
+
+$ sudo apt-get install flex bison	# Ubuntu and other Debian-based systems
+$ sudo yum install flex bison	# Fedora, etc 
 
 MacOS users need to install Xcode. Some spurious error messages may be
 reported, and a nw_gen test may fail - AFAICT this is due to differences in the

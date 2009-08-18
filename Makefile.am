@@ -10,3 +10,9 @@ EXTRA_DIST = \
 	doc/tutorial.pdf \
 	doc/Makefile \
 	data/*
+
+# set PLATFORM=... when running make dist-bin
+dist-bin: distdir
+	cp src/nw_* $(distdir)/src
+	tardir=$(distdir) && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).$(PLATFORM).tar.gz
+	$(am__remove_distdir)
