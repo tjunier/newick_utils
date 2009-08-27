@@ -358,8 +358,11 @@ void svg_run_params_comment(int argc, char *argv[])
 {
 	int i;
 
-	printf ("\n<!-- " );
-	for (i = 0; i < argc; i++) 
+	/* Shows the command-line arguments - but not the executable itself,
+	 * since it can cause tests to fail when using libtool's shell
+	 * wrappers. */
+	printf ("\n<!-- arguments: " );
+	for (i = 1; i < argc; i++) /* i = 1 intentional */
 		printf ("%s ", argv[i]);
 	printf (" -->\n" );
 }

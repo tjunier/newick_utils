@@ -13,6 +13,7 @@ AC_CONFIG_HEADER([config.h])
 AC_PROG_CC
 AC_PROG_YACC
 AM_PROG_LEX
+LT_INIT#([disable-fast-install)]
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lm':

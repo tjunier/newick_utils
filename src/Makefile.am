@@ -30,58 +30,62 @@ newick_scanner.c: newick_scanner.l
 address_scanner.c: address_scanner.l
 	flex -oaddress_scanner.c address_scanner.l 
 
-nw_display_SOURCES = $(NW_CORE) display.c canvas.c text_graph.c \
+lib_LTLIBRARIES = libnw.la
+libnw_la_SOURCES = $(NW_CORE)
+
+nw_display_SOURCES = display.c canvas.c text_graph.c \
 		simple_node_pos.c svg_graph.c readline.c lca.c \
 		node_pos_alloc.c xml_utils.c graph_common.c \
 		svg_graph_ortho.c svg_graph_radial.c
 
-nw_display_LDADD = @LEXLIB@ -lm
+nw_display_LDADD = @LEXLIB@ -lm libnw.la
 
-nw_clade_SOURCES = $(NW_CORE) $(NW_OUT) subtree.c lca.c
-nw_clade_LDADD = @LEXLIB@ 
+nw_clade_SOURCES = $(NW_OUT) subtree.c lca.c
+nw_clade_LDADD = @LEXLIB@ libnw.la
 
-nw_reroot_SOURCES = $(NW_CORE) $(NW_OUT) reroot.c lca.c
-nw_reroot_LDADD = @LEXLIB@
+nw_reroot_SOURCES = $(NW_OUT) reroot.c lca.c
+nw_reroot_LDADD = @LEXLIB@ libnw.la
 
-nw_rename_SOURCES = $(NW_CORE) $(NW_OUT) rename.c readline.c
-nw_rename_LDADD = @LEXLIB@
+nw_rename_SOURCES = $(NW_OUT) rename.c readline.c
+nw_rename_LDADD = @LEXLIB@ libnw.la
 
-nw_condense_SOURCES = $(NW_CORE) $(NW_OUT) condense.c
-nw_condense_LDADD = @LEXLIB@
+nw_condense_SOURCES = $(NW_OUT) condense.c
+nw_condense_LDADD = @LEXLIB@ libnw.la
 
-nw_support_SOURCES = $(NW_CORE) $(NW_OUT) support.c node_set.c
-nw_support_LDADD = @LEXLIB@
+nw_support_SOURCES = $(NW_OUT) support.c node_set.c
+nw_support_LDADD = @LEXLIB@ libnw.la
 
-nw_ed_SOURCES = $(NW_CORE) $(NW_OUT) address_scanner.l address_parser.y \
+nw_ed_SOURCES = $(NW_OUT) address_scanner.l address_parser.y \
 	tree_editor.c enode.c
-nw_ed_LDADD = @LEXLIB@ -lm
+nw_ed_LDADD = @LEXLIB@ -lm libnw.la
 
-nw_topology_SOURCES = $(NW_CORE) $(NW_OUT) topology.c
-nw_topology_LDADD = @LEXLIB@
+nw_topology_SOURCES = $(NW_OUT) topology.c
+nw_topology_LDADD = @LEXLIB@ libnw.la
 
-nw_distance_SOURCES = $(NW_CORE) distance.c simple_node_pos.c lca.c \
+nw_distance_SOURCES = distance.c simple_node_pos.c lca.c \
 		      node_pos_alloc.c
-nw_distance_LDADD = @LEXLIB@
+nw_distance_LDADD = @LEXLIB@ libnw.la
 
-nw_labels_SOURCES = $(NW_CORE) labels.c 
-nw_labels_LDADD = @LEXLIB@
+nw_labels_SOURCES = labels.c 
+nw_labels_LDADD = @LEXLIB@ libnw.la
 
-nw_prune_SOURCES = $(NW_CORE) $(NW_OUT) prune.c 
-nw_prune_LDADD = @LEXLIB@
+nw_prune_SOURCES = $(NW_OUT) prune.c 
+nw_prune_LDADD = @LEXLIB@ libnw.la
 
-nw_order_SOURCES = $(NW_CORE) $(NW_OUT) order.c order_tree.c
-nw_order_LDADD = @LEXLIB@
+nw_order_SOURCES = $(NW_OUT) order.c order_tree.c
+nw_order_LDADD = @LEXLIB@ libnw.la
 
 nw_indent_SOURCES = indent.c indent_lex.l
-nw_indent_LDADD = @LEXLIB@
+nw_indent_LDADD = @LEXLIB@ libnw.la
 
-nw_match_SOURCES = match.c $(NW_CORE) $(NW_OUT) order_tree.c
-nw_match_LDADD = @LEXLIB@
+nw_match_SOURCES = match.c $(NW_OUT) order_tree.c
+nw_match_LDADD = @LEXLIB@ libnw.la
 
-nw_gen_SOURCES = generate.c $(NW_CORE) $(NW_OUT) tree_models.c
+nw_gen_SOURCES = generate.c $(NW_OUT) tree_models.c
+nw_gen_LDADD = libnw.la
 
-nw_trim_SOURCES = trim.c $(NW_CORE) $(NW_OUT)
-nw_trim_LDADD = @LEXLIB@
+nw_trim_SOURCES = trim.c $(NW_OUT)
+nw_trim_LDADD = @LEXLIB@ libnw.la
 
 # Removes automatically generated C code (Lex & YACC)
 #
