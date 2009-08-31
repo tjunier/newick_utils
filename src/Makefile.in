@@ -80,15 +80,14 @@ libnw_la_LIBADD =
 am__objects_1 =
 am__objects_2 = newick_parser.lo newick_scanner.lo rnode.lo list.lo \
 	parser.lo link.lo tree.lo nodemap.lo hash.lo rnode_iterator.lo \
-	masprintf.lo $(am__objects_1)
+	masprintf.lo to_newick.lo concat.lo $(am__objects_1)
 am_libnw_la_OBJECTS = $(am__objects_2)
 libnw_la_OBJECTS = $(am_libnw_la_OBJECTS)
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_3 = to_newick.$(OBJEXT) concat.$(OBJEXT)
-am_nw_clade_OBJECTS = $(am__objects_3) subtree.$(OBJEXT) lca.$(OBJEXT)
+am_nw_clade_OBJECTS = subtree.$(OBJEXT) lca.$(OBJEXT)
 nw_clade_OBJECTS = $(am_nw_clade_OBJECTS)
 nw_clade_DEPENDENCIES = libnw.la
-am_nw_condense_OBJECTS = $(am__objects_3) condense.$(OBJEXT)
+am_nw_condense_OBJECTS = condense.$(OBJEXT)
 nw_condense_OBJECTS = $(am_nw_condense_OBJECTS)
 nw_condense_DEPENDENCIES = libnw.la
 am_nw_display_OBJECTS = display.$(OBJEXT) canvas.$(OBJEXT) \
@@ -103,12 +102,11 @@ am_nw_distance_OBJECTS = distance.$(OBJEXT) simple_node_pos.$(OBJEXT) \
 	lca.$(OBJEXT) node_pos_alloc.$(OBJEXT)
 nw_distance_OBJECTS = $(am_nw_distance_OBJECTS)
 nw_distance_DEPENDENCIES = libnw.la
-am_nw_ed_OBJECTS = $(am__objects_3) address_scanner.$(OBJEXT) \
-	address_parser.$(OBJEXT) tree_editor.$(OBJEXT) enode.$(OBJEXT)
+am_nw_ed_OBJECTS = address_scanner.$(OBJEXT) address_parser.$(OBJEXT) \
+	tree_editor.$(OBJEXT) enode.$(OBJEXT)
 nw_ed_OBJECTS = $(am_nw_ed_OBJECTS)
 nw_ed_DEPENDENCIES = libnw.la
-am_nw_gen_OBJECTS = generate.$(OBJEXT) $(am__objects_3) \
-	tree_models.$(OBJEXT)
+am_nw_gen_OBJECTS = generate.$(OBJEXT) tree_models.$(OBJEXT)
 nw_gen_OBJECTS = $(am_nw_gen_OBJECTS)
 nw_gen_DEPENDENCIES = libnw.la
 am_nw_indent_OBJECTS = indent.$(OBJEXT) indent_lex.$(OBJEXT)
@@ -117,32 +115,28 @@ nw_indent_DEPENDENCIES = libnw.la
 am_nw_labels_OBJECTS = labels.$(OBJEXT)
 nw_labels_OBJECTS = $(am_nw_labels_OBJECTS)
 nw_labels_DEPENDENCIES = libnw.la
-am_nw_match_OBJECTS = match.$(OBJEXT) $(am__objects_3) \
-	order_tree.$(OBJEXT)
+am_nw_match_OBJECTS = match.$(OBJEXT) order_tree.$(OBJEXT)
 nw_match_OBJECTS = $(am_nw_match_OBJECTS)
 nw_match_DEPENDENCIES = libnw.la
-am_nw_order_OBJECTS = $(am__objects_3) order.$(OBJEXT) \
-	order_tree.$(OBJEXT)
+am_nw_order_OBJECTS = order.$(OBJEXT) order_tree.$(OBJEXT)
 nw_order_OBJECTS = $(am_nw_order_OBJECTS)
 nw_order_DEPENDENCIES = libnw.la
-am_nw_prune_OBJECTS = $(am__objects_3) prune.$(OBJEXT)
+am_nw_prune_OBJECTS = prune.$(OBJEXT)
 nw_prune_OBJECTS = $(am_nw_prune_OBJECTS)
 nw_prune_DEPENDENCIES = libnw.la
-am_nw_rename_OBJECTS = $(am__objects_3) rename.$(OBJEXT) \
-	readline.$(OBJEXT)
+am_nw_rename_OBJECTS = rename.$(OBJEXT) readline.$(OBJEXT)
 nw_rename_OBJECTS = $(am_nw_rename_OBJECTS)
 nw_rename_DEPENDENCIES = libnw.la
-am_nw_reroot_OBJECTS = $(am__objects_3) reroot.$(OBJEXT) lca.$(OBJEXT)
+am_nw_reroot_OBJECTS = reroot.$(OBJEXT) lca.$(OBJEXT)
 nw_reroot_OBJECTS = $(am_nw_reroot_OBJECTS)
 nw_reroot_DEPENDENCIES = libnw.la
-am_nw_support_OBJECTS = $(am__objects_3) support.$(OBJEXT) \
-	node_set.$(OBJEXT)
+am_nw_support_OBJECTS = support.$(OBJEXT) node_set.$(OBJEXT)
 nw_support_OBJECTS = $(am_nw_support_OBJECTS)
 nw_support_DEPENDENCIES = libnw.la
-am_nw_topology_OBJECTS = $(am__objects_3) topology.$(OBJEXT)
+am_nw_topology_OBJECTS = topology.$(OBJEXT)
 nw_topology_OBJECTS = $(am_nw_topology_OBJECTS)
 nw_topology_DEPENDENCIES = libnw.la
-am_nw_trim_OBJECTS = trim.$(OBJEXT) $(am__objects_3)
+am_nw_trim_OBJECTS = trim.$(OBJEXT)
 nw_trim_OBJECTS = $(am_nw_trim_OBJECTS)
 nw_trim_DEPENDENCIES = libnw.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -318,9 +312,8 @@ HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
 # is not necessary, it builds just fine)
 NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
 	link.c tree.c nodemap.c hash.c rnode_iterator.c \
-	masprintf.c $(HDR)
+	masprintf.c to_newick.c concat.c $(HDR)
 
-NW_OUT = to_newick.c concat.c
 AM_YFLAGS = -d
 lib_LTLIBRARIES = libnw.la
 libnw_la_SOURCES = $(NW_CORE)
@@ -330,21 +323,21 @@ nw_display_SOURCES = display.c canvas.c text_graph.c \
 		svg_graph_ortho.c svg_graph_radial.c
 
 nw_display_LDADD = @LEXLIB@ -lm libnw.la
-nw_clade_SOURCES = $(NW_OUT) subtree.c lca.c
+nw_clade_SOURCES = subtree.c lca.c
 nw_clade_LDADD = @LEXLIB@ libnw.la
-nw_reroot_SOURCES = $(NW_OUT) reroot.c lca.c
+nw_reroot_SOURCES = reroot.c lca.c
 nw_reroot_LDADD = @LEXLIB@ libnw.la
-nw_rename_SOURCES = $(NW_OUT) rename.c readline.c
+nw_rename_SOURCES = rename.c readline.c
 nw_rename_LDADD = @LEXLIB@ libnw.la
-nw_condense_SOURCES = $(NW_OUT) condense.c
+nw_condense_SOURCES = condense.c
 nw_condense_LDADD = @LEXLIB@ libnw.la
-nw_support_SOURCES = $(NW_OUT) support.c node_set.c
+nw_support_SOURCES = support.c node_set.c
 nw_support_LDADD = @LEXLIB@ libnw.la
-nw_ed_SOURCES = $(NW_OUT) address_scanner.l address_parser.y \
+nw_ed_SOURCES = address_scanner.l address_parser.y \
 	tree_editor.c enode.c
 
 nw_ed_LDADD = @LEXLIB@ -lm libnw.la
-nw_topology_SOURCES = $(NW_OUT) topology.c
+nw_topology_SOURCES = topology.c
 nw_topology_LDADD = @LEXLIB@ libnw.la
 nw_distance_SOURCES = distance.c simple_node_pos.c lca.c \
 		      node_pos_alloc.c
@@ -352,17 +345,17 @@ nw_distance_SOURCES = distance.c simple_node_pos.c lca.c \
 nw_distance_LDADD = @LEXLIB@ libnw.la
 nw_labels_SOURCES = labels.c 
 nw_labels_LDADD = @LEXLIB@ libnw.la
-nw_prune_SOURCES = $(NW_OUT) prune.c 
+nw_prune_SOURCES = prune.c 
 nw_prune_LDADD = @LEXLIB@ libnw.la
-nw_order_SOURCES = $(NW_OUT) order.c order_tree.c
+nw_order_SOURCES = order.c order_tree.c
 nw_order_LDADD = @LEXLIB@ libnw.la
 nw_indent_SOURCES = indent.c indent_lex.l
 nw_indent_LDADD = @LEXLIB@ libnw.la
-nw_match_SOURCES = match.c $(NW_OUT) order_tree.c
+nw_match_SOURCES = match.c order_tree.c
 nw_match_LDADD = @LEXLIB@ libnw.la
-nw_gen_SOURCES = generate.c $(NW_OUT) tree_models.c
+nw_gen_SOURCES = generate.c tree_models.c
 nw_gen_LDADD = libnw.la
-nw_trim_SOURCES = trim.c $(NW_OUT)
+nw_trim_SOURCES = trim.c
 nw_trim_LDADD = @LEXLIB@ libnw.la
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -543,7 +536,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/address_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/address_scanner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/canvas.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/concat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/concat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/condense.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/display.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/distance.Po@am__quote@
@@ -580,7 +573,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg_graph_ortho.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg_graph_radial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/text_graph.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/to_newick.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/to_newick.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/topology.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tree_editor.Po@am__quote@

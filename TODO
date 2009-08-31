@@ -274,3 +274,5 @@ it seems to be the root.
 [done] general: do a fork of the project, and get rid of the redge structure.
 All data pertaining to a node's parent edge can be stored in the node itself.
 This should simplify things and speed them up a little.
+
+[done] general: put all reusable code (i.e., all .c files except the ones that contain the main() fucntion of the programs themselves) into a library, and link to it. Use dynamic linking except when distributing binaries, which should be statically linked (use ./configure --disable-shared).
