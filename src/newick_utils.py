@@ -71,12 +71,13 @@ class Llist(object):
 		return self
 
 	def next(self):
-		if not bool(self.current.next):
+		try:
+			result = self.current.data
+			next = self.current.next.contents
+			self.current = next
+			return result
+		except ValueError:
 			raise StopIteration
-		result = self.current.data
-		next = self.current.next.contents
-		self.current = next
-		return result
 		
 class Rnode(object):
 
@@ -84,11 +85,16 @@ class Rnode(object):
 		'''Constructor. Arg is an r'''
 		self.rnode = rnode
 
-	def label(self):
+	def get_label(self):
 		return self.rnode.label
 
 	def is_leaf(self):
 		return bool(libnw.is_leaf(pointer(self.rnode)))
+
+	def get_edge_length(self):
+		if not hasattr(self, 'edge_length'):
+			self.edge_length = float(self.rnode.edge_length_as_string)
+		return self.edge_length
 
 class Tree(object):
 
@@ -109,9 +115,21 @@ class Tree(object):
 	def to_newick(self):
 		return libnw.to_newick(self.tree.root)
 
-	def nodes(self):
+	def get_nodes(self):
 		'''Returns an iterator over all the tree's nodes, in post-order'''
 		nodes_in_order = Llist(self.tree.nodes_in_order.contents)
 		for data in nodes_in_order:
 			node_p = cast(data, POINTER(rnode))
 			yield Rnode(node_p.contents)
+
+	def get_depth(self):
+		'''Returns the tree's depth, i.e. the depth of the deepest leaf (in branch length units).'''
+		nodelist = list(self.get_nodes())
+		#nodelist.reverse()
+		for node in nodelist:
+			print "%s: %d" % (node.get_label(), node.get_edge_length())
+
+	def get_ancestor_depth(self):
+		'''Returns the tree's ancestor depth, i.e. the number of ancestors of the deepest leaf
+		(in numbers of ancestors)'''
+		pass
