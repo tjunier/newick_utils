@@ -65,20 +65,20 @@ class Llist(object):
 
 	def __init__(self, llist):
 		self.llist = llist
-		self.current = llist.head.contents
+		current = self.llist.head.contents
+		self.py_list = []
+		while True:
+			if not bool(current.next):
+				break
+			push(self.py_list, current.data.contents)
+			current = current.next.contents
 
 	def __iter__(self):
 		return self
 
 	def next(self):
-		try:
-			result = self.current.data
-			next = self.current.next.contents
-			self.current = next
-			return result
-		except ValueError:
-			raise StopIteration
-		
+		pass
+
 class Rnode(object):
 
 	def __init__(self, rnode):
