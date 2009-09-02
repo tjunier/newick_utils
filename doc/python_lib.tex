@@ -1,0 +1,54 @@
+\lstset{
+	language=Python,
+	basicstyle=\ttfamily,
+	keywordstyle=\color{NavyBlue},
+	stringstyle=\color{OliveGreen},
+	commentstyle=\color{red},
+	frame=single,
+	frameround=tttt,
+	framexleftmargin=5mm,
+	numbers=left
+}
+
+\chapter{Python Bindings}
+\label{chap_python_lib}
+
+This chapter shows how you can use the \nutils{}'s functionalities in Python
+programs. while the \nutils{} are written in C, the \texttt{ctypes}
+module\footnote{Available in Python 2.5 and up} makes it easy to access them
+from python, and the distribution contains a module, \texttt{newick\_utils.py},
+that provides an object-oriented interface to the underlying C code.
+
+Let's say we want to add a utility that prints simple statistics about trees,
+like the number of nodes, the depth, whether it is a cladogram or a phylogram,
+etc. We will call it \texttt{nw\_info.py}, and for now we'll pass it a \nw{}
+file on standard input, so the usage will be something like:
+
+\begin{verbatim}
+$ nw_info.py < data/catarrhini
+\end{verbatim}
+
+\noindent{}Our first program will just print the trees' type (cladogram or
+phylogram).
+
+\begin{lstlisting}
+from newick_utils import *
+
+for tree in Tree.parse_newick_input():
+    print tree.get_type()
+\end{lstlisting}
+
+\noindent{}Line 1 imports definitions from the \texttt{newick\_utils.py}
+module. Line 3 iterates over all the trees in input, returning an object of
+class \texttt{Tree} for each of them. The type of this tree is printed on line
+4.
+
+This program is very simple, but more complicated utilities may have similar
+structures: iterate over all the input trees, doing something with them.
+
+\begin{lstlisting}
+from newick_utils import *
+
+for tree in Tree.parse_newick_input():
+    # process tree
+\end{lstlisting}

@@ -2,6 +2,21 @@
 
 from newick_utils import *
 
-for tree in Tree.parse_newick_input():
+def count_polytomies(tree):
+	count = 0
 	for node in tree.get_nodes():
-		print node.get_label()
+		if node.children_count() > 2:
+			count += 1
+	return count
+
+for tree in Tree.parse_newick_input():
+	type = tree.get_type()
+	if type == Tree.PHYLOGRAM:
+		depth =  tree.get_depth() # also sets nodes' depths
+	else:
+		depth = None
+	print 'Type:', type
+	print '#Nodes:', len(list(tree.get_nodes()))
+	print '  #leaves:', tree.get_leaf_count()
+	print '#Polytomies:', count_polytomies(tree)
+	print "Depth:", depth
