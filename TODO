@@ -1,4 +1,6 @@
-general: add parser for NEXUS (http://sysbio.oxfordjournals.org/cgi/reprint/46/4/590) and PhyloXML (http://www.phyloxml.org/).
+nw_tree: add a test for many input trees when using the -r option
+
+[later] general: add parser for NEXUS (http://sysbio.oxfordjournals.org/cgi/reprint/46/4/590) and PhyloXML (http://www.phyloxml.org/).
 
 nw_gen: review the usefulness of time-limited trees in light of nw_trim: we can
 now use nw_trim to cut a tree at any desired length, yielding a time-limited

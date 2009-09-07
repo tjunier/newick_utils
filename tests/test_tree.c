@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "rnode.h"
 #include "link.h"
@@ -180,6 +181,38 @@ int test_get_labels()
 
 }
 
+int test_get_type()
+{
+	const char *test_name = "test_get_tree_type()";
+	struct rooted_tree cladogram = tree_2();
+	struct rooted_tree phylogram = tree_3();
+	struct rooted_tree neither = tree_12();
+
+	if (TREE_TYPE_UNKNOWN != cladogram.type) {
+		printf ("%s: tree type should be unknown before get_tree_type() is called.\n",
+				test_name);
+		return 1;
+	}
+
+	if (TREE_TYPE_CLADOGRAM != get_tree_type(&cladogram)) {
+		printf ("%s: tree should be a cladogram.\n", test_name);
+		return 1;
+	}
+
+	if (TREE_TYPE_PHYLOGRAM != get_tree_type(&phylogram)) {
+		printf ("%s: tree should be a phylogram.\n", test_name);
+		return 1;
+	}
+
+	if (TREE_TYPE_NEITHER != get_tree_type(&neither)) {
+		printf ("%s: tree should be of neither type.\n", test_name);
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
 int test_is_cladogram()
 {
 	const char *test_name = "test_is_cladogram";
@@ -248,6 +281,25 @@ int test_nodes_from_labels()
 	return 0;
 }
 
+static regex_t * compile_regexp(char *regexp_string)
+{
+	int errcode;
+	regex_t *preg = malloc(sizeof(regex_t));
+	int cflags = 0;
+	if (NULL == preg) {perror(NULL); exit(EXIT_FAILURE);}
+	errcode = regcomp(preg, regexp_string, cflags);
+	if (errcode) {
+		size_t errbufsize = regerror(errcode, preg, NULL, 0);
+		char *errbuf = malloc(errbufsize * sizeof(char));
+		if (NULL == errbuf) {perror(NULL); exit(EXIT_FAILURE);}
+		regerror(errcode, preg, errbuf, errbufsize);
+		fprintf (stderr, "%s\n", errbuf);
+		exit(EXIT_FAILURE);
+	}
+
+	return preg;
+}
+
 int test_nodes_from_regexp()
 {
 	const char *test_name = "test_nodes_from_regexp";
@@ -256,9 +308,11 @@ int test_nodes_from_regexp()
 	struct llist *nodes;
 	char *regexp_string;
 	struct list_elem *el;
+	regex_t * regexp;
 
 	regexp_string = "HRV_A.";
-	nodes = nodes_from_regexp(&tree, regexp_string);
+	regexp = compile_regexp(regexp_string);
+	nodes = nodes_from_regexp(&tree, regexp);
 
 	el = nodes->head;
 	if (strcmp(((struct rnode *) el->data)->label, "HRV_A1") != 0) {
@@ -279,7 +333,8 @@ int test_nodes_from_regexp()
 	}
 
 	regexp_string = "HRV_[AB]$";
-	nodes = nodes_from_regexp(&tree, regexp_string);
+	regexp = compile_regexp(regexp_string);
+	nodes = nodes_from_regexp(&tree, regexp);
 
 	el = nodes->head;
 	if (strcmp(((struct rnode *) el->data)->label, "HRV_A") != 0) {
@@ -387,6 +442,7 @@ int main()
 	failures += test_leaf_count();
 	failures += test_get_leaf_labels();
 	failures += test_get_labels();
+	failures += test_get_type();
 	failures += test_is_cladogram();
 	failures += test_nodes_from_labels();
 	failures += test_nodes_from_regexp();

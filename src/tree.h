@@ -27,15 +27,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+#include <regex.h>
+
 struct rnode;
 struct llist;
 
 extern const int FREE_NODE_DATA;
 extern const int DONT_FREE_NODE_DATA;
 
+enum tree_type {TREE_TYPE_UNKNOWN, TREE_TYPE_CLADOGRAM, TREE_TYPE_PHYLOGRAM, TREE_TYPE_NEITHER};
+
 struct rooted_tree {
 	struct rnode *root;
 	struct llist *nodes_in_order;
+	enum tree_type type;
 };
 
 /* Reroots the tree in such a way that 'outgroup' and descendants are one of
@@ -83,14 +88,22 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 		struct llist *labels);
 
 /* like nodes_from_labels(), but uses a regular expression (compiled from second argument) instead of a list of labels. */
+/* NOTE: if you use the same regexp for >1 calls, try nodes_from_regexp()
+ * below and compile the regexp only once beforehand (and free it afterwards). */
 
-/* TODO: pass compiled regexp instead of string, so compilation occurs just once at the start of the run */
+struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
+		char *regexp_string);
+
+/* like nodes_from_labels(), but uses a regular expression (passed as second argument) instead of a list of labels. */
 
 struct llist *nodes_from_regexp(struct rooted_tree *tree,
-		char *regexp_string);
+		regex_t *preg);
 
 /* Clones a (sub)tree, given the root node of the subtree. All nodes and edges
  * are new: one can modify or delete the clone without affecting the original
  * in any way. */
 
 struct rooted_tree *clone_subtree(struct rnode *);
+
+/* Returns the tree's type (Cladogram, Phylogram, etc) */
+enum tree_type get_tree_type(struct rooted_tree *tree);

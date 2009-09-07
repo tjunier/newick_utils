@@ -40,10 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodemap.h"
 #include "hash.h"
 #include "rnode_iterator.h"
-#include "to_newick.h" // TODO: rm when debugged
 
 const int FREE_NODE_DATA = 1;
 const int DONT_FREE_NODE_DATA = 0;
+
 
 /* 'outgroup' is the node which will be the outgroup after rerooting. */
 
@@ -217,19 +217,41 @@ struct llist *get_labels(struct rooted_tree *tree)
 	return labels;
 }
 
-/* TODO: this could be derived by the parser and stored in a member of the
- * rooted_tree structure. */
-
 int is_cladogram(struct rooted_tree *tree)
 {
+	return TREE_TYPE_CLADOGRAM == get_tree_type(tree);
+}
+
+/* This could be derived by the parser and stored in a member of the
+ * rooted_tree structure, but since not all apps need to know whether or not a
+ * tree is a cladogram, we decided that the parser should concentrate on
+ * building the data structure. We use a 'lazy' approach here: the type is
+ * determined once (on demand), and remembered afterwards. */
+
+enum tree_type get_tree_type(struct rooted_tree *tree)
+{
+	if (TREE_TYPE_UNKNOWN != tree->type)
+		return tree->type;
+	
+	/* Type is not known, so we compute it. */
+	int nb_edges_with_lengths = 0;
+	int nb_edges_without_lengths = 0;
 	struct list_elem *el;
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = el->data;
-		if (strcmp(current->edge_length_as_string, "") != 0)
-			return 0;
+		if (strcmp(current->edge_length_as_string, "") == 0)	/* length is empty (NOT zero!) */
+			nb_edges_without_lengths++;
+		else
+			nb_edges_with_lengths++;
 	}
-
-	return 1;
+	
+	printf ("empty edges: %d, nonempty edges: %d\n", nb_edges_without_lengths, nb_edges_with_lengths);
+	if (nb_edges_with_lengths > 0 && nb_edges_without_lengths > 0) 
+		return TREE_TYPE_NEITHER;	/* weird, but legal... */
+	else if (nb_edges_with_lengths == 0) 
+		return TREE_TYPE_CLADOGRAM;
+	else
+		return TREE_TYPE_PHYLOGRAM;
 }
 
 struct llist *nodes_from_labels(struct rooted_tree *tree,
@@ -254,7 +276,7 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 	return result;
 }
 
-struct llist *nodes_from_regexp(struct rooted_tree *tree,
+struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 		char *regexp_string)
 {
 	int errcode;
@@ -290,6 +312,28 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree,
 	regfree(preg);
 	/* Therefore: */
 	free(preg);
+
+	return result;
+}
+
+struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
+{
+       				       
+	int errcode;
+	struct llist *result = create_llist();
+	struct list_elem *el;
+
+	size_t nmatch = 1;	/* either matches or doesn't */
+	regmatch_t pmatch[nmatch]; 
+	int eflags = 0;
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *node = el->data;
+		errcode = regexec(preg, node->label, nmatch, pmatch, eflags);	
+		if (0 == errcode) {
+			append_element(result, node);
+		}
+	}
 
 	return result;
 }

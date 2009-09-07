@@ -40,10 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree.h"
 #include "parser.h"
 #include "masprintf.h"
-/*
-#include "link.h"
-#include "hash.h"
-*/
 #include "rnode.h"
 #include "list.h"
 
@@ -220,24 +216,16 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		switch (params.depth_type) {
 		case DEPTH_DISTANCE:
 			if (ndata->distance_depth > params.threshold)
-				to_trim = true;
+				trim(node, params);
 			break;
 		case DEPTH_ANCESTORS:
 			if (ndata->ancestry_depth > params.threshold)
-				to_trim = true;
+				trim(node, params);
 			break;
 		default:
 			assert (false);	/* programmer error */
 			exit(EXIT_FAILURE);
 		}
-
-		// TODO: handle this in switch() clause above
-		if (to_trim) {
-			// printf ("\tto trim.\n");
-			/* sets the trimmed flag in node data */
-			trim(node, params);
-		}
-	
 	}
 
 	destroy_llist(nodes_in_preorder);

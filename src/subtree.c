@@ -54,7 +54,8 @@ struct parameters {
 	int check_monophyly;
 	int siblings;
 	int mode;
-	char *regexp_string;
+	char * regexp_string;
+	regex_t *regexp;
 	int context;
 };
 
@@ -131,6 +132,25 @@ void help(char *argv[])
 	      );
 }
 
+static regex_t * compile_regexp(char *regexp_string)
+{
+	int errcode;
+	regex_t *preg = malloc(sizeof(regex_t));
+	int cflags = 0;
+	if (NULL == preg) {perror(NULL); exit(EXIT_FAILURE);}
+	errcode = regcomp(preg, regexp_string, cflags);
+	if (errcode) {
+		size_t errbufsize = regerror(errcode, preg, NULL, 0);
+		char *errbuf = malloc(errbufsize * sizeof(char));
+		if (NULL == errbuf) {perror(NULL); exit(EXIT_FAILURE);}
+		regerror(errcode, preg, errbuf, errbufsize);
+		fprintf (stderr, "%s\n", errbuf);
+		exit(EXIT_FAILURE);
+	}
+
+	return preg;
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 
@@ -190,6 +210,7 @@ struct parameters get_params(int argc, char *argv[])
 		case REGEXP:
 			optind++;	/* optind is now index of regexp */
 			params.regexp_string = argv[optind];
+			params.regexp = compile_regexp(params.regexp_string);
 			break;
 		default:
 			fprintf (stderr, "Unknown mode %d\n", params.mode);
@@ -229,6 +250,7 @@ int is_monophyletic(struct llist *descendants, struct rnode *subtree_root)
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct llist *descendants;
+	regex_t *preg;
 
 	switch (params.mode) {
 	case EXACT:
@@ -242,7 +264,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		}
 		break;
 	case REGEXP:
-		descendants = nodes_from_regexp(tree, params.regexp_string);
+		descendants = nodes_from_regexp(tree, params.regexp);
 		if (0 == descendants->count) {
 			fprintf (stderr, "WARNING: no match for regexp /%s/\n",
 					params.regexp_string);
@@ -313,6 +335,13 @@ int main(int argc, char *argv[])
 
 	if (EXACT == params.mode)
 		destroy_llist(params.labels);
+	else {
+		/* This does not free 'params.regexp' itself, only memory pointed to by 'params.regexp'
+		 * members and allocated by regcomp().*/
+		regfree(params.regexp);
+		/* Therefore: */
+		free(params.regexp);
+	}
 
 	return 0;
 }

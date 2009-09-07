@@ -425,7 +425,7 @@ int main(int argc, char* argv[])
 	struct rooted_tree *tree;
 
 	address_scanner_set_input(params.address);
-	adsparse(); /* sets 'expression_root' TODO: make change of global explicit */
+	adsparse(); /* sets 'expression_root' */ 
 	address_scanner_clear_input();
 
 	while (NULL != (tree = parse_tree())) {

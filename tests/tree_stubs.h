@@ -45,3 +45,7 @@ struct rooted_tree tree_10();
 /* A partially linear tree */
 /* ((((Gorilla,(Pan,Homo)Hominini)Homininae)Hominidae)Hominoidea); */
 struct rooted_tree tree_11();
+
+/* A tree some edges of which have length, and others don't */
+/* ((A,B:1),C); */
+struct rooted_tree tree_12();

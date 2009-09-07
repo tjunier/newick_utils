@@ -448,3 +448,35 @@ struct rooted_tree tree_11()
 
 	return tree;
 }
+
+/* A tree some edges of which have length, and others don't */
+/* ((A,B:1),C); */
+struct rooted_tree tree_12()
+{
+	struct rnode *node_A, *node_B, *node_C, *node_d, *node_e;
+	struct llist *nodes_in_order;
+	struct rooted_tree result;
+	
+	node_A = create_rnode("A", "");
+	node_B = create_rnode("B", "1");
+	node_C = create_rnode("C", "");
+	node_e = create_rnode("", "");
+	node_d = create_rnode("", "");
+
+	add_child(node_d, node_A);
+	add_child(node_d, node_B);
+	add_child(node_e, node_d);
+	add_child(node_e, node_C);
+
+	nodes_in_order = create_llist();
+	append_element(nodes_in_order, node_A);
+	append_element(nodes_in_order, node_B);
+	append_element(nodes_in_order, node_d);
+	append_element(nodes_in_order, node_C);
+	append_element(nodes_in_order, node_e);
+
+	result.root = node_e;
+	result.nodes_in_order = nodes_in_order;
+
+	return result;
+}
