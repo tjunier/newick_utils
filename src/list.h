@@ -27,10 +27,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 /*
  * NOTE: Care should be exercised when manipulating the lists (e.g.
  * appending a list to another list), lest it become very hairy to free() them
  * without free()ing something twice.  shallow_copy() is your friend. */
+
+/* NOTE: functions that return pointers will return NULL in case of error (most
+ * probably a malloc() problem due to insufficient memory. Functions that just
+ * perform an action (i.e., who could return void) return SUCCESS or FAILURE.
+ * FAILURE will often be caused by insufficient memory in a called function. 
+ */
 
 struct list_elem {
 	struct list_elem *next;
@@ -51,11 +58,11 @@ struct llist *create_llist();
 /* adds data to the beginning of the list (becomes
    new head). */
 
-void prepend_element(struct llist *list, void *data);
+int prepend_element(struct llist *list, void *data);
 
 /* adds data to end of list */
 
-void append_element(struct llist *list, void *data);
+int append_element(struct llist *list, void *data);
 
 /* Appends list to target list, by redirecting target's pointers and updating
  * count - no new memory allocation . The list structure pointed to by 'insert'

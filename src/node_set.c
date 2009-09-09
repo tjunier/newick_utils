@@ -50,6 +50,7 @@ const int BYTE_SIZE = 8;
 
 /* Fails if the tree has 0 nodes */
 
+// TODO: have caller check for NULL
 node_set create_node_set(int node_count)
 {
 	node_set set;
@@ -62,10 +63,7 @@ node_set create_node_set(int node_count)
 	/* allocate bytes and clear them */
 	assert(num_bytes != 0);
 	set = malloc(num_bytes);
-	if (NULL == set) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == set) return NULL;
 	memset(set, 0, num_bytes);
 	// printf ("[cns] created node set %p\n", set);
 
@@ -102,6 +100,7 @@ int node_set_contains(node_set set, int node_number, int node_count)
 	return set[node_byte] & (1 << node_bit);
 }
 
+// TODO: have caller check for NULL
 node_set node_set_union(node_set set1, node_set set2, int node_count)
 {
 	node_set result;
@@ -110,6 +109,7 @@ node_set node_set_union(node_set set1, node_set set2, int node_count)
 
 	assert(node_count > 0);
 	result = create_node_set(node_count);
+	if (NULL == result) return NULL;
 
 	num_bytes = node_count / BYTE_SIZE;
 	if (node_count % BYTE_SIZE != 0) { num_bytes++; }
@@ -155,10 +155,8 @@ int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
 			if (NULL != hash_get(n2n, current->label)) 
 				return NS_DUP_LABEL;
 			nump = malloc(sizeof(int));
-			if (NULL == nump) {
-				perror(NULL);
-				exit(EXIT_FAILURE);
-			}
+			if (NULL == nump) 
+				return NS_MEM_ERROR;
 			*nump = ord_number;
 			hash_set(n2n, current->label, nump);
 			ord_number++;
@@ -168,17 +166,14 @@ int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
 
 	return NS_OK;
 }
-
+// TODO: have caller check for NULL
 char *node_set_to_s(node_set set, int node_count)
 {
 	char *result;
 	int i;
 
 	result = malloc ((node_count + 1) * sizeof(char));
-	if (NULL == result) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == result) return NULL;
 
 	for (i = 0; i < node_count; i++) {
 		int node_byte = i / BYTE_SIZE;

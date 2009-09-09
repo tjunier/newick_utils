@@ -40,7 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hash.h"
 #include "list.h"
 #include "masprintf.h"
+#include "common.h"
 
+// TODO: have caller check for NULL
 struct hash *create_hash(int n)
 {
 	struct hash *h;
@@ -48,18 +50,12 @@ struct hash *create_hash(int n)
 
 	/* allocate storage for struct hash */
 	h = (struct hash *) malloc (sizeof(struct hash));
-	if (NULL == h) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == h) return NULL;
 
 	h->size = n;
 	/* allocate storage for n pointers to llist */
 	h->bins = (struct llist **) malloc (n * sizeof(struct llist *));
-	if (NULL == h->bins) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == h->bins) return NULL;
 	/* create a llist at each position */
 	for (i = 0; i < n; i++) {
 		(h->bins)[i] = create_llist();
@@ -78,7 +74,8 @@ unsigned int hash_func (const char *key)
 	return h;
 }
 
-void hash_set(struct hash *h, const char *key, void *value)
+// TODO: have caller check for FAILURE
+int hash_set(struct hash *h, const char *key, void *value)
 {
 	int hash_code = hash_func(key) % h->size;
 	struct llist *bin;
@@ -92,21 +89,20 @@ void hash_set(struct hash *h, const char *key, void *value)
 		kvp = (struct key_val_pair *) le->data;
 		if (0 == strcmp(key, kvp->key)) {
 			kvp->value = value;
-			return;
+			return SUCCESS;
 		}
 	}
 	/* Key not found - create new key_val_pair, fill it with key and val,
 	 * and append to bin. */
 	kvp = (struct key_val_pair *) malloc (sizeof (struct key_val_pair));
-	if (NULL == kvp) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == kvp) return FAILURE;
 	kvp->key = strdup(key);
 	kvp->value = value;
 
 	append_element(bin, kvp);
 	h->count++;
+
+	return SUCCESS;
 }
 
 void *hash_get(struct hash *h, const char *key)
@@ -192,11 +188,6 @@ void destroy_hash(struct hash *h)
 
 char * make_hash_key(void *addr)
 {
-	char *key = masprintf("%p", addr);
-	if (NULL == key) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
-	return key;
+	return masprintf("%p", addr);
 }
 

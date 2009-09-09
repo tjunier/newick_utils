@@ -36,11 +36,12 @@ struct rooted_tree;
 
 /* Error codes */
 
-enum ns_return {NS_OK, NS_DUP_LABEL, NS_EMPTY_LABEL};
+enum ns_return {NS_OK, NS_DUP_LABEL, NS_EMPTY_LABEL, NS_MEM_ERROR};
 
 typedef char* node_set;
 
 /* Creates a node_set for 'node_count' nodes. */
+/* Returns NULL in case of malloc() error. */
 
 node_set create_node_set(int node_count);
 
@@ -52,7 +53,7 @@ void node_set_add(node_set set, int node_number, int node_count);
 
 int node_set_contains(node_set set, int node_number, int node_count);
 
-/* returns the union of two sets */
+/* returns the union of two sets, or NULL in case of malloc() problems */
 
 node_set node_set_union(node_set set1, node_set set2, int node_count);
 

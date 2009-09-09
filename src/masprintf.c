@@ -67,6 +67,7 @@ char * masprintf(const char *fmt, ...)
 	}
 }
 
+// TODO: have caller check for NULL
 char * mastrcat(char *dest, const char *src)
 {
 	size_t dest_len = strlen(dest);
@@ -74,7 +75,7 @@ char * mastrcat(char *dest, const char *src)
 	
 	/* 'dest' MUST have been allocated by malloc() etc */
 	char * result = realloc(dest, dest_len + src_len + 1);
-	if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
+	if (NULL == result) return NULL;
 
 	strncpy(result + dest_len, src, src_len + 1);
 

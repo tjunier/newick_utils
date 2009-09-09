@@ -78,6 +78,7 @@ void link_p2c(struct rnode *parent, struct rnode *child, char *length_s)
 
 /* Returns half the length passed as a parameter (as char *), or "". */
 
+// TODO: have caller check for NULL
 char * compute_new_edge_length(char * length_as_string)
 {
 	char *result;
@@ -85,7 +86,7 @@ char * compute_new_edge_length(char * length_as_string)
 	if (0 != strcmp("", length_as_string)) {
 		double length = atof(length_as_string);
 		result = masprintf("%g", length / 2);
-		if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
+		if (NULL == result) return NULL;
 	} else  {
                 /* Note: we cannot just say result = ""; because result will be
                  * free()d later, so it has to have been dynamically allocated.
@@ -135,6 +136,7 @@ void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
 	/* not found - do nothing */
 }
 
+// TODO: have caller check for NULL
 char *add_len_strings(char *ls1, char *ls2)
 {
 	char * result;
@@ -145,11 +147,11 @@ char *add_len_strings(char *ls1, char *ls2)
 		double l1 = atof(ls1);
 		double l2 = atof(ls2);
 		result = masprintf("%g", l1 + l2);
-		if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
+		if (NULL == result) return NULL;
 	} else {
 		result = strdup("");
 		/* I'd be REALLY suprised if this fails... */
-		if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
+		if (NULL == result) return NULL;
 	}
 
 	return result;

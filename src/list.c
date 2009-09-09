@@ -31,30 +31,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <assert.h>
 
+#include "common.h"
 #include "list.h"
 
+// TODO: have caller check for NULL
 struct llist *create_llist()
 {
 	struct llist *llist_p;
 	llist_p = malloc(sizeof(struct llist));
-	if (NULL == llist_p) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == llist_p) return NULL;
 	llist_p->head = llist_p->tail = NULL;
 	llist_p->count = 0;
 	return llist_p;
 }
 
-void prepend_element(struct llist *list, void *data)
+// TODO: have caller check for FAILURE
+int prepend_element(struct llist *list, void *data)
 {
 	struct list_elem *el_p;
 
 	el_p = malloc(sizeof(struct list_elem));
-	if (NULL == el_p) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == el_p) return FAILURE;
 	el_p->data = data;
 	el_p->next = NULL;
 
@@ -66,17 +63,17 @@ void prepend_element(struct llist *list, void *data)
 		list->head = el_p;
 	}
 	list->count += 1;
+
+	return SUCCESS;
 }
 
-void append_element(struct llist *list, void *data)
+// TODO: have caller check for FAILURE
+int append_element(struct llist *list, void *data)
 {
 	struct list_elem *el_p;
 
 	el_p = malloc(sizeof(struct list_elem));
-	if (NULL == el_p) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == el_p) return FAILURE;
 	el_p->data = data;
 	el_p->next = NULL;
 
@@ -89,7 +86,7 @@ void append_element(struct llist *list, void *data)
 	}
 	list->count += 1;
 
-        //fprintf (stderr, "appended element %p (data: %p) to list %p\n", el_p, data, list);
+	return SUCCESS;
 }
 
 struct llist *llist_reverse(struct llist *list)
@@ -307,12 +304,13 @@ void destroy_llist(struct llist *l)
 	free(l);
 }
 
+// TODO: have caller check for NULL
 void ** llist_to_array (struct llist *l)
 {
 	if (0 == l->count) { return NULL; }
 
 	void ** array = malloc(l->count * sizeof(void *));
-	if (NULL == array) { perror(NULL); exit(EXIT_FAILURE); }
+	if (NULL == array) return NULL;
 
 	struct list_elem *el;
 	int i;

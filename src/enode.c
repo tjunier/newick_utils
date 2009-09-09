@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "enode.h"
 #include "rnode.h"
@@ -44,16 +45,14 @@ static struct rnode *current_tree_node;
 /* A general enode constructor. This is not meant to be used directly, but
  * rather via the create_enode_* functions. */
 
+//TODO: have caller check for NULL;
 static struct enode *create_enode(int type, 
 		struct enode *left,
 		struct enode *right,
 		float value)
 {
 	struct enode *enode = malloc(sizeof (struct enode));
-	if (NULL == enode) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == enode) return NULL;
 
 	enode->type = type;
 	enode->left = left;
@@ -98,14 +97,6 @@ void enode_eval_set_current_rnode(struct rnode *tree_node)
 	current_tree_node = tree_node;
 }
 
-
-/* Design note: the handling of errors is a bit rough: in case an enode of
- * unknown type is found, the function calls exit(). But passing a wrong type
- * enode is going to be a programmer's error, so the program is very unlikely
- * to exit() on a user, furthermore it is a severe enough error to warrant
- * immediate termination. And finally, it's not clear how to pass an error code
- * in a function that returns a float. */ 
-
 float eval_enode(struct enode *node)
 {
 	struct rnode_data *data;
@@ -145,7 +136,6 @@ float eval_enode(struct enode *node)
 	case ENODE_NB_ANCESTORS:
 		return data->nb_ancestors;
 	default:
-		fprintf (stderr, "Unknown enode type %d\n", node->type);
-		exit(EXIT_FAILURE);
+		assert(0);	/* programmer error */
 	}
 }

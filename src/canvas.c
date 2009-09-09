@@ -40,27 +40,18 @@ struct canvas *create_canvas(int width, int height)
 	int line_no;
 
 	cp = malloc(sizeof(struct canvas));
-	if (NULL == cp) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == cp) return NULL;
 
 	cp->width = width;
 	cp->height = height;
 	/* allocate space for pointers to lines */
 	cp->lines = malloc(height * sizeof(char *));
-	if (NULL == cp->lines) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == cp->lines) return NULL;
 	/* now allocate lines */
 	for (line_no = 0; line_no < height; line_no++) {
 		int c;
 		cp->lines[line_no] = malloc((width+1) * sizeof(char));
-		if (NULL == cp->lines[line_no]) {
-			perror(NULL);
-			exit(EXIT_FAILURE);
-		}
+		if (NULL == cp->lines[line_no]) return NULL;
 		for (c = 0; c < width; c++)
 			cp->lines[line_no][c] = ' ';
 		cp->lines[line_no][c] = '\0';

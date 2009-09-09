@@ -35,6 +35,7 @@ struct canvas {
 	};
 
 /* Creates a canvas of w chars by h lines */
+/* Returns NULL iff canvas can't be allocated. */
 
 struct canvas *create_canvas(int w, int l);
 

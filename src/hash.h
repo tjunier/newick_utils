@@ -29,6 +29,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* Simple hash table. Arbitrary data, keyed by strings. Fixed number of bins, does not grow. */
 
+/* NOTE: All functions except the most simple ones can fail, in which case the
+ * return value indicates failure or success. Functions that return pointers
+ * will return NULL in case of error (most probably a malloc() problem due to
+ * insufficient memory. Functions that just perform an action (i.e., who could
+ * return void) return SUCCESS or FAILURE. FAILURE will often be caused by
+ * insufficient memory in a called function. 
+ */
+
 struct llist;
 
 struct hash {
@@ -42,14 +50,14 @@ struct key_val_pair {
 	void *value;
 };
 
-/* Creates a hash with n bins. If memory allocation fails, exits program. */
+/* Creates a hash with n bins. If memory allocation fails, returns NULL . */
 
 struct hash * create_hash(int n);
 
 /* Inserts a (key, value) pair into a hash. Increments count. The 'key' will be
  * duplicated. */
 
-void hash_set(struct hash *, const char *key, void *value);
+int hash_set(struct hash *, const char *key, void *value);
 
 /* Retrieves a value from a hash. Returns the value, or NULL if not present. */
 

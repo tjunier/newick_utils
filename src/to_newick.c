@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 char *length(struct rnode *node)
 {
 	char * result = malloc(sizeof(char));
-	if (NULL == result) return;
+	if (NULL == result) return NULL;
 	*result = '\0';
 
 	if (NULL != node->parent) {

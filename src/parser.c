@@ -41,6 +41,7 @@ enum parser_status_type newick_parser_status;
 
 int nwsparse(); // TODO: rm this if fails
 
+// TODO: have caller check value
 struct rooted_tree *parse_tree()
 {
 	struct rooted_tree *tree;
@@ -62,6 +63,8 @@ struct rooted_tree *parse_tree()
 	} else {
 		free(tree);
 		destroy_llist(nodes_in_order);
+		/* 'newick_parser_status' has been set by nwsparse(), and can be
+		 * read by caller (should, in fact). */
 		return NULL;
 	}
 }
