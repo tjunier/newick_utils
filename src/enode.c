@@ -45,7 +45,6 @@ static struct rnode *current_tree_node;
 /* A general enode constructor. This is not meant to be used directly, but
  * rather via the create_enode_* functions. */
 
-//TODO: have caller check for NULL;
 static struct enode *create_enode(int type, 
 		struct enode *left,
 		struct enode *right,

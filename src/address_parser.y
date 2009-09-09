@@ -71,10 +71,15 @@ void adserror(char *s)
 
 /* I use the words 'term' and 'factor' by analogy with arithmetic operators */
 
+// TODO: test the parser's behaviour when the create_enode_*() functions fail.
 expression: /* empty */ { expression_root = NULL; }
 	| term { expression_root = $1; }
 	| expression OP_OR term {
 		struct enode *or = create_enode_op(ENODE_OR, $1, $3);
+		if (NULL == or) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		expression_root = or;
 		$$ = or;	/* might not be the root */
 	}
@@ -82,17 +87,33 @@ expression: /* empty */ { expression_root = NULL; }
 term: factor
 	| term OP_AND factor {
 		struct enode *and = create_enode_op(ENODE_AND, $1, $3);
+		if (NULL == and) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		$$ = and;
 	}
 
 factor: comparison 
       	| BOOL_FUNC {
 		struct enode *bf = create_enode_func($1);
+		if (NULL == bf) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		$$ = bf;
 	}
 	| OP_NOT BOOL_FUNC {
 		struct enode *bf = create_enode_func($2);
+		if (NULL == bf) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		struct enode *not = create_enode_not(bf);
+		if (NULL == not) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		$$ = not;	
 	}
       	| OPEN_PAREN expression CLOSE_PAREN {
@@ -100,26 +121,54 @@ factor: comparison
 	}
       	| OP_NOT OPEN_PAREN expression CLOSE_PAREN {
 		struct enode *not = create_enode_not($3);
+		if (NULL == not) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		$$ = not;
 	}
 
 comparison: comparand COMPARATOR comparand {
 		struct enode *c = create_enode_op($2, $1, $3);
+		if (NULL == c) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		$$ = c;
 	}
 	| comparand COMPARATOR comparand COMPARATOR comparand {
 		struct enode *c1 = create_enode_op($2, $1, $3);
+		if (NULL == c1) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		struct enode *c2 = create_enode_op($4, $3, $5);
-		struct enode *res = create_enode_op(ENODE_AND, c1, c2);
-		$$ = res;
+		if (NULL == c2) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
+		struct enode *result = create_enode_op(ENODE_AND, c1, c2);
+		if (NULL == result) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
+		$$ = result;
 	}
 
 comparand: CONST {
 		struct enode *n = create_enode_constant($1);
+		if (NULL == n) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		$$ = n;
 	}
 	| NUM_FUNC {
 		struct enode *f = create_enode_func($1);
+		if (NULL == f) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
 		$$ = f;
 	}
 

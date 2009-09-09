@@ -425,7 +425,13 @@ int main(int argc, char* argv[])
 	struct rooted_tree *tree;
 
 	address_scanner_set_input(params.address);
+	// TODO: have adsparse() set an error code to distinguish the various
+	// causes of NULL (e.g., syntax error and memory error)
 	adsparse(); /* sets 'expression_root' */ 
+	if (NULL == expression_root) {
+		fprintf (stderr, "Could not parse address.\n");
+		exit(EXIT_FAILURE);
+	}
 	address_scanner_clear_input();
 
 	while (NULL != (tree = parse_tree())) {
