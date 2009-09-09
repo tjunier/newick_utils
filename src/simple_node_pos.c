@@ -27,8 +27,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-/* simple_node_pos.c - a structure for storing an rnode's position in a tree,
- * as well as getters and setters. */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -41,8 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "simple_node_pos.h"
 #include "list.h"
 #include "rnode.h"
+#include "common.h"
 
-void alloc_simple_node_pos(struct rooted_tree *t) 
+int alloc_simple_node_pos(struct rooted_tree *t) 
 {
 	struct list_elem *le;
 	struct rnode *node;
@@ -50,11 +49,9 @@ void alloc_simple_node_pos(struct rooted_tree *t)
 	for (le = t->nodes_in_order->head; NULL != le; le = le->next) {
 		node = le->data;
 		node->data = malloc(sizeof(struct simple_node_pos));
-		if (NULL == node->data) {
-			perror(NULL);
-			exit(EXIT_FAILURE);
-		}
+		if (NULL == node->data) return FAILURE;
 	}
+	return SUCCESS;
 }
 
 void set_simple_node_pos_top (struct rnode * node, double top)

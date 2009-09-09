@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "list.h"
 #include "link.h"
-#include "to_newick.h"
+#include "to_newick.h" // TODO: needed?
+#include "parser.h"
 
 /* in the (admittedly artificial) case of trees with lots of nesting on the
  * left side, the stack can be exhausted. I set this to 100,000, which is
@@ -47,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extern struct llist *nodes_in_order;
 extern struct rnode *root;
+extern enum parser_status status;
+
 extern int lineno;
 char *nwsget_text();
 
@@ -80,7 +83,7 @@ void nwserror(char *s)
 
 %%
 
-tree: /* empty */	{ root = NULL; YYACCEPT; }
+tree: /* empty */	{ root = NULL; status = PARSER_STATUS_EMPTY; YYACCEPT; }
     | node SEMICOLON {
     		root = $1;
 		YYACCEPT;
@@ -105,6 +108,8 @@ inner_node: O_PAREN nodelist C_PAREN {
 		struct list_elem* lep;
 		struct rnode *np;
 		np = create_rnode("","");
+		// TODO: check the parser's behaviour if create_rnode() fails
+		if (NULL == np) { root = NULL; YYACCEPT; }
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child(np, (struct rnode*) lep->data);
 		}
@@ -115,6 +120,7 @@ inner_node: O_PAREN nodelist C_PAREN {
 		struct list_elem* lep;
 		struct rnode *np;
 		np = create_rnode($4,"");
+		if (NULL == np) { root = NULL; YYACCEPT; }
 		free($4);
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child(np, (struct rnode*) lep->data);
@@ -126,6 +132,7 @@ inner_node: O_PAREN nodelist C_PAREN {
 		struct list_elem* lep;
 		struct rnode *np;
 		np = create_rnode($4,$6);
+		if (NULL == np) { root = NULL; YYACCEPT; }
 		free($4);
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child(np, (struct rnode*) lep->data);
@@ -138,6 +145,7 @@ inner_node: O_PAREN nodelist C_PAREN {
 		struct list_elem* lep;
 		struct rnode *np;
 		np = create_rnode("",$5);
+		if (NULL == np) { root = NULL; YYACCEPT; }
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
 			add_child(np, (struct rnode*) lep->data);
 		}
@@ -169,23 +177,27 @@ nodelist: node {
 leaf: LABEL {
 		struct rnode *np;
 		np = create_rnode($1,"");
+		if (NULL == np) { root = NULL; YYACCEPT; }
 		free($1);
 		$$ = np;
 	}
     | LABEL COLON LABEL {
 		struct rnode *np;
 		np = create_rnode($1,$3);
+		if (NULL == np) { root = NULL; YYACCEPT; }
 		free($1);
 		free($3);
 		$$ = np;
 	}
     | COLON LABEL {
 		struct rnode *np = create_rnode("",$2);
+		if (NULL == np) { root = NULL; YYACCEPT; }
 		free($2);
 		$$ = np;
 	}
     | /* empty */ {
 		struct rnode *np = create_rnode("","");
+		if (NULL == np) { root = NULL; YYACCEPT; }
 		$$ = np;
 	}
     ;

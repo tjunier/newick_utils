@@ -32,6 +32,7 @@ struct rooted_tree tree_1()
 
 	result.root = node_e;
 	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
 
 	return result;
 }
@@ -76,6 +77,7 @@ struct rooted_tree tree_2()
 
 	result.root = node_i;
 	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
 
 	return result;
 }
@@ -120,6 +122,7 @@ struct rooted_tree tree_3()
 
 	result.root = node_i;
 	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
 
 	return result;
 }
@@ -166,6 +169,7 @@ struct rooted_tree tree_4()
 
 	result.root = node_i;
 	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
 
 	return result;
 }
@@ -207,6 +211,7 @@ struct rooted_tree tree_5()
 
 	result.root = node_h;
 	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
 
 	return result;
 }
@@ -243,6 +248,7 @@ struct rooted_tree tree_6()
 
 	result.root = node_f;
 	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
 
 	return result;
 }
@@ -288,6 +294,7 @@ struct rooted_tree tree_7()
 
 	result.root = node_i;
 	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
 
 	return result;
 }
@@ -328,6 +335,7 @@ struct rooted_tree tree_8()
 	struct rooted_tree result;
 	result.root = root;
 	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
 
 	return result;
 }
@@ -378,6 +386,7 @@ struct rooted_tree tree_9()
 
 	tree.root = nj;
 	tree.nodes_in_order = nodes_in_order;
+	tree.type = TREE_TYPE_UNKNOWN;
 
 	return tree;
 }
@@ -410,6 +419,7 @@ struct rooted_tree tree_10()
 
 	tree.root = hominoidea;
 	tree.nodes_in_order = nodes_in_order;
+	tree.type = TREE_TYPE_UNKNOWN;
 
 	return tree;
 }
@@ -445,6 +455,7 @@ struct rooted_tree tree_11()
 
 	tree.root = hominoidea;
 	tree.nodes_in_order = nodes_in_order;
+	tree.type = TREE_TYPE_UNKNOWN;
 
 	return tree;
 }
@@ -477,6 +488,7 @@ struct rooted_tree tree_12()
 
 	result.root = node_e;
 	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
 
 	return result;
 }

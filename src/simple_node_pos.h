@@ -53,8 +53,9 @@ struct simple_node_pos {
 };
 
 /* Allocates a simple_node_pos structure for each node. */
+/* Returns FAILURE iff allocation fails. */
 
-void alloc_simple_node_pos(struct rooted_tree *);
+int alloc_simple_node_pos(struct rooted_tree *);
 
 /* Setters and getters. These should be passed as arguments to
  * set_node_vpos_cb() and set_node_depth_cb() (see node_pos_alloc.h). */

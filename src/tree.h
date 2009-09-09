@@ -46,8 +46,9 @@ struct rooted_tree {
 /* Reroots the tree in such a way that 'outgroup' and descendants are one of
  * the root's children, and the rest of the tree is the other child. The old
  * root node gets spliced out if it has only one child. */
+/* Returns SUCCESS unless there was a problem (malloc()) */
 
-void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
+int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
 
 /* Collapses pure clades (= clades in which all leaves are of the same label)
  * into a single leaf, also of the same label */
@@ -90,11 +91,13 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 /* like nodes_from_labels(), but uses a regular expression (compiled from second argument) instead of a list of labels. */
 /* NOTE: if you use the same regexp for >1 calls, try nodes_from_regexp()
  * below and compile the regexp only once beforehand (and free it afterwards). */
+/* Returns NULL on failure. */
 
 struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 		char *regexp_string);
 
 /* like nodes_from_labels(), but uses a regular expression (passed as second argument) instead of a list of labels. */
+/* Returns NULL on failure. */
 
 struct llist *nodes_from_regexp(struct rooted_tree *tree,
 		regex_t *preg);
@@ -102,6 +105,7 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree,
 /* Clones a (sub)tree, given the root node of the subtree. All nodes and edges
  * are new: one can modify or delete the clone without affecting the original
  * in any way. */
+/* Returns NULL on failure. */
 
 struct rooted_tree *clone_subtree(struct rnode *);
 

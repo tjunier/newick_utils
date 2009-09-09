@@ -33,5 +33,6 @@ struct rnode;
 
 /* Returns a Newick representation of the tree. Memory is allocated, don't
  * forget to free() it. */
+/* Returns NULL in case of failure (which will be a memory allocation problem). */
 
 char *to_newick(struct rnode* node);

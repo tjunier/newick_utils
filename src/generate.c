@@ -133,8 +133,13 @@ int main(int argc, char *argv[])
 
 	// The 1st parameter is the exponential distribution's rate parameter,
 	// which is the inverse of the mean.
-	time_limited_tree(1.0 / params.mean_branch_length,
+	int result = time_limited_tree(1.0 / params.mean_branch_length,
 			params.duration);
-	
-	exit(EXIT_SUCCESS);
+	if (result)
+		exit(EXIT_SUCCESS);
+	else {
+		fprintf (stderr, "Memory allocation problem");
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
 }

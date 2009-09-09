@@ -51,10 +51,7 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 {
 	struct rnode_iterator *iter;
 	iter = (struct rnode_iterator *) malloc(sizeof(struct rnode_iterator));
-	if (NULL == iter) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == iter) return NULL;
 
 	iter->root = iter->current = root;
 	iter->seen = create_hash(INIT_HASH_SIZE);

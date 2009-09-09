@@ -42,10 +42,8 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	struct rnode *node_p;
 
 	node_p = malloc(sizeof(struct rnode));
-	if (NULL == node_p) {
-		perror(NULL);
-		exit(1);
-	}
+	if (NULL == node_p) return NULL;
+
 	if (NULL == label) {
 		label = "";
 	}

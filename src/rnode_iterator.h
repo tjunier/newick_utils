@@ -35,6 +35,7 @@ struct rnode_iterator;
 struct llist;
 
 /* Creates an iterator. You can then pass it to the functions below. */
+/* Returns NULL in case of problems (which will be with allocation) */
 
 struct rnode_iterator *create_rnode_iterator(struct rnode *root);
 

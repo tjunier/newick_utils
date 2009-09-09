@@ -33,9 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 // #include "newick.tab.h"
 #include "tree.h"
+#include "parser.h"
 
 struct llist *nodes_in_order;
 struct rnode *root;
+enum parser_status status;
+
 int nwsparse(); // TODO: rm this if fails
 
 struct rooted_tree *parse_tree()
@@ -54,6 +57,7 @@ struct rooted_tree *parse_tree()
 	if (NULL != root) {
 		tree->root = root;
 		tree->nodes_in_order = nodes_in_order;
+		tree->type = TREE_TYPE_UNKNOWN; 
 		return tree;
 	} else {
 		free(tree);

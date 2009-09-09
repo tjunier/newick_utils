@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nodemap.h"
 #include "hash.h"
 #include "rnode_iterator.h"
+#include "common.h"
 
 const int FREE_NODE_DATA = 1;
 const int DONT_FREE_NODE_DATA = 0;
@@ -47,7 +48,7 @@ const int DONT_FREE_NODE_DATA = 0;
 
 /* 'outgroup' is the node which will be the outgroup after rerooting. */
 
-void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
+int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 {
 	struct rnode *old_root = tree->root;
 	struct rnode *new_root;
@@ -56,7 +57,8 @@ void reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	struct list_elem *elem;
 
 	/* Insert node (will be the new root) above outgroup */
-	insert_node_above(outgroup, "");
+	if (! insert_node_above(outgroup, ""))
+		return FAILURE;
 	new_root = outgroup->parent;
 
 	/* We need to swap the nodes from new root to the old root (i.e., swap
@@ -234,6 +236,7 @@ enum tree_type get_tree_type(struct rooted_tree *tree)
 		return tree->type;
 	
 	/* Type is not known, so we compute it. */
+	int nb_nodes = tree->nodes_in_order->count;
 	int nb_edges_with_lengths = 0;
 	int nb_edges_without_lengths = 0;
 	struct list_elem *el;
@@ -245,13 +248,15 @@ enum tree_type get_tree_type(struct rooted_tree *tree)
 			nb_edges_with_lengths++;
 	}
 	
-	printf ("empty edges: %d, nonempty edges: %d\n", nb_edges_without_lengths, nb_edges_with_lengths);
-	if (nb_edges_with_lengths > 0 && nb_edges_without_lengths > 0) 
-		return TREE_TYPE_NEITHER;	/* weird, but legal... */
-	else if (nb_edges_with_lengths == 0) 
+	if (nb_edges_without_lengths == nb_nodes) 
 		return TREE_TYPE_CLADOGRAM;
-	else
+	else if (nb_edges_with_lengths == nb_nodes) 
 		return TREE_TYPE_PHYLOGRAM;
+	else if (nb_edges_with_lengths == nb_nodes - 1
+		&& strcmp("", tree->root->edge_length_as_string) == 0)
+		return TREE_TYPE_PHYLOGRAM;
+	else
+		return TREE_TYPE_NEITHER;	/* weird, but legal */
 }
 
 struct llist *nodes_from_labels(struct rooted_tree *tree,
@@ -282,15 +287,18 @@ struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 	int errcode;
 	regex_t *preg = malloc(sizeof(regex_t));
 	int cflags = 0;
-	if (NULL == preg) {perror(NULL); exit(EXIT_FAILURE);}
+	if (NULL == preg) return NULL;
 	errcode = regcomp(preg, regexp_string, cflags);
 	if (errcode) {
 		size_t errbufsize = regerror(errcode, preg, NULL, 0);
 		char *errbuf = malloc(errbufsize * sizeof(char));
-		if (NULL == errbuf) {perror(NULL); exit(EXIT_FAILURE);}
+		if (NULL == errbuf) return NULL;
+		/* NOTE: this would be more informative, but I want to return
+		 * an error value instead of just exit()ing. 
 		regerror(errcode, preg, errbuf, errbufsize);
 		fprintf (stderr, "%s\n", errbuf);
 		exit(EXIT_FAILURE);
+		*/
 	}
        				       
 	struct llist *result = create_llist();
@@ -360,7 +368,7 @@ struct rooted_tree* clone_subtree(struct rnode *root)
 	struct llist *nodes_in_order_clone = get_nodes_in_order(root_clone);
 
 	struct rooted_tree *clone = malloc(sizeof(struct rooted_tree));
-	if (NULL == clone) { perror(NULL); exit(EXIT_FAILURE); }
+	if (NULL == clone) return NULL;
 
 	clone->root = root_clone;
 	clone->nodes_in_order = nodes_in_order_clone;

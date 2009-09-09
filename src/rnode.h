@@ -74,6 +74,7 @@ struct rnode {
  * or empty, the node will have an empty string for a label. If
  * 'length_as_string' is NULL or empty, the node's branch will have no length
  * */
+/* Returns NULL if structure cannot be created (malloc() problems). */
 
 struct rnode *create_rnode(char *label, char *length_as_string);
 

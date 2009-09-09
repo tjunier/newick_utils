@@ -1,17 +1,29 @@
+CURRENTLY: ensuring that the return value of create_rnode() is being checked.
+
+general: library functions should not call exit() - this should only be found
+in app code. This is especially true since we're writing Python bindings: a
+Python app may not want to exit() just because our function can't complete -
+rather it would throw an exception.
+
 nw_tree: add a test for many input trees when using the -r option
 
-[later] general: add parser for NEXUS (http://sysbio.oxfordjournals.org/cgi/reprint/46/4/590) and PhyloXML (http://www.phyloxml.org/).
+[later] general: add parser for NEXUS
+(http://sysbio.oxfordjournals.org/cgi/reprint/46/4/590) and PhyloXML
+(http://www.phyloxml.org/).
 
 nw_gen: review the usefulness of time-limited trees in light of nw_trim: we can
 now use nw_trim to cut a tree at any desired length, yielding a time-limited
 tree. Also, introduce a limit on node number, so we can grow a tree until it
 reaches N leaves, etc.
 
-nw_match: now we have topological matches; consider exact matches (without reordering). Also consider monophyly matches (similar to nw_clade -m, but print the whole matching tree instead of the subtree).
+nw_match: now we have topological matches; consider exact matches (without
+reordering). Also consider monophyly matches (similar to nw_clade -m, but print
+the whole matching tree instead of the subtree).
 
 nw_clade -m should consider single leaves as monophyletic
 
-nw_clade (and computing LCAs in general): deal with non-unique node labels. Use regexps wherever it makes sense.
+nw_clade (and computing LCAs in general): deal with non-unique node labels. Use
+regexps wherever it makes sense.
 
 nw_reroot: option -l should accept outgroup nodes and automatically complement
 the selection. In fact, what happens if we pass ingroup labels but not -l?
@@ -19,7 +31,8 @@ Actually it doesn't change anything. Fix this before the release.
 
 tree.c: rename nodes_in_order to nodes_in_postorder
 
-new program: nw_info: prints a summary (number of leaves, number of inner nodes, overall depth, whether the tree is a cladogram, etc.
+new program: nw_info: prints a summary (number of leaves, number of inner
+nodes, overall depth, whether the tree is a cladogram, etc.
 
 nw_ed: add a function for replacing an inner node with a leaf (TODO: useful?)
 
@@ -29,18 +42,21 @@ nw_topol: add a function for making a tree clocklike (ultrametric)
 
 nw_ed: valgrind nw_ed -no data/catarrhini 'i & b < 10' d
 
-[dropped] nw_ed: nw_ed data/catarrhini 'i & a > 2' s doesn't work properly -- WRONG, it works allright.
+[dropped] nw_ed: nw_ed data/catarrhini 'i & a > 2' s doesn't work properly --
+WRONG, it works allright.
 
-[partly done] nw_display: SVG ortho, align middle of label, rather than bottom, to branch.
-Try with some SVG property.
+[partly done] nw_display: SVG ortho, align middle of label, rather than bottom,
+to branch.  Try with some SVG property.
 
-nw_prune: remove complement (i.e., keep specified nodes and prune the rest);  allow selection of a branch by its LCA.
+nw_prune: remove complement (i.e., keep specified nodes and prune the rest);
+allow selection of a branch by its LCA.
 
 nw_display: craft test tree for numeric verification of lengths and positions
 
 nw_display: use CSS in scale bar
 
-[partly done] nw_display: add scale bar to SVG radial -- in progress, but scale is too compressed in radial trees -- try with catarrhini.
+[partly done] nw_display: add scale bar to SVG radial -- in progress, but scale
+is too compressed in radial trees -- try with catarrhini.
 
 nw_display: add scale bar to text display
 
@@ -151,7 +167,12 @@ case (see src/test_loops)].
 error"). One case I encountered was two consecutive labels (in fact there was a
 spurious space between them). Something could be done, such as fusing them with
 a '_', or dropping all but the first; at the very least the program should say
-what the problem was and where it was found. -- Note: to detect incorrect constructs, I introduced "wrong" cases in the grammar, as suggested in the Lex & Yacc book. This causes conflicts in the grammar, but I decided to keep it that way, since i) Bison solves the conflicts correctly, and ii) the "correct" grammar (the one that only recognizes correct trees) is perfectly non-ambiguous.
+what the problem was and where it was found. -- Note: to detect incorrect
+constructs, I introduced "wrong" cases in the grammar, as suggested in the Lex
+& Yacc book. This causes conflicts in the grammar, but I decided to keep it
+that way, since i) Bison solves the conflicts correctly, and ii) the "correct"
+grammar (the one that only recognizes correct trees) is perfectly
+non-ambiguous.
 
 [done] nw_topology: also remove length of root's parent edge, if it has one
 (like when it is extracted from another tree).
@@ -168,7 +189,10 @@ leaves should be the default behaviour for cladograms.
 (http://evolution.genetics.washington.edu/phylip/newicktree.html) to the test
 suite.
 
-[done] nw_display: replace underscores by spaces, as underscores are a way to introduce spaces where they are normally not allowed. The transformation is only done in nw_display, not in the parser: this way the labels are always valid Newick.
+[done] nw_display: replace underscores by spaces, as underscores are a way to
+introduce spaces where they are normally not allowed. The transformation is
+only done in nw_display, not in the parser: this way the labels are always
+valid Newick.
 
 [done] nw_bipart: invert order of arguments: 'target' newick tree mus be first.
 
@@ -176,22 +200,26 @@ suite.
 case, as every printable char except ()[]:,; is legal in labels. Also confuses
 lexer, so fix it too while we're at it.
 
-[done] all: add help, available with option -h (program should then quit successfully).
+[done] all: add help, available with option -h (program should then quit
+successfully).
 
 [done] BUG: nw_ed crashes on cladograms when trying to splice out nodes. Fixed
 - that was because new edge lengths were not malloc()ed when both lengths were
-empty.
+  empty.
 
 [done] nw_display: make one SVG group with tree branches, and another with text
 
 [done] nw_display: add functionality for circular trees
 
-[done] nw_display: check the 'null' values (try colormaps). Add a test for every
-option.
+[done] nw_display: check the 'null' values (try colormaps). Add a test for
+every option.
 
-[done] nw_clade: add functionality for returning sibling, based on one or more labels.
+[done] nw_clade: add functionality for returning sibling, based on one or more
+labels.
 
-[done] nw_match: prints out trees which "match" another ("pattern") tree, e.g. if we keep only the species found in the "pattern" tree, topologies should be the same.
+[done] nw_match: prints out trees which "match" another ("pattern") tree, e.g.
+if we keep only the species found in the "pattern" tree, topologies should be
+the same.
 
 [done] check error handling: functions must only call exit() when error is
 unrecoverable, otherwise they should return an error code.
@@ -206,7 +234,8 @@ primitive now, it works.
 
 [done] nw_clade: add specification of labels by regular expression
 
-[done] add a module 'xml_utils' with a function for escaping '&', '<', etc in XML (useful for URLs)
+[done] add a module 'xml_utils' with a function for escaping '&', '<', etc in
+XML (useful for URLs)
 
 [done] nw_display: add anchors to labels, passed in a separate file named as
 argument to an option
@@ -220,13 +249,13 @@ clade map, in which not only the color but any CSS properties may be specified.
 [done ] nw_display: add a possibility for adding other attributes to the <a>
 tag (we now have href, which is the only required one, make it possible to
 
-[done] nw_clade: output context, e.g. given a LCA, output the containing clade, n levels up (n specifiable)
-specify oters on the same line)
+[done] nw_clade: output context, e.g. given a LCA, output the containing clade,
+n levels up (n specifiable) specify oters on the same line)
 
 [done] Valgrind everything
 
-[done ] svg_graph.c: separate the code for radial trees from the common
-SVG code; do the same for orthogonal trees. Keep data as private as possible.
+[done ] svg_graph.c: separate the code for radial trees from the common SVG
+code; do the same for orthogonal trees. Keep data as private as possible.
 Ideally the client program (i.e., nw_display) should only know about functions
 for setting SVG parameters, and displaying trees. All the rest should be neatly
 hidden.
@@ -235,18 +264,19 @@ hidden.
 to #define _GNU_SOURCE.
 
 [done] nw_display: for SVG, handle trees with multiple instances of the same
-label.  There are many developments in this direction:
-	o a single label may match more than one node [done]
-	o one may wish to label those nodes independently (i.e., not as a clade)
-	o one could envision using regular expressions
-And the program should still be reasonably quick. To do now: distingish clade
-styles (the only ones existing now) from "group" styles, i.e. styles applied
-individually to all nodes in a group (rather than to their LCA and
-descendents).
+label.  There are many developments in this direction: o a single label may
+match more than one node [done] o one may wish to label those nodes
+independently (i.e., not as a clade) o one could envision using regular
+expressions And the program should still be reasonably quick. To do now:
+distingish clade styles (the only ones existing now) from "group" styles, i.e.
+styles applied individually to all nodes in a group (rather than to their LCA
+and descendents).
 
-[done] nw_display: add an option, perhaps -d or -D, for the CSS style of the default clade (clade_0).
+[done] nw_display: add an option, perhaps -d or -D, for the CSS style of the
+default clade (clade_0).
 
-[done] nw_display: add ornaments. That's an arbitrary snippet of SVG code that will be inserted next to a node's label.
+[done] nw_display: add ornaments. That's an arbitrary snippet of SVG code that
+will be inserted next to a node's label.
 
 [dropped] test procedure: test program should FAIL if it segfaults
 (obviously...) - In fact I could not reproduce a case when it does not fail, so
@@ -258,7 +288,8 @@ I'll leave this out for now.
 
 [done] nw_ed: make test for action 'l' (print label)
 
-[done] nw_display: scale bar is sometimes off the chart, try e.g. nw_display -s ../data/simiiformes_wrong_rr.nw
+[done] nw_display: scale bar is sometimes off the chart, try e.g. nw_display -s
+../data/simiiformes_wrong_rr.nw
 
 [solved] nw_distance: doesnt' work with doc/dist_sel_xpl.nw (parent edge of
 inner node C has length 5, should have length 4). -- tree had wrong format. 
@@ -267,7 +298,8 @@ inner node C has length 5, should have length 4). -- tree had wrong format.
 be just nodes A and B (labeled leaves) but then the LCA should be node d, yet
 it seems to be the root.
 
-[done] new program nw_trim: cuts branches at a certain depth or number of ancestors. optionally prints out the trimmed branches.
+[done] new program nw_trim: cuts branches at a certain depth or number of
+ancestors. optionally prints out the trimmed branches.
 
 [done] all: check that all programs support multiple trees in input.
 
@@ -277,4 +309,7 @@ it seems to be the root.
 All data pertaining to a node's parent edge can be stored in the node itself.
 This should simplify things and speed them up a little.
 
-[done] general: put all reusable code (i.e., all .c files except the ones that contain the main() fucntion of the programs themselves) into a library, and link to it. Use dynamic linking except when distributing binaries, which should be statically linked (use ./configure --disable-shared).
+[done] general: put all reusable code (i.e., all .c files except the ones that
+contain the main() fucntion of the programs themselves) into a library, and
+link to it. Use dynamic linking except when distributing binaries, which should
+be statically linked (use ./configure --disable-shared).

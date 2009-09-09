@@ -51,11 +51,12 @@ void add_child(struct rnode *parent, struct rnode *child);
 // OBSOLETE - use add_child() 
 // void link_p2c(struct rnode *parent, struct rnode *child, char *length);
 
-/* Inserts a node withe label 'label' in this node's parent edge. The two
+/* Inserts a node with the label 'label' in this node's parent edge. The two
  * resulting edges will each have a length of half the original's, if
  * specified. */
+/* Returns SUCCESS unless the new node can't be created (malloc()...) */
 
-void insert_node_above(struct rnode *node, char *label);
+int insert_node_above(struct rnode *node, char *label);
 
 /* Replaces child node 'old' by 'new'. Does nothing if 'old' is not found. */
 

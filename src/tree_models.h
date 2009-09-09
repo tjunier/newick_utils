@@ -38,15 +38,17 @@ struct rnode;
 void geometric_tree(double prob_node_has_children);
 
 /* A more complicated model where each branch's length is exponentially
- * distributed (up to a duration threshold).  */
+ * distributed (up to a duration threshold).  Returns 0 (FAILURE) IFF there is
+ * any problem (which will be memory allocation errors) . */
 
-void time_limited_tree(double branch_termination_rate, double duration);
+int time_limited_tree(double branch_termination_rate, double duration);
 
 /* Attributes length to the parent edge (exponentially distributed with
  * parameter 'branch_termination_rate'), capped by duration threshold stored in
  * node's data pointer. Returns the remaining time (which can be negative) The
  * 'alt_random' parameter is used (if > 0) for testing the function by
  * supplying a known "random" value */
+ /* If the function fails for some reason (e.g. no RAM left), it returns -1 */
 
 double tlt_grow_node(struct rnode *, double branch_termination_rate,
 		double alt_random);

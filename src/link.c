@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 #include "link.h"
 #include "masprintf.h"
+#include "common.h"
 
 void add_child(struct rnode *parent, struct rnode *child)
 {
@@ -95,7 +96,7 @@ char * compute_new_edge_length(char * length_as_string)
 	return result;
 }
 
-void insert_node_above(struct rnode *this, char *label)
+int insert_node_above(struct rnode *this, char *label)
 {
 	struct rnode *parent;
 	struct rnode *new;
@@ -106,6 +107,7 @@ void insert_node_above(struct rnode *this, char *label)
 	new_edge_length = compute_new_edge_length(this->edge_length_as_string);
 	/* create new node */
 	new = create_rnode(label, new_edge_length);
+	if (NULL == new) return FAILURE; // TODO: caller should check!
 	/* link new node to this node */
 	add_child(new, this);
 	free(this->edge_length_as_string);

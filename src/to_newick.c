@@ -40,10 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 char *length(struct rnode *node)
 {
 	char * result = malloc(sizeof(char));
-	if (NULL == result) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == result) return;
 	*result = '\0';
 
 	if (NULL != node->parent) {
@@ -60,15 +57,13 @@ char *length(struct rnode *node)
 char *subtree(struct rnode *node)
 {
 	char * result = malloc(sizeof(char));
-	if (NULL == result) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == result) return NULL;
 	*result = '\0';
 
 	if (is_leaf(node)) {
 		result = append_to(result, node->label);
 		char *length_s = length(node);
+		if (NULL == length_s) return NULL;
 		result = append_to(result, length_s);
 		free(length_s);
 	} else {
@@ -82,6 +77,7 @@ char *subtree(struct rnode *node)
 		elem = node->children->head;
 		child = elem->data;
 		child_node_s = subtree(child);
+		if (NULL == child_node_s) return NULL;
 		result = append_to(result, child_node_s);
 		free(child_node_s);
 		/* other children, comma-separated */
@@ -89,6 +85,7 @@ char *subtree(struct rnode *node)
 			result = append_to(result, ",");
 			child = elem->data;
 			child_node_s = subtree(child);
+			if (NULL == child_node_s) return NULL;
 			result = append_to(result, child_node_s);
 			free(child_node_s);
 		}
@@ -97,6 +94,7 @@ char *subtree(struct rnode *node)
 			result = append_to(result, node->label);
 		}
 		char *length_s = length(node);
+		if (NULL == length_s) return NULL;
 		result = append_to(result, length_s);
 		free(length_s);
 	}
@@ -107,6 +105,7 @@ char *to_newick(struct rnode *node)
 {
 	char *result;
 	result = subtree(node);
+	if (NULL == result) return NULL;
 	result = append_to(result, ";");
 	return result;
 }

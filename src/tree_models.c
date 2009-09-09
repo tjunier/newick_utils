@@ -142,7 +142,7 @@ double random_lt_1()
  * edge. The length is randomly drawn from an exponential distribution, but it
  * cannot exceed a certain threshold, which must be stored in the node's data.
  * The function returns the remaining time (threshold - randomly drawn length)
- * */
+ * If the function fails for some reason (e.g. no RAM left), it returns -1 */
 
 double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 		double alt_random)
@@ -169,9 +169,8 @@ double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 		length += remaining_time;
 
 	char *length_s = masprintf("%g", length);
-	if (NULL == length_s) { perror(NULL); exit(EXIT_FAILURE); }
 	free(leaf->edge_length_as_string);
-	leaf->edge_length_as_string = length_s;
+	leaf->edge_length_as_string = length_s;	/* NULL if masprintf() fails - check in caller */
 
 	/* Return the remaining time so caller f() can take action based on
 	 * whether there is time left or not */
@@ -183,14 +182,13 @@ double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 struct rnode *create_child_with_time_limit(double time_limit)
 {
 	char *label = masprintf("n%d", running_number());
-	if (NULL == label) { perror(NULL); exit(EXIT_FAILURE); }
+	if (NULL == label) 
+		return NULL;
 	struct rnode *kid = create_rnode(label, "");
 	free(label);
 	double *limit_p = malloc(sizeof(double));
-	if (NULL == limit_p) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (NULL == limit_p)
+		return NULL;
 	*limit_p = time_limit;
 
 	kid->data = limit_p;
@@ -219,11 +217,11 @@ void free_data(char *newick, struct llist *leaves_queue,
 	destroy_llist(all_children);
 }
 
-void time_limited_tree(double branch_termination_rate, double duration)
+int time_limited_tree(double branch_termination_rate, double duration)
 {
 	/* create root */
 	char *label = masprintf("n%d", running_number());
-	if (NULL == label) { perror(NULL); exit(EXIT_FAILURE); }
+	if (NULL == label) { return FAILURE; }
 	struct rnode *root = create_rnode(label, "");
 	free(label);
 
@@ -238,12 +236,14 @@ void time_limited_tree(double branch_termination_rate, double duration)
 
 	/* 1st child */
 	kid = create_child_with_time_limit(duration);
+	if (NULL == kid) return FAILURE;
 	add_child(root, kid);	/* length is determined below */
 	append_element(leaves_queue, kid);
 	append_element(all_children, kid);
 
 	/* 2nd child */
 	kid = create_child_with_time_limit(duration);
+	if (NULL == kid) return FAILURE;
 	add_child(root, kid);	
 	append_element(leaves_queue, kid);
 	append_element(all_children, kid);
@@ -253,13 +253,18 @@ void time_limited_tree(double branch_termination_rate, double duration)
 		struct rnode *current = shift(leaves_queue);
 		double remaining_time = tlt_grow_node(current,
 				branch_termination_rate, UNUSED); 
+		/* length is set by tlt_grow_node(), NULL means error */
+		if (NULL == current->edge_length_as_string)
+			return FAILURE;
 		if (remaining_time > 0) {
 			kid = create_child_with_time_limit(remaining_time);
+			if (NULL == kid) return FAILURE;
 			add_child(current, kid);
 			append_element(leaves_queue, kid);
 			append_element(all_children, kid);
 
 			kid = create_child_with_time_limit(remaining_time);
+			if (NULL == kid) return FAILURE;
 			add_child(current, kid);
 			append_element(leaves_queue, kid);
 			append_element(all_children, kid);
@@ -270,4 +275,6 @@ void time_limited_tree(double branch_termination_rate, double duration)
 	printf("%s\n", newick);
 
 	free_data(newick, leaves_queue, root, all_children);
+
+	return SUCCESS;
 }

@@ -205,10 +205,13 @@ static int get_group_type(const char *type)
  * and a list of labels. The style will apply to the clade defined by the
  * labels (if the type is CLADE) or to all individual nodes in the list (if the
  * style is INDIVIDUAL). */
+/* TODO: NULL is returned in two cases: if there is an error, or if
+ * css_map_file is NULL. The former is OK, the latter is not. It would be
+ * better not to call the function al all in this case. */
 
 struct llist *read_css_map()
 {
-	if (NULL == css_map_file)  return NULL; 
+	if (NULL == css_map_file)  return NULL; // see TODO above...
 
 	struct llist *css_map = create_llist();
 
@@ -217,7 +220,7 @@ struct llist *read_css_map()
 	while ((line = read_line(css_map_file)) != NULL) {
 		struct css_map_element *css_el = malloc(
 				sizeof(struct css_map_element));
-		if (NULL == css_el) { perror(NULL); exit(EXIT_FAILURE); }
+		if (NULL == css_el) return;
 
 		/* Split line into whitespace-separated "words" (or words
 		 * delimited by double quotes). First word is the CSS
@@ -256,7 +259,7 @@ struct llist *read_css_map()
 }
 
 /* Builds an ornament map structure. This is like the CSS map, but for
- * ornaments. */
+ * ornaments. Also returns NULL on error. */
 
 struct llist *read_ornament_map()
 {
@@ -268,7 +271,7 @@ struct llist *read_ornament_map()
 	while ((line = read_line(ornament_map_file)) != NULL) {
 		struct ornament_map_element *oel = malloc(
 				sizeof(struct ornament_map_element));
-		if (NULL == oel) { perror(NULL); exit(EXIT_FAILURE); }
+		if (NULL == oel) return NULL;
 
 		/* Split line into whitespace-separated "words" (or words
 		 * delimited by double quotes). First word is the ornament ,
@@ -304,11 +307,11 @@ struct llist *read_ornament_map()
 	return ornament_map;
 }
 
-/* Reads in the URL map (label -> URL) */
+/* Reads in the URL map (label -> URL), returns NULL on error. */
 
 struct hash *read_url_map()
 {
-	if (NULL == url_map_file) return NULL;
+	if (NULL == url_map_file) return NULL; // TODO: see read_css_map()
 
 	struct hash *url_map = create_hash(URL_MAP_SIZE);
 
@@ -322,9 +325,7 @@ struct hash *read_url_map()
 		char *escaped_url = escape_predefined_character_entities(url);
 		char *anchor_attributes;
 		anchor_attributes = masprintf("xlink:href='%s' ", escaped_url);
-		if (NULL == anchor_attributes) {
-			perror(NULL); exit (EXIT_FAILURE);
-		}
+		if (NULL == anchor_attributes) return NULL;
 		char *att;
 		while ((att = wt_next(wtok)) != NULL) {
 			int att_len = strlen(anchor_attributes);
@@ -334,10 +335,7 @@ struct hash *read_url_map()
 			att_len += 1;	/* terminal '\0' */
 			anchor_attributes = realloc(anchor_attributes,
 				att_len * sizeof(char));
-			if (NULL == anchor_attributes) {
-				perror(NULL);
-				exit(EXIT_FAILURE);
-			}
+			if (NULL == anchor_attributes) return NULL;
 			strcat(anchor_attributes, att);
 			strcat(anchor_attributes, " ");
 
@@ -359,6 +357,7 @@ struct hash *read_url_map()
 
 void svg_init()
 {
+	// TODO: check the return values of the read_*_map() functions, and report any problems (bit vector?)
 	css_map = read_css_map();
 	ornament_map = read_ornament_map();
 	url_map = read_url_map();
@@ -526,8 +525,9 @@ void set_ornaments(struct rooted_tree *tree)
 /* Allocates and initializes an svg_data structure for each of the tree's
  * nodes. The real data are set later through callbacks (see
  * svg_set_node_top(), etc) */
+/* Returns FAILURE IFF there is any problem (malloc(), in this case) */
 
-void svg_alloc_node_pos(struct rooted_tree *tree) 
+int svg_alloc_node_pos(struct rooted_tree *tree) 
 {
 	struct list_elem *le;
 	struct rnode *node;
@@ -535,12 +535,13 @@ void svg_alloc_node_pos(struct rooted_tree *tree)
 	for (le = tree->nodes_in_order->head; NULL != le; le = le->next) {
 		node = le->data;
 		struct svg_data *svgd = malloc(sizeof(struct svg_data));
-		if (NULL == svgd) { perror(NULL); exit (EXIT_FAILURE); }
+		if (NULL == svgd) return FAILURE;
 		svgd->top = svgd->bottom = svgd->depth = -1.0;
 		svgd->group_nb = UNSTYLED_CLADE;	
 		svgd->ornament = NULL;
 		node->data = svgd;
 	}
+	return SUCCESS;
 }
 
 void svg_set_node_top (struct rnode *node, double top)
@@ -670,14 +671,14 @@ void draw_scale_bar(int hpos, double vpos,
 	printf ("</g>");
 }
 
-void display_svg_tree(struct rooted_tree *tree, int align_leaves,
+int display_svg_tree(struct rooted_tree *tree, int align_leaves,
 		int with_scale_bar, char *branch_length_unit)
 {	
 	assert(init_done);
 
 	/* set node positions - these are a property of the tree, and are
 	 * independent of the graphics port or style */
- 	svg_alloc_node_pos(tree);
+ 	if (! svg_alloc_node_pos(tree)) return FAILURE;
 	set_node_vpos_cb(tree,
 			svg_set_node_top, svg_set_node_bottom,
 			svg_get_node_top, svg_get_node_bottom);
