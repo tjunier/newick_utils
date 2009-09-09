@@ -100,14 +100,15 @@ int insert_node_above(struct rnode *this, char *label)
 {
 	struct rnode *parent;
 	struct rnode *new;
-	char * new_edge_length;	/* both new edges have 1/2 the length of the old one */
+	char * new_edge_length;	/* both new edges have 1/2 the length of the
+				   old one */
 
 	/* find parent edge and parent node */
 	parent = this->parent;
 	new_edge_length = compute_new_edge_length(this->edge_length_as_string);
 	/* create new node */
 	new = create_rnode(label, new_edge_length);
-	if (NULL == new) return FAILURE; // TODO: caller should check!
+	if (NULL == new) return FAILURE;
 	/* link new node to this node */
 	add_child(new, this);
 	free(this->edge_length_as_string);
@@ -115,6 +116,8 @@ int insert_node_above(struct rnode *this, char *label)
 	replace_child(parent, this, new);
 
 	free(new_edge_length);
+
+	return SUCCESS;
 }
 	
 void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)

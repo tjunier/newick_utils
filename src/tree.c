@@ -92,6 +92,8 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	 * For now we annull it so it cannot be used. */
         destroy_llist(tree->nodes_in_order);
 	tree->nodes_in_order = NULL;
+
+	return SUCCESS;
 }
 
 /* Returns true IFF all children are leaves. Assumes n is not a leaf. */

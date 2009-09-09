@@ -43,10 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hash.h"
 #include "common.h"
 
-/* return values for reroot() */ /* TODO: replace with an enum? */
-const int OK = 0;
-const int NO_LCA = 1;
-const int LCA_IS_TREE_ROOT = 2;
+enum reroot_status {
+	OK,
+	NO_LCA,			/* Can't find last common ancestor */
+	LCA_IS_TREE_ROOT,	/* LCA is the tree's root */
+	CANT_REROOT };		/* Could not reroot (malloc() problem) */
 
 struct parameters {
 	struct llist *labels;
@@ -192,13 +193,10 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 		if (tree->root == outgroup_root) {
 			return LCA_IS_TREE_ROOT;
 		}
-		reroot_tree (tree, outgroup_root);
-		char *newick = to_newick(tree->root);
-		printf ("%s\n", newick);
-		free(newick);
+		if (! reroot_tree (tree, outgroup_root))
+			return CANT_REROOT;
 		return OK;
 	} else {
-		fprintf (stderr, "Could not find LCA.\n");
 		return NO_LCA;
 	}
 }
@@ -220,15 +218,15 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 	struct llist *result = create_llist();
 	struct list_elem *el;
 
-	/* add nodes to result iff i) node is a leaf, ii) node's label is not among
-	 * 'excluded_labels' */ 
+	/* add nodes to result iff i) node is a leaf, ii) node's label is not
+	 * among 'excluded_labels' */ 
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = (struct rnode *) el->data;
 		if (is_leaf(current)) {
-			/* Can't use llist_index_of(), because it compares the addresses of
-			 * the 'data' members of elements. Instead we must check string
-			 * equality, which is why we use llist_index_of_f(), and pass it
-			 * string_eq(). */
+			/* Can't use llist_index_of(), because it compares the
+			 * addresses of the 'data' members of elements. Instead
+			 * we must check string equality, which is why we use
+			 * llist_index_of_f(), and pass it string_eq(). */
 			if (llist_index_of_f(excluded_labels, string_eq,
 						current->label) == -1) {
 				append_element(result, current);
@@ -239,6 +237,35 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 	return result;
 }
 
+void try_ingroup(struct rooted_tree *tree, struct parameters params)
+{
+	/* we will try to insert the root above the ingroup - for this we'll
+	 * need all leaves that are NOT in the outgroup. */
+	struct llist *ingroup_leaves;
+	ingroup_leaves = get_ingroup_leaves(tree, params.labels);
+	enum reroot_status result = reroot(tree, ingroup_leaves);
+	char *newick;
+	switch (result) {
+		case OK:
+			newick = to_newick(tree->root);
+			printf ("%s\n", newick);
+			free(newick);
+			break;
+		case LCA_IS_TREE_ROOT:
+			fprintf (stderr, "LCA is still tree's root "
+				"- be sure to include ALL outgroup "
+				"leaves with -l");
+			break;
+		case NO_LCA:
+			fprintf(stderr, "Can't find last common ancestor.\n");
+			break;
+		case CANT_REROOT:
+			fprintf(stderr, "Memory error - exiting.\n");
+			exit(EXIT_FAILURE);
+			break;
+	}
+	destroy_llist(ingroup_leaves);
+}
 
 /* Tries to reroot 'directly', i.e. using outgroup. If this fails (because the
  * outgroup's LCA is the tree's root) and 'try_ingroup' is true (option -l),
@@ -247,23 +274,30 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct llist *outgroup_nodes = get_outgroup_nodes(tree, params.labels);
-	int result = reroot(tree, outgroup_nodes);
-	if (LCA_IS_TREE_ROOT == result) {
-		if (params.try_ingroup) {
-			/* we will try to insert the root above the
-			 * ingroup - for this we'll need all leaves
-			 * that are NOT in the outgroup. */
-			struct llist *ingroup_leaves;
-			ingroup_leaves = get_ingroup_leaves(tree, params.labels);
-			result = reroot(tree, ingroup_leaves);
-			if (LCA_IS_TREE_ROOT == result) {
-				fprintf (stderr, "LCA is still tree's root - be sure to include ALL ougroup leaves with -l");
+	enum reroot_status result = reroot(tree, outgroup_nodes);
+	char *newick;
+	switch (result) {
+		case OK:
+			newick = to_newick(tree->root);
+			printf ("%s\n", newick);
+			free(newick);
+			break;
+		case LCA_IS_TREE_ROOT:
+			if (params.try_ingroup)
+				try_ingroup(tree, params);
+			else {
+				fprintf (stderr,
+					"Outgroup's LCA is tree's root "
+					"- cannot reroot. Try -l.\n");
 			}
-			destroy_llist(ingroup_leaves);
-		}
-		else {
-			fprintf (stderr, "Outgroup's LCA is tree's root - cannot reroot. Try -l.\n");
-		}
+			break;
+		case NO_LCA:
+			fprintf(stderr, "Can't find last common ancestor.\n");
+			break;
+		case CANT_REROOT:
+			fprintf(stderr, "Memory error - exiting.\n");
+			exit(EXIT_FAILURE);
+			break;
 	}
 	destroy_llist(outgroup_nodes);
 }
