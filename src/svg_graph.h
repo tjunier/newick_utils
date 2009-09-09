@@ -27,7 +27,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-enum { SVG_ORTHOGONAL, SVG_RADIAL };
+enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
+enum display_status { DISPLAY_OK, DISPLAY_UNKNOWN_STYLE, DISPLAY_MEM_ERROR };
 
 /* Functions for displaying a tree as SVG. User should call any of the
  * set_svg_*() functions that are needed, then svg_init(), then svg_header(),
@@ -62,7 +63,7 @@ void svg_header();
  * either SVG_ORTHOGONAL or SVG_RADIAL. */
 /* Returns SUCCESS unless there was any problem. */
 
-int display_svg_tree(struct rooted_tree *, int align_leaves,
+enum display_status display_svg_tree(struct rooted_tree *, int align_leaves,
 		int with_scale_bar, char *branch_length_unit);
 
 /* Writes an SVG footer */

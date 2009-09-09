@@ -211,8 +211,6 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		ndata->distance_depth = edge_length + parent_data->distance_depth;
 		ndata->ancestry_depth = 1 + parent_data->ancestry_depth;
 
-		/* To trim or not to trim? */
-		bool to_trim = false;
 		switch (params.depth_type) {
 		case DEPTH_DISTANCE:
 			if (ndata->distance_depth > params.threshold)

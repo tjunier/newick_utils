@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "readline.h"
 
+enum read_status read_line_status;
+
 char * read_line(FILE *file)
 {
 	char *line;
@@ -44,8 +46,8 @@ char * read_line(FILE *file)
 
 	fpos = ftell(file);	/* remember where we start */
 	if (-1 == fpos) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
+		read_line_status = READLINE_ERROR;
+		return NULL;
 	}
 
 	/* find next newline */
@@ -56,19 +58,22 @@ char * read_line(FILE *file)
 	}
 
 	/* return NULL if EOF and line length is 0 */
-	if (feof(file) && 0 == len) return NULL;
+	if (feof(file) && 0 == len) {
+		read_line_status = READLINE_EOF;
+		return NULL;
+	}	
 
 	/* allocate memory for line */
 	line = malloc((1 + len) * sizeof(char));
 	if (NULL == line) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
+		read_line_status = READLINE_ERROR;
+		return NULL;
 	}
 
 	/* return to where we started */
 	if (-1 == fseek(file, fpos, SEEK_SET)) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
+		read_line_status = READLINE_ERROR;
+		return NULL;
 	}
 
 	fgets(line, len+1, file);

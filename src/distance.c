@@ -257,11 +257,12 @@ struct parameters get_params(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (alternative_format)
+	if (alternative_format) {
 		if (MATRIX == params.distance_type)
 			params.matrix_shape = TRIANGLE;
 		else
 			params.list_orientation = HORIZONTAL;
+	}
 
 
 	return params;

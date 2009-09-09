@@ -354,6 +354,7 @@ static struct rnode *clone_clade(struct rnode *root)
 {
 	struct rnode *root_clone = create_rnode(root->label,
 			root->edge_length_as_string);
+	if (NULL == root_clone) return NULL;
 	struct list_elem *el;
 	for (el = root->children->head; NULL != el; el = el->next) {
 		struct rnode *kid = el->data;
@@ -367,6 +368,7 @@ static struct rnode *clone_clade(struct rnode *root)
 struct rooted_tree* clone_subtree(struct rnode *root)
 {
 	struct rnode *root_clone = clone_clade(root);
+	if (NULL == root_clone) return NULL;
 	struct llist *nodes_in_order_clone = get_nodes_in_order(root_clone);
 
 	struct rooted_tree *clone = malloc(sizeof(struct rooted_tree));

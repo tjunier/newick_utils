@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -127,12 +128,16 @@ struct hash *read_map(const char *filename)
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		key = wt_next(wtok);	/* find first whitespace */
 		if (NULL == key) {
-			fprintf (stderr, "Invalid line format in map file %s: '%s'\n", filename, line);
+			fprintf (stderr,
+				"Invalid line format in map file %s: '%s'\n",
+				filename, line);
 			exit(EXIT_FAILURE);
 		}
 		value = wt_next(wtok);
 		if (NULL == value) {
-			fprintf (stderr, "Invalid line format in map file %s: '%s'\n", filename, line);
+			fprintf (stderr,
+				"Invalid line format in map file %s: '%s'\n",
+				filename, line);
 			exit(EXIT_FAILURE);
 		}
 		hash_set(map, key, (void *) value);
@@ -141,7 +146,15 @@ struct hash *read_map(const char *filename)
 		free(line);
 	}
 
-	return map;
+	// TODO: have caller check value
+	switch (read_line_status) {
+		case READLINE_EOF:
+			return map;
+		case READLINE_ERROR:
+			return NULL;
+		default:
+			assert(0);	/* programmer error */
+	}
 }
 
 struct parameters get_params(int argc, char *argv[])

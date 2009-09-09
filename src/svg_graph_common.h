@@ -66,7 +66,11 @@ void set_svg_leaf_label_style(char *);
 void set_svg_inner_label_style(char *);
 void set_svg_edge_label_style(char *);
 void set_svg_plain_node_style(char *);
+void set_svg_root_length(int);
+void set_svg_label_char_width(double);
 
 /* Returns the largest power of ten not greater than argument */
 
 double largest_PoT_lte(double);
+
+void draw_scale_bar(int, double, double, double, char *);

@@ -34,8 +34,8 @@ struct rnode;
 /* A pretty simple model where each node has a fixed probability of having 2
  * children. If set to > 0.5, the expected number of leaves is infnite and the
  * program will probably not stop of its own. */
-
-void geometric_tree(double prob_node_has_children);
+/* Returns FAILURE if there was a problem (most probably malloc()) */
+int geometric_tree(double prob_node_has_children);
 
 /* A more complicated model where each branch's length is exponentially
  * distributed (up to a duration threshold).  Returns 0 (FAILURE) IFF there is
@@ -50,6 +50,7 @@ int time_limited_tree(double branch_termination_rate, double duration);
  * supplying a known "random" value */
  /* If the function fails for some reason (e.g. no RAM left), it returns -1 */
 
+// TODO: why is this function public?
 double tlt_grow_node(struct rnode *, double branch_termination_rate,
 		double alt_random);
 

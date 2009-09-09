@@ -220,7 +220,7 @@ struct llist *read_css_map()
 	while ((line = read_line(css_map_file)) != NULL) {
 		struct css_map_element *css_el = malloc(
 				sizeof(struct css_map_element));
-		if (NULL == css_el) return;
+		if (NULL == css_el) return NULL;
 
 		/* Split line into whitespace-separated "words" (or words
 		 * delimited by double quotes). First word is the CSS
@@ -255,7 +255,15 @@ struct llist *read_css_map()
 
 	fclose(css_map_file);
 
-	return css_map;
+	// TODO: have caller check value
+	switch (read_line_status) {
+		case READLINE_EOF:
+			return css_map;
+		case READLINE_ERROR:
+			return NULL;
+		default:
+			assert(0);	/* programmer error */
+	}
 }
 
 /* Builds an ornament map structure. This is like the CSS map, but for
@@ -304,7 +312,15 @@ struct llist *read_ornament_map()
 
 	fclose(ornament_map_file);
 
-	return ornament_map;
+	// TODO: have caller check value
+	switch (read_line_status) {
+		case READLINE_EOF:
+			return ornament_map;
+		case READLINE_ERROR:
+			return NULL;
+		default:
+			assert(0);	/* programmer error */
+	}
 }
 
 /* Reads in the URL map (label -> URL), returns NULL on error. */
@@ -348,7 +364,15 @@ struct hash *read_url_map()
 		free(escaped_url);
 	}
 
-	return url_map;
+	// TODO: have caller check value
+	switch (read_line_status) {
+		case READLINE_EOF:
+			return url_map;
+		case READLINE_ERROR:
+			return NULL;
+		default:
+			assert(0);	/* programmer error */
+	}	
 }
 
 /* Call this function before calling display_svg_tree(). Resist the temptation
@@ -600,7 +624,6 @@ void draw_grid()
  * space */
 
 // TODO: first two args should both be double
-//
 void draw_scale_bar(int hpos, double vpos,
 		double h_scale, double d_max, char *branch_length_unit)
 {
@@ -611,9 +634,9 @@ void draw_scale_bar(int hpos, double vpos,
 	 * it instead. */
 
 	const int big_tick_height = 5; 			/* px */
-	const int small_tick_height = 3;		/* px */
+	// const int small_tick_height = 3;		/* px */
 	const int units_text_voffset = -18;		/* px */
-	const int vsep = 1;				/* px */
+	// const int vsep = 1;				/* px */
 	const int lbl_vspace = 2;			/* px */
 	const int lbl_hspace = 2;			/* px */
 	double pot = largest_PoT_lte(d_max);		/* tree units */
@@ -671,8 +694,11 @@ void draw_scale_bar(int hpos, double vpos,
 	printf ("</g>");
 }
 
-int display_svg_tree(struct rooted_tree *tree, int align_leaves,
-		int with_scale_bar, char *branch_length_unit)
+enum display_status display_svg_tree(
+		struct rooted_tree *tree,
+		int align_leaves,
+		int with_scale_bar,
+		char *branch_length_unit)
 {	
 	assert(init_done);
 
@@ -696,8 +722,9 @@ int display_svg_tree(struct rooted_tree *tree, int align_leaves,
 		display_svg_tree_radial(tree, hd, align_leaves,
 				with_scale_bar, branch_length_unit);
 	else
-		// TODO: better handling of errors: should return error code
-		fprintf (stderr, "Unknown tree style %d\n", graph_style);
+		return DISPLAY_UNKNOWN_STYLE;
+
+	return DISPLAY_OK;
 }
 
 void svg_footer() { printf ("</svg>\n"); }

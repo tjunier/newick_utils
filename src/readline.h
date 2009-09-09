@@ -29,6 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <stdio.h>
 
+enum read_status { READLINE_EOF, READLINE_ERROR };
+extern enum read_status read_line_status;
+
 struct word_tokenizer {
 	char *string;
 	char *word_start;
@@ -37,11 +40,14 @@ struct word_tokenizer {
 };
 
 /* Returns a line from a file, as a pointer to an allocated buffer. Returns
- * NULL if EOF. The buffer should be free()d when no longer needed. */
+ * NULL if EOF or error (the external variable readline_status will be set so
+ * that callers can tell EOF from errors). The buffer should be free()d when no
+ * longer needed. */
 
 char *read_line(FILE *);
 
-/* Creates a word tokenizer for a string, passed as arguments. Function wt_next() returns tokens. */
+/* Creates a word tokenizer for a string, passed as arguments. Function
+ * wt_next() returns tokens. */
 
 struct word_tokenizer *create_word_tokenizer(const char *);
 

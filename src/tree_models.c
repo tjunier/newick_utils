@@ -71,14 +71,16 @@ static int geo_has_children(double prob_node_has_children)
 /* Visits a leaf: probabilistically adds children to the leaf, and adds those
  * children to the leaves queue (since they are new leaves) */
 
-static void geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
+static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 		struct llist *leaves_queue)
 {
 	// printf ("visiting leaf %p (%s)\n", leaf, leaf->label);
 	if (geo_has_children(prob_node_has_children)) {
 		// printf (" gets children\n");
 		struct rnode *kid1 = create_rnode("kid1", "");	
+		if (NULL == kid1) return FAILURE;
 		struct rnode *kid2 = create_rnode("kid2", "");	
+		if (NULL == kid2) return FAILURE;
 		add_child(leaf, kid1);
 		add_child(leaf, kid2);
 		append_element(leaves_queue, kid1);
@@ -86,14 +88,17 @@ static void geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 	} else {
 		// printf (" gets no children\n");
 	}
+
+	return SUCCESS;	// TODO: check in caller
 }
 
 /* Generate a tree using the geometric model */
 
-void geometric_tree(double prob_node_has_children)
+int geometric_tree(double prob_node_has_children)
 {
 	struct llist *leaves_queue = create_llist();
 	struct rnode *root = create_rnode("root", "");
+	if (NULL == root) return FAILURE;
 
 	append_element(leaves_queue, root);
 
@@ -116,6 +121,8 @@ void geometric_tree(double prob_node_has_children)
 	printf("%s\n", newick);
 	free(newick);
 	destroy_llist(leaves_queue);
+
+	return SUCCESS;	// TODO: check in caller
 }
 
 /******************************************************************/
@@ -185,6 +192,7 @@ struct rnode *create_child_with_time_limit(double time_limit)
 	if (NULL == label) 
 		return NULL;
 	struct rnode *kid = create_rnode(label, "");
+	if (NULL == kid) return NULL;
 	free(label);
 	double *limit_p = malloc(sizeof(double));
 	if (NULL == limit_p)

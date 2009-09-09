@@ -34,6 +34,8 @@ extern double leaf_vskip;
 
 /* Functions for drawing orthogonal trees */
 
+int graph_height(int, int);
+
 void display_svg_tree_orthogonal (
 		struct rooted_tree *tree,
 		struct h_data hd,

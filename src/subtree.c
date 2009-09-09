@@ -250,7 +250,6 @@ int is_monophyletic(struct llist *descendants, struct rnode *subtree_root)
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct llist *descendants;
-	regex_t *preg;
 
 	switch (params.mode) {
 	case EXACT:
