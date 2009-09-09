@@ -43,6 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "readline.h"
 #include "common.h"
 
+enum read_map_error_type { READ_MAP_FOPEN, READ_MAP_FORMAT, READ_MAP_MEM };
+
+static enum read_map_error_type read_map_error;
+static char* read_map_error_line;
+
 struct parameters {
 	char  *map_filename;
 	int only_leaves;
@@ -119,26 +124,31 @@ struct hash *read_map(const char *filename)
 	const int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
 
 	FILE *map_file = fopen(filename, "r");
-	if (NULL == map_file) { perror(NULL); exit(EXIT_FAILURE); }
+	if (NULL == map_file) {
+		read_map_error = READ_MAP_FOPEN;
+		return NULL;
+	}
 
 	struct hash *map = create_hash(HASH_SIZE);
 	char *line;
 	while (NULL != (line = read_line(map_file))) {
 		char *key, *value;
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		if (NULL == wtok) {
+			read_map_error = READ_MAP_MEM;
+			return NULL; // TODO: have caller check value
+		}
 		key = wt_next(wtok);	/* find first whitespace */
 		if (NULL == key) {
-			fprintf (stderr,
-				"Invalid line format in map file %s: '%s'\n",
-				filename, line);
-			exit(EXIT_FAILURE);
+			read_map_error = READ_MAP_FORMAT;
+			read_map_error_line = line;
+			return NULL;
 		}
 		value = wt_next(wtok);
 		if (NULL == value) {
-			fprintf (stderr,
-				"Invalid line format in map file %s: '%s'\n",
-				filename, line);
-			exit(EXIT_FAILURE);
+			read_map_error = READ_MAP_FORMAT;
+			read_map_error_line = line;
+			return NULL;
 		}
 		hash_set(map, key, (void *) value);
 		destroy_word_tokenizer(wtok);
@@ -151,6 +161,7 @@ struct hash *read_map(const char *filename)
 		case READLINE_EOF:
 			return map;
 		case READLINE_ERROR:
+			read_map_error = READ_MAP_MEM;
 			return NULL;
 		default:
 			assert(0);	/* programmer error */

@@ -228,6 +228,7 @@ struct llist *read_css_map()
 		 * */
 		struct llist *label_list = create_llist();
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		if (NULL == wtok) return NULL;
 		char *style = wt_next_noquote(wtok);
 		char *type = wt_next(wtok);
 		char *label;
@@ -287,6 +288,7 @@ struct llist *read_ornament_map()
 
 		struct llist *label_list = create_llist();
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		if (NULL == wtok) return NULL;
 		char *ornament = wt_next_noquote(wtok);
 		char *type = wt_next(wtok);
 		char *label;
@@ -334,6 +336,7 @@ struct hash *read_url_map()
 	char *line;
 	while ((line = read_line(url_map_file)) != NULL) {
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		if (NULL == wtok) return NULL;
 		char *label = wt_next(wtok);
 		underscores2spaces(label);
 		remove_quotes(label);

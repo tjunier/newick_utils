@@ -30,7 +30,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 
 enum read_status { READLINE_EOF, READLINE_ERROR };
+
 extern enum read_status read_line_status;
+
+enum next_status { NEXT_TOKEN_END, NEXT_TOKEN_ERROR };
+
+extern enum next_status next_token_status;
 
 struct word_tokenizer {
 	char *string;
@@ -40,14 +45,15 @@ struct word_tokenizer {
 };
 
 /* Returns a line from a file, as a pointer to an allocated buffer. Returns
- * NULL if EOF or error (the external variable readline_status will be set so
- * that callers can tell EOF from errors). The buffer should be free()d when no
- * longer needed. */
+ * NULL if EOF or error (the external variable 'read_line_status' will be set
+ * so that callers can tell EOF from errors). The buffer should be free()d when
+ * no longer needed. */
 
 char *read_line(FILE *);
 
 /* Creates a word tokenizer for a string, passed as arguments. Function
  * wt_next() returns tokens. */
+/* Returns NULL if the structure can't be created (malloc() error) */
 
 struct word_tokenizer *create_word_tokenizer(const char *);
 
@@ -55,6 +61,9 @@ struct word_tokenizer *create_word_tokenizer(const char *);
  * space for the token, which must e free()d later.  Quote-delimited strings
  * (single and double quotes) are honored, i.e. 'two words' is a single token,
  * and the quotes are retained (because they are valid in Newick labels). */
+/* Returns NULL when there is no more token, or in case of error. The external
+ * variable 'next_token_status' will be set so that the caller can know what
+ * caused NULL. */
 
 char *wt_next(struct word_tokenizer *);
 

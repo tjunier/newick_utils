@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct llist *nodes_in_order;
 struct rnode *root;
-enum parser_status status;
+enum parser_status_type newick_parser_status;
 
 int nwsparse(); // TODO: rm this if fails
 
@@ -47,8 +47,8 @@ struct rooted_tree *parse_tree()
 
 	tree = malloc(sizeof(struct rooted_tree));
 	if(NULL == tree) {
-		perror(NULL);
-		exit(EXIT_FAILURE);
+		newick_parser_status = PARSER_STATUS_MALLOC_ERROR; 
+		return NULL;
 	}
 
 	nodes_in_order = create_llist();

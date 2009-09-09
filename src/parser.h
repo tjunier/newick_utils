@@ -28,7 +28,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-enum parser_status { PARSER_STATUS_OK, PARSER_STATUS_EMPTY, PARSER_STATUS_PARSE_ERROR, PARSER_STATUS_MALLOC_ERROR };
+enum parser_status_type {
+	PARSER_STATUS_OK,
+	PARSER_STATUS_EMPTY,
+	PARSER_STATUS_PARSE_ERROR,
+	PARSER_STATUS_MALLOC_ERROR
+};
 struct rooted_tree;
 
 /* Parses a tree from nwsin, returns a pointer to a tree structure, or NULL if

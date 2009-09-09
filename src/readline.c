@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "readline.h"
 
 enum read_status read_line_status;
+enum next_status next_token_status;
 
 char * read_line(FILE *file)
 {
@@ -87,7 +88,7 @@ char * read_line(FILE *file)
 struct word_tokenizer *create_word_tokenizer(const char *string)
 {
 	struct word_tokenizer *wt = malloc(sizeof(struct word_tokenizer));
-	if (NULL == wt) { perror(NULL); exit(EXIT_FAILURE); }
+	if (NULL == wt) return NULL;
 
 	wt->string = strdup(string);
 	wt->string_len = strlen(wt->string);
@@ -101,6 +102,7 @@ char *wt_next(struct word_tokenizer *wt)
 {
 	/* No more tokens to parse */
 	if (wt->word_start >= wt->string + wt->string_len) {
+		next_token_status = NEXT_TOKEN_END;
 		return NULL;
 	}
 
@@ -112,18 +114,24 @@ char *wt_next(struct word_tokenizer *wt)
 	 * the next ' or "; otherwise look for whitespace or NULL. */
 	if (*wt->word_start == '\'') {
 		wt->word_stop = 1 + strpbrk(wt->word_start + 1, "'");
-		if (NULL == wt->word_stop) { wt->word_stop = wt->string + wt->string_len; }
+		if (NULL == wt->word_stop) {
+			wt->word_stop = wt->string + wt->string_len; }
 	} else if (*wt->word_start == '"') {
 		wt->word_stop = 1 + strpbrk(wt->word_start + 1, "\"");
-		if (NULL == wt->word_stop) { wt->word_stop = wt->string + wt->string_len; }
+		if (NULL == wt->word_stop) {
+			wt->word_stop = wt->string + wt->string_len; }
 	} else {
 		wt->word_stop = strpbrk(wt->word_start, " \t\n");
-		if (NULL == wt->word_stop) { wt->word_stop = wt->string + wt->string_len; }
+		if (NULL == wt->word_stop) {
+			wt->word_stop = wt->string + wt->string_len; }
 	}
 	/* Find the word's length, and allocate memory for it */
 	int wlen = wt->word_stop - wt->word_start;
 	char *word = malloc((wlen + 1) * sizeof(char));
-	if (NULL == word) { perror(NULL); exit(EXIT_FAILURE); }
+	if (NULL == word) { 
+		next_token_status = NEXT_TOKEN_ERROR;
+		return NULL;
+	}
 	/* Copy the word into the allocated space, terminating the string */
 	strncpy(word, wt->word_start, wlen);
 	word[wlen] = '\0';
@@ -134,6 +142,7 @@ char *wt_next(struct word_tokenizer *wt)
 	return word;
 }
 
+// TODO: have caller check value
 char *wt_next_noquote(struct word_tokenizer *wt)
 {
 	char *word = wt_next(wt);
@@ -144,8 +153,8 @@ char *wt_next_noquote(struct word_tokenizer *wt)
 		if (word[len-1] == word[0]) {
 			char *unquoted = malloc((len) * sizeof(char));
 			if (NULL == unquoted) {
-				perror(NULL);
-				exit(EXIT_FAILURE);
+				next_token_status = NEXT_TOKEN_ERROR;
+				return NULL;
 			}
 			strncpy(unquoted, word+1, len-2);
 			unquoted[len-2] = '\0';
