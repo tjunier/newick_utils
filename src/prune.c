@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "tree.h"
 #include "nodemap.h"
@@ -155,7 +156,20 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 					label);
 			continue;
 		}
-		unlink_rnode (goner);
+		enum unlink_rnode_status result = unlink_rnode(goner);
+		switch(result) {
+		case UNLINK_RNODE_DONE:
+			break;
+		case UNLINK_RNODE_ROOT_CHILD:
+			unlink_rnode_root_child->parent = NULL;
+			tree->root = unlink_rnode_root_child;
+			break;
+		case UNLINK_RNODE_ERROR:
+			fprintf (stderr, "Memory error - exiting.\n");
+			exit(EXIT_FAILURE);
+		default:
+			assert(0); /* programmer error */
+		}
 	}
 
 	destroy_hash(lbl2node_map);

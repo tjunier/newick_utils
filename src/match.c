@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <assert.h>
 
 /*
 #include <assert.h>
@@ -218,7 +219,23 @@ void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 		if (is_root(current)) continue;
 		if (NULL == hash_get(kept, current->label)) {
 			/* not in 'kept': remove */
-			unlink_rnode(current);
+			enum unlink_rnode_status result = unlink_rnode(current);
+			switch(result) {
+			case UNLINK_RNODE_DONE:
+				break;
+			case UNLINK_RNODE_ROOT_CHILD:
+				/* TODO: shouldn't we do this?
+				unlink_rnode_root_child->parent = NULL;
+				target_tree->root = unlink_rnode_root_child;
+				*/
+				break;
+			case UNLINK_RNODE_ERROR:
+				fprintf (stderr, "Memory error - "
+						"exiting.\n");
+				exit(EXIT_FAILURE);
+			default:
+				assert(0); /* programmer error */
+			}
 		}
 	}
 }
@@ -233,8 +250,26 @@ void prune_empty_labels(struct rooted_tree *target_tree)
 		struct rnode *current = el->data;
 		char *label = current->label;
 		if (is_leaf(current)) {
-			if (0 == strcmp("", label))
-				unlink_rnode(current);
+			if (0 == strcmp("", label)) {
+				enum unlink_rnode_status result =
+					unlink_rnode(current);
+				switch(result) {
+				case UNLINK_RNODE_DONE:
+					break;
+				case UNLINK_RNODE_ROOT_CHILD:
+					/* TODO: shouldn't we do this?
+					unlink_rnode_root_child->parent = NULL;
+					target_tree->root = unlink_rnode_root_child;
+					*/
+					break;
+				case UNLINK_RNODE_ERROR:
+					fprintf (stderr, "Memory error - "
+							"exiting.\n");
+					exit(EXIT_FAILURE);
+				default:
+					assert(0); /* programmer error */
+				}
+			}
 		}
 	}
 	destroy_llist(nodes_in_order);
