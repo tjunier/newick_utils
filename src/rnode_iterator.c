@@ -39,14 +39,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SEEN "SEEN"
 
 static const int INIT_HASH_SIZE = 1000;
+enum iter_status { RNODE_ITERATOR_END, RNODE_ITERATOR_ERROR };
 
 struct rnode_iterator
 {
 	struct rnode *root;	/* starting point */
 	struct rnode *current;
 	struct hash *seen;
+	enum iter_status status;
 };
 
+// TODO: have caller check for NULL
 struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 {
 	struct rnode_iterator *iter;
@@ -55,6 +58,7 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 
 	iter->root = iter->current = root;
 	iter->seen = create_hash(INIT_HASH_SIZE);
+	if (NULL == iter->seen) return NULL;
 
 	return iter;
 }
@@ -101,12 +105,16 @@ static struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 	return NULL;	/* no unvisited child left */
 }
 
+// TODO: have caller check for NULL and status
 struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 {
 	char *current_node_hash_key = make_hash_key(iter->current);
 
 	if (is_leaf(iter->current)) {
-		hash_set(iter->seen, current_node_hash_key, SEEN);
+		if (! hash_set(iter->seen, current_node_hash_key, SEEN)) {
+			iter->status = RNODE_ITERATOR_ERROR;
+			return NULL;
+		}
 		iter->current = iter->current->parent;
 		free(current_node_hash_key);
 		return iter->current;
@@ -118,9 +126,14 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 			free(current_node_hash_key);
 			return iter->current;
 		} else {
-			hash_set(iter->seen, current_node_hash_key, SEEN);
+			if (! hash_set(iter->seen, current_node_hash_key,
+						SEEN)) {
+				iter->status = RNODE_ITERATOR_ERROR;
+				return NULL;
+			}
 			free(current_node_hash_key);
 			if (iter->current == iter->root) {
+				iter->status = RNODE_ITERATOR_END;
 				return NULL;
 			} else {
 				iter->current = iter->current->parent;
@@ -133,10 +146,12 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 /* Computes the list by doing a tree traversal, then reversing it, printing out
  * each node the first time it sees it. */
 
+// TODO: have caller check for NULL
 struct llist *get_nodes_in_order(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);
 	struct hash *seen = create_hash(INIT_HASH_SIZE);
+	if (NULL == seen) return NULL;
 	struct rnode *current;
 	struct llist *traversal = create_llist();
 	struct llist *reverse_traversal;
@@ -162,7 +177,8 @@ struct llist *get_nodes_in_order(struct rnode *root)
 		if (NULL == hash_get(seen, current_hash_key)) {
 			append_element (nodes_in_reverse_order, current);
 			/* Could use anything - existential hash */
-			hash_set(seen, current_hash_key, current);
+			if (! hash_set(seen, current_hash_key, current))
+				return NULL;
 		}
 		free(current_hash_key);
 	}
@@ -180,11 +196,14 @@ struct hash *get_leaf_label_map(struct rnode *root)
 	struct rnode_iterator *it = create_rnode_iterator(root);
 	struct rnode *current;
 	struct hash *result = create_hash(INIT_HASH_SIZE);
+	if (NULL == result) return NULL;
 
 	while ((current = rnode_iterator_next(it)) != NULL) {
 		if (is_leaf(current)) {
 			if (strcmp("", current->label) != 0) {
-				hash_set(result, current->label, current);
+				if (! hash_set(result,
+					current->label, current)) 
+						return NULL;
 			}
 		}
 	}

@@ -119,6 +119,7 @@ void help(char *argv[])
 	);
 }
 
+// TODO: have caller check value
 struct hash *read_map(const char *filename)
 {
 	const int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
@@ -130,13 +131,18 @@ struct hash *read_map(const char *filename)
 	}
 
 	struct hash *map = create_hash(HASH_SIZE);
+	if (NULL == map) {
+		read_map_error = READ_MAP_MEM;
+		return NULL;
+	}
+
 	char *line;
 	while (NULL != (line = read_line(map_file))) {
 		char *key, *value;
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) {
 			read_map_error = READ_MAP_MEM;
-			return NULL; // TODO: have caller check value
+			return NULL; 
 		}
 		key = wt_next(wtok);	/* find first whitespace */
 		if (NULL == key) {
@@ -150,7 +156,10 @@ struct hash *read_map(const char *filename)
 			read_map_error_line = line;
 			return NULL;
 		}
-		hash_set(map, key, (void *) value);
+		if (! hash_set(map, key, (void *) value)) {
+			read_map_error = READ_MAP_MEM;
+			return NULL;
+		}
 		destroy_word_tokenizer(wtok);
 		free(key); /* copied by hash_set(), so can be free()d now */
 		free(line);

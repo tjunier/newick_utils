@@ -36,6 +36,7 @@ struct llist;
  * nodes, keyed by label. Empty labels are ignored. Labels should be unique.
  * Redundant labels will not cause a crash, but may cause unexpected results as
  * the "map" will not be one-to-one. */
+/* Returns NULL in case of malloc() error. */
 
 struct hash *create_label2node_map(const struct llist *);
 
@@ -44,6 +45,7 @@ struct hash *create_label2node_map(const struct llist *);
  * labels (cf create_label2node_map() which assumes labels are unique). Empty
  * labels are treated like any other label. Nodes of the same label are stored
  * in the order they are in the parameter list. */
+/* Returns NULL in case of malloc() error. */
 
 struct hash *create_label2node_list_map(const struct llist *);
 

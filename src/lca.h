@@ -35,6 +35,7 @@ struct llist;
  * NOTE: Both nodes are assumed to belong to the tree; if this is
  * not the case, then the function will return the tree's root or
  * may hang.  NOTE: Clobbers node->data. */
+/* Returns NULL in case of malloc() error. */
 
 struct rnode *lca2(struct rooted_tree *, struct rnode *,
 		struct rnode *);

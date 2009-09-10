@@ -379,7 +379,11 @@ int main(int argc, char *argv[])
 	/* for now, SVG can only handle one tree */
 	if (params.svg) {
 		set_svg_parameters(params);
-		svg_init();
+		if(! svg_init()) {
+			fprintf (stderr, "Could not initialize SVG"
+					" (memory problem) - exiting.\n");
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	while (NULL != (tree = parse_tree())) {

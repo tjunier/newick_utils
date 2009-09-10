@@ -1,9 +1,10 @@
-CURRENTLY: ensuring that the return value of create_rnode() is being checked.
+general: functions that return FAILURE or NULL sould free() whatever they have
+allocated before returning. -- or should they? if there is not enough memory
+and the program is going to exit, is it worth the trouble?
 
-general: library functions should not call exit() - this should only be found
-in app code. This is especially true since we're writing Python bindings: a
-Python app may not want to exit() just because our function can't complete -
-rather it would throw an exception.
+general: check that the functions return an error code in case of problem
+(which is almost always a malloc() error). Check that this value is heeded by
+the caller.
 
 nw_tree: add a test for many input trees when using the -r option
 
@@ -313,3 +314,8 @@ This should simplify things and speed them up a little.
 contain the main() fucntion of the programs themselves) into a library, and
 link to it. Use dynamic linking except when distributing binaries, which should
 be statically linked (use ./configure --disable-shared).
+
+[done] general: library functions should not call exit() - this should only be
+found in app code. This is especially true since we're writing Python
+bindings: a Python app may not want to exit() just because our function can't
+complete - rather it would throw an exception.

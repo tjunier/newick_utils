@@ -208,8 +208,6 @@ static int get_group_type(const char *type)
 
 struct llist *read_css_map()
 {
-	if (NULL == css_map_file)  return NULL; // see TODO above...
-
 	struct llist *css_map = create_llist();
 
 	char *line;
@@ -324,9 +322,8 @@ struct llist *read_ornament_map()
 
 struct hash *read_url_map()
 {
-	if (NULL == url_map_file) return NULL; // TODO: see read_css_map()
-
 	struct hash *url_map = create_hash(URL_MAP_SIZE);
+	if (NULL == url_map) return NULL;
 
 	char *line;
 	while ((line = read_line(url_map_file)) != NULL) {
@@ -354,7 +351,8 @@ struct hash *read_url_map()
 			strcat(anchor_attributes, " ");
 
 		}
-		hash_set(url_map, label, anchor_attributes);
+		if (! hash_set(url_map, label, anchor_attributes))
+			return NULL;
 		destroy_word_tokenizer(wtok);
 		free(line);
 		free(label);
@@ -377,16 +375,26 @@ struct hash *read_url_map()
  * to put it inside display_svg_tree(): it is kept separate because its job is
  * not directly to draw trees*/
 
-void svg_init()
+int svg_init()
 {
-	// TODO: check the return values of the read_*_map() functions, and report any problems (bit vector?)
-	if (NULL != css_map_file)
+	if (NULL != css_map_file) {
 		css_map = read_css_map();
-	if (NULL != ornament_map_file)
+		if (NULL == css_map)
+			return FAILURE;
+	}
+	if (NULL != ornament_map_file) {
 		ornament_map = read_ornament_map();
-	if (NULL != url_map_file)
+		if (NULL == ornament_map)
+			return FAILURE;
+	}
+	if (NULL != url_map_file) {
 		url_map = read_url_map();
+		if (NULL == url_map)
+			return FAILURE;
+	}
 	init_done = 1;
+
+	return SUCCESS;
 }
 
 /* Passed to dump_llist() for labels */

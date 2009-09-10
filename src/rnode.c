@@ -107,16 +107,19 @@ void free_descendants(struct rnode *node)
 {
 	const int HASH_SIZE = 1000; 	/* pretty arbitrary */
 	struct hash *to_free = create_hash(HASH_SIZE);
+	/* not much point in error codes if we won't even be able to free
+	 * memory... */
+	if (NULL == to_free) return;	
 	struct rnode_iterator *it = create_rnode_iterator(node);
 	struct rnode *current;
 
-	// Iterates through the tree nodes, "remembering" nodes seen for the
-	// first time
+	/* Iterates through the tree nodes, "remembering" nodes seen for the
+	 * first time */
 	while (NULL != (current = rnode_iterator_next(it))) {
-		// fprintf (stderr, "visiting node %s\n", current->label);
 		char *node_hash_key = make_hash_key(current);
 		if (NULL == hash_get(to_free, node_hash_key))
-			hash_set(to_free, node_hash_key, current);
+			if (! hash_set(to_free, node_hash_key, current))
+				return; /* wont' be able to free */
                 free(node_hash_key);
 	}
 

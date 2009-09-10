@@ -154,24 +154,25 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-void init_lbl2num(struct rooted_tree *tree)
+int init_lbl2num(struct rooted_tree *tree)
 {
 	struct list_elem *el;
 	lbl2num = create_hash(num_leaves);
+	if (NULL == lbl2num) return FAILURE;
 	int n = 0;
 
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = (struct rnode *) el->data;
 		if (! is_leaf(current)) { continue; }
 		int *num = malloc(sizeof(int));
-		if (NULL == num) {
-			perror(NULL);
-			exit(EXIT_FAILURE);
-		}
+		if (NULL == num) return FAILURE;
 		*num = n;
-		hash_set(lbl2num, current->label, num);
+		if (! hash_set(lbl2num, current->label, num))
+			return FAILURE;
 		n++;
 	}	
+
+	return SUCCESS;
 }
 
 node_set union_of_child_node_sets(struct rnode *node)
@@ -188,7 +189,8 @@ node_set union_of_child_node_sets(struct rnode *node)
 	return result;
 }
 
-void add_bipart_count(const char *node_set_string)
+// TODO: have caller check for FAILURE
+int add_bipart_count(const char *node_set_string)
 {
 	int *count = hash_get(bipart_counts, node_set_string);
 	if (NULL == count) {
@@ -198,10 +200,13 @@ void add_bipart_count(const char *node_set_string)
 			exit(EXIT_FAILURE);
 		}
 		*num = 1;
-		hash_set(bipart_counts, node_set_string, num);
+		if (! hash_set(bipart_counts, node_set_string, num))
+			return FAILURE;
 	} else {
 		(*count)++;
 	}
+
+	return SUCCESS;
 }
 
 void compute_bipartitions(struct rooted_tree *tree)
@@ -236,16 +241,19 @@ void empty_data(struct rooted_tree *tree)
 	}
 }
 
-void process_tree(struct rooted_tree *tree)
+int process_tree(struct rooted_tree *tree)
 {
 	if (NULL == lbl2num) { /* first tree */
 		num_leaves = leaf_count(tree);
-		init_lbl2num(tree);
+		if (! init_lbl2num(tree)) return FAILURE;
 		bipart_counts = create_hash(num_leaves);
+		if (NULL == bipart_counts) return FAILURE;
 	}
 	compute_bipartitions(tree);
 	empty_data(tree);
 	destroy_tree(tree, DONT_FREE_NODE_DATA);
+
+	return SUCCESS;
 }
 
 void show_bipartition_counts()
@@ -360,7 +368,11 @@ int main(int argc, char *argv[])
 	nwsin = params.rep_trees_file;
 	int rep_count = 0;
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree);
+		if (! process_tree(tree)) {
+			fprintf(stderr, "Could not process tree "
+				"(memory error) - exiting.\n");
+			exit(EXIT_FAILURE);
+		}
 		rep_count++;
 	}
 

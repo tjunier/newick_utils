@@ -143,6 +143,7 @@ int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
 	 * approach N in some cases (e.g. when most leaves are attached to the
 	 * root due to low bootstrap support). So we allocate N bins. */
 	struct hash *n2n = create_hash(tree->nodes_in_order->count);
+	if (NULL == n2n) return NS_MEM_ERROR;
 	struct list_elem *el;
 	int ord_number = 0;
 
@@ -158,7 +159,8 @@ int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
 			if (NULL == nump) 
 				return NS_MEM_ERROR;
 			*nump = ord_number;
-			hash_set(n2n, current->label, nump);
+			if (! hash_set(n2n, current->label, nump))
+				return NS_MEM_ERROR;
 			ord_number++;
 		}
 	}	

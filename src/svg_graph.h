@@ -48,9 +48,10 @@ void set_svg_left_label_angle_correction(double);
 
 /* Call this before calling svg_header(), etc, but _after_ the set_svg*()
  * functions. It will launch the initializations liek reading the color map,
- * etc. */
+ * etc. Returns FAILURE if there was an error (which will be a malloc()
+ * problem). */
 
-void svg_init();
+int svg_init();
 
 /* Writes an SVG header */
 

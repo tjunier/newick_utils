@@ -87,6 +87,7 @@ struct rnode *old_lca2(struct rooted_tree *tree, struct rnode *desc_A,
  * along the way. Then starts again from descendant B, returning the first
  * 'seen' node. */
 
+// TODO: have caller check for NULL
 struct rnode *lca2(struct rooted_tree *tree, struct rnode *desc_A,
 		struct rnode *desc_B)
 {
@@ -96,16 +97,17 @@ struct rnode *lca2(struct rooted_tree *tree, struct rnode *desc_A,
 	/* This hash will remember which nodes have been visited. It need be at
 	 * most as large as the number of nodes in the tree. */
 	struct hash *seen_nodes = create_hash(tree->nodes_in_order->count);
+	if (NULL == seen_nodes) return NULL;
 
 	/* Climb to root, marking nodes as 'seen' */
 	while (! is_root(desc_A)) {
 		key = make_hash_key(desc_A);
-		hash_set(seen_nodes, key, SEEN);
+		if(! hash_set(seen_nodes, key, SEEN)) return NULL;
 		free(key);
 		desc_A = desc_A->parent;
 	}
 	key = make_hash_key(desc_A);
-	hash_set(seen_nodes, key, SEEN);
+	if (! hash_set(seen_nodes, key, SEEN)) return NULL;
 	free(key);
 
 	while (1) {

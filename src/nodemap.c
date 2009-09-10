@@ -41,11 +41,12 @@ struct hash * create_label2node_map(struct llist *node_list)
 	struct list_elem *elem;
 	
 	map = create_hash(node_list->count);
+	if (NULL == map) return NULL;
 
 	for (elem = node_list->head; NULL != elem; elem = elem->next) {
 		struct rnode *current = (struct rnode *) elem->data;
 		if (strcmp("", current->label) == 0) { continue; }
-		hash_set(map, current->label, current);
+		if (! hash_set(map, current->label, current)) return NULL;
 	}
 
 	return map;
@@ -56,6 +57,7 @@ struct hash * create_label2node_list_map(struct llist *node_list)
 	/* At most there will be one hash element per list element, so this
 	 * will be enough. */
 	struct hash *map = create_hash(node_list->count);	
+	if (NULL == map) return NULL;
 
 	struct list_elem *elem;
 
@@ -68,7 +70,8 @@ struct hash * create_label2node_list_map(struct llist *node_list)
 		if (NULL == lbl_node_list) {
 			/* Create the list and add * it to the hash */
 		 	lbl_node_list = create_llist();
-			hash_set(map, current_lbl, lbl_node_list);
+			if (! hash_set(map, current_lbl, lbl_node_list))
+				return NULL;
 		}
 		/* Now add the current node to the list */
 		append_element (lbl_node_list, current);

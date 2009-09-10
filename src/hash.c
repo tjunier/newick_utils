@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "masprintf.h"
 #include "common.h"
 
-// TODO: have caller check for NULL
 struct hash *create_hash(int n)
 {
 	struct hash *h;
@@ -74,7 +73,6 @@ unsigned int hash_func (const char *key)
 	return h;
 }
 
-// TODO: have caller check for FAILURE
 int hash_set(struct hash *h, const char *key, void *value)
 {
 	int hash_code = hash_func(key) % h->size;
