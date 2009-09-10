@@ -140,6 +140,7 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 		struct llist *lbl_list = create_llist();
+		if (NULL == lbl_list) { perror(NULL); exit(EXIT_FAILURE); }
 		optind++;	/* optind is now index of 1st label */
 		for (; optind < argc; optind++) {
 			append_element(lbl_list, argv[optind]);
@@ -165,6 +166,7 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 
 	map = create_label2node_map(tree->nodes_in_order);	
 	outgroup_nodes = create_llist();
+	if (NULL == outgroup_nodes) { perror(NULL); exit(EXIT_FAILURE); }
 	for (el = labels->head; NULL != el; el = el->next) {
 		struct rnode *desc;
 		desc = hash_get(map, (char *) el->data);
@@ -216,6 +218,7 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 		struct llist *excluded_labels)
 {
 	struct llist *result = create_llist();
+	if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *el;
 
 	/* add nodes to result iff i) node is a leaf, ii) node's label is not

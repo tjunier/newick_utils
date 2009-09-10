@@ -185,6 +185,11 @@ inner_node: O_PAREN nodelist C_PAREN {
 nodelist: node {
 		struct llist *listp;
 		listp = create_llist();
+		if (NULL == listp) {
+			newick_parser_status = PARSER_STATUS_MALLOC_ERROR;
+			root = NULL;
+			YYACCEPT;
+		}
 		append_element(listp, $1);
 		$$ = listp;
 	}

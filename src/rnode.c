@@ -53,6 +53,7 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	node_p->label = strdup(label);
 	node_p->edge_length_as_string = strdup(length_as_string);
 	node_p->children = create_llist();	
+	if (NULL == node_p->children) return NULL;
 	node_p->parent = NULL;
 	node_p->data = NULL;
 

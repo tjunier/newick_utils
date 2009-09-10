@@ -53,6 +53,10 @@ struct rooted_tree *parse_tree()
 	}
 
 	nodes_in_order = create_llist();
+	if (NULL == nodes_in_order) {
+		newick_parser_status = PARSER_STATUS_MALLOC_ERROR;
+		return NULL;
+	}
 	nwsparse();
 	
 	if (NULL != root) {
@@ -63,8 +67,8 @@ struct rooted_tree *parse_tree()
 	} else {
 		free(tree);
 		destroy_llist(nodes_in_order);
-		/* 'newick_parser_status' has been set by nwsparse(), and can be
-		 * read by caller (should, in fact). */
+		/* NOTE: 'newick_parser_status' has been set by nwsparse(), and
+		 * can be read by caller (should, in fact). */
 		return NULL;
 	}
 }

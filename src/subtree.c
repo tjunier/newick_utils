@@ -201,6 +201,9 @@ struct parameters get_params(int argc, char *argv[])
 		switch (params.mode) {
 		case EXACT:
 			lbl_list = create_llist();
+			if (NULL == lbl_list) {
+				perror(NULL); exit(EXIT_FAILURE);
+			}
 			optind++;	/* optind is now index of 1st label */
 			for (; optind < argc; optind++) {
 				append_element(lbl_list, argv[optind]);

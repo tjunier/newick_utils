@@ -94,9 +94,11 @@ static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 
 /* Generate a tree using the geometric model */
 
+// TODO: have caller check for FAILURE
 int geometric_tree(double prob_node_has_children)
 {
 	struct llist *leaves_queue = create_llist();
+	if (NULL == leaves_queue) return FAILURE;
 	struct rnode *root = create_rnode("root", "");
 	if (NULL == root) return FAILURE;
 
@@ -226,6 +228,7 @@ void free_data(char *newick, struct llist *leaves_queue,
 	destroy_llist(all_children);
 }
 
+// TODO: have caller check for FAILURE
 int time_limited_tree(double branch_termination_rate, double duration)
 {
 	/* create root */
@@ -237,10 +240,12 @@ int time_limited_tree(double branch_termination_rate, double duration)
 	/* This list remembers all children nodes created, for purposes of
 	 * freeing */
 	struct llist *all_children = create_llist();
+	if (NULL == all_children) return FAILURE;
 
 	/* This list stores children who have yet to grow (and maybe have
 	 * children of their own) */
 	struct llist *leaves_queue = create_llist();
+	if (NULL == leaves_queue) return FAILURE;
 	struct rnode *kid;
 
 	/* 1st child */

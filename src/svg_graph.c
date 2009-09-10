@@ -206,9 +206,11 @@ static int get_group_type(const char *type)
  * labels (if the type is CLADE) or to all individual nodes in the list (if the
  * style is INDIVIDUAL). */
 
+// return checked
 struct llist *read_css_map()
 {
 	struct llist *css_map = create_llist();
+	if (NULL == css_map) return NULL;
 
 	char *line;
 	int i = 1;
@@ -222,6 +224,7 @@ struct llist *read_css_map()
 		 * specification, second is group type, then come the labels.
 		 * */
 		struct llist *label_list = create_llist();
+		if (NULL == label_list) return NULL;
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) return NULL;
 		char *style = wt_next_noquote(wtok);
@@ -268,6 +271,7 @@ struct llist *read_css_map()
 struct llist *read_ornament_map()
 {
 	struct llist *ornament_map = create_llist();
+	if (NULL == ornament_map) return NULL;
 
 	char *line;
 	while ((line = read_line(ornament_map_file)) != NULL) {
@@ -280,6 +284,7 @@ struct llist *read_ornament_map()
 		 * second is group type, then come the labels.  */
 
 		struct llist *label_list = create_llist();
+		if (NULL == label_list) return NULL;
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) return NULL;
 		char *ornament = wt_next_noquote(wtok);
@@ -410,7 +415,8 @@ void dump_label (void *lbl) { puts((char *) lbl); }
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
-void set_group_numbers(struct rooted_tree *tree)
+// TODO: have caller check for FAILURE
+int set_group_numbers(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
 	struct css_map_element *css_el;
@@ -460,6 +466,7 @@ void set_group_numbers(struct rooted_tree *tree)
 		if (INDIVIDUAL != css_el->group_type) continue;
 		struct llist *labels = css_el->labels;
 		struct llist *group_nodes = create_llist();
+		if (NULL == group_nodes) return FAILURE; 
 		/* Iterate over all labels of this element, adding the
 		 * corresponding nodes to 'group_nodes' */
 		for (el = labels->head; NULL != el; el = el->next) {
@@ -486,6 +493,8 @@ void set_group_numbers(struct rooted_tree *tree)
 		destroy_llist(group_nodes);
 	}
 	destroy_label2node_list_map(map);
+
+	return SUCCESS;
 }
 
 /* Attributes ornaments to nodes, based on the ornament map (if one was
@@ -497,7 +506,8 @@ void set_group_numbers(struct rooted_tree *tree)
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
-void set_ornaments(struct rooted_tree *tree)
+// TODO: have caller check for FAILURE
+int set_ornaments(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
 	struct ornament_map_element *oel;
@@ -526,6 +536,7 @@ void set_ornaments(struct rooted_tree *tree)
 		if (INDIVIDUAL != oel->group_type) continue;
 		struct llist *labels = oel->labels;
 		struct llist *group_nodes = create_llist();
+		if (NULL == group_nodes) return FAILURE;
 		/* Iterate over all labels of this element, adding the
 		 * corresponding nodes to 'group_nodes' */
 		struct list_elem *el;
@@ -553,6 +564,8 @@ void set_ornaments(struct rooted_tree *tree)
 		destroy_llist(group_nodes);
 	}
 	destroy_label2node_list_map(map);
+
+	return SUCCESS;
 }
 
 /* Allocates and initializes an svg_data structure for each of the tree's

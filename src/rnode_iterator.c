@@ -154,8 +154,10 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	if (NULL == seen) return NULL;
 	struct rnode *current;
 	struct llist *traversal = create_llist();
+	if (NULL == traversal) return NULL;
 	struct llist *reverse_traversal;
 	struct llist *nodes_in_reverse_order = create_llist();
+	if (NULL == nodes_in_reverse_order) return NULL;
 	struct llist *nodes_in_order;
 	char *current_hash_key;
 

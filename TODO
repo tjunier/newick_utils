@@ -1,3 +1,5 @@
+CURRENTLY: ensure that the return value of create_llist() is being checked.
+
 general: functions in app code (i.e., NOT library code) can either call exit()
 directly, or return an error value. In some programs I have perhaps been a bit
 too fanatical in that only main() and get_parameters() ever call exit(). But in

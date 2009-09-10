@@ -301,7 +301,11 @@ void remove_knee_nodes(struct rooted_tree *tree)
 		struct rnode *current = el->data;
 		if (is_inner_node(current))
 			if (1 == children_count(current))
-				splice_out_rnode(current);
+				if (! splice_out_rnode(current)) {
+					fprintf (stderr,
+					"Memory error - exiting.\n");
+					exit(EXIT_FAILURE);
+				}
 	}
 	destroy_llist(nodes_in_order);
 

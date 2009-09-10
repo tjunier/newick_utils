@@ -48,6 +48,7 @@ const int DONT_FREE_NODE_DATA = 0;
 
 /* 'outgroup' is the node which will be the outgroup after rerooting. */
 
+// TODO: have caller check for FAILURE
 int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 {
 	struct rnode *old_root = tree->root;
@@ -69,6 +70,7 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	 * the tree from the soon-to-be new root to the old (which is still the
 	 * root) */
 	swap_list = create_llist();
+	if (NULL == swap_list) return FAILURE;
 	for (node = new_root; ! is_root(node); node = node->parent) {
 		/* order of swaps is important: tree is always consistent */
 		prepend_element(swap_list, node);
@@ -192,9 +194,11 @@ int leaf_count(struct rooted_tree * tree)
 	return n;
 }
 
+// TODO: have caller check for NULL
 struct llist *get_leaf_labels(struct rooted_tree *tree)
 {
 	struct llist *labels = create_llist();
+	if (NULL == labels) return NULL;
 	struct list_elem *el;
 
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
@@ -207,9 +211,11 @@ struct llist *get_leaf_labels(struct rooted_tree *tree)
 	return labels;
 }
 
+// TODO: have caller check for NULL
 struct llist *get_labels(struct rooted_tree *tree)
 {
 	struct llist *labels = create_llist();
+	if (NULL == labels) return NULL;
 	struct list_elem *el;
 
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
@@ -261,12 +267,14 @@ enum tree_type get_tree_type(struct rooted_tree *tree)
 		return TREE_TYPE_NEITHER;	/* weird, but legal */
 }
 
+// TODO: have caller check for NULL
 struct llist *nodes_from_labels(struct rooted_tree *tree,
 		struct llist *labels)
 {
 	struct hash *label2node_map = create_label2node_map(
 			tree->nodes_in_order); 
 	struct llist *result = create_llist();
+	if (NULL == result) return NULL;
 	struct list_elem *el;
 	for (el = labels->head; NULL != el; el = el->next) {
 		char *label = el->data;
@@ -283,6 +291,7 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 	return result;
 }
 
+// TODO: have caller check for NULL
 struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 		char *regexp_string)
 {
@@ -304,6 +313,7 @@ struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 	}
        				       
 	struct llist *result = create_llist();
+	if (NULL == result) return NULL;
 	struct list_elem *el;
 
 	size_t nmatch = 1;	/* either matches or doesn't */
@@ -326,11 +336,13 @@ struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 	return result;
 }
 
+// TODO: have caller check for NULL
 struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 {
        				       
 	int errcode;
 	struct llist *result = create_llist();
+	if (NULL == result) return NULL;
 	struct list_elem *el;
 
 	size_t nmatch = 1;	/* either matches or doesn't */

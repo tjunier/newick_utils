@@ -52,6 +52,7 @@ struct hash * create_label2node_map(struct llist *node_list)
 	return map;
 }
 
+// TODO: have caller check for NULL
 struct hash * create_label2node_list_map(struct llist *node_list)
 {
 	/* At most there will be one hash element per list element, so this
@@ -70,6 +71,7 @@ struct hash * create_label2node_list_map(struct llist *node_list)
 		if (NULL == lbl_node_list) {
 			/* Create the list and add * it to the hash */
 		 	lbl_node_list = create_llist();
+			if (NULL == lbl_node_list) return NULL;
 			if (! hash_set(map, current_lbl, lbl_node_list))
 				return NULL;
 		}
