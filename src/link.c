@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "masprintf.h"
 #include "common.h"
 
+struct rnode *unlink_rnode_root_child;
+
 void add_child(struct rnode *parent, struct rnode *child)
 {
 	struct llist *children_list;
@@ -78,7 +80,6 @@ void link_p2c(struct rnode *parent, struct rnode *child, char *length_s)
 
 /* Returns half the length passed as a parameter (as char *), or "". */
 
-// TODO: have caller check for NULL
 char * compute_new_edge_length(char * length_as_string)
 {
 	char *result;
@@ -107,6 +108,7 @@ int insert_node_above(struct rnode *this, char *label)
 	/* find parent edge and parent node */
 	parent = this->parent;
 	new_edge_length = compute_new_edge_length(this->edge_length_as_string);
+	if (NULL == new_edge_length) return FAILURE;
 	/* create new node */
 	new = create_rnode(label, new_edge_length);
 	if (NULL == new) return FAILURE;
@@ -136,7 +138,6 @@ void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
 	/* not found - do nothing */
 }
 
-// TODO: have caller check for NULL
 char *add_len_strings(char *ls1, char *ls2)
 {
 	char * result;
@@ -160,7 +161,7 @@ char *add_len_strings(char *ls1, char *ls2)
 /* 'this' node is the one that is to be spliced out. All nodes and edges are
  * relative to this one. */
 
-void splice_out_rnode(struct rnode *this)
+int splice_out_rnode(struct rnode *this)
 {
 	struct rnode *parent = this->parent;
 	struct list_elem *elem;
@@ -173,6 +174,7 @@ void splice_out_rnode(struct rnode *this)
 		char *new_edge_len_s = add_len_strings(
 			this->edge_length_as_string,
 			child->edge_length_as_string);
+		if (NULL == new_edge_len_s) return FAILURE;
 		free(child->edge_length_as_string);
 		child->edge_length_as_string = new_edge_len_s;
 		child->parent = parent;  /* instead of this node */
@@ -189,6 +191,8 @@ void splice_out_rnode(struct rnode *this)
 	/* insert list of modified edges in parent's children list */
 	insert_after(parent->children, i-1, kids_copy);
 	free(kids_copy);
+
+	return SUCCESS;
 }
 
 /* OBSOLETE */
@@ -258,7 +262,7 @@ void swap_nodes(struct rnode *node)
 	parent->edge_length_as_string = length;
 }
 
-struct rnode * unlink_rnode(struct rnode *node)
+int unlink_rnode(struct rnode *node)
 {
 	struct rnode *parent = node->parent;
 	struct llist *siblings = parent->children; 	/* includes 'node'! */
@@ -273,14 +277,18 @@ struct rnode * unlink_rnode(struct rnode *node)
 	 * return its first child) */
 	if (1 == siblings->count) {
 		if (is_root(parent)) {
-			return (struct rnode *) siblings->head->data;
+			unlink_rnode_root_child = 
+				(struct rnode *) siblings->head->data;
+			return UNLINK_RNODE_ROOT_CHILD;
 		}
 		else {
-			splice_out_rnode(parent);
-			return NULL;
+			if (! splice_out_rnode(parent))
+				return UNLINK_RNODE_ERROR;
+			else
+				return UNLINK_RNODE_DONE;
 		}
 	}
-	return NULL;
+	return UNLINK_RNODE_DONE;
 }
 
 struct llist *siblings(struct rnode *node)

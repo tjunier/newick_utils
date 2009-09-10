@@ -1,3 +1,9 @@
+general: functions in app code (i.e., NOT library code) can either call exit()
+directly, or return an error value. In some programs I have perhaps been a bit
+too fanatical in that only main() and get_parameters() ever call exit(). But in
+fact there is a case for allowing other functions to do so, as long as they are
+never used elsewhere. Check this.
+
 general: functions that return FAILURE or NULL sould free() whatever they have
 allocated before returning. -- or should they? if there is not enough memory
 and the program is going to exit, is it worth the trouble?

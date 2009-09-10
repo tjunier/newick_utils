@@ -36,7 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * nodes in the tree will still contain the spliced-out node (which is good
  * anyway since you need it to free the spliced-out node).*/
 
+enum unlink_rnode_status { UNLINK_RNODE_DONE, UNLINK_RNODE_ROOT_CHILD,
+	UNLINK_RNODE_ERROR };
+
 struct rnode;
+
+extern struct rnode * unlink_rnode_root_child;
 
 /* Adds 'child' to 'parent''s list of children nodes */
 
@@ -68,8 +73,9 @@ void replace_child(struct rnode *node, struct rnode *old, struct rnode *new);
 
 /* Should NOT be used for deleting ("pruning") nodes (will segfault)! Use
  * unlink_rnode() instead. */
+/* Returns FAILURE iff there is a malloc() problem. */
 
-void splice_out_rnode(struct rnode *node);
+int splice_out_rnode(struct rnode *node);
 
 /* Reverses an edge: parent becomes child, and vice versa. To ensure that the
  * tree still has a single meaningful root, the edge's parent node (before the
@@ -94,18 +100,22 @@ void insert_child(struct rnode *parent, struct rnode *child, int index);
 
 void swap_nodes(struct rnode *node);
 
-/* Removes a node from its parent's children list. The node is not freed.
- * If the removed node had more than one sibling, the tree is in a normal
- * state and the function stops here. If not, the tree is abnormal because
- * the parent has only one child. There are two possibilities: i) the parent is
- * the root - the function stops there and returns the root's (only) child so
- * that it may become the tree's root (we cannot do this here, since we're
- * working at node level, not tree level); ii) the parent is an inner node - it
- * gets spliced out.
- * RETURN VALUE: the root's remaining child if the removed node's parent is
- * root AND the root has only one remaining child; NULL otherwise. */
+/* Removes a node from its parent's children list. The node is not freed. There
+ * are the following cases: If the removed node had more than one sibling, the
+ * tree is in a normal state and the function stops here (case 1). If not, the
+ * tree is abnormal because the parent has only one child. There are two
+ * possibilities: i) the parent is the root (case 2) - the function stops there
+ * and returns the root's (only) child so that it may become the tree's root
+ * (we cannot do this here, since we're working at node level, not tree level);
+ * ii) the parent is an inner node (case 3) - it gets spliced out.
+ * RETURN VALUE:
+	UNLINK_RNODE_ERROR - there was an error (malloc(), most probably)
+	UNLINK_RNODE_DONE - cases 1 and 3 (nothing else to do)
+	UNLINK_RNODE_ROOT_CHILD - case 2; also sets the external variable
+		'unlink_rnode_root_child' to the root's child.
+*/
 
-struct rnode * unlink_rnode(struct rnode *);
+int unlink_rnode(struct rnode *);
 
 /* Returns the node's list of siblings. Siblings appear in the same order as in
  * the parent's children list. The list is empty for root, it may be empty for

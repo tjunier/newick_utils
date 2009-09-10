@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <assert.h>
 
 #include "rnode.h"
 #include "link.h"
@@ -415,13 +417,21 @@ int test_unlink_rnode()
 	map = create_label2node_map(t.nodes_in_order);
 	node_A = hash_get(map, "A");
 
-	struct rnode *r = unlink_rnode(node_A);
-	if (NULL != r) {
-		printf ("%s: unlink_rnode should return NULL, "
+	enum unlink_rnode_status result = unlink_rnode(node_A);
+	switch(result) {
+	case UNLINK_RNODE_DONE:
+		break;
+	case UNLINK_RNODE_ROOT_CHILD:
+		printf ("%s: unlink_rnode should return UNLINK_RNODE_DONE, "
 			"as node A's parent is not the root\n", test_name);
 		return 1;
+	case UNLINK_RNODE_ERROR:
+		fprintf (stderr, "Memory error -\n");
+		exit(EXIT_FAILURE);
+	default:
+		assert(0); /* programmer error */
 	}
-	
+
 	char * exp = "(B:3,(C:1,(D:1,E:1)g:2)h:3)i;";
 	char * obt = to_newick(t.root);
 
@@ -445,14 +455,24 @@ int test_unlink_rnode_rad_leaf()
 	map = create_label2node_map(t.nodes_in_order);
 	node_D = hash_get(map, "D");
 
-	struct rnode *r = unlink_rnode(node_D);
+	enum unlink_rnode_status result = unlink_rnode(node_D);
 	/* node D was a child of the root, which now has only one child (e) -
 	 * this one becomes the new root. */
-	if (NULL != r) {
-		r->parent = NULL;
-		t.root = r;
+	switch(result) {
+	case UNLINK_RNODE_DONE:
+		printf ("%s: unlink_rnode() should have returned UNLINK_RNODE_ROOT_CHILD, but returned UNLINK_RNODE_DONE.\n", test_name);
+		return 1;
+	case UNLINK_RNODE_ROOT_CHILD:
+		unlink_rnode_root_child->parent = NULL;
+		t.root = unlink_rnode_root_child;
+		break;
+	case UNLINK_RNODE_ERROR:
+		fprintf (stderr, "Memory error -\n");
+		exit(EXIT_FAILURE);
+	default:
+		assert(0); /* programmer error */
 	}
-	
+
 	char * exp = "(A:1,B:1,C:1)e;";
 	char * obt = to_newick(t.root);
 
@@ -477,11 +497,19 @@ int test_unlink_rnode_3sibs()
 	map = create_label2node_map(t.nodes_in_order);
 	node_B = hash_get(map, "B");
 
-	struct rnode *r = unlink_rnode(node_B);
-	if (NULL != r) {
-		printf ("%s: unlink_rnode should return NULL, "
+	enum unlink_rnode_status result = unlink_rnode(node_B);
+	switch(result) {
+	case UNLINK_RNODE_DONE:
+		break;
+	case UNLINK_RNODE_ROOT_CHILD:
+		printf ("%s: unlink_rnode should return UNLINK_RNODE_DONE, "
 			"as node A's parent is not the root\n", test_name);
 		return 1;
+	case UNLINK_RNODE_ERROR:
+		fprintf (stderr, "Memory error -\n");
+		exit(EXIT_FAILURE);
+	default:
+		assert(0); /* programmer error */
 	}
 	
 	char * exp = "((A:1,C:1)e:1,D:2)f;";

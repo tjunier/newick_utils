@@ -439,6 +439,9 @@ double ** fill_matrix (struct rooted_tree *tree, struct llist *selected_nodes)
 				break;
 			}
 			struct rnode *lca = lca2(tree, h_node, v_node);
+			if (NULL == lca) { perror(NULL);  exit(EXIT_FAILURE); }
+			/* perror() should work since malloc() will set the
+			 * message string. */
 			lines[j][i] = 
 				((struct simple_node_pos *) h_node->data)->depth
 				+

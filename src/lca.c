@@ -56,38 +56,10 @@ void mark_unseen(struct rooted_tree *tree)
 }
 */
 
-/* Old version of lca2(). Used rnode->data to mark nodes, the new version uses
- * a hash (and thus avoids modifying its arguments, but may be somewhat slower) */
-
-/*
-struct rnode *old_lca2(struct rooted_tree *tree, struct rnode *desc_A,
-		struct rnode *desc_B)
-{
-	char *SEEN = "seen";
-	
-	// Makes sure no node accidentally retains 'seen' status. 
-	// mark_unseen(tree);
-
-	// Climb to root, marking nodes as 'seen' 
-	while (! is_root(desc_A)) {
-		desc_A->data = SEEN;
-		desc_A = desc_A->parent_edge->parent_node;
-	}
-	desc_A->data = SEEN;
-
-	while (SEEN != desc_B->data)
-		desc_B = desc_B->parent_edge->parent_node;
-
-	return desc_B;
-}
-*/
-
-
 /* Start from descendant A and climbs to the root, marking each node as 'seen'
  * along the way. Then starts again from descendant B, returning the first
  * 'seen' node. */
 
-// TODO: have caller check for NULL
 struct rnode *lca2(struct rooted_tree *tree, struct rnode *desc_A,
 		struct rnode *desc_B)
 {
@@ -133,9 +105,9 @@ void * lca2w(void *a, void *b)
 			(struct rnode *) b);
 }
 
-/* Returns the LCA of any number of nodes, by applying lca2 to a
- * list of descendants. THIS USES UP THE LIST! Use lca_from_nodes() to keep the
-argument list intact. */
+/* Returns the LCA of any number of nodes, by applying lca2 to a list of
+ * descendants. THIS USES UP THE LIST! Use lca_from_nodes() to keep the
+ * argument list intact. */
 
 struct rnode *lca (struct rooted_tree *tree,
 		struct llist *descendants)

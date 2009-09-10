@@ -338,7 +338,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct llist *nodes;
 	struct list_elem *el;
-	struct rnode *r;
+	enum unlink_rnode_status result;
 	char *newick;
 
 	/* these two traversals fill the node data. */
@@ -391,11 +391,21 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 					continue;	/* next node */
 
 				}
-				r = unlink_rnode(current);
-				if (NULL != r) {
-					r->parent = NULL;
-					tree->root = r;
-				} 
+				result = unlink_rnode(current);
+				switch(result) {
+				case UNLINK_RNODE_DONE:
+					break;
+				case UNLINK_RNODE_ROOT_CHILD:
+					unlink_rnode_root_child->parent = NULL;
+					tree->root = unlink_rnode_root_child;
+					break;
+				case UNLINK_RNODE_ERROR:
+					fprintf (stderr, "Memory error - "
+							"exiting.\n");
+					exit(EXIT_FAILURE);
+				default:
+					assert(0); /* programmer error */
+				}
 				break;
 			case ACTION_PRINT_LABEL:
 				printf ("%s\n", current->label);
