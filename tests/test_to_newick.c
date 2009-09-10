@@ -150,10 +150,6 @@ int test_bug1()
 	struct rnode *child_2;
 	struct rnode *child_3;
 	struct rnode *child_4;
-	struct redge *child_1_edge;
-	struct redge *child_2_edge;
-	struct redge *child_3_edge;
-	struct redge *child_4_edge;
 
 	parent = create_rnode("parent", "");
 	child_1 = create_rnode("child_1", "");

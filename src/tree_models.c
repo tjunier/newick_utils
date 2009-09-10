@@ -89,7 +89,7 @@ static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 		// printf (" gets no children\n");
 	}
 
-	return SUCCESS;	// TODO: check in caller
+	return SUCCESS;
 }
 
 /* Generate a tree using the geometric model */
@@ -103,7 +103,7 @@ int geometric_tree(double prob_node_has_children)
 	append_element(leaves_queue, root);
 
 	/* The queue contains any newly added leaves. We visit them in turn,
-	 * possibly adding new leaves to th equeue. The process stops when no
+	 * possibly adding new leaves to the queue. The process stops when no
 	 * new leaves have been added. */
 
 	while (leaves_queue->count > 0) {
@@ -112,8 +112,9 @@ int geometric_tree(double prob_node_has_children)
 		 * the end of the queue */
 		for (; nb_leaves_to_visit > 0; nb_leaves_to_visit--) {
 			struct rnode *current_leaf = shift(leaves_queue);
-			geo_visit_leaf(current_leaf, prob_node_has_children,
-					leaves_queue);
+			if (! geo_visit_leaf(current_leaf, prob_node_has_children,
+					leaves_queue))
+				return FAILURE;
 		}
 	}
 
@@ -122,7 +123,7 @@ int geometric_tree(double prob_node_has_children)
 	free(newick);
 	destroy_llist(leaves_queue);
 
-	return SUCCESS;	// TODO: check in caller
+	return SUCCESS;
 }
 
 /******************************************************************/

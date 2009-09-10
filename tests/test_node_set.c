@@ -127,7 +127,6 @@ int test_add_set()
 	const char *test_name = "test_add_set";
 	node_set set1;
 	node_set set2;
-	node_set result;
 	int i;
 
 	set1 = create_node_set(10);

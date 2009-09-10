@@ -205,9 +205,6 @@ static int get_group_type(const char *type)
  * and a list of labels. The style will apply to the clade defined by the
  * labels (if the type is CLADE) or to all individual nodes in the list (if the
  * style is INDIVIDUAL). */
-/* TODO: NULL is returned in two cases: if there is an error, or if
- * css_map_file is NULL. The former is OK, the latter is not. It would be
- * better not to call the function al all in this case. */
 
 struct llist *read_css_map()
 {
@@ -272,8 +269,6 @@ struct llist *read_css_map()
 
 struct llist *read_ornament_map()
 {
-	if (NULL == ornament_map_file)  return NULL; 
-
 	struct llist *ornament_map = create_llist();
 
 	char *line;
@@ -385,9 +380,12 @@ struct hash *read_url_map()
 void svg_init()
 {
 	// TODO: check the return values of the read_*_map() functions, and report any problems (bit vector?)
-	css_map = read_css_map();
-	ornament_map = read_ornament_map();
-	url_map = read_url_map();
+	if (NULL != css_map_file)
+		css_map = read_css_map();
+	if (NULL != ornament_map_file)
+		ornament_map = read_ornament_map();
+	if (NULL != url_map_file)
+		url_map = read_url_map();
 	init_done = 1;
 }
 

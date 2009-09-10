@@ -144,7 +144,6 @@ int test_iterator_midtree()
 	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 	struct rooted_tree tree = tree_3();
 	struct hash *nodemap = create_label2node_map(tree.nodes_in_order);
-	struct rnode *node_i = hash_get(nodemap, "i");
 	struct rnode *node_h = hash_get(nodemap, "h");
 	struct rnode *node_C = hash_get(nodemap, "C");
 	struct rnode *node_g = hash_get(nodemap, "g");

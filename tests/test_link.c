@@ -170,8 +170,6 @@ int test_is_root()
 	struct rnode *left;
 	struct rnode *right;
 
-	struct redge *edge;
-
 	root = create_rnode("root", "12.34");
 	left = create_rnode("left", "23.45");
 	right = create_rnode("right", "");
