@@ -237,13 +237,17 @@ int remove_child(struct rnode *child)
 	return n;
 }
 
-void insert_child(struct rnode *parent, struct rnode *child, int index)
+// TODO: have caller check for FAILURE
+int insert_child(struct rnode *parent, struct rnode *child, int index)
 {
 	struct llist *kids = parent->children;
 	struct llist *insert = create_llist();
+	if (NULL == insert) return FAILURE;
 	append_element(insert, child);
 	insert_after(kids, index-1, insert);
 	child->parent = parent;
+
+	return SUCCESS;
 }
 
 void swap_nodes(struct rnode *node)
@@ -291,10 +295,12 @@ int unlink_rnode(struct rnode *node)
 	return UNLINK_RNODE_DONE;
 }
 
+// TODO: have caller check for NULL
 struct llist *siblings(struct rnode *node)
 {
 	struct rnode *sib;
 	struct llist *result = create_llist();
+	if (NULL == result) return NULL;
 	struct list_elem *elem;
 
 	if (is_root(node)) return result;

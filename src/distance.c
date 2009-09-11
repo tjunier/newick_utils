@@ -244,6 +244,7 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 		struct llist *lbl_list = create_llist();
+		if (NULL == lbl_list) { perror(NULL); exit(EXIT_FAILURE); }
 		optind++;	/* optind is now index of 1st label */
 		for (; optind < argc; optind++) {
 			append_element(lbl_list, argv[optind]);
@@ -281,6 +282,7 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 			break;
 		case ALL_LABELS:
 			result = create_llist();
+			if (NULL == result) {perror(NULL); exit(EXIT_FAILURE);}
 			for (el = tree->nodes_in_order->head; NULL != el;
 				el = el->next) {
 				node = el->data;
@@ -290,6 +292,7 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 			break;
 		case ALL_LEAF_LABELS:
 			result = create_llist();
+			if (NULL == result) {perror(NULL); exit(EXIT_FAILURE);}
 			for (el = tree->nodes_in_order->head; NULL != el;
 				el = el->next) {
 				node = el->data;
@@ -300,6 +303,7 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 			break;
 		case ALL_LEAVES:
 			result = create_llist();
+			if (NULL == result) {perror(NULL); exit(EXIT_FAILURE);}
 			for (el = tree->nodes_in_order->head; NULL != el;
 				el = el->next) {
 				node = el->data;
@@ -309,6 +313,7 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 			break;
 		case ALL_INNER_NODES:
 			result = create_llist();
+			if (NULL == result) {perror(NULL); exit(EXIT_FAILURE);}
 			for (el = tree->nodes_in_order->head; NULL != el;
 				el = el->next) {
 				node = el->data;

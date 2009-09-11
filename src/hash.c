@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "masprintf.h"
 #include "common.h"
 
+// TODO: have caller check for NULL
 struct hash *create_hash(int n)
 {
 	struct hash *h;
@@ -58,6 +59,7 @@ struct hash *create_hash(int n)
 	/* create a llist at each position */
 	for (i = 0; i < n; i++) {
 		(h->bins)[i] = create_llist();
+		if (NULL == (h->bins)[i]) return NULL;
 	}
 	h->count = 0; 	/* no key-value paits yet */
 	return h;
@@ -141,9 +143,11 @@ void dump_hash(struct hash *h, void (*dump_func)())
 	printf ("Dump done.\n");
 }
 
+// TODO: have caller check for NULL
 struct llist *hash_keys(struct hash *h)
 {
 	struct llist *list = create_llist();
+	if (NULL == list) return NULL;
 	int i;
 
 	for (i = 0; i < h->size; i++) {

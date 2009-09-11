@@ -73,7 +73,7 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	if (NULL == swap_list) return FAILURE;
 	for (node = new_root; ! is_root(node); node = node->parent) {
 		/* order of swaps is important: tree is always consistent */
-		prepend_element(swap_list, node);
+		if (! prepend_element(swap_list, node)) return FAILURE;
 	}
 	/* Now, we swap the nodes in the list. */ 
 	for (elem = swap_list->head; NULL != elem; elem = elem->next) {

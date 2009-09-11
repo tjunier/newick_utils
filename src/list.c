@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "list.h"
 
-// TODO: have caller check for NULL
+// caller checked
 struct llist *create_llist()
 {
 	struct llist *llist_p;
@@ -45,7 +45,7 @@ struct llist *create_llist()
 	return llist_p;
 }
 
-// TODO: have caller check for FAILURE
+// caller checked
 int prepend_element(struct llist *list, void *data)
 {
 	struct list_elem *el_p;
@@ -89,22 +89,27 @@ int append_element(struct llist *list, void *data)
 	return SUCCESS;
 }
 
+// TODO: have caller check for NULL
 struct llist *llist_reverse(struct llist *list)
 {
 	struct llist *result;
 	struct list_elem *elem;
 
 	result = create_llist();
+	if (NULL == result) return NULL;
 
 	for (elem = list->head; NULL != elem; elem = elem->next) 
-		prepend_element(result, elem->data);
+		if (! prepend_element(result, elem->data))
+			return NULL;
 
 	return result;
 }
 
+// TODO: have caller check for NULL
 struct llist *shallow_copy(struct llist *orig)
 {
 	struct llist *copy = create_llist();
+	if (NULL == copy) return NULL;
 	struct list_elem *elem;
 
 	for (elem = orig->head; NULL != elem; elem = elem->next) {
@@ -131,6 +136,7 @@ void *shift(struct llist *list)
 	return data;
 }
 
+// TODO: have caller check for NULL
 void *reduce(struct llist *list, void* (*func)(void *, void*))
 {
 	void *func_result;
@@ -142,7 +148,7 @@ void *reduce(struct llist *list, void* (*func)(void *, void*))
 		assert(NULL != list->head);
 		second = shift(list);
 		func_result = func(top, second);
-		prepend_element(list, func_result);
+		if (! prepend_element(list, func_result)) return NULL;
 	}
 
 	return shift(list);
@@ -225,6 +231,7 @@ void insert_after(struct llist *target, int pos, struct llist *insert)
 	}
 }
 
+// TODO: have caller check for NULL
 struct llist *delete_after(struct llist *target, int pos, int length)
 {
 	struct llist *result;
@@ -232,6 +239,7 @@ struct llist *delete_after(struct llist *target, int pos, int length)
 	int i, n;
 
 	result = create_llist();
+	if (NULL == result) return NULL;
 
 	if (-1 == pos) {
 		elem = target->head;
@@ -320,9 +328,11 @@ void ** llist_to_array (struct llist *l)
 	return array;
 }
 
+// TODO: have caller check for NULL
 struct llist *array_to_llist(void **array, int count)
 {
 	struct llist *list = create_llist();
+	if (NULL == list) return NULL;
 	int i;
 
 	for (i = 0; i < count; i++) 

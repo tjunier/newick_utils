@@ -93,8 +93,9 @@ int remove_child(struct rnode *child);
 
 /* Inserts child into parent's children list, at the specified index. Sets the
  * child's parent. */
+/* Returns FAILURE iff there was a problem (malloc(), most probably) */
 
-void insert_child(struct rnode *parent, struct rnode *child, int index);
+int insert_child(struct rnode *parent, struct rnode *child, int index);
 
 /* Swaps 'node' and its parent, i.e, parent becomes a child of 'node' */
 

@@ -134,10 +134,13 @@ struct rnode *lca_from_nodes (struct rooted_tree *tree,
 	return result;
 }
 
+// TODO: have caller check for NULL
 struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 {
 	struct hash *node_map = create_label2node_map(tree->nodes_in_order);
+	if (NULL == node_map) return NULL;
 	struct llist *descendant_nodes = create_llist();
+	if (NULL == descendant_nodes) return NULL;
 	struct list_elem *el;
 
 	for (el = labels->head; NULL != el; el = el->next) {
@@ -163,6 +166,7 @@ struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 	return result;
 }
 
+// TODO: have caller check for NULL
 struct rnode *lca_from_labels_multi (struct rooted_tree *tree, 
 		struct llist *labels)
 {
@@ -174,6 +178,7 @@ struct rnode *lca_from_labels_multi (struct rooted_tree *tree,
 	 * (there may be more than one) to the list of descendants. */
 
 	struct llist *descendants = create_llist();
+	if (NULL == descendants) return NULL;
 	struct list_elem *elem;
 	for (elem = labels->head; NULL != elem; elem = elem->next) {
 		char *label = elem->data;
