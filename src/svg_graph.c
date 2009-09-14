@@ -433,6 +433,7 @@ int set_group_numbers(struct rooted_tree *tree)
 		if (CLADE != css_el->group_type) continue;
 		struct llist *labels = css_el->labels;
 		struct rnode *lca = lca_from_labels_multi(tree, labels);
+		if (NULL == lca) return FAILURE;
 		struct svg_data *lca_data = lca->data;
 		lca_data->group_nb = css_el->group_nb;
 	}
@@ -524,6 +525,7 @@ int set_ornaments(struct rooted_tree *tree)
 		if (CLADE != oel->group_type) continue;
 		struct llist *labels = oel->labels;
 		struct rnode *lca = lca_from_labels_multi(tree, labels);
+		if (NULL == lca) return FAILURE;
 		struct svg_data *lca_data = lca->data;
 		lca_data->ornament = strdup(oel->ornament);
 	}
