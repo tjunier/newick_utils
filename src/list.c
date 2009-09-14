@@ -232,7 +232,7 @@ void insert_after(struct llist *target, int pos, struct llist *insert)
 	}
 }
 
-// TODO: have caller check for NULL
+// caller checked
 struct llist *delete_after(struct llist *target, int pos, int length)
 {
 	struct llist *result;

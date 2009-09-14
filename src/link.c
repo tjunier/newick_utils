@@ -169,6 +169,7 @@ int splice_out_rnode(struct rnode *this)
 
 	/* delete old edge from parent's children list */
 	struct llist *del = delete_after(parent->children, i-1, 1);
+	if (NULL == del) return FAILURE;
 	destroy_llist(del);
 
 	/* insert list of modified edges in parent's children list */
@@ -178,15 +179,17 @@ int splice_out_rnode(struct rnode *this)
 	return SUCCESS;
 }
 
+// TODO: have caller check for status.
 int remove_child(struct rnode *child)
 {
-	if (is_root(child)) return -1;
+	if (is_root(child)) return RM_CHILD_IS_ROOT;;
 
 	struct rnode *parent = child->parent;
 	struct llist *kids = parent->children;
 	int n = llist_index_of(kids, child);
 	assert(n != -1);
 	struct llist *deleted = delete_after(kids, n-1, 1);
+	if (NULL == deleted) return RM_CHILD_MEM_ERROR;
 	child->parent = NULL;
 	destroy_llist(deleted);
 
@@ -234,6 +237,7 @@ int unlink_rnode(struct rnode *node)
 	/* This removes this node from its parent's list of children.  We get
 	 * the resulting list only so we can free it. */
 	struct llist *del = delete_after(siblings, index-1, 1);
+	if (NULL == del) return UNLINK_RNODE_ERROR;
 	destroy_llist(del);	
 
 	/* If deleting this node results in the parent having only one child,

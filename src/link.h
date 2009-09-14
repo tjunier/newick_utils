@@ -29,6 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* Functions for creating and manipulating trees at the node level. */
 
+#define RM_CHILD_IS_ROOT (-1)
+#define RM_CHILD_MEM_ERROR (-2)
+
 /* NOTE: Tree properties such as 'nodes_in_order' will generally be invalidated
  * by these methods. You will need either to recompute them, or to avoid
  * relying on them after the call. For example, it is safe to splice out a node
@@ -77,17 +80,9 @@ void replace_child(struct rnode *node, struct rnode *old, struct rnode *new);
 
 int splice_out_rnode(struct rnode *node);
 
-/* Reverses an edge: parent becomes child, and vice versa. To ensure that the
- * tree still has a single meaningful root, the edge's parent node (before the
- * call) should be the tree's root (and the edge's child node will be the new
- * root). It is the caller's responsibility to ensure this. */
-
-// OBSOLETE - use swap_nodes()
-
-// void reverse_redge(struct redge *edge);
-
 /* deletes child from parent's children list; returns the index of the child in
- * the list prior to removal. Child's parent is set to NULL. */
+ * the list prior to removal. Child's parent is set to NULL. In case of error,
+ * returns a negative number (see RM_CHILD_*) above. */
 
 int remove_child(struct rnode *child);
 
