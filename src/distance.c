@@ -280,6 +280,7 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 	switch (selection) {
 		case ALL_NODES:
 			result = shallow_copy(tree->nodes_in_order);
+			if (NULL == result) {perror(NULL); exit(EXIT_FAILURE);}
 			break;
 		case ALL_LABELS:
 			result = create_llist();

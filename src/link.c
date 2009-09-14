@@ -142,6 +142,7 @@ char *add_len_strings(char *ls1, char *ls2)
 /* 'this' node is the one that is to be spliced out. All nodes and edges are
  * relative to this one. */
 
+// TODO: have caller check for FAILURE
 int splice_out_rnode(struct rnode *this)
 {
 	struct rnode *parent = this->parent;
@@ -161,6 +162,7 @@ int splice_out_rnode(struct rnode *this)
 		child->parent = parent;  /* instead of this node */
 	}
 	struct llist *kids_copy = shallow_copy(this->children);
+	if (NULL == kids_copy) return FAILURE;
 
 	/* find where this node's parent edge is in parent */
 	int i = llist_index_of(parent->children, this);

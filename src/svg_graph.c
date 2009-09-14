@@ -484,6 +484,7 @@ int set_group_numbers(struct rooted_tree *tree)
 				continue;
 			}
 			struct llist *copy = shallow_copy(nodes_of_label);
+			if (NULL == copy) return FAILURE;
 			append_list(group_nodes, copy);
 			free(copy); 	/* NOT destroy_llist(): the list
 					   elements are in group_nodes. */
@@ -556,6 +557,7 @@ int set_ornaments(struct rooted_tree *tree)
 				continue;
 			}
 			struct llist *copy = shallow_copy(nodes_of_label);
+			if (NULL == copy) return FAILURE;
 			append_list(group_nodes, copy);
 			free(copy); 	/* NOT destroy_llist(): the list
 					   elements are in group_nodes. */

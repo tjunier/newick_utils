@@ -283,6 +283,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 
 	/* We need a copy b/c lca() modifies its arg */
 	struct llist *desc_clone = shallow_copy(descendants);
+	if (NULL == desc_clone) { perror(NULL); exit(EXIT_FAILURE); }
 	struct rnode *subtree_root = lca(tree, desc_clone);
 	free(desc_clone); /* elems freed in lca() */
 

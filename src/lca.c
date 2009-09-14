@@ -122,11 +122,13 @@ struct rnode *lca (struct rooted_tree *tree,
 	return (struct rnode *) result;
 }
 
+// TODO: have caller check for NULL
 struct rnode *lca_from_nodes (struct rooted_tree *tree,
 		struct llist *descendants)
 {
 	struct rnode *result;
 	struct llist *copy = shallow_copy(descendants);
+	if (NULL == copy) return NULL;
 
 	result = lca(tree, copy);
 
@@ -189,6 +191,7 @@ struct rnode *lca_from_labels_multi (struct rooted_tree *tree,
 					label);
 		else  {
 			struct llist *copy = shallow_copy(nodes_list);
+			if (NULL == copy) return NULL;
 			append_list (descendants, copy);
 			free(copy); 	/* NOT destroy_llist(): the list
 					   elements are in descendants. */
