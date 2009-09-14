@@ -218,7 +218,7 @@ int swap_nodes(struct rnode *node)
 
 	struct rnode *parent = node->parent;
 	char *length = strdup(node->edge_length_as_string);
-	remove_child(node);
+	if (! remove_child(node)) return FAILURE;
 	if (! add_child(node, parent)) return FAILURE;
 
 	free(node->edge_length_as_string);

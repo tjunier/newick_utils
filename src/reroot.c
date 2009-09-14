@@ -305,7 +305,6 @@ int main(int argc, char *argv[])
 	struct parameters params;
 	
 	params = get_params(argc, argv);
-
 	while (NULL != (tree = parse_tree())) {
 		// fprintf(stderr, "rerooting...\n");
 		process_tree(tree, params);
