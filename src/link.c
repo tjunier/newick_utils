@@ -142,7 +142,7 @@ char *add_len_strings(char *ls1, char *ls2)
 /* 'this' node is the one that is to be spliced out. All nodes and edges are
  * relative to this one. */
 
-// TODO: have caller check for FAILURE
+// caller checked
 int splice_out_rnode(struct rnode *this)
 {
 	struct rnode *parent = this->parent;

@@ -122,7 +122,7 @@ struct rnode *lca (struct rooted_tree *tree,
 	return (struct rnode *) result;
 }
 
-// TODO: have caller check for NULL
+// caller checked
 struct rnode *lca_from_nodes (struct rooted_tree *tree,
 		struct llist *descendants)
 {

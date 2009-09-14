@@ -383,7 +383,10 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				break;
 			case ACTION_SPLICE_OUT:
 				if (is_inner_node(current)) {
-					splice_out_rnode(current);
+					if (! splice_out_rnode(current)) {
+						perror(NULL);
+						exit(EXIT_FAILURE);
+					}
 				} else {
 					fprintf (stderr, "Warning: tried to splice out non-inner node ('%s')\n", current->label);
 				}

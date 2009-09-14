@@ -83,7 +83,8 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
         destroy_llist(swap_list);
 
 	if (children_count(old_root) == 1) {
-		splice_out_rnode(old_root);
+		if (! splice_out_rnode(old_root))
+			return FAILURE;
 		// fprintf (stderr, "freeing '%s' (spliced out).\n", old_root->label);
 		destroy_rnode(old_root, NULL);
 	}
