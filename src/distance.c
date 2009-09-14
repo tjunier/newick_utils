@@ -627,6 +627,10 @@ int main(int argc, char *argv[])
 			}
 			*/
 			lca_node = lca_from_nodes(tree, selected_nodes);
+			if (NULL == lca_node) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 			print_distance_list(lca_node, selected_nodes,
 				params.list_orientation, params.show_header);
 			break;

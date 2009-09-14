@@ -105,7 +105,7 @@ struct llist *llist_reverse(struct llist *list)
 	return result;
 }
 
-// TODO: have caller check for NULL
+// caller checked
 struct llist *shallow_copy(struct llist *orig)
 {
 	struct llist *copy = create_llist();

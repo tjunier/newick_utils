@@ -201,6 +201,7 @@ struct rnode *lca_from_labels_multi (struct rooted_tree *tree,
 	// TODO: handle case with no nodes found
 
 	struct rnode *result = lca_from_nodes (tree, descendants);
+	if (NULL == result) return NULL;
 
 	destroy_llist(descendants);
 	destroy_label2node_list_map(nodes_by_label);
