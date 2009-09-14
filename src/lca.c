@@ -109,6 +109,7 @@ void * lca2w(void *a, void *b)
  * descendants. THIS USES UP THE LIST! Use lca_from_nodes() to keep the
  * argument list intact. */
 
+// TODO: have caller check for NULL
 struct rnode *lca (struct rooted_tree *tree,
 		struct llist *descendants)
 {
@@ -119,7 +120,7 @@ struct rnode *lca (struct rooted_tree *tree,
 	lca2w_tree = tree; 
 	result = reduce(descendants, lca2w);
 
-	return (struct rnode *) result;
+	return result;
 }
 
 // caller checked

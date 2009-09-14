@@ -137,7 +137,7 @@ void *shift(struct llist *list)
 	return data;
 }
 
-// TODO: have caller check for NULL
+// caller checked
 void *reduce(struct llist *list, void* (*func)(void *, void*))
 {
 	void *func_result;
