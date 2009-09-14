@@ -54,6 +54,7 @@ int lbl_comparator(const void *a, const void *b)
 	return cmp;
 }
 
+// TODO: have caller check for FAILURE
 int order_tree(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -82,6 +83,7 @@ int order_tree(struct rooted_tree *tree)
 			struct llist *ordered_kids_list;
 			ordered_kids_list = array_to_llist(
 				(void **) kids_array, count);
+			if (NULL == ordered_kids_list) return FAILURE;
 			current->children = ordered_kids_list;
 
 			// Get sort field from first child ("back-inherit") [?]
