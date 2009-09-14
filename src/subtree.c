@@ -285,6 +285,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct llist *desc_clone = shallow_copy(descendants);
 	if (NULL == desc_clone) { perror(NULL); exit(EXIT_FAILURE); }
 	struct rnode *subtree_root = lca(tree, desc_clone);
+	if (NULL == subtree_root) { perror(NULL); exit(EXIT_FAILURE); }
 	free(desc_clone); /* elems freed in lca() */
 
 	/* Jump up tree to get context, if any was required ('context' > 0) */

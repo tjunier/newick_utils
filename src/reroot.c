@@ -43,11 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hash.h"
 #include "common.h"
 
-enum reroot_status {
-	OK,
-	NO_LCA,			/* Can't find last common ancestor */
-	LCA_IS_TREE_ROOT,	/* LCA is the tree's root */
-	CANT_REROOT };		/* Could not reroot (malloc() problem) */
+enum reroot_status { OK, LCA_IS_TREE_ROOT };
 
 struct parameters {
 	struct llist *labels;
@@ -192,21 +188,23 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
  * but may also mean ingroup nodes, if option -l was passed and rerooting on
  * outgroup failed. */
 
+// TODO: have caller check status
 int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 {
 	struct rnode *outgroup_root;
 
 	outgroup_root = lca(tree, outgroup_nodes);
-	if (NULL != outgroup_root) {
-		if (tree->root == outgroup_root) {
-			return LCA_IS_TREE_ROOT;
-		}
-		if (! reroot_tree (tree, outgroup_root))
-			return CANT_REROOT;
-		return OK;
-	} else {
-		return NO_LCA;
+	if (NULL == outgroup_root) { perror(NULL); exit(EXIT_FAILURE); }
+
+	if (tree->root == outgroup_root) {
+		return LCA_IS_TREE_ROOT;
 	}
+	if (! reroot_tree (tree, outgroup_root)) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
+
+	return OK;
 }
 
 /* Returns true IFF arguments (cast to char*) are equal - IOW, the negation
@@ -269,13 +267,6 @@ void try_ingroup(struct rooted_tree *tree, struct parameters params)
 				"- be sure to include ALL outgroup "
 				"leaves with -l");
 			break;
-		case NO_LCA:
-			fprintf(stderr, "Can't find last common ancestor.\n");
-			break;
-		case CANT_REROOT:
-			fprintf(stderr, "Memory error - exiting.\n");
-			exit(EXIT_FAILURE);
-			break;
 	}
 	destroy_llist(ingroup_leaves);
 }
@@ -303,13 +294,6 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 					"Outgroup's LCA is tree's root "
 					"- cannot reroot. Try -l.\n");
 			}
-			break;
-		case NO_LCA:
-			fprintf(stderr, "Can't find last common ancestor.\n");
-			break;
-		case CANT_REROOT:
-			fprintf(stderr, "Memory error - exiting.\n");
-			exit(EXIT_FAILURE);
 			break;
 	}
 	destroy_llist(outgroup_nodes);

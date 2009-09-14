@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "list.h"
 
+
 // caller checked
 struct llist *create_llist()
 {
@@ -149,6 +150,7 @@ void *reduce(struct llist *list, void* (*func)(void *, void*))
 		assert(NULL != list->head);
 		second = shift(list);
 		func_result = func(top, second);
+		if (NULL == func_result) return NULL;
 		if (! prepend_element(list, func_result)) return NULL;
 	}
 
@@ -329,7 +331,7 @@ void ** llist_to_array (struct llist *l)
 	return array;
 }
 
-// TODO: have caller check for NULL
+// caller checked
 struct llist *array_to_llist(void **array, int count)
 {
 	struct llist *list = create_llist();

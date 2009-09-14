@@ -89,7 +89,9 @@ struct llist *shallow_copy(struct llist *list);
 void *shift(struct llist *);
 
 /* Reduces list to a single element by popping the first two, and
- * replacing them by the result of (*func)() applied to them */ 
+ * replacing them by the result of (*func)() applied to them, until there is
+ * only one element left.  (*func)() should return NULL iff there is an error.
+ * That way reduce() will return NULL iff there is an error. */ 
 
 void *reduce(struct llist *, void* (*func)(void *, void *));
 

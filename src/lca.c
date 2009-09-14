@@ -109,7 +109,7 @@ void * lca2w(void *a, void *b)
  * descendants. THIS USES UP THE LIST! Use lca_from_nodes() to keep the
  * argument list intact. */
 
-// TODO: have caller check for NULL
+// caller checked
 struct rnode *lca (struct rooted_tree *tree,
 		struct llist *descendants)
 {
@@ -132,6 +132,7 @@ struct rnode *lca_from_nodes (struct rooted_tree *tree,
 	if (NULL == copy) return NULL;
 
 	result = lca(tree, copy);
+	if (NULL == result) return NULL;
 
 	destroy_llist(copy);
 	return result;
@@ -163,6 +164,7 @@ struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 	}
 
 	struct rnode *result = lca(tree, descendant_nodes);
+	if (NULL == result) return NULL;
 
 	destroy_hash(node_map);
 	destroy_llist(descendant_nodes);
