@@ -164,11 +164,12 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	/* Iterates over the whole tree - note that a node is visite dmore than
 	 * once, except for leaves. */
 	while ((current = rnode_iterator_next(it)) != NULL) {
-		append_element (traversal, current);
+		if (! append_element (traversal, current)) return NULL;
 	}
 	destroy_rnode_iterator(it);
 
 	reverse_traversal = llist_reverse(traversal);
+	if (NULL == reverse_traversal) return NULL;
 	destroy_llist(traversal);
 
 	/* This keeps only the first 'visit' through any node */
@@ -177,7 +178,10 @@ struct llist *get_nodes_in_order(struct rnode *root)
 		current = el->data;
 		current_hash_key = make_hash_key(current);
 		if (NULL == hash_get(seen, current_hash_key)) {
-			append_element (nodes_in_reverse_order, current);
+			/* Not seen yet? add to list, and mark as seen (hash) */
+			if (! append_element
+					(nodes_in_reverse_order, current))
+				return NULL;
 			/* Could use anything - existential hash */
 			if (! hash_set(seen, current_hash_key, current))
 				return NULL;
@@ -187,6 +191,7 @@ struct llist *get_nodes_in_order(struct rnode *root)
 
 	destroy_llist(reverse_traversal);
 	nodes_in_order = llist_reverse(nodes_in_reverse_order);
+	if (NULL == nodes_in_order) return NULL;
 	destroy_llist(nodes_in_reverse_order);
 	destroy_hash(seen);
 

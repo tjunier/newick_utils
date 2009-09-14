@@ -67,7 +67,7 @@ int prepend_element(struct llist *list, void *data)
 	return SUCCESS;
 }
 
-// TODO: have caller check for FAILURE
+// caller checked
 int append_element(struct llist *list, void *data)
 {
 	struct list_elem *el_p;
@@ -113,7 +113,8 @@ struct llist *shallow_copy(struct llist *orig)
 	struct list_elem *elem;
 
 	for (elem = orig->head; NULL != elem; elem = elem->next) {
-		append_element(copy, elem->data);
+		if (! append_element(copy, elem->data))
+			return NULL;
 	}
 
 	return copy;
@@ -336,7 +337,8 @@ struct llist *array_to_llist(void **array, int count)
 	int i;
 
 	for (i = 0; i < count; i++) 
-		append_element(list, array[i]);
+		if (! append_element(list, array[i]))
+			return NULL;
 
 	return list;
 }

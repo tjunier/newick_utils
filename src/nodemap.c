@@ -76,7 +76,8 @@ struct hash * create_label2node_list_map(struct llist *node_list)
 				return NULL;
 		}
 		/* Now add the current node to the list */
-		append_element (lbl_node_list, current);
+		if (! append_element (lbl_node_list, current))
+			return NULL;
 	}
 
 	return map;

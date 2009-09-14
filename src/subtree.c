@@ -206,7 +206,10 @@ struct parameters get_params(int argc, char *argv[])
 			}
 			optind++;	/* optind is now index of 1st label */
 			for (; optind < argc; optind++) {
-				append_element(lbl_list, argv[optind]);
+				if (! append_element(lbl_list, argv[optind])) {
+					perror(NULL);
+					exit(EXIT_FAILURE);
+				}
 			}
 			params.labels = lbl_list;
 			break;

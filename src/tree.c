@@ -205,7 +205,8 @@ struct llist *get_leaf_labels(struct rooted_tree *tree)
 		struct rnode *current = (struct rnode *) el->data;
 		if (is_leaf(current)) 
 			if (strcmp ("", current->label) != 0)
-				append_element(labels, current->label);
+				if (! append_element(labels, current->label))
+					return NULL;
 	}
 
 	return labels;
@@ -221,7 +222,8 @@ struct llist *get_labels(struct rooted_tree *tree)
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = (struct rnode *) el->data;
 		if (strcmp ("", current->label) != 0)
-			append_element(labels, current->label);
+			if (! append_element(labels, current->label))
+				return NULL;
 	}
 
 	return labels;
@@ -279,12 +281,12 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 	for (el = labels->head; NULL != el; el = el->next) {
 		char *label = el->data;
 		struct rnode *node = hash_get(label2node_map, label);
-		if (NULL == node) {
+		if (NULL == node) 
 			fprintf (stderr, "WARNING: label '%s' not found.\n",
 					label);
-		} else {
-			append_element(result, node);
-		}
+		else 
+			if (! append_element(result, node))
+				return NULL;
 	}
 	destroy_hash(label2node_map);
 
@@ -323,9 +325,8 @@ struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *node = el->data;
 		errcode = regexec(preg, node->label, nmatch, pmatch, eflags);	
-		if (0 == errcode) {
-			append_element(result, node);
-		}
+		if (0 == errcode) 
+			if (! append_element(result, node)) return NULL;
 	}
 	/* This does not free 'preg' itself, only memory pointed to by 'preg'
 	 * members and allocated by regcomp().*/
@@ -353,7 +354,8 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 		struct rnode *node = el->data;
 		errcode = regexec(preg, node->label, nmatch, pmatch, eflags);	
 		if (0 == errcode) {
-			append_element(result, node);
+			if (! append_element(result, node))
+				return NULL;
 		}
 	}
 

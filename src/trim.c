@@ -173,6 +173,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct rnode *node;
 
 	nodes_in_preorder = llist_reverse(tree->nodes_in_order);
+	if (NULL == nodes_in_preorder) { perror(NULL); exit(EXIT_FAILURE); }
 	node = (struct rnode *) nodes_in_preorder->head->data; /* root */
 	struct node_data * ndata = malloc(sizeof(struct node_data));
 	if (NULL == ndata) { perror(NULL); exit(EXIT_FAILURE); }

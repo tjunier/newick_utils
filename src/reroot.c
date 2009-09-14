@@ -143,7 +143,10 @@ struct parameters get_params(int argc, char *argv[])
 		if (NULL == lbl_list) { perror(NULL); exit(EXIT_FAILURE); }
 		optind++;	/* optind is now index of 1st label */
 		for (; optind < argc; optind++) {
-			append_element(lbl_list, argv[optind]);
+			if (! append_element(lbl_list, argv[optind])) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 		}
 		params.labels = lbl_list;
 	} else {
@@ -174,7 +177,10 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 			fprintf (stderr, "WARNING: label '%s' does not occur in tree\n",
 					(char *) el->data);
 		} else {
-			append_element(outgroup_nodes, desc);
+			if (! append_element(outgroup_nodes, desc)) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 		}
 	}
         destroy_hash(map);
@@ -231,9 +237,12 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 			 * we must check string equality, which is why we use
 			 * llist_index_of_f(), and pass it string_eq(). */
 			if (llist_index_of_f(excluded_labels, string_eq,
-						current->label) == -1) {
-				append_element(result, current);
-			}
+						current->label) == -1) 
+				if (! append_element(result, current)) {
+					perror(NULL);
+					exit(EXIT_FAILURE);
+				}
+			
 		}
 	}
 
@@ -244,6 +253,7 @@ void try_ingroup(struct rooted_tree *tree, struct parameters params)
 {
 	/* we will try to insert the root above the ingroup - for this we'll
 	 * need all leaves that are NOT in the outgroup. */
+	// TODO: why just leaves?
 	struct llist *ingroup_leaves;
 	ingroup_leaves = get_ingroup_leaves(tree, params.labels);
 	enum reroot_status result = reroot(tree, ingroup_leaves);

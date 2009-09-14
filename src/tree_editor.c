@@ -284,6 +284,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 {
 	struct list_elem *el;
 	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
+	if (NULL == rev_nodes) { perror(NULL), exit(EXIT_FAILURE); }
 	struct rnode *node;
 	struct rnode_data *rndata;
 
@@ -347,8 +348,10 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 
 	if (POST_ORDER == params.order)
 		nodes = tree->nodes_in_order;
-	else if (PRE_ORDER == params.order)
+	else if (PRE_ORDER == params.order) {
 		nodes = llist_reverse(tree->nodes_in_order);
+		if (NULL == nodes) { perror(NULL); exit(EXIT_FAILURE); }
+	}
 	else 
 		assert(0);	 /* programmer error... */
 

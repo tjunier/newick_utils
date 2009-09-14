@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree.h"
 #include "list.h"
 #include "node_pos_alloc.h"
+#include "common.h"
 
 int set_node_vpos_cb(struct rooted_tree *t,
 		void (*set_node_top)(struct rnode *, double),
@@ -77,6 +78,7 @@ int set_node_vpos_cb(struct rooted_tree *t,
 	return leaf_count;
 }
 
+// TODO: have caller check for FAILURE (in returned struct)
 struct h_data set_node_depth_cb(struct rooted_tree *tree,
 		void (*set_node_depth)(struct rnode *, double),
 		double (*get_node_depth)(struct rnode *))
@@ -87,8 +89,10 @@ struct h_data set_node_depth_cb(struct rooted_tree *tree,
 	int max_label_len = 0;
 	double max_leaf_depth = 0.0;
 	struct h_data result;
+	result.status = FAILURE; 
 
 	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
+	if (NULL == nodes_in_reverse_order) return result;
 
 	/* set the root's depth to 0 */
 	elem = nodes_in_reverse_order->head;
@@ -107,7 +111,8 @@ struct h_data set_node_depth_cb(struct rooted_tree *tree,
 		else
 			node->edge_length = atof(node->edge_length_as_string);
 
-		double node_depth = node->edge_length + get_node_depth(parent_node);
+		double node_depth = node->edge_length +
+			get_node_depth(parent_node);
 
 		set_node_depth(node, node_depth);
 		
@@ -124,6 +129,7 @@ struct h_data set_node_depth_cb(struct rooted_tree *tree,
 
 	result.l_max = max_label_len;
 	result.d_max = max_leaf_depth;
+	result.status = SUCCESS;
 
 	return result;
 }

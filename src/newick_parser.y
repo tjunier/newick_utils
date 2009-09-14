@@ -83,6 +83,9 @@ void nwserror(char *s)
 
 %%
 
+// TODO: check the parser's behaviour if create_rnode(), append_element(), etc
+// fail
+
 tree: /* empty */	{
 		root = NULL;
 		newick_parser_status = PARSER_STATUS_EMPTY;
@@ -105,15 +108,26 @@ tree: /* empty */	{
     }
     ;
 
-node: leaf { append_element(nodes_in_order, $1); }
-    | inner_node { append_element(nodes_in_order, $1); }
+node: 	leaf {
+		if (! append_element(nodes_in_order, $1)) {
+			root = NULL;
+			newick_parser_status = PARSER_STATUS_MALLOC_ERROR;
+			YYACCEPT;
+		}
+	}
+    	| inner_node {
+    		if (! append_element(nodes_in_order, $1)) {
+			root = NULL;
+			newick_parser_status = PARSER_STATUS_MALLOC_ERROR;
+			YYACCEPT;
+		}
+	}
     ;
 
 inner_node: O_PAREN nodelist C_PAREN {
 		struct list_elem* lep;
 		struct rnode *np;
 		np = create_rnode("","");
-		// TODO: check the parser's behaviour if create_rnode() fails
 		if (NULL == np) {
 			newick_parser_status = PARSER_STATUS_MALLOC_ERROR;
 			root = NULL;
@@ -190,12 +204,21 @@ nodelist: node {
 			root = NULL;
 			YYACCEPT;
 		}
-		append_element(listp, $1);
+		if (! append_element(listp, $1)) {
+			newick_parser_status = PARSER_STATUS_MALLOC_ERROR;
+			root = NULL;
+			YYACCEPT;
+		}
+			
 		$$ = listp;
 	}
 	| nodelist COMMA node {
 		struct llist *listp = $1;
-		append_element(listp, $3);
+		if (! append_element(listp, $3)) {
+			newick_parser_status = PARSER_STATUS_MALLOC_ERROR;
+			root = NULL;
+			YYACCEPT;
+		}
 		$$ = listp;
 	}
 	;

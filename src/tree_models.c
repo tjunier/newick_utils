@@ -71,6 +71,7 @@ static int geo_has_children(double prob_node_has_children)
 /* Visits a leaf: probabilistically adds children to the leaf, and adds those
  * children to the leaves queue (since they are new leaves) */
 
+// TODO: have caller check for FAILURE
 static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 		struct llist *leaves_queue)
 {
@@ -83,8 +84,8 @@ static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 		if (NULL == kid2) return FAILURE;
 		add_child(leaf, kid1);
 		add_child(leaf, kid2);
-		append_element(leaves_queue, kid1);
-		append_element(leaves_queue, kid2);
+		if (! append_element(leaves_queue, kid1)) return FAILURE;
+		if (! append_element(leaves_queue, kid2)) return FAILURE;
 	} else {
 		// printf (" gets no children\n");
 	}
@@ -102,7 +103,7 @@ int geometric_tree(double prob_node_has_children)
 	struct rnode *root = create_rnode("root", "");
 	if (NULL == root) return FAILURE;
 
-	append_element(leaves_queue, root);
+	if (! append_element(leaves_queue, root)) return FAILURE;
 
 	/* The queue contains any newly added leaves. We visit them in turn,
 	 * possibly adding new leaves to the queue. The process stops when no
@@ -252,15 +253,15 @@ int time_limited_tree(double branch_termination_rate, double duration)
 	kid = create_child_with_time_limit(duration);
 	if (NULL == kid) return FAILURE;
 	add_child(root, kid);	/* length is determined below */
-	append_element(leaves_queue, kid);
-	append_element(all_children, kid);
+	if (! append_element(leaves_queue, kid)) return FAILURE;
+	if (! append_element(all_children, kid)) return FAILURE;
 
 	/* 2nd child */
 	kid = create_child_with_time_limit(duration);
 	if (NULL == kid) return FAILURE;
 	add_child(root, kid);	
-	append_element(leaves_queue, kid);
-	append_element(all_children, kid);
+	if (! append_element(leaves_queue, kid)) return FAILURE;
+	if (! append_element(all_children, kid)) return FAILURE;
 
 
 	while (0 != leaves_queue->count) {
@@ -274,14 +275,14 @@ int time_limited_tree(double branch_termination_rate, double duration)
 			kid = create_child_with_time_limit(remaining_time);
 			if (NULL == kid) return FAILURE;
 			add_child(current, kid);
-			append_element(leaves_queue, kid);
-			append_element(all_children, kid);
+			if (! append_element(leaves_queue, kid)) return FAILURE;
+			if (! append_element(all_children, kid)) return FAILURE;
 
 			kid = create_child_with_time_limit(remaining_time);
 			if (NULL == kid) return FAILURE;
 			add_child(current, kid);
-			append_element(leaves_queue, kid);
-			append_element(all_children, kid);
+			if (! append_element(leaves_queue, kid)) return FAILURE;
+			if (! append_element(all_children, kid)) return FAILURE;
 		} 
 	}
 

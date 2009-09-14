@@ -38,6 +38,7 @@ struct rnode;
 struct h_data {
 	int l_max; 	/* lenth of longest label */
 	double d_max; 	/* depth of deepest leaf */
+	int status;	/* used to indicate errors */
 };
 
 /* The following functions set the value of the node's positions. This is done
@@ -66,6 +67,8 @@ int set_node_vpos_cb(struct rooted_tree *t,
  * attributed a length of 1. Returns a structure containing the tree's depth
  * (depth of the deepest leaf) and the length (in characters) of the longest
  * label. These are useful for determining horizontal scale. */
+/* In case of error, the structure's 'status' member is set to FAILURE,
+ * otherwise it is SUCCESS: */
 
 struct h_data set_node_depth_cb(struct rooted_tree *,
 		void (*set_node_depth)(struct rnode *, double),

@@ -231,7 +231,7 @@ struct llist *read_css_map()
 		char *type = wt_next(wtok);
 		char *label;
 		while ((label = wt_next(wtok)) != NULL) {
-			append_element(label_list, label);
+			if (! append_element(label_list, label)) return NULL;
 		}
 		destroy_word_tokenizer(wtok);
 		free(line);
@@ -246,7 +246,7 @@ struct llist *read_css_map()
 		css_el->style = style;
 		css_el->labels = label_list;
 		css_el->group_nb = i;
-		append_element(css_map, css_el);
+		if (! append_element(css_map, css_el)) return NULL;
 		i++;
 
 		free(type);
@@ -268,6 +268,7 @@ struct llist *read_css_map()
 /* Builds an ornament map structure. This is like the CSS map, but for
  * ornaments. Also returns NULL on error. */
 
+// return checked
 struct llist *read_ornament_map()
 {
 	struct llist *ornament_map = create_llist();
@@ -291,7 +292,7 @@ struct llist *read_ornament_map()
 		char *type = wt_next(wtok);
 		char *label;
 		while ((label = wt_next(wtok)) != NULL) {
-			append_element(label_list, label);
+			if (! append_element(label_list, label)) return NULL;
 		}
 		destroy_word_tokenizer(wtok);
 		free(line);
@@ -305,7 +306,8 @@ struct llist *read_ornament_map()
 		}
 		oel->ornament = ornament;
 		oel->labels = label_list;
-		append_element(ornament_map, oel);
+		if (! append_element(ornament_map, oel))
+			return NULL;
 
 		free(type);
 	}
@@ -438,6 +440,7 @@ int set_group_numbers(struct rooted_tree *tree)
 	/* Now propagate the styles to the descendants */
 	struct llist *nodes_in_reverse_order;
 	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
+	if (NULL == nodes_in_reverse_order) return FAILURE;
 	struct list_elem *el; /* TODO: can't I reuse elem from above? */
 	el = nodes_in_reverse_order->head->next;	/* skip root */
 	for (;  NULL != el; el = el->next) {
