@@ -82,8 +82,8 @@ static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 		if (NULL == kid1) return FAILURE;
 		struct rnode *kid2 = create_rnode("kid2", "");	
 		if (NULL == kid2) return FAILURE;
-		add_child(leaf, kid1);
-		add_child(leaf, kid2);
+		if (! add_child(leaf, kid1)) return FAILURE;
+		if (! add_child(leaf, kid2)) return FAILURE;
 		if (! append_element(leaves_queue, kid1)) return FAILURE;
 		if (! append_element(leaves_queue, kid2)) return FAILURE;
 	} else {
@@ -252,14 +252,15 @@ int time_limited_tree(double branch_termination_rate, double duration)
 	/* 1st child */
 	kid = create_child_with_time_limit(duration);
 	if (NULL == kid) return FAILURE;
-	add_child(root, kid);	/* length is determined below */
+	/* add_child(...): length is determined below */
+	if (! add_child(root, kid)) return FAILURE;
 	if (! append_element(leaves_queue, kid)) return FAILURE;
 	if (! append_element(all_children, kid)) return FAILURE;
 
 	/* 2nd child */
 	kid = create_child_with_time_limit(duration);
 	if (NULL == kid) return FAILURE;
-	add_child(root, kid);	
+	if (! add_child(root, kid)) return FAILURE;
 	if (! append_element(leaves_queue, kid)) return FAILURE;
 	if (! append_element(all_children, kid)) return FAILURE;
 
@@ -274,13 +275,13 @@ int time_limited_tree(double branch_termination_rate, double duration)
 		if (remaining_time > 0) {
 			kid = create_child_with_time_limit(remaining_time);
 			if (NULL == kid) return FAILURE;
-			add_child(current, kid);
+			if (! add_child(current, kid)) return FAILURE;
 			if (! append_element(leaves_queue, kid)) return FAILURE;
 			if (! append_element(all_children, kid)) return FAILURE;
 
 			kid = create_child_with_time_limit(remaining_time);
 			if (NULL == kid) return FAILURE;
-			add_child(current, kid);
+			if (! add_child(current, kid)) return FAILURE;
 			if (! append_element(leaves_queue, kid)) return FAILURE;
 			if (! append_element(all_children, kid)) return FAILURE;
 		} 

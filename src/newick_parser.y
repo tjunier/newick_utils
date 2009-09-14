@@ -134,7 +134,12 @@ inner_node: O_PAREN nodelist C_PAREN {
 			YYACCEPT;
 		}
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			add_child(np, (struct rnode*) lep->data);
+			if (! add_child(np, (struct rnode*) lep->data)) {
+				root = NULL;
+				newick_parser_status =
+					PARSER_STATUS_MALLOC_ERROR;
+				YYACCEPT;
+			}
 		}
 		destroy_llist($2);
 		$$ = np;
@@ -150,7 +155,12 @@ inner_node: O_PAREN nodelist C_PAREN {
 		}
 		free($4);
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			add_child(np, (struct rnode*) lep->data);
+			if (! add_child(np, (struct rnode*) lep->data)) {
+				root = NULL;
+				newick_parser_status =
+					PARSER_STATUS_MALLOC_ERROR;
+				YYACCEPT;
+			}
 		}
 		destroy_llist($2);
 		$$ = np;
@@ -166,7 +176,12 @@ inner_node: O_PAREN nodelist C_PAREN {
 		}
 		free($4);
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			add_child(np, (struct rnode*) lep->data);
+			if (! add_child(np, (struct rnode*) lep->data)) {
+				root = NULL;
+				newick_parser_status =
+					PARSER_STATUS_MALLOC_ERROR;
+				YYACCEPT;
+			}
 		}
 		destroy_llist($2);
 		free($6);
@@ -182,7 +197,12 @@ inner_node: O_PAREN nodelist C_PAREN {
 			YYACCEPT;
 		}
 		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			add_child(np, (struct rnode*) lep->data);
+			if (! add_child(np, (struct rnode*) lep->data)) {
+				root = NULL;
+				newick_parser_status =
+					PARSER_STATUS_MALLOC_ERROR;
+				YYACCEPT;
+			}
 		}
 		destroy_llist($2);
 		free($5);

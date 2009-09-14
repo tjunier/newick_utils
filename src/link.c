@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode *unlink_rnode_root_child;
 
-// TODO: have caller check for FAILURE
+// caller checked
 int add_child(struct rnode *parent, struct rnode *child)
 {
 	struct llist *children_list;
@@ -57,30 +57,6 @@ int add_child(struct rnode *parent, struct rnode *child)
 
 	return SUCCESS;
 }
-
-/* OBSOLETE - use add_child() */
-/*
-void set_parent_edge(struct rnode *child, struct redge *edge)
-{
-	child->parent_edge = edge;
-	edge->child_node = child;
-}
-*/
-
-/* OBSOLETE - use add_child() */
-/*
-void link_p2c(struct rnode *parent, struct rnode *child, char *length_s)
-{
-	struct redge *edge;
-
-	edge = create_redge(length_s);
-
-	edge->parent_node = parent;
-
-	add_child_edge(parent, edge);
-	set_parent_edge(child, edge);
-}
-*/
 
 /* Returns half the length passed as a parameter (as char *), or "". */
 
@@ -102,6 +78,7 @@ char * compute_new_edge_length(char * length_as_string)
 	return result;
 }
 
+// caller checked
 int insert_node_above(struct rnode *this, char *label)
 {
 	struct rnode *parent;
@@ -117,7 +94,7 @@ int insert_node_above(struct rnode *this, char *label)
 	new = create_rnode(label, new_edge_length);
 	if (NULL == new) return FAILURE;
 	/* link new node to this node */
-	add_child(new, this);
+	if (! add_child(new, this)) return FAILURE;
 	free(this->edge_length_as_string);
 	this->edge_length_as_string = strdup(new_edge_length);
 	replace_child(parent, this, new);
@@ -199,33 +176,6 @@ int splice_out_rnode(struct rnode *this)
 	return SUCCESS;
 }
 
-/* OBSOLETE */
-/*
-void reverse_redge(struct redge *edge)
-{
-	struct rnode *parent, *child;
-	struct redge *reverse_edge;
-
-	parent = edge->parent_node;
-	child = edge->child_node;
-
-	// remove edge from old parent's children list 
-	int n = llist_index_of(parent->children, edge);
-	struct llist *deleted = delete_after(parent->children, n - 1, 1);
-        destroy_llist(deleted);
-
-	// create new edge with same length string as old
-	reverse_edge = create_redge(edge->length_as_string);
-
-	set_parent_edge(parent, reverse_edge);	// intentional (reversing!)
-
-	add_child_edge(child, reverse_edge); 	// intentional (reversing!)
-	reverse_edge->parent_node = child;
-	child->parent_edge = NULL;	
-	destroy_redge(edge);
-}
-*/
-
 int remove_child(struct rnode *child)
 {
 	if (is_root(child)) return -1;
@@ -241,7 +191,8 @@ int remove_child(struct rnode *child)
 	return n;
 }
 
-// TODO: have caller check for FAILURE
+// caller checked (in fact, no caller found!)
+// TODO: is this f() ever used?
 int insert_child(struct rnode *parent, struct rnode *child, int index)
 {
 	struct llist *kids = parent->children;
@@ -254,7 +205,8 @@ int insert_child(struct rnode *parent, struct rnode *child, int index)
 	return SUCCESS;
 }
 
-void swap_nodes(struct rnode *node)
+// caller checked
+int swap_nodes(struct rnode *node)
 {
 	assert(NULL != node->parent);
 	assert(is_root(node->parent));  /* must swap below root */
@@ -262,12 +214,14 @@ void swap_nodes(struct rnode *node)
 	struct rnode *parent = node->parent;
 	char *length = strdup(node->edge_length_as_string);
 	remove_child(node);
-	add_child(node, parent);
+	if (! add_child(node, parent)) return FAILURE;
 
 	free(node->edge_length_as_string);
 	node->edge_length_as_string = strdup("");
 	free(parent->edge_length_as_string);
 	parent->edge_length_as_string = length;
+
+	return SUCCESS;
 }
 
 int unlink_rnode(struct rnode *node)
@@ -299,7 +253,7 @@ int unlink_rnode(struct rnode *node)
 	return UNLINK_RNODE_DONE;
 }
 
-// TODO: have caller check for NULL
+// caller checked
 struct llist *siblings(struct rnode *node)
 {
 	struct rnode *sib;

@@ -98,8 +98,9 @@ int remove_child(struct rnode *child);
 int insert_child(struct rnode *parent, struct rnode *child, int index);
 
 /* Swaps 'node' and its parent, i.e, parent becomes a child of 'node' */
+/* Returns FAILURE in case of problem (memory) */
 
-void swap_nodes(struct rnode *node);
+int swap_nodes(struct rnode *node);
 
 /* Removes a node from its parent's children list. The node is not freed. There
  * are the following cases: If the removed node had more than one sibling, the

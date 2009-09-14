@@ -78,7 +78,7 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	/* Now, we swap the nodes in the list. */ 
 	for (elem = swap_list->head; NULL != elem; elem = elem->next) {
 		struct rnode *to_swap = elem->data;
-		swap_nodes(to_swap);
+		if (! swap_nodes(to_swap)) return FAILURE;
 	}
         destroy_llist(swap_list);
 
@@ -363,6 +363,7 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 }
 
 /* Clones a clade (recursively) */
+// TODO: have caller check for NULL
 // TODO: try an iterative version using a rnode_iterator
 static struct rnode *clone_clade(struct rnode *root)
 {
@@ -373,7 +374,7 @@ static struct rnode *clone_clade(struct rnode *root)
 	for (el = root->children->head; NULL != el; el = el->next) {
 		struct rnode *kid = el->data;
 		struct rnode *kid_clone = clone_clade(kid);
-		add_child(root_clone, kid_clone); 
+		if (! add_child(root_clone, kid_clone)) return NULL;
 	}
 
 	return root_clone;

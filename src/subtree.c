@@ -301,6 +301,10 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			char *newick;
 			if (params.siblings) {
 				struct llist *sibs = siblings(subtree_root);
+				if (NULL == sibs) {
+					perror(NULL);
+					exit(EXIT_FAILURE);
+				}
 				struct list_elem *el;
 				for (el=sibs->head;NULL!=el;el=el->next) {
 					struct rnode *sib;
