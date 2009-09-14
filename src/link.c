@@ -45,13 +45,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode *unlink_rnode_root_child;
 
-void add_child(struct rnode *parent, struct rnode *child)
+// TODO: have caller check for FAILURE
+int add_child(struct rnode *parent, struct rnode *child)
 {
 	struct llist *children_list;
 	child->parent = parent;
 
 	children_list = parent->children;
-	append_element(children_list, child);
+	if (! append_element(children_list, child))
+		return FAILURE;
+
+	return SUCCESS;
 }
 
 /* OBSOLETE - use add_child() */
@@ -243,7 +247,7 @@ int insert_child(struct rnode *parent, struct rnode *child, int index)
 	struct llist *kids = parent->children;
 	struct llist *insert = create_llist();
 	if (NULL == insert) return FAILURE;
-	append_element(insert, child);
+	if (! append_element(insert, child)) return FAILURE;
 	insert_after(kids, index-1, insert);
 	child->parent = parent;
 
@@ -308,7 +312,8 @@ struct llist *siblings(struct rnode *node)
 	for (elem = node->parent->children->head; NULL != elem; elem = elem->next) {
 		sib = (struct rnode *) elem->data;
 		if (sib != node)
-			append_element(result, sib);
+			if (! append_element(result, sib))
+				return NULL;
 	}
 
 	return result;

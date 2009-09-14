@@ -246,9 +246,10 @@ struct parameters get_params(int argc, char *argv[])
 		struct llist *lbl_list = create_llist();
 		if (NULL == lbl_list) { perror(NULL); exit(EXIT_FAILURE); }
 		optind++;	/* optind is now index of 1st label */
-		for (; optind < argc; optind++) {
-			append_element(lbl_list, argv[optind]);
-		}
+		for (; optind < argc; optind++) 
+			if (! append_element(lbl_list, argv[optind])) {
+				perror(NULL); exit(EXIT_FAILURE);
+			}
 		params.labels = lbl_list;
 		if (0 != lbl_list->count)
 			params.selection = ARGV_LABELS;
@@ -287,7 +288,10 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 				el = el->next) {
 				node = el->data;
 				if (0 != strcmp(node->label, ""))
-					append_element(result, node);
+					if (! append_element(result, node)) {
+						perror(NULL);
+						exit(EXIT_FAILURE);
+					}
 			}
 			break;
 		case ALL_LEAF_LABELS:
@@ -298,7 +302,10 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 				node = el->data;
 				if (is_leaf(node) &&
 				   (0 != strcmp(node->label, "")))
-					append_element(result, node);
+					if (! append_element(result, node)) {
+						perror(NULL);
+						exit(EXIT_FAILURE);
+					}
 			}
 			break;
 		case ALL_LEAVES:
@@ -308,7 +315,10 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 				el = el->next) {
 				node = el->data;
 				if (is_leaf(node))
-					append_element(result, node);
+					if (! append_element(result, node)) {
+						perror(NULL);
+						exit(EXIT_FAILURE);
+					}
 			}
 			break;
 		case ALL_INNER_NODES:
@@ -318,7 +328,10 @@ struct llist *get_selected_nodes (struct rooted_tree *tree,
 				el = el->next) {
 				node = el->data;
 				if (is_inner_node(node))
-					append_element(result, node);
+					if (! append_element(result, node)) {
+						perror(NULL);
+						exit(EXIT_FAILURE);
+					}
 			}
 			break;
 		default:

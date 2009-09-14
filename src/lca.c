@@ -155,7 +155,8 @@ struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 					label);
 			continue;
 		}
-		append_element(descendant_nodes, desc);
+		if (! append_element(descendant_nodes, desc))
+			return NULL;
 	}
 
 	struct rnode *result = lca(tree, descendant_nodes);

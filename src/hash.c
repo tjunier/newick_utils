@@ -75,6 +75,7 @@ unsigned int hash_func (const char *key)
 	return h;
 }
 
+// checked
 int hash_set(struct hash *h, const char *key, void *value)
 {
 	int hash_code = hash_func(key) % h->size;
@@ -99,7 +100,7 @@ int hash_set(struct hash *h, const char *key, void *value)
 	kvp->key = strdup(key);
 	kvp->value = value;
 
-	append_element(bin, kvp);
+	if (! append_element(bin, kvp)) return FAILURE;
 	h->count++;
 
 	return SUCCESS;
@@ -155,7 +156,8 @@ struct llist *hash_keys(struct hash *h)
 	       struct list_elem *el;
 	       for (el = bin->head; NULL != el; el = el->next) {
 		       struct key_val_pair *kvp = el->data;
-		       append_element(list, kvp->key);
+		       if (! append_element(list, kvp->key))
+			       return NULL;
 	       }
 	}
 

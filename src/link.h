@@ -44,8 +44,8 @@ struct rnode;
 extern struct rnode * unlink_rnode_root_child;
 
 /* Adds 'child' to 'parent''s list of children nodes */
-
-void add_child(struct rnode *parent, struct rnode *child);
+/* Returns FAILURE iff there was a problem (malloc(), most probably) */
+int add_child(struct rnode *parent, struct rnode *child);
 
 /* sets 'edge' as 'child''s parent edge, and 'child' as 'edge''s child
  * node. */
