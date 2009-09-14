@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 #include "rnode_iterator.h"
 #include "hash.h"
+#include "common.h"
 
 struct rnode *create_rnode(char *label, char *length_as_string)
 {
@@ -104,13 +105,11 @@ void dump_rnode(void *arg)
 	printf ("rnode at %p: %s\n", node, node->label);
 }
 
-void free_descendants(struct rnode *node)
+int free_descendants(struct rnode *node)
 {
 	const int HASH_SIZE = 1000; 	/* pretty arbitrary */
 	struct hash *to_free = create_hash(HASH_SIZE);
-	/* not much point in error codes if we won't even be able to free
-	 * memory... */
-	if (NULL == to_free) return;	
+	if (NULL == to_free) return FAILURE;	
 	struct rnode_iterator *it = create_rnode_iterator(node);
 	struct rnode *current;
 
@@ -120,12 +119,13 @@ void free_descendants(struct rnode *node)
 		char *node_hash_key = make_hash_key(current);
 		if (NULL == hash_get(to_free, node_hash_key))
 			if (! hash_set(to_free, node_hash_key, current))
-				return; /* wont' be able to free */
+				return FAILURE; 
                 free(node_hash_key);
 	}
 
 	// Frees all nodes "seen" above - which must be all the tree's nodes.
 	struct llist *keys = hash_keys(to_free);
+	if (NULL == keys) return FAILURE;
        	struct list_elem *el;
 	for (el = keys->head; NULL != el; el = el->next) {
 		char *key = el->data;
@@ -136,4 +136,6 @@ void free_descendants(struct rnode *node)
         destroy_llist(keys);
         destroy_hash(to_free);
 	destroy_rnode_iterator(it);
+
+	return SUCCESS;
 }

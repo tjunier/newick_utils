@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 #include "rnode.h"
 #include "hash.h"
+#include "common.h"
 
 struct hash * create_label2node_map(struct llist *node_list)
 {
@@ -83,10 +84,12 @@ struct hash * create_label2node_list_map(struct llist *node_list)
 	return map;
 }
 
-void destroy_label2node_list_map(struct hash *map)
+// TODO: have caller check for FAILURE
+int destroy_label2node_list_map(struct hash *map)
 {
 
 	struct llist *keys = hash_keys(map);	
+	if (NULL == keys) return FAILURE;
 	struct list_elem *el;
 	for (el = keys->head; NULL != el; el = el->next) {
 		char *label = el->data;
@@ -95,4 +98,6 @@ void destroy_label2node_list_map(struct hash *map)
 	}
 	destroy_llist(keys);
 	destroy_hash(map);
+
+	return SUCCESS;
 }

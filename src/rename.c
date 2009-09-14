@@ -254,6 +254,7 @@ int main(int argc, char *argv[])
 	}
 
 	struct llist *keys = hash_keys(rename_map);
+	if (NULL == keys) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *e;
 	for (e = keys->head; NULL != e; e = e->next) {
 		char *key = (char *) e->data;

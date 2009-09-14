@@ -89,7 +89,7 @@ int append_element(struct llist *list, void *data)
 	return SUCCESS;
 }
 
-// TODO: have caller check for NULL
+// caller checked
 struct llist *llist_reverse(struct llist *list)
 {
 	struct llist *result;
