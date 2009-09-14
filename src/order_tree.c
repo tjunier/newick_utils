@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "tree.h"
 #include "list.h"
+#include "common.h"
+#include "order_tree.h"
 
 int lbl_comparator(const void *a, const void *b)
 {
@@ -52,7 +54,7 @@ int lbl_comparator(const void *a, const void *b)
 	return cmp;
 }
 
-void order_tree(struct rooted_tree *tree)
+int order_tree(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
 
@@ -73,6 +75,7 @@ void order_tree(struct rooted_tree *tree)
 			int count = current->children->count;
 			kids_array = (struct rnode **)
 				llist_to_array(current->children);
+			if (NULL == kids_array) return FAILURE;
 			destroy_llist(current->children);
 			qsort(kids_array, count, sizeof(struct redge *),
 					lbl_comparator);
@@ -86,4 +89,6 @@ void order_tree(struct rooted_tree *tree)
 			free(kids_array);
 		}
 	}
+
+	return SUCCESS;
 }

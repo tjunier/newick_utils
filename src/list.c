@@ -313,7 +313,7 @@ void destroy_llist(struct llist *l)
 	free(l);
 }
 
-// TODO: have caller check for NULL
+// caller checked
 void ** llist_to_array (struct llist *l)
 {
 	if (0 == l->count) { return NULL; }
