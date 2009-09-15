@@ -178,6 +178,7 @@ int init_lbl2num(struct rooted_tree *tree)
 node_set union_of_child_node_sets(struct rnode *node)
 {
 	node_set result = create_node_set(num_leaves);
+	if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *el;
 
 	for (el = node->children->head; NULL != el; el = el->next) {
@@ -217,9 +218,15 @@ void compute_bipartitions(struct rooted_tree *tree)
 		struct rnode *current = (struct rnode *) el->data;
 		node_set set;
 		if (is_leaf(current)) {
-			int *num = (int *) hash_get(lbl2num, current->label);
-			assert (NULL != num);
+			int *num = hash_get(lbl2num, current->label);
+			if (NULL == num) {
+				fprintf(stderr,
+					"Label '%s' not found - aborting\n",
+					current->label);
+				exit(EXIT_FAILURE);
+			}
 			set = create_node_set(num_leaves);
+			if (NULL == set) {perror(NULL); exit(EXIT_FAILURE);}
 			node_set_add(set, *num, num_leaves);
 		} else {
 			set = union_of_child_node_sets(current);
@@ -325,6 +332,7 @@ void attribute_support_to_target_tree(struct rooted_tree *tree, int rep_count)
 			int *num = (int *) hash_get(lbl2num, current->label);
 			assert (NULL != num);
 			set = create_node_set(num_leaves);
+			if (NULL == set) {perror(NULL); exit(EXIT_FAILURE);}
 			node_set_add(set, *num, num_leaves);
 		} else {
 			set = union_of_child_node_sets(current);

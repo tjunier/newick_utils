@@ -50,7 +50,7 @@ const int BYTE_SIZE = 8;
 
 /* Fails if the tree has 0 nodes */
 
-// TODO: have caller check for NULL
+// caller checked
 node_set create_node_set(int node_count)
 {
 	node_set set;
@@ -58,7 +58,7 @@ node_set create_node_set(int node_count)
 	/* First, we need to see how many bytes we will need. */
 	int num_bytes = node_count / BYTE_SIZE;
        	/* if the remainder is not null, add one char */
-	if (node_count % BYTE_SIZE != 0) { num_bytes++; }
+	if (node_count % BYTE_SIZE != 0) num_bytes++;
 
 	/* allocate bytes and clear them */
 	assert(num_bytes != 0);
