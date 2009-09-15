@@ -112,6 +112,6 @@ int is_stair_node(struct rnode *node);
 
 /* Frees a node and all its descendants. Use this when you cannot use
  * destroy_tree(), e.g. when the tree structure has been altered. */ 
-/* Returns SUCCESS unless there was a problem (memory) */
+/* Like all free()ing functions, does not return error codes. */
 
-int free_descendants(struct rnode *node);
+void free_descendants(struct rnode *node);

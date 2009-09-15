@@ -105,12 +105,14 @@ void dump_rnode(void *arg)
 	printf ("rnode at %p: %s\n", node, node->label);
 }
 
-int free_descendants(struct rnode *node)
+/* If something fails, we just return. */
+void free_descendants(struct rnode *node)
 {
 	const int HASH_SIZE = 1000; 	/* pretty arbitrary */
 	struct hash *to_free = create_hash(HASH_SIZE);
-	if (NULL == to_free) return FAILURE;	
+	if (NULL == to_free) return;	
 	struct rnode_iterator *it = create_rnode_iterator(node);
+	if (NULL == it) return;
 	struct rnode *current;
 
 	/* Iterates through the tree nodes, "remembering" nodes seen for the
@@ -119,13 +121,13 @@ int free_descendants(struct rnode *node)
 		char *node_hash_key = make_hash_key(current);
 		if (NULL == hash_get(to_free, node_hash_key))
 			if (! hash_set(to_free, node_hash_key, current))
-				return FAILURE; 
+				return; 
                 free(node_hash_key);
 	}
 
 	// Frees all nodes "seen" above - which must be all the tree's nodes.
 	struct llist *keys = hash_keys(to_free);
-	if (NULL == keys) return FAILURE;
+	if (NULL == keys) return;
        	struct list_elem *el;
 	for (el = keys->head; NULL != el; el = el->next) {
 		char *key = el->data;
@@ -136,6 +138,4 @@ int free_descendants(struct rnode *node)
         destroy_llist(keys);
         destroy_hash(to_free);
 	destroy_rnode_iterator(it);
-
-	return SUCCESS;
 }

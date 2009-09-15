@@ -150,6 +150,7 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 struct llist *get_nodes_in_order(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);
+	if (NULL == it) return NULL;
 	struct hash *seen = create_hash(INIT_HASH_SIZE);
 	if (NULL == seen) return NULL;
 	struct rnode *current;
@@ -198,9 +199,11 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	return nodes_in_order;
 }
 
+// TODO: have caller check for NULL
 struct hash *get_leaf_label_map(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);
+	if (NULL == it) return NULL;
 	struct rnode *current;
 	struct hash *result = create_hash(INIT_HASH_SIZE);
 	if (NULL == result) return NULL;
