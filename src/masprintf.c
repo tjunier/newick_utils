@@ -67,7 +67,7 @@ char * masprintf(const char *fmt, ...)
 	}
 }
 
-// TODO: have caller check for NULL
+// TODO: is this f() ever used?
 char * mastrcat(char *dest, const char *src)
 {
 	size_t dest_len = strlen(dest);

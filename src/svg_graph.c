@@ -465,6 +465,7 @@ int set_group_numbers(struct rooted_tree *tree)
 	 * */
 	// TODO: think of making the label2node map a member of the tree structure.
 	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
+	if (NULL == map) return FAILURE;
 	for (elem = css_map->head; NULL != elem; elem = elem->next) {
 		css_el = elem->data;
 		if (INDIVIDUAL != css_el->group_type) continue;
@@ -537,6 +538,7 @@ int set_ornaments(struct rooted_tree *tree)
 
 	// TODO: think of making the label2node map a member of the tree structure.
 	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
+	if (NULL == map) return FAILURE;
 	for (elem = ornament_map->head; NULL != elem; elem = elem->next) {
 		oel = elem->data;
 		if (INDIVIDUAL != oel->group_type) continue;

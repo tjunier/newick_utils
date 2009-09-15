@@ -179,6 +179,7 @@ struct rnode *lca_from_labels_multi (struct rooted_tree *tree,
 	/* Make a hash of lists of nodes of the same label */
 	struct hash *nodes_by_label;
        	nodes_by_label = create_label2node_list_map(tree->nodes_in_order);
+	if (NULL == nodes_by_label) return NULL;
 
 	/* Iterate over labels, add all nodes that have the current label
 	 * (there may be more than one) to the list of descendants. */
