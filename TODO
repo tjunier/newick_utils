@@ -1,3 +1,5 @@
+CURRENT: check for return (and status) of rnode_iterator_next()
+
 general: the main loop should no longer unconditionally quit if parse_tree()
 returns NULL. Instead, it should look at the value of 'newick_parser_status'
 (an external var set by the parser), and take appropriate action - that is: i)

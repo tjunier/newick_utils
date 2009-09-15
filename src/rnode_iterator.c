@@ -49,7 +49,6 @@ struct rnode_iterator
 	enum iter_status status;
 };
 
-// TODO: have caller check for NULL
 struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 {
 	struct rnode_iterator *iter;
