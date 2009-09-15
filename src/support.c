@@ -175,6 +175,7 @@ int init_lbl2num(struct rooted_tree *tree)
 	return SUCCESS;
 }
 
+// TODO: shouldn't this call node_set_union() ?
 node_set union_of_child_node_sets(struct rnode *node)
 {
 	node_set result = create_node_set(num_leaves);
@@ -231,6 +232,10 @@ void compute_bipartitions(struct rooted_tree *tree)
 		} else {
 			set = union_of_child_node_sets(current);
 			char *node_set_string = node_set_to_s(set, num_leaves);
+			if (NULL == node_set_string) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 			add_bipart_count(node_set_string);
 			free(node_set_string);
 		}
@@ -337,6 +342,10 @@ void attribute_support_to_target_tree(struct rooted_tree *tree, int rep_count)
 		} else {
 			set = union_of_child_node_sets(current);
 			char *node_set_string = node_set_to_s(set, num_leaves);
+			if (NULL == node_set_string) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 			int * count_p = hash_get(bipart_counts, node_set_string);
 			int count;
 			if (NULL == count_p) {
