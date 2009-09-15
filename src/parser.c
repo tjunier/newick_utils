@@ -57,6 +57,9 @@ struct rooted_tree *parse_tree()
 		newick_parser_status = PARSER_STATUS_MALLOC_ERROR;
 		return NULL;
 	}
+
+	/* calls the YACC (Bison, in fact) parser. This sets 'root' and
+	 * 'newick_parser_status'. */
 	nwsparse();
 	
 	if (NULL != root) {

@@ -32,10 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "tree.h"
 #include "parser.h"
 #include "to_newick.h"
+#include "stdbool.h"
 
 enum actions { PURE_CLADES, STAIR_NODES }; /* not sure we'll keep stair nodes */
 
@@ -133,13 +135,32 @@ int main(int argc, char *argv[])
 	
 	params = get_params(argc, argv);
 
-	while (NULL != (tree = parse_tree())) {
-		collapse_pure_clades(tree);
-		char *newick = to_newick(tree->root);
-		printf ("%s\n", newick);
-		free(newick);
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+	while (true) {
+		tree = parse_tree();
+		if (NULL != tree) {
+			collapse_pure_clades(tree);
+			char *newick = to_newick(tree->root);
+			printf ("%s\n", newick);
+			free(newick);
+			destroy_tree(tree, DONT_FREE_NODE_DATA);
+		}
+		else switch (newick_parser_status) {
+			case PARSER_STATUS_EMPTY:	/* EOF, etc. */
+				/* goto is ok to break "twice" */
+				goto end;
+			case PARSER_STATUS_PARSE_ERROR:
+				/* for now, the parser prints the error message
+				 * */
+				break;
+			case PARSER_STATUS_MALLOC_ERROR:
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			default:
+				assert(0);	/* programmer error */
+		}
 	}
+
+end:
 
 	return 0;
 }

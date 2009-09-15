@@ -228,6 +228,7 @@ struct llist *read_css_map()
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) return NULL;
 		char *style = wt_next_noquote(wtok);
+		if (NULL == style) return NULL; 
 		char *type = wt_next(wtok);
 		char *label;
 		while ((label = wt_next(wtok)) != NULL) {
@@ -289,6 +290,7 @@ struct llist *read_ornament_map()
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) return NULL;
 		char *ornament = wt_next_noquote(wtok);
+		if (NULL == ornament) return NULL;
 		char *type = wt_next(wtok);
 		char *label;
 		while ((label = wt_next(wtok)) != NULL) {
