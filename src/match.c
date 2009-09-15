@@ -183,7 +183,7 @@ struct rooted_tree *get_ordered_pattern_tree(char *pattern)
 	}
 	newick_scanner_clear_string_input();
 
-	order_tree(pattern_tree);
+	if (!order_tree(pattern_tree)) { perror(NULL); exit(EXIT_FAILURE); }
 
 	return pattern_tree;
 }
@@ -321,22 +321,15 @@ void process_tree(struct rooted_tree *tree, struct hash *pattern_labels,
 {
 	// show_node_children_numbers(tree);
 	char *original_newick = to_newick(tree->root);
-	//printf ("%s\n", to_newick(tree->root));
 	remove_inner_node_labels(tree);
-	//printf ("%s\n", to_newick(tree->root));
 	prune_extra_labels(tree, pattern_labels);
 	/* NOTE prune_extra_labels() has altered topology! tree->nodes_in_order
 	 * is now invalid. */
-	//printf ("%s\n", to_newick(tree->root));
 	prune_empty_labels(tree);
-	//printf ("%s\n", to_newick(tree->root));
 	remove_knee_nodes(tree);
-	//printf ("%s\n", to_newick(tree->root));
 	remove_branch_lengths(tree);	
-	//printf ("%s\n", to_newick(tree->root));
-	order_tree(tree);
+	if (! order_tree(tree)) { perror(NULL); exit(EXIT_FAILURE); }
 	char *processed_newick = to_newick(tree->root);
-	//printf ("%s\n", processed_newick);
 	int match = (0 == strcmp(processed_newick, pattern_newick));
 	match = params.reverse ? !match : match;
 	if (match) printf ("%s\n", original_newick);

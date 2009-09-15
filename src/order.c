@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 	get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		order_tree(tree);
+		if (! order_tree(tree)) { perror(NULL); exit(EXIT_FAILURE); }
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);
