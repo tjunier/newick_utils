@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "simple_node_pos.h"
 #include "rnode.h"
 #include "node_pos_alloc.h"
+#include "common.h"
+#include "graph_common.h"
 
 static const int LBL_SPACE = 2;
 static const int ROOT_SPACE = 1;
@@ -84,7 +86,8 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 have to be passed, increasing coupling and diminishing implementation hiding.
 What's more, we can't assume that the new tree will fit in the old canvas. */
 
-void display_tree(struct rooted_tree *tree, int width, int align_leaves)
+// TODO: have caller check for status
+enum display_status display_tree(struct rooted_tree *tree, int width, int align_leaves)
 {	
 	/* set node positions */
 	alloc_simple_node_pos(tree);
@@ -96,6 +99,7 @@ void display_tree(struct rooted_tree *tree, int width, int align_leaves)
 	struct h_data hd = set_node_depth_cb(tree,
 			set_simple_node_pos_depth,
 			get_simple_node_pos_depth);
+	if (FAILURE == hd.status) return DISPLAY_MEM_ERROR;
 	double scale = -1;
 	struct canvas *canvasp;
 
@@ -110,4 +114,6 @@ void display_tree(struct rooted_tree *tree, int width, int align_leaves)
 
 	/* release memory */
 	destroy_canvas(canvasp);
+
+	return DISPLAY_OK;
 }

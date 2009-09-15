@@ -28,7 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
-enum display_status { DISPLAY_OK, DISPLAY_UNKNOWN_STYLE, DISPLAY_MEM_ERROR };
 
 /* Functions for displaying a tree as SVG. User should call any of the
  * set_svg_*() functions that are needed, then svg_init(), then svg_header(),

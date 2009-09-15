@@ -78,7 +78,7 @@ int set_node_vpos_cb(struct rooted_tree *t,
 	return leaf_count;
 }
 
-// TODO: have caller check for FAILURE (in returned struct)
+// caller checked
 struct h_data set_node_depth_cb(struct rooted_tree *tree,
 		void (*set_node_depth)(struct rnode *, double),
 		double (*get_node_depth)(struct rnode *))
@@ -92,7 +92,7 @@ struct h_data set_node_depth_cb(struct rooted_tree *tree,
 	result.status = FAILURE; 
 
 	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
-	if (NULL == nodes_in_reverse_order) return result;
+	if (NULL == nodes_in_reverse_order) return result; /* fails! */
 
 	/* set the root's depth to 0 */
 	elem = nodes_in_reverse_order->head;

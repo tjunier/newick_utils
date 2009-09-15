@@ -1,4 +1,8 @@
-general: check that the destroy_*() functions return an error code (and that it is heeded)
+general: check that the destroy_*() functions return an error code (and that it
+is heeded) -- but do we really always care? What if memory can be free()d
+later? For when a destroy_*() function fails, it is typically because it is
+trying to build a list of (ptrs to) structures that must be freed. This does
+not preclude further calls to free() from working. */
 
 CURRENTLY: ensure that the return value of append_element() is being checked.
 

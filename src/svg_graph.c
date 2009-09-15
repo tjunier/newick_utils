@@ -725,6 +725,7 @@ void draw_scale_bar(int hpos, double vpos,
 	printf ("</g>");
 }
 
+// TODO: have caller check for status
 enum display_status display_svg_tree(
 		struct rooted_tree *tree,
 		int align_leaves,
@@ -735,12 +736,13 @@ enum display_status display_svg_tree(
 
 	/* set node positions - these are a property of the tree, and are
 	 * independent of the graphics port or style */
- 	if (! svg_alloc_node_pos(tree)) return FAILURE;
+ 	if (! svg_alloc_node_pos(tree)) return DISPLAY_MEM_ERROR;
 	set_node_vpos_cb(tree,
 			svg_set_node_top, svg_set_node_bottom,
 			svg_get_node_top, svg_get_node_bottom);
 	struct h_data hd = set_node_depth_cb(tree,
 			svg_set_node_depth, svg_get_node_depth);
+	if (FAILURE == hd.status) return DISPLAY_MEM_ERROR;
 
 	if (css_map) set_group_numbers(tree);
 	if (ornament_map) set_ornaments(tree);

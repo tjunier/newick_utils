@@ -83,12 +83,11 @@ struct hash * create_label2node_list_map(struct llist *node_list)
 	return map;
 }
 
-// TODO: have caller check for FAILURE
-int destroy_label2node_list_map(struct hash *map)
+void destroy_label2node_list_map(struct hash *map)
 {
 
 	struct llist *keys = hash_keys(map);	
-	if (NULL == keys) return FAILURE;
+	if (NULL == keys) return;
 	struct list_elem *el;
 	for (el = keys->head; NULL != el; el = el->next) {
 		char *label = el->data;
@@ -97,6 +96,4 @@ int destroy_label2node_list_map(struct hash *map)
 	}
 	destroy_llist(keys);
 	destroy_hash(map);
-
-	return SUCCESS;
 }

@@ -586,7 +586,7 @@ int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params;
-	
+	struct h_data depths;	
 	params = get_params(argc, argv);
 
 	/* TODO: could take the switch out of the loop, since the distance type
@@ -596,9 +596,13 @@ int main(int argc, char *argv[])
 
 	while ((tree = parse_tree()) != NULL) {
 		alloc_simple_node_pos(tree);
-		set_node_depth_cb(tree,
+		depths = set_node_depth_cb(tree,
 				set_simple_node_pos_depth,
 				get_simple_node_pos_depth);
+		if (FAILURE == depths.status) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
 		struct rnode *lca_node;
 		struct llist *selected_nodes;
 
