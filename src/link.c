@@ -188,7 +188,7 @@ int remove_child(struct rnode *child)
 	struct rnode *parent = child->parent;
 	struct llist *kids = parent->children;
 	int n = llist_index_of(kids, child);
-	assert(n != -1);
+	assert(n >= 0);
 	struct llist *deleted = delete_after(kids, n-1, 1);
 	if (NULL == deleted) return RM_CHILD_MEM_ERROR;
 	child->parent = NULL;
@@ -212,6 +212,7 @@ int insert_child(struct rnode *parent, struct rnode *child, int index)
 }
 
 // caller checked
+// TODO: return value should differentiate between mem error and child-is-root
 int swap_nodes(struct rnode *node)
 {
 	assert(NULL != node->parent);
@@ -219,7 +220,7 @@ int swap_nodes(struct rnode *node)
 
 	struct rnode *parent = node->parent;
 	char *length = strdup(node->edge_length_as_string);
-	if (! remove_child(node)) return FAILURE;
+	if(remove_child(node) < 0) return FAILURE;
 	if (! add_child(node, parent)) return FAILURE;
 
 	free(node->edge_length_as_string);
