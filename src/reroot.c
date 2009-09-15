@@ -188,7 +188,6 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
  * but may also mean ingroup nodes, if option -l was passed and rerooting on
  * outgroup failed. */
 
-// TODO: have caller check status
 int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 {
 	struct rnode *outgroup_root;
