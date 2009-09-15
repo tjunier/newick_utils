@@ -179,8 +179,7 @@ int splice_out_rnode(struct rnode *this)
 	return SUCCESS;
 }
 
-// HERE!!!
-// TODO: have caller check for status.
+// caller checked
 int remove_child(struct rnode *child)
 {
 	if (is_root(child)) return RM_CHILD_IS_ROOT;;
