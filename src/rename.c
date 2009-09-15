@@ -43,10 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "readline.h"
 #include "common.h"
 
-enum read_map_error_type { READ_MAP_FOPEN, READ_MAP_FORMAT, READ_MAP_MEM };
-
-static enum read_map_error_type read_map_error;
-static char* read_map_error_line;
 
 struct parameters {
 	char  *map_filename;
@@ -119,62 +115,45 @@ void help(char *argv[])
 	);
 }
 
-// TODO: have caller check value
 struct hash *read_map(const char *filename)
 {
 	const int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
 
 	FILE *map_file = fopen(filename, "r");
-	if (NULL == map_file) {
-		read_map_error = READ_MAP_FOPEN;
-		return NULL;
-	}
+	if (NULL == map_file) { perror(NULL); exit(EXIT_FAILURE); }
 
 	struct hash *map = create_hash(HASH_SIZE);
-	if (NULL == map) {
-		read_map_error = READ_MAP_MEM;
-		return NULL;
-	}
+	if (NULL == map) { perror(NULL); exit(EXIT_FAILURE); }
 
 	char *line;
 	while (NULL != (line = read_line(map_file))) {
 		char *key, *value;
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
-		if (NULL == wtok) {
-			read_map_error = READ_MAP_MEM;
-			return NULL; 
-		}
+		if (NULL == wtok) { perror(NULL); exit(EXIT_FAILURE); }
 		key = wt_next(wtok);	/* find first whitespace */
 		if (NULL == key) {
-			read_map_error = READ_MAP_FORMAT;
-			read_map_error_line = line;
-			return NULL;
+			fprintf (stderr,
+				"Wrong format in line %s - aborting.\n",
+				line);
+			exit(EXIT_FAILURE);
 		}
 		value = wt_next(wtok);
 		if (NULL == value) {
-			read_map_error = READ_MAP_FORMAT;
-			read_map_error_line = line;
-			return NULL;
+			fprintf (stderr,
+				"Wrong format in line %s - aborting.\n",
+				line);
+			exit(EXIT_FAILURE);
 		}
 		if (! hash_set(map, key, (void *) value)) {
-			read_map_error = READ_MAP_MEM;
-			return NULL;
+			perror(NULL);
+			exit(EXIT_FAILURE);
 		}
 		destroy_word_tokenizer(wtok);
 		free(key); /* copied by hash_set(), so can be free()d now */
 		free(line);
 	}
 
-	// TODO: have caller check value
-	switch (read_line_status) {
-		case READLINE_EOF:
-			return map;
-		case READLINE_ERROR:
-			read_map_error = READ_MAP_MEM;
-			return NULL;
-		default:
-			assert(0);	/* programmer error */
-	}
+	return map;
 }
 
 struct parameters get_params(int argc, char *argv[])
