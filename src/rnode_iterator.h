@@ -31,8 +31,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * functions that depend on those */
 
 struct rnode;
-struct rnode_iterator;
 struct llist;
+enum iter_status { RNODE_ITERATOR_INIT, RNODE_ITERATOR_END,
+	RNODE_ITERATOR_ERROR };
+
+struct rnode_iterator
+{
+	struct rnode *root;	/* starting point */
+	struct rnode *current;
+	struct hash *seen;
+	enum iter_status status;
+};
+
 
 /* Creates an iterator. You can then pass it to the functions below. */
 /* Returns NULL in case of problems (which will be with allocation) */
@@ -43,7 +53,9 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root);
 
 void destroy_rnode_iterator(struct rnode_iterator *);
 
-/* Gets the next node information */
+/* Gets the next node. Returns NULL if there is no more nodes, or in case of
+ * error. Sets the 'status' flag of the iterator to indicate the reason for
+ * NULL.  */
 
 struct rnode *rnode_iterator_next(struct rnode_iterator *);
 

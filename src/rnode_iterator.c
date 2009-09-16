@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "rnode_iterator.h"
 #include "hash.h"
@@ -39,15 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SEEN "SEEN"
 
 static const int INIT_HASH_SIZE = 1000;
-enum iter_status { RNODE_ITERATOR_END, RNODE_ITERATOR_ERROR };
-
-struct rnode_iterator
-{
-	struct rnode *root;	/* starting point */
-	struct rnode *current;
-	struct hash *seen;
-	enum iter_status status;
-};
 
 struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 {
@@ -58,6 +50,7 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 	iter->root = iter->current = root;
 	iter->seen = create_hash(INIT_HASH_SIZE);
 	if (NULL == iter->seen) return NULL;
+	iter->status = RNODE_ITERATOR_INIT;
 
 	return iter;
 }
@@ -109,7 +102,11 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 {
 	char *current_node_hash_key = make_hash_key(iter->current);
 
-	if (is_leaf(iter->current)) {
+	/* We have to consider the case of a single-node tree (this happens
+	 * e.g. in nw_match if none of the labels in the pattern tree is found
+	 * in the target tree). The single node is in this case both a leaf (no
+	 * children) and the root (no parent). Hence the double test below. */
+	if (is_leaf(iter->current) && ! is_root(iter->current)) {
 		if (! hash_set(iter->seen, current_node_hash_key, SEEN)) {
 			iter->status = RNODE_ITERATOR_ERROR;
 			return NULL;
@@ -166,6 +163,17 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	while ((current = rnode_iterator_next(it)) != NULL) {
 		if (! append_element (traversal, current)) return NULL;
 	}
+	/* rnode_iterator_next() returned NULL: see why */
+	switch (it->status) {
+		case RNODE_ITERATOR_END:
+			break;	/* Ok */
+		case RNODE_ITERATOR_ERROR:
+			return NULL;
+		case RNODE_ITERATOR_INIT: /* should now be end or error */
+		default:
+			assert(0);	/* programmer error */
+	}
+
 	destroy_rnode_iterator(it);
 
 	reverse_traversal = llist_reverse(traversal);
@@ -215,6 +223,15 @@ struct hash *get_leaf_label_map(struct rnode *root)
 						return NULL;
 			}
 		}
+	}
+	/* See why rnode_iterator_next() returned NULL */
+	switch (it->status) {
+		case RNODE_ITERATOR_END:
+			break;	/* Ok */
+		case RNODE_ITERATOR_ERROR:
+			return NULL;
+		default:
+			assert(0);	/* programmer error */
 	}
 
 	destroy_rnode_iterator(it);

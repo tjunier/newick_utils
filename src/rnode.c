@@ -124,6 +124,15 @@ void free_descendants(struct rnode *node)
 				return; 
                 free(node_hash_key);
 	}
+	/* rnode_iterator_next() returned NULL: see why */
+	switch (it->status) {
+		case RNODE_ITERATOR_END:
+			break;	/* Ok */
+		case RNODE_ITERATOR_ERROR:
+			return;
+		default:
+			assert(0);	/* programmer error */
+	}
 
 	// Frees all nodes "seen" above - which must be all the tree's nodes.
 	struct llist *keys = hash_keys(to_free);
