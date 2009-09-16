@@ -369,7 +369,6 @@ struct hash *read_url_map()
 		free(escaped_url);
 	}
 
-	// TODO: have caller check value
 	switch (read_line_status) {
 		case READLINE_EOF:
 			return url_map;
@@ -419,7 +418,7 @@ void dump_label (void *lbl) { puts((char *) lbl); }
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
-// TODO: have caller check for FAILURE
+// caller checked
 int set_group_numbers(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -514,7 +513,7 @@ int set_group_numbers(struct rooted_tree *tree)
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
-// TODO: have caller check for FAILURE
+// caller checked
 int set_ornaments(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -727,7 +726,7 @@ void draw_scale_bar(int hpos, double vpos,
 	printf ("</g>");
 }
 
-// TODO: have caller check for status
+// caller checked
 enum display_status display_svg_tree(
 		struct rooted_tree *tree,
 		int align_leaves,
@@ -746,8 +745,14 @@ enum display_status display_svg_tree(
 			svg_set_node_depth, svg_get_node_depth);
 	if (FAILURE == hd.status) return DISPLAY_MEM_ERROR;
 
-	if (css_map) set_group_numbers(tree);
-	if (ornament_map) set_ornaments(tree);
+	if (css_map)
+		if (! set_group_numbers(tree))
+			return DISPLAY_MEM_ERROR;
+
+	if (ornament_map)
+		if (! set_ornaments(tree))
+			return DISPLAY_MEM_ERROR;
+
  	prettify_labels(tree);
 
 	if (SVG_ORTHOGONAL == graph_style)

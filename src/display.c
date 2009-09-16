@@ -398,8 +398,22 @@ int main(int argc, char *argv[])
 
 			svg_header(leaf_count(tree), with_scale_bar);
 			svg_run_params_comment(argc, argv);
-			display_svg_tree(tree, align_leaves, with_scale_bar,
+			enum display_status status = 
+				display_svg_tree(tree,
+					align_leaves, with_scale_bar,
 					params.branch_length_unit);
+			switch(status) {
+				case DISPLAY_OK:
+					break;
+					assert(0);
+				case DISPLAY_MEM_ERROR:
+					perror(NULL);
+					exit(EXIT_FAILURE);
+				/* The following two should never happen */
+				case DISPLAY_UNKNOWN_STYLE:
+				default:
+					assert(0);
+			}
 			svg_footer();
 		} else {
 			prettify_labels(tree);
