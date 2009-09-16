@@ -338,7 +338,7 @@ struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 	return result;
 }
 
-// TODO: have caller check for NULL
+// caller checked
 struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 {
        				       
@@ -364,7 +364,7 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 }
 
 /* Clones a clade (recursively) */
-// TODO: have caller check for NULL
+// caller checked
 // TODO: try an iterative version using a rnode_iterator
 static struct rnode *clone_clade(struct rnode *root)
 {
@@ -375,6 +375,7 @@ static struct rnode *clone_clade(struct rnode *root)
 	for (el = root->children->head; NULL != el; el = el->next) {
 		struct rnode *kid = el->data;
 		struct rnode *kid_clone = clone_clade(kid);
+		if (NULL == kid_clone) return NULL;
 		if (! add_child(root_clone, kid_clone)) return NULL;
 	}
 
