@@ -48,7 +48,7 @@ const int DONT_FREE_NODE_DATA = 0;
 
 /* 'outgroup' is the node which will be the outgroup after rerooting. */
 
-// TODO: have caller check for FAILURE
+// caller checked
 int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 {
 	struct rnode *old_root = tree->root;
@@ -195,7 +195,7 @@ int leaf_count(struct rooted_tree * tree)
 	return n;
 }
 
-// TODO: have caller check for NULL
+// TODO: is this ever used?
 struct llist *get_leaf_labels(struct rooted_tree *tree)
 {
 	struct llist *labels = create_llist();
@@ -213,7 +213,7 @@ struct llist *get_leaf_labels(struct rooted_tree *tree)
 	return labels;
 }
 
-// TODO: have caller check for NULL
+// TODO: is this ever used?
 struct llist *get_labels(struct rooted_tree *tree)
 {
 	struct llist *labels = create_llist();
@@ -270,7 +270,7 @@ enum tree_type get_tree_type(struct rooted_tree *tree)
 		return TREE_TYPE_NEITHER;	/* weird, but legal */
 }
 
-// TODO: have caller check for NULL
+// caller checked
 struct llist *nodes_from_labels(struct rooted_tree *tree,
 		struct llist *labels)
 {

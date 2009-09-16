@@ -264,6 +264,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	switch (params.mode) {
 	case EXACT:
 		descendants = nodes_from_labels(tree, params.labels);
+		if (NULL == descendants) { perror(NULL); exit(EXIT_FAILURE); }
 		if (0 == descendants->count) {
 			fprintf (stderr, "WARNING: no label matches.\n");
 			/* I don't consider this a failure: it is just the case

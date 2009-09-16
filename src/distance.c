@@ -609,6 +609,10 @@ int main(int argc, char *argv[])
 		if (ARGV_LABELS == params.selection) {
 			selected_nodes = nodes_from_labels(tree,
 					params.labels);
+			if (NULL == selected_nodes) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 		} else {
 			selected_nodes = get_selected_nodes(tree,
 					params.selection);
