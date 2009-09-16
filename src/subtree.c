@@ -275,6 +275,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		break;
 	case REGEXP:
 		descendants = nodes_from_regexp(tree, params.regexp);
+		if (NULL == descendants) { perror(NULL); exit(EXIT_FAILURE); }
 		if (0 == descendants->count) {
 			fprintf (stderr, "WARNING: no match for regexp /%s/\n",
 					params.regexp_string);

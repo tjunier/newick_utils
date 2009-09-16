@@ -294,7 +294,7 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 	return result;
 }
 
-// TODO: have caller check for NULL
+// TODO: is this ever used?
 struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 		char *regexp_string)
 {
