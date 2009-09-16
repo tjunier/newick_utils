@@ -191,7 +191,6 @@ node_set union_of_child_node_sets(struct rnode *node)
 	return result;
 }
 
-// TODO: have caller check for FAILURE
 int add_bipart_count(const char *node_set_string)
 {
 	int *count = hash_get(bipart_counts, node_set_string);
@@ -236,7 +235,10 @@ void compute_bipartitions(struct rooted_tree *tree)
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
-			add_bipart_count(node_set_string);
+			if (! add_bipart_count(node_set_string)) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 			free(node_set_string);
 		}
 		current->data = set;
