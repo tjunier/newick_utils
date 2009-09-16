@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "common.h"
 #include "list.h"
@@ -373,6 +374,7 @@ int main(int argc, char *argv[])
 	struct parameters params;
 	int align_leaves;
 	int with_scale_bar;
+	enum display_status status; 
 
 	params = get_params(argc, argv);
 
@@ -398,8 +400,7 @@ int main(int argc, char *argv[])
 
 			svg_header(leaf_count(tree), with_scale_bar);
 			svg_run_params_comment(argc, argv);
-			enum display_status status = 
-				display_svg_tree(tree,
+			status = display_svg_tree(tree,
 					align_leaves, with_scale_bar,
 					params.branch_length_unit);
 			switch(status) {
@@ -417,7 +418,19 @@ int main(int argc, char *argv[])
 			svg_footer();
 		} else {
 			prettify_labels(tree);
-			display_tree(tree, params.width, align_leaves);
+			status = display_tree(tree, params.width, align_leaves);
+			switch(status) {
+				case DISPLAY_OK:
+					break;
+					assert(0);
+				case DISPLAY_MEM_ERROR:
+					perror(NULL);
+					exit(EXIT_FAILURE);
+				/* The following two should never happen */
+				case DISPLAY_UNKNOWN_STYLE:
+				default:
+					assert(0);
+			}
 		}
 		destroy_tree(tree, FREE_NODE_DATA);
 	}

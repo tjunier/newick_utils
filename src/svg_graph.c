@@ -255,7 +255,6 @@ struct llist *read_css_map()
 
 	fclose(css_map_file);
 
-	// TODO: have caller check value
 	switch (read_line_status) {
 		case READLINE_EOF:
 			return css_map;
@@ -316,7 +315,6 @@ struct llist *read_ornament_map()
 
 	fclose(ornament_map_file);
 
-	// TODO: have caller check value
 	switch (read_line_status) {
 		case READLINE_EOF:
 			return ornament_map;
