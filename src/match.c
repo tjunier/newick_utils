@@ -245,6 +245,7 @@ void prune_empty_labels(struct rooted_tree *target_tree)
 	/* I'm getting the lilst of nodes dynamically, because the tree has
 	 * been altered. */
 	struct llist *nodes_in_order = get_nodes_in_order(target_tree->root);
+	if (NULL == nodes_in_order) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *el;
 	for (el=nodes_in_order->head; NULL != el; el=el->next) {
 		struct rnode *current = el->data;
@@ -263,8 +264,7 @@ void prune_empty_labels(struct rooted_tree *target_tree)
 					*/
 					break;
 				case UNLINK_RNODE_ERROR:
-					fprintf (stderr, "Memory error - "
-							"exiting.\n");
+					perror(NULL);
 					exit(EXIT_FAILURE);
 				default:
 					assert(0); /* programmer error */
@@ -295,6 +295,7 @@ void remove_knee_nodes(struct rooted_tree *tree)
 {
 	/* tree was modified -> can't use its ordered node list */
 	struct llist *nodes_in_order = get_nodes_in_order(tree->root);
+	if (NULL == nodes_in_order) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *el;
 
 	for (el = nodes_in_order->head; NULL != el; el = el->next) {
@@ -302,8 +303,7 @@ void remove_knee_nodes(struct rooted_tree *tree)
 		if (is_inner_node(current))
 			if (1 == children_count(current))
 				if (! splice_out_rnode(current)) {
-					fprintf (stderr,
-					"Memory error - exiting.\n");
+					perror(NULL);
 					exit(EXIT_FAILURE);
 				}
 	}

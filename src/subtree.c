@@ -231,11 +231,15 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+// TODO: 
+//  o this f() should be a library f()
+//  o it should return codes for: yes, no, error
 int is_monophyletic(struct llist *descendants, struct rnode *subtree_root)
 {
 	int result = TRUE;
 
 	struct hash *leaf_map = get_leaf_label_map(subtree_root);
+	if (NULL == leaf_map) { perror(NULL); exit(EXIT_FAILURE); }
 	if (leaf_map->count != descendants->count) {
 		result = FALSE;
 	}

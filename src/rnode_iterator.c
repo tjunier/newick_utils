@@ -97,7 +97,7 @@ static struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 	return NULL;	/* no unvisited child left */
 }
 
-// TODO: have caller check for NULL and status
+// caller checked
 struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 {
 	char *current_node_hash_key = make_hash_key(iter->current);
@@ -142,7 +142,7 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 /* Computes the list by doing a tree traversal, then reversing it, printing out
  * each node the first time it sees it. */
 
-// TODO: have caller check for NULL
+// caller checked
 struct llist *get_nodes_in_order(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);
@@ -158,8 +158,8 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	struct llist *nodes_in_order;
 	char *current_hash_key;
 
-	/* Iterates over the whole tree - note that a node is visite dmore than
-	 * once, except for leaves. */
+	/* Iterates over the whole tree - note that a node is visited more than
+	 * once, except leaves. */
 	while ((current = rnode_iterator_next(it)) != NULL) {
 		if (! append_element (traversal, current)) return NULL;
 	}
@@ -181,6 +181,7 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	destroy_llist(traversal);
 
 	/* This keeps only the first 'visit' through any node */
+	// TODO: can't this be done in the first traversal, above?
 	struct list_elem *el;
 	for (el = reverse_traversal->head; NULL != el; el = el->next) {
 		current = el->data;
@@ -206,7 +207,7 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	return nodes_in_order;
 }
 
-// TODO: have caller check for NULL
+// caller checked
 struct hash *get_leaf_label_map(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);

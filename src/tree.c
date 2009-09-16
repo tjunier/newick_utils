@@ -381,11 +381,13 @@ static struct rnode *clone_clade(struct rnode *root)
 	return root_clone;
 }
 
+// TODO: have caller check for NULL
 struct rooted_tree* clone_subtree(struct rnode *root)
 {
 	struct rnode *root_clone = clone_clade(root);
 	if (NULL == root_clone) return NULL;
 	struct llist *nodes_in_order_clone = get_nodes_in_order(root_clone);
+	if (NULL == nodes_in_order_clone) return NULL;
 
 	struct rooted_tree *clone = malloc(sizeof(struct rooted_tree));
 	if (NULL == clone) return NULL;
