@@ -36,10 +36,16 @@ enum parser_status_type {
 };
 struct rooted_tree;
 
+extern enum parser_status_type newick_parser_status;
+
+/* Sets the parser's input to the file whose name is passed as argument.
+ * Returns FAILURE iff there was a problem (file not found, or error, etc).
+ * */
+
+int set_parser_input_filename (char *filename);
+
 /* Parses a tree from nwsin, returns a pointer to a tree structure, or NULL if
  * there is no input. It is the caller's responsibility to set nwsin (which by
- * default is stdin). */
-
-extern enum parser_status_type newick_parser_status;
+ * default is stdin). Use one of the set_parser_input_*() functions.. */
 
 struct rooted_tree *parse_tree();

@@ -34,12 +34,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // #include "newick.tab.h"
 #include "tree.h"
 #include "parser.h"
+#include "common.h"
 
 struct llist *nodes_in_order;
 struct rnode *root;
 enum parser_status_type newick_parser_status;
 
 int nwsparse(); // TODO: rm this if fails
+
+int set_parser_input_filename (char *filename)
+{
+	extern FILE *nwsin;
+	FILE *fin = fopen(filename, "r");
+	if (NULL == fin) return FAILURE;
+	nwsin = fin;
+
+	return SUCCESS;
+}
 
 // TODO: have caller check value
 struct rooted_tree *parse_tree()

@@ -35,6 +35,13 @@ class llist(Structure):
 		    ('tail', POINTER(list_elem)),
 		    ('count', c_int)]
 
+class hash(Structure):
+	_fields_ = [
+			('llist', POINTER(POINTER(llist))),
+			('size', c_int),
+			('count', c_int)
+			]
+
 class rnode(Structure):
 	pass
 rnode._fields_ = [('parent', POINTER(rnode)),
@@ -49,8 +56,26 @@ class rooted_tree(Structure):
 		    ('nodes_in_order', POINTER(llist))]
 
 ################################################################
+# C enums mapped to Python constants
+
+# tree.h
+(TREE_TYPE_UNKNOWN, TREE_TYPE_CLADOGRAM, TREE_TYPE_PHYLOGRAM,
+		TREE_TYPE_NEITHER) = xrange(4)
+
+################################################################
 # C functions
 
+libnw.create_hash.argtypes = [c_int]
+libnw.create_hash.restype = POINTER(hash)
+libnw.hash_set.argtypes = [POINTER(hash), c_char_p, c_void_p]
+libnw.hash_get.argtypes = [POINTER(hash), c_char_p]
+libnw.hash_get.restype = c_void_p
+
+libnw.create_llist.restype = POINTER(llist)
+libnw.append_element.argtypes = [POINTER(llist), c_void_p]
+
+libnw.set_parser_input_filename.argtypes = [c_char_p]
+libnw.newick_scanner_set_string_input.argtypes = [c_char_p]
 libnw.parse_tree.restype = POINTER(rooted_tree)
 
 libnw.to_newick.argtypes = [POINTER(rnode)]
@@ -59,14 +84,24 @@ libnw.to_newick.restype = c_char_p
 libnw.is_leaf.argtypes = [POINTER(rnode)]
 libnw.children_count.argtypes = [POINTER(rnode)]
 
-libnw.is_cladogram.argtypes = [POINTER(rooted_tree)]
+libnw.lca_from_labels_multi.argtypes = [POINTER(rooted_tree), POINTER(llist)]
+libnw.lca_from_labels_multi.restype = POINTER(rnode)
+
+libnw.get_tree_type.argtypes = [POINTER(rooted_tree)]
 
 ################################################################
 # User-land Python classes
 
+
 class Llist(object):
 
+	'''This class is meant to be used as an iterator, e.g.
+	      list = Llist(list_pointer)
+		  for element in list:
+		      # do something with 'element' '''
+
 	def __init__(self, llist):
+		'''Constructor. Arg is a llist'''
 		self.llist = llist
 		current = self.llist.head
 		self.py_list = []
@@ -76,6 +111,17 @@ class Llist(object):
 
 	def __iter__(self):
 		return iter(self.py_list)
+
+class Hash(object):
+
+	def __init__(self, c_hash_p):
+		self.hash = c_hash_p.contents
+
+	def __setitem__(self, key, value):
+		libnw.hash_set(self.hash, key, value)
+
+	def __getitem__(self, key):
+		return libnw.hash_get(self.hash, key)
 
 class Rnode(object):
 
@@ -89,13 +135,16 @@ class Rnode(object):
 		c_rnode_address = cast(c_rnode_p, c_void_p).value
 		# Add self to dictionary (see above)
 		Rnode.c_addr_to_py_obj[c_rnode_address] = self
-
-	def get_label(self):
-		return self.rnode.label
+		self.label = self.rnode.label
+		self.parent = None
 
 	def get_parent(self):
-		parent_addr = cast(self.rnode.parent, c_void_p).value
-		return Rnode.c_addr_to_py_obj[parent_addr]
+		if self.parent is None:
+			# We can't do this in the ctor since parent may not be in the
+			# 'c_addr_to_py_obj' dict yet.
+			parent_addr = cast(self.rnode.parent, c_void_p).value
+			self.parent = Rnode.c_addr_to_py_obj[parent_addr]
+		return self.parent
 
 	def set_depth(self, depth):
 		self.depth = depth
@@ -123,14 +172,25 @@ class Rnode(object):
 
 class Tree(object):
 
-	# Some class constants
-	PHYLOGRAM = 'Phylogram'
-	CLADOGRAM = 'Cladogram'
-
 	@classmethod
-	def parse_newick_input(cls):
-		'''A generator method that yields trees.
-		Usage e.g. 'for tree in parse_newick_input():' '''
+	def parse_newick_input(cls, source='', type='filename'):
+		'''
+		A generator method that yields trees.
+		Usage e.g.:
+			parse_newick_input()	# parses stdin
+			parse_newick_input('my_file')	# parses 'my file'
+			# parse a string:
+			parse_newick_input('((A,B),C);', type='string')
+		'''
+		# Set input source
+		if type == 'filename': 
+			if source != '':	# a named file; otherwise uses stdin
+				libnw.set_parser_input_filename(source)
+		elif type == 'string':
+			libnw.newick_scanner_set_string_input(source)
+		else:
+			raise RuntimeError("Unknown type '%s'" % type)
+		# Yield trees
 		while True:
 			tree = libnw.parse_tree()
 			if bool(tree):
@@ -139,6 +199,8 @@ class Tree(object):
 				return
 
 	def __init__(self, tree):
+		'''Do not call this function directly. Use Tree.parse_newick_input to
+		parse trees from an input source.'''
 		self.tree = tree
 		self.root = tree.root.contents
 		nodes_in_order = Llist(self.tree.nodes_in_order.contents)
@@ -187,10 +249,7 @@ class Tree(object):
 	def get_type(self):
 		'''Returns CLADOGRAM IFF tree contains NO edge lengths (this is
 		different from zero-length edges!), otherwise returns PHYLOGRAM'''
-		if bool(libnw.is_cladogram(self.tree)):
-			return Tree.CLADOGRAM
-		else:
-			return Tree.PHYLOGRAM
+		return libnw.get_tree_type(self.tree)
 
 	def get_leaf_count(self):
 		count = 0
@@ -198,3 +257,14 @@ class Tree(object):
 			if node.is_leaf():
 				count += 1
 		return count
+
+	def lca_from_labels(self, labels):
+		'''Returns an Rnode which is the last common ancestor of the nodes 
+		whose labels are passed in list 'labels_list', or None if for some
+		reason the LCA can't be found.'''
+		c_labels = libnw.create_llist()
+		for label in labels:
+			libnw.append_element(c_labels, label)
+		c_lca = libnw.lca_from_labels_multi(self.tree, c_labels)
+		c_rnode_address = cast(c_lca, c_void_p).value
+		return Rnode.c_addr_to_py_obj[c_rnode_address]

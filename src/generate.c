@@ -129,17 +129,15 @@ int main(int argc, char *argv[])
 	struct parameters params = get_params(argc, argv);
 	srand(params.seed);
 
-	// geometric_tree(params.prob_node_has_children);
+	// TODO: offer geometric trees as well, and don't forget to check the
+	// return value of geometric_tree().
+	/* geometric_tree(params.prob_node_has_children); */
 
 	// The 1st parameter is the exponential distribution's rate parameter,
 	// which is the inverse of the mean.
 	int result = time_limited_tree(1.0 / params.mean_branch_length,
 			params.duration);
-	if (result)
-		exit(EXIT_SUCCESS);
-	else {
-		fprintf (stderr, "Memory allocation problem");
-		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
+	if (! result) { perror(NULL); exit(EXIT_FAILURE); }
+
+	exit(EXIT_SUCCESS);
 }

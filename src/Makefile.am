@@ -18,7 +18,7 @@ HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
 # is not necessary, it builds just fine)
 NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
 	link.c tree.c nodemap.c hash.c rnode_iterator.c \
-	masprintf.c to_newick.c concat.c $(HDR)
+	masprintf.c to_newick.c concat.c lca.c $(HDR)
 
 
 AM_YFLAGS = -d
@@ -33,16 +33,16 @@ lib_LTLIBRARIES = libnw.la
 libnw_la_SOURCES = $(NW_CORE)
 
 nw_display_SOURCES = display.c canvas.c text_graph.c \
-		simple_node_pos.c svg_graph.c readline.c lca.c \
+		simple_node_pos.c svg_graph.c readline.c \
 		node_pos_alloc.c xml_utils.c graph_common.c \
 		svg_graph_ortho.c svg_graph_radial.c
 
 nw_display_LDADD = @LEXLIB@ -lm libnw.la
 
-nw_clade_SOURCES = subtree.c lca.c
+nw_clade_SOURCES = subtree.c
 nw_clade_LDADD = @LEXLIB@ libnw.la
 
-nw_reroot_SOURCES = reroot.c lca.c
+nw_reroot_SOURCES = reroot.c
 nw_reroot_LDADD = @LEXLIB@ libnw.la
 
 nw_rename_SOURCES = rename.c readline.c
@@ -61,7 +61,7 @@ nw_ed_LDADD = @LEXLIB@ -lm libnw.la
 nw_topology_SOURCES = topology.c
 nw_topology_LDADD = @LEXLIB@ libnw.la
 
-nw_distance_SOURCES = distance.c simple_node_pos.c lca.c \
+nw_distance_SOURCES = distance.c simple_node_pos.c \
 		      node_pos_alloc.c
 nw_distance_LDADD = @LEXLIB@ libnw.la
 

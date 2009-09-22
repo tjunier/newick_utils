@@ -71,7 +71,7 @@ static int geo_has_children(double prob_node_has_children)
 /* Visits a leaf: probabilistically adds children to the leaf, and adds those
  * children to the leaves queue (since they are new leaves) */
 
-// TODO: have caller check for FAILURE
+// caller checked
 static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 		struct llist *leaves_queue)
 {
@@ -95,7 +95,7 @@ static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 
 /* Generate a tree using the geometric model */
 
-// TODO: have caller check for FAILURE
+// caller checked
 int geometric_tree(double prob_node_has_children)
 {
 	struct llist *leaves_queue = create_llist();
@@ -229,7 +229,7 @@ void free_data(char *newick, struct llist *leaves_queue,
 	destroy_llist(all_children);
 }
 
-// TODO: have caller check for FAILURE
+// caller checked
 int time_limited_tree(double branch_termination_rate, double duration)
 {
 	/* create root */

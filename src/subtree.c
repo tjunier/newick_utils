@@ -189,13 +189,10 @@ struct parameters get_params(int argc, char *argv[])
 	/* check arguments */
 	if ((argc - optind) >= 2)	{
 		if (0 != strcmp("-", argv[optind])) {
-			FILE *fin = fopen(argv[optind], "r");
-			extern FILE *nwsin;
-			if (NULL == fin) {
+			if (! set_parser_input_filename(argv[optind])) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
-			nwsin = fin;
 		}
 		struct llist *lbl_list;
 		switch (params.mode) {

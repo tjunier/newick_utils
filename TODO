@@ -1,37 +1,34 @@
-CURRENT: check for return (and status) of rnode_iterator_next()
+general: apps should use set_parser_input_filename() instead of setting nwsin
+directly.
 
-general: the main loop should no longer unconditionally quit if parse_tree()
-returns NULL. Instead, it should look at the value of 'newick_parser_status'
-(an external var set by the parser), and take appropriate action - that is: i)
-abort with failure if (and only if) out of memory; ii) start next iteration in
-case of syntax error (errors are not always recoverable, but some are and the
-program should at least try to parse the next tree); iii) finish normally when
-input is empty (EOF). See condense.c
+[later] general: the main loop should no longer unconditionally quit if
+parse_tree() returns NULL. Instead, it should look at the value of
+'newick_parser_status' (an external var set by the parser), and take
+appropriate action - that is: i) abort with failure if (and only if) out of
+memory; ii) start next iteration in case of syntax error (errors are not always
+recoverable, but some are and the program should at least try to parse the next
+tree); iii) finish normally when input is empty (EOF). See condense.c
 
-newick_parser.y: the yacc code currently prints error messages when it
+[later] newick_parser.y: the yacc code currently prints error messages when it
 encounters a syntax error. This should be done by the calling app: the parser
 should set an external var like it does for 'newick_parser_status'. This var
 could be the line number of the incorrect tree, or it could be the tree itself.
 
-general: check that the destroy_*() functions return an error code (and that it
-is heeded) -- but do we really always care? What if memory can be free()d
-later? For when a destroy_*() function fails, it is typically because it is
-trying to build a list of (ptrs to) structures that must be freed. This does
-not preclude further calls to free() from working. */
+[later] general: check that the destroy_*() functions return an error code (and
+that it is heeded) -- but do we really always care? What if memory can be
+free()d later? For when a destroy_*() function fails, it is typically because
+it is trying to build a list of (ptrs to) structures that must be freed. This
+does not preclude further calls to free() from working. */
 
-general: functions in app code (i.e., NOT library code) can either call exit()
-directly, or return an error value. In some programs I have perhaps been a bit
-too fanatical in that only main() and get_parameters() ever call exit(). But in
-fact there is a case for allowing other functions to do so, as long as they are
-never used elsewhere. Check this.
+[later] general: functions in app code (i.e., NOT library code) can either call
+exit() directly, or return an error value. In some programs I have perhaps been
+a bit too fanatical in that only main() and get_parameters() ever call exit().
+But in fact there is a case for allowing other functions to do so, as long as
+they are never used elsewhere. Check this.
 
 general: functions that return FAILURE or NULL sould free() whatever they have
 allocated before returning. -- or should they? if there is not enough memory
 and the program is going to exit, is it worth the trouble?
-
-general: check that the functions return an error code in case of problem
-(which is almost always a malloc() error). Check that this value is heeded by
-the caller.
 
 nw_tree: add a test for many input trees when using the -r option
 
@@ -346,3 +343,7 @@ be statically linked (use ./configure --disable-shared).
 found in app code. This is especially true since we're writing Python
 bindings: a Python app may not want to exit() just because our function can't
 complete - rather it would throw an exception.
+
+[done] general: check that the functions return an error code in case of problem
+(which is almost always a malloc() error). Check that this value is heeded by
+the caller.

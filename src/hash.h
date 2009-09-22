@@ -45,6 +45,7 @@ struct hash {
 	int count;	/* the number of data elements - initially 0 */
 };
 
+// TODO: does this need to be public?
 struct key_val_pair {
 	char *key;
 	void *value;

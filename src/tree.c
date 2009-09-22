@@ -382,7 +382,7 @@ static struct rnode *clone_clade(struct rnode *root)
 	return root_clone;
 }
 
-// TODO: have caller check for NULL
+// TODO: is this ever used?
 struct rooted_tree* clone_subtree(struct rnode *root)
 {
 	struct rnode *root_clone = clone_clade(root);
