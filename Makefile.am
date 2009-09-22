@@ -7,6 +7,8 @@ EXTRA_DIST = \
 	tests/*.map \
 	tests/*.cmap \
 	src/*.sh \
+	src/newick_utils.py \
+	src/nw_info.py \
 	doc/tutorial.pdf \
 	doc/Makefile \
 	data/*
