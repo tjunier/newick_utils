@@ -30,10 +30,10 @@ class TestTree (unittest.TestCase):
 				'(((A,B)f,C)g,(D,E)h)i;', type = 'string').next()
 
 	def test_get_type(self):
-		self.assertEqual(TREE_TYPE_CLADOGRAM, self.clado1.get_type())
-		self.assertEqual(TREE_TYPE_PHYLOGRAM, self.phylo1.get_type())
-		self.assertEqual(TREE_TYPE_PHYLOGRAM, self.phylo2.get_type())
-		self.assertEqual(TREE_TYPE_NEITHER, self.neither.get_type())
+		self.assertEqual('Cladogram', self.clado1.get_type())
+		self.assertEqual('Phylogram', self.phylo1.get_type())
+		self.assertEqual('Phylogram', self.phylo2.get_type())
+		self.assertEqual('Neither', self.neither.get_type())
 
 	def test_get_depth(self):
 		self.assertEqual(2, self.phylo1.get_depth())

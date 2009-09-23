@@ -1,0 +1,9 @@
+2009-09
+
+Version 1.1.0 makes a library, libnw.so, to which the binaries are linked (by
+default, dynamically). This lib can also be used by Python programs via the
+ctypes modules and interface classes defined in src/newick_utils.py.
+
+2009-08
+
+new Make target 'bin-dist' for making binary distributions.

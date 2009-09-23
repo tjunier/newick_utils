@@ -13,11 +13,14 @@
 \chapter{Python Bindings}
 \label{chap_python_lib}
 
-This chapter shows how you can use the \nutils{}'s functionalities in Python
-programs. While the \nutils{} are written in C, the \texttt{ctypes}
-module\footnote{Available in Python 2.5 and up} makes it easy to access them
-from Python, and the distribution contains a module, \texttt{newick\_utils.py},
-that provides an object-oriented interface to the underlying C code.
+Although the \nutils{} are primarily intended for shell use, it is also
+possible to use (some of) their functionalities in Python programs\footnote{Or
+C programs, for that matter: the app code is well separated from the library
+code, which can serve as an \textsc{api}}. While the \nutils{} are written in
+C, the \texttt{ctypes} module\footnote{Available in Python 2.5 and up} makes it
+easy to access them from Python, and the distribution contains a module,
+\texttt{newick\_utils.py}, that provides an object-oriented interface to the
+underlying C code.
 
 Let's say we want to add a utility that prints simple statistics about trees,
 like the number of nodes, the depth, whether it is a cladogram or a phylogram,
@@ -39,7 +42,7 @@ for tree in Tree.parse_newick_input():
 \end{lstlisting}
 
 \noindent{}Line 1 imports definitions from the \texttt{newick\_utils.py}
-module. Line 2 is the main loop: the \texttt{Tree.parse\_newick\_input}
+module. Line 3 is the main loop: the \texttt{Tree.parse\_newick\_input}
 reads standard input and yields an instance of class \texttt{Tree} for each
 Newick string. We can now work with it, using methods of class \texttt{Tree} or adding our own:
 

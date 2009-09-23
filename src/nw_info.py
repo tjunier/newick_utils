@@ -11,7 +11,7 @@ def count_polytomies(tree):
 
 for tree in Tree.parse_newick_input():
 	type = tree.get_type()
-	if type == Tree.PHYLOGRAM:
+	if type == 'Phylogram':
 		# also sets nodes' depths
 		depth =  tree.get_depth() 
 	else:

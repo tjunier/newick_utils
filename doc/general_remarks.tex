@@ -32,6 +32,7 @@ complete description can be found at
 The input file is always the first argument to the program (after any options).
 It may be a file stored in a filesystem, or \stdin{}. In the latter case, the
 filename is replaced by a '\texttt{-}' (dash):
+
 \begin{samepage}
 \begin{verbatim}
 $ nw_display mytrees.nw
@@ -40,8 +41,13 @@ is the same as
 \begin{verbatim}
 $ cat mytrees.nw | nw_display -
 \end{verbatim}
+or
+\begin{verbatim}
+$ nw_display - < mytrees.nw
+\end{verbatim}
 \end{samepage}
-Of course the second form is only really useful when chaining several programs into pipelines.
+
+\noindent{}Of course the second ("dashed") form is only really useful when chaining several programs into pipelines.
 
 \subsection{Multiple Input Trees}
 

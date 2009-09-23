@@ -1,5 +1,6 @@
 SUBDIRS = src tests doc
 EXTRA_DIST = \
+	BSD_license \
 	tests/*_args \
 	tests/*.exp \
 	tests/*.nw \

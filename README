@@ -13,7 +13,7 @@ Binaries
 --------
 
 If you have a binaries distribution (that is, with a name like
-newick-utils-x.y.z-bin-x86-64.tar.gz), you do not have to compile. The binaries
+newick-utils-x.y.z-linux-x86-64.tar.gz), you do not have to compile. The binaries
 are in ./src ; they all have names that start with nw_, so you can do 
 
 $ sudo cp src/nw_* /usr/local/bin	# or wherever you want

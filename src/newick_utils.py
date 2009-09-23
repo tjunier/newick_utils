@@ -88,6 +88,7 @@ class rooted_tree(Structure):
 # tree.h
 (TREE_TYPE_UNKNOWN, TREE_TYPE_CLADOGRAM, TREE_TYPE_PHYLOGRAM,
 		TREE_TYPE_NEITHER) = xrange(4)
+type_names = ('Unknown', 'Cladogram', 'Phylogram', 'Neither') 
 
 ################################################################
 # C functions
@@ -276,7 +277,7 @@ class Tree(object):
 	def get_type(self):
 		'''Returns CLADOGRAM IFF tree contains NO edge lengths (this is
 		different from zero-length edges!), otherwise returns PHYLOGRAM'''
-		return libnw.get_tree_type(self.tree)
+		return type_names[libnw.get_tree_type(self.tree)]
 
 	def get_leaf_count(self):
 		count = 0

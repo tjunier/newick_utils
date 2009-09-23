@@ -1,11 +1,15 @@
 \chapter{Installing the \nutils}
 
+\section{From source}
+
 I have tested the \nutils{} on various distributions of Linux, as well as on
-Mac OS X. On Linux, chances are you already have development tools
-preinstalled, but some distributions (\eg, Ubuntu) do not install \textsc{gcc},
-etc. by default. Check that you have \textsc{gcc},
-Bison, Flex, and the \textsc{gnu} autotools. On MacOS X, you need to
-install XCode (\url{http://developer.apple.com/tools/xcode}). 
+Mac OS X\footnote{I use Linux as a main development platform. Although I try my
+best to get the package to compile on Macs, I don't always succeed.}. On Linux,
+chances are you already have development tools preinstalled, but some
+distributions (\eg, Ubuntu) do not install \textsc{gcc}, etc. by default. Check
+that you have \textsc{gcc}, Bison, Flex, and the \textsc{gnu} autotools,
+including Libtool. On MacOS X, you need to install XCode
+(\url{http://developer.apple.com/tools/xcode}).
 
 The package uses the \textsc{gnu} autotools, like many other open source
 software packages. So all you need to do is the usual
@@ -17,4 +21,30 @@ $ make
 $ make check
 # make install
 \end{verbatim}
-The \texttt{make check} is optional, but you should try it anyway.
+The \texttt{make check} is optional, but you should try it anyway. Note that
+the \gen{} test may fail - this is due to differences in random number
+generators, as far as I can tell.
+
+
+\section{As binaries}
+
+Since version 1.1, there is also a binary distribution. The name of the archive
+matches \texttt{newick-utils-<version>-<platform>.tar.gz}. All you need to do is:
+
+\begin{verbatim}
+$ tar xzf newick-utils-<vesion>-<platform>.tar.gz
+$ cd newick-utils-<vesion>-<platform>
+\end{verbatim}
+
+\noindent{}The binaries are in \texttt{src}. Testing may be less important than
+when installing from source, but you can do it like this:
+
+\begin{verbatim}
+$ cd tests
+$ for test in test*.sh; do ./$test; done 
+\end{verbatim}
+
+\noindent{}any failure will generate a \texttt{FAIL} message (which you could filter with \texttt{grep}, etc).
+
+You can then copy/move the binaries wherever it suits you.
+
