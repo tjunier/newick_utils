@@ -97,7 +97,6 @@ static struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 	return NULL;	/* no unvisited child left */
 }
 
-// caller checked
 struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 {
 	char *current_node_hash_key = make_hash_key(iter->current);
@@ -142,7 +141,6 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 /* Computes the list by doing a tree traversal, then reversing it, printing out
  * each node the first time it sees it. */
 
-// caller checked
 struct llist *get_nodes_in_order(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);
@@ -207,7 +205,6 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	return nodes_in_order;
 }
 
-// caller checked
 struct hash *get_leaf_label_map(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);

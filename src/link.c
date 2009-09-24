@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode *unlink_rnode_root_child;
 
-// caller checked
 int add_child(struct rnode *parent, struct rnode *child)
 {
 	struct llist *children_list;
@@ -78,7 +77,6 @@ char * compute_new_edge_length(char * length_as_string)
 	return result;
 }
 
-// caller checked
 int insert_node_above(struct rnode *this, char *label)
 {
 	struct rnode *parent;
@@ -142,7 +140,6 @@ char *add_len_strings(char *ls1, char *ls2)
 /* 'this' node is the one that is to be spliced out. All nodes and edges are
  * relative to this one. */
 
-// caller checked
 int splice_out_rnode(struct rnode *this)
 {
 	struct rnode *parent = this->parent;
@@ -179,7 +176,6 @@ int splice_out_rnode(struct rnode *this)
 	return SUCCESS;
 }
 
-// caller checked
 int remove_child(struct rnode *child)
 {
 	if (is_root(child)) return RM_CHILD_IS_ROOT;;
@@ -196,7 +192,6 @@ int remove_child(struct rnode *child)
 	return n;
 }
 
-// caller checked (in fact, no caller found!)
 // TODO: is this f() ever used?
 int insert_child(struct rnode *parent, struct rnode *child, int index)
 {
@@ -210,7 +205,6 @@ int insert_child(struct rnode *parent, struct rnode *child, int index)
 	return SUCCESS;
 }
 
-// caller checked
 // TODO: return value should differentiate between mem error and child-is-root
 int swap_nodes(struct rnode *node)
 {
@@ -260,7 +254,6 @@ int unlink_rnode(struct rnode *node)
 	return UNLINK_RNODE_DONE;
 }
 
-// caller checked
 struct llist *siblings(struct rnode *node)
 {
 	struct rnode *sib;

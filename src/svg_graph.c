@@ -416,7 +416,6 @@ void dump_label (void *lbl) { puts((char *) lbl); }
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
-// caller checked
 int set_group_numbers(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -511,7 +510,6 @@ int set_group_numbers(struct rooted_tree *tree)
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
-// caller checked
 int set_ornaments(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -724,7 +722,6 @@ void draw_scale_bar(int hpos, double vpos,
 	printf ("</g>");
 }
 
-// caller checked
 enum display_status display_svg_tree(
 		struct rooted_tree *tree,
 		int align_leaves,

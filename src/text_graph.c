@@ -86,7 +86,6 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 have to be passed, increasing coupling and diminishing implementation hiding.
 What's more, we can't assume that the new tree will fit in the old canvas. */
 
-// caller checked
 enum display_status display_tree(struct rooted_tree *tree, int width, int align_leaves)
 {	
 	/* set node positions */

@@ -48,7 +48,6 @@ const int DONT_FREE_NODE_DATA = 0;
 
 /* 'outgroup' is the node which will be the outgroup after rerooting. */
 
-// caller checked
 int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 {
 	struct rnode *old_root = tree->root;
@@ -270,7 +269,6 @@ enum tree_type get_tree_type(struct rooted_tree *tree)
 		return TREE_TYPE_NEITHER;	/* weird, but legal */
 }
 
-// caller checked
 struct llist *nodes_from_labels(struct rooted_tree *tree,
 		struct llist *labels)
 {
@@ -338,7 +336,6 @@ struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
 	return result;
 }
 
-// caller checked
 struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 {
        				       
@@ -364,7 +361,6 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 }
 
 /* Clones a clade (recursively) */
-// caller checked
 // TODO: try an iterative version using a rnode_iterator
 static struct rnode *clone_clade(struct rnode *root)
 {

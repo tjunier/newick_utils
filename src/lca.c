@@ -109,7 +109,6 @@ void * lca2w(void *a, void *b)
  * descendants. THIS USES UP THE LIST! Use lca_from_nodes() to keep the
  * argument list intact. */
 
-// caller checked
 struct rnode *lca (struct rooted_tree *tree,
 		struct llist *descendants)
 {
@@ -123,7 +122,6 @@ struct rnode *lca (struct rooted_tree *tree,
 	return result;
 }
 
-// caller checked
 struct rnode *lca_from_nodes (struct rooted_tree *tree,
 		struct llist *descendants)
 {
@@ -138,7 +136,6 @@ struct rnode *lca_from_nodes (struct rooted_tree *tree,
 	return result;
 }
 
-// caller checked
 struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 {
 	struct hash *node_map = create_label2node_map(tree->nodes_in_order);
@@ -172,7 +169,6 @@ struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 	return result;
 }
 
-// caller checked
 struct rnode *lca_from_labels_multi (struct rooted_tree *tree, 
 		struct llist *labels)
 {

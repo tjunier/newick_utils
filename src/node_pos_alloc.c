@@ -78,7 +78,6 @@ int set_node_vpos_cb(struct rooted_tree *t,
 	return leaf_count;
 }
 
-// caller checked
 struct h_data set_node_depth_cb(struct rooted_tree *tree,
 		void (*set_node_depth)(struct rnode *, double),
 		double (*get_node_depth)(struct rnode *))

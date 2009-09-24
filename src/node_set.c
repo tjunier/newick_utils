@@ -50,7 +50,6 @@ const int BYTE_SIZE = 8;
 
 /* Fails if the tree has 0 nodes */
 
-// caller checked
 node_set create_node_set(int node_count)
 {
 	node_set set;
@@ -100,7 +99,6 @@ int node_set_contains(node_set set, int node_number, int node_count)
 	return set[node_byte] & (1 << node_bit);
 }
 
-// caller checked - found none!
 node_set node_set_union(node_set set1, node_set set2, int node_count)
 {
 	node_set result;
@@ -169,7 +167,6 @@ int build_name2num(struct rooted_tree *tree, struct hash **name2num_ptr)
 	return NS_OK;
 }
 
-// caller checked
 char *node_set_to_s(node_set set, int node_count)
 {
 	char *result;

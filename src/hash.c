@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "masprintf.h"
 #include "common.h"
 
-// caller checked
 struct hash *create_hash(int n)
 {
 	struct hash *h;
@@ -75,7 +74,6 @@ unsigned int hash_func (const char *key)
 	return h;
 }
 
-// caller checked
 int hash_set(struct hash *h, const char *key, void *value)
 {
 	int hash_code = hash_func(key) % h->size;
@@ -144,7 +142,6 @@ void dump_hash(struct hash *h, void (*dump_func)())
 	printf ("Dump done.\n");
 }
 
-// caller checked
 struct llist *hash_keys(struct hash *h)
 {
 	struct llist *list = create_llist();

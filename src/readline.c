@@ -142,7 +142,6 @@ char *wt_next(struct word_tokenizer *wt)
 	return word;
 }
 
-// caller checked
 char *wt_next_noquote(struct word_tokenizer *wt)
 {
 	char *word = wt_next(wt);

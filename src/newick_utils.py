@@ -316,7 +316,14 @@ class Tree(object):
 		return Rnode.c_addr_to_py_obj[c_rnode_address]
 
 	def reroot(self, node):
-		'''Reroots the tree on 'node'''
+		'''Reroots the tree on 'node'.
+		Note: this invalidates some properties of the tree (like the node
+		list). The underlying C function does NOT update them, because it was
+		meant to do only what is strictly necessary - in this case, reroot the
+		tree and print it.  Bottom line: don't use the tree for anything else
+		than printing.'''
+		# TODO: add a C funtion that updates the tree to it becomes useable for
+		# everything, and call it here after rerooting.
 		libnw.reroot_tree(self.tree, node.rnode)
 
 	def __compute_label2nodes(self):

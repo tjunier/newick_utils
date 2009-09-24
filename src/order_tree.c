@@ -54,7 +54,6 @@ int lbl_comparator(const void *a, const void *b)
 	return cmp;
 }
 
-// caller checked
 int order_tree(struct rooted_tree *tree)
 {
 	struct list_elem *elem;

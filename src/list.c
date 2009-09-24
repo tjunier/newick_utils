@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 
 
-// caller checked
 struct llist *create_llist()
 {
 	struct llist *llist_p;
@@ -46,7 +45,6 @@ struct llist *create_llist()
 	return llist_p;
 }
 
-// caller checked
 int prepend_element(struct llist *list, void *data)
 {
 	struct list_elem *el_p;
@@ -68,7 +66,6 @@ int prepend_element(struct llist *list, void *data)
 	return SUCCESS;
 }
 
-// caller checked
 int append_element(struct llist *list, void *data)
 {
 	struct list_elem *el_p;
@@ -90,7 +87,6 @@ int append_element(struct llist *list, void *data)
 	return SUCCESS;
 }
 
-// caller checked
 struct llist *llist_reverse(struct llist *list)
 {
 	struct llist *result;
@@ -106,7 +102,6 @@ struct llist *llist_reverse(struct llist *list)
 	return result;
 }
 
-// caller checked
 struct llist *shallow_copy(struct llist *orig)
 {
 	struct llist *copy = create_llist();
@@ -138,7 +133,6 @@ void *shift(struct llist *list)
 	return data;
 }
 
-// caller checked
 void *reduce(struct llist *list, void* (*func)(void *, void*))
 {
 	void *func_result;
@@ -234,7 +228,6 @@ void insert_after(struct llist *target, int pos, struct llist *insert)
 	}
 }
 
-// caller checked
 // TODO: consider the case when target->count == 1, pos == -1 and length == 1
 // -- IOW, remove the last element in the list. AFAICT the target's count and
 // head are Ok (count is 0 and head is NULL), but tail is not NULL, when it
@@ -320,7 +313,6 @@ void destroy_llist(struct llist *l)
 	free(l);
 }
 
-// caller checked
 void ** llist_to_array (struct llist *l)
 {
 	if (0 == l->count) { return NULL; }
@@ -336,7 +328,6 @@ void ** llist_to_array (struct llist *l)
 	return array;
 }
 
-// caller checked
 struct llist *array_to_llist(void **array, int count)
 {
 	struct llist *list = create_llist();
