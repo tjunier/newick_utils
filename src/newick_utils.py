@@ -116,6 +116,7 @@ libnw.lca_from_labels_multi.argtypes = [POINTER(rooted_tree), POINTER(llist)]
 libnw.lca_from_labels_multi.restype = POINTER(rnode)
 
 libnw.get_tree_type.argtypes = [POINTER(rooted_tree)]
+libnw.reroot_tree.argtypes = [POINTER(rooted_tree), POINTER(rnode)]
 
 ################################################################
 # User-land Python classes
@@ -233,6 +234,7 @@ class Tree(object):
 		self.root = tree.root.contents
 		nodes_in_order = Llist(self.tree.nodes_in_order.contents)
 		self.depth = None
+		self.label2nodes = None
 		# Create an Rnode for each C rnode structure
 		for data in nodes_in_order:
 			c_node_p = cast(data, POINTER(rnode))
@@ -280,6 +282,7 @@ class Tree(object):
 		return type_names[libnw.get_tree_type(self.tree)]
 
 	def get_leaf_count(self):
+		'''Returns the number of leaves in this tree.'''
 		count = 0
 		for node in self.get_nodes():
 			if node.is_leaf():
@@ -287,15 +290,19 @@ class Tree(object):
 		return count
 
 	def get_nodes_with_label(self, label):
-		if self.label2nodes is None: self.compute_label2nodes
+		'''Returns a tuple of Rnode objects that have the specified label, or
+		None if no such node exists.
+		If you know that labels are unique, you can use get_node_with_label
+		(that's 'node' without 's') which returns the node directly. '''
+		if self.label2nodes is None: self.__compute_label2nodes()
+		return self.label2nodes[label]
 
-	def compute_label2nodes(self):
-		self.label2nodes = {}
-		for node in self.get_nodes():
-			label = node.get_label()
-			if self.label2nodes[label] is None:
-				self.label2nodes[label] = []
-			append(self.label2nodes[label], node)
+	def get_node_with_label(self, label):
+		'''Returns the Rnode object that has the specified label, or None if
+		no such node exists. If more than one node can have the same label, use
+		get_node_with_label ('nodes' with an 's') '''
+		if self.label2nodes is None: self.__compute_label2nodes()
+		return self.label2nodes[label][0]
 
 	def lca_from_labels(self, labels):
 		'''Returns an Rnode which is the last common ancestor of the nodes 
@@ -307,3 +314,15 @@ class Tree(object):
 		c_lca = libnw.lca_from_labels_multi(self.tree, c_labels)
 		c_rnode_address = cast(c_lca, c_void_p).value
 		return Rnode.c_addr_to_py_obj[c_rnode_address]
+
+	def reroot(self, node):
+		'''Reroots the tree on 'node'''
+		libnw.reroot_tree(self.tree, node.rnode)
+
+	def __compute_label2nodes(self):
+		self.label2nodes = {}
+		for node in self.get_nodes():
+			label = node.label
+			if label not in self.label2nodes:
+				self.label2nodes[label] = []
+			self.label2nodes[label].append(node)
