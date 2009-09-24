@@ -286,6 +286,17 @@ class Tree(object):
 				count += 1
 		return count
 
+	def get_nodes_with_label(self, label):
+		if self.label2nodes is None: self.compute_label2nodes
+
+	def compute_label2nodes(self):
+		self.label2nodes = {}
+		for node in self.get_nodes():
+			label = node.get_label()
+			if self.label2nodes[label] is None:
+				self.label2nodes[label] = []
+			append(self.label2nodes[label], node)
+
 	def lca_from_labels(self, labels):
 		'''Returns an Rnode which is the last common ancestor of the nodes 
 		whose labels are passed in list 'labels_list', or None if for some
