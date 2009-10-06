@@ -55,9 +55,14 @@ Newick string. We can now work with it, using methods of class \texttt{Tree} or 
 
 As you can see, most of the work is done by methods called on the \texttt{tree}
 object, such as \texttt{get\_leaf\_count} which (surprise!) returns the number
-of leaves of a tree. But since there is no method for coounting polytomies, we
+of leaves of a tree. But since there is no method for counting polytomies, we
 added our own function, \texttt{count\_polytomies}, which takes a \texttt{Tree}
 object as argument.
 
-Detailed information about all classes and methods is found in file
-\texttt{newick\_utils.py}.
+As another example, a simple implementation of \reroot{} is found in
+\texttt{src/nw\_reroot.py}. Its performance is almost as good as \reroot{}'s,
+especially on large input.
+
+\section{API Documentation}
+
+\noindent{}Detailed information about all classes and methods available for accessing the \nutils{} library from Python is found in file \texttt{newick\_utils.py}. Note that the library must be installed on your system, which means that you must compile from source.

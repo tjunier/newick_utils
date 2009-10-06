@@ -1,3 +1,6 @@
+nw_display: try to have the program find out the screen's width when outputting
+to a terminal (I think it must be something like isatty() and friends).
+
 general: apps should use set_parser_input_filename() instead of setting nwsin
 directly.
 
