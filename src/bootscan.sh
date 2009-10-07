@@ -22,13 +22,13 @@
 # percent identity. If the sequence with smallest distance changes drastically,
 # you may have a breakpoint.
 
-# Requires Muscle [1], EMBOSS [2], and PhyML [3], GNUPlot [5]; as
+# Requires Muscle [1], EMBOSS [2], PhyML 2.4 [3], and GNUPlot [5]; as
 # well as the GNU core utilities [4] (which you probably already have if you're
 # running Linux). The PATH should be set so that these programs are found, as
 # the script cannot use absolute pathnames (for portability).
 
 # Will create files (alignment, trees, etc) in the directory in which the input
-# file is found.
+# file is found (temporary files will be cleaned up).
 
 # References
 # [1] http://www.drive5.com/muscle
@@ -109,7 +109,7 @@ extract_distances_noref()
 
 plot_classic()
 {
-	printf "set terminal postscript eps color size 5,2.5 \n" > $DIST_GNUPLOT
+	printf "set terminal png large size 640,400\n" > $DIST_GNUPLOT
 	printf "set output '%s'\n" $DIST_IMAGE >> $DIST_GNUPLOT
 	printf "set key outside\n" >> $DIST_GNUPLOT 
 	printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
@@ -149,7 +149,7 @@ declare -r R_DISTANCE_THRESHOLD=0.4
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
 declare -r DIST_NOREF=$INPUT_FILE.nrdist
 declare -r DIST_GNUPLOT=$INPUT_FILE.dist.plt
-declare -r DIST_IMAGE=$INPUT_FILE.dist.eps
+declare -r DIST_IMAGE=$INPUT_FILE.bscan.png
 
 ################################################################
 # Main
@@ -167,7 +167,7 @@ label_data
 
 echo "Extracting distances for ${labels[*]}"
 extract_distances_noref
-echo "Plotting classic bootscan"
+printf "Plotting bootscan, output is %s\n" $DIST_IMAGE
 plot_classic
 echo "Cleaning up"
 cleanup # comment this to see the temporary results
