@@ -1,21 +1,20 @@
 \documentclass[a4paper,10pt]{report}
 
 \usepackage{url}
-\usepackage{graphics}
 \usepackage{graphicx}
 \usepackage{verbatim}
-\usepackage{amsthm}
-\usepackage{amsmath}
-\usepackage{amssymb}
 \usepackage[usenames,dvipsnames]{color}
 \usepackage{listings}
 
+% This looks better than CM
+\usepackage{palatino}
 \usepackage[margin=1.5in]{geometry}
 
 % Colors
 \definecolor{Blue}{rgb}{0,0,1}
 \definecolor{Red}{rgb}{1,0,0}
 
+% frequent acronyms, abbreviations, aliases, etc.
 \newcommand{\nutils}{Newick Utilities}
 \newcommand{\unix}{\textsc{Unix}}
 \newcommand{\ascii}{\textsc{ascii}}
@@ -51,15 +50,6 @@
 \newcommand{\support}{\texttt{nw\_support}}
 \newcommand{\topology}{\texttt{nw\_topology}}
 \newcommand{\trim}{\texttt{nw\_trim}}
-
-% These are only needed for the Axioms and Properties parts - not sure we'll
-% include them.
-\newtheorem{prop}{Proposition}
-\newtheorem{lemma}{Lemma}
-\theoremstyle{definition}
-\newtheorem{dfn}{Definition}
-\theoremstyle{definition}
-\newtheorem{axiom}{Axiom}
 
 % Arbitrary-size horizontal rules - good for titles
 \newcommand{\Hrule}[1]{\rule{\linewidth}{#1}}
