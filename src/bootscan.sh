@@ -110,7 +110,7 @@ extract_distances_noref()
 plot_classic()
 {
 	printf "set terminal png large size 640,400\n" > $DIST_GNUPLOT
-	printf "set output '%s'\n" $DIST_IMAGE >> $DIST_GNUPLOT
+	printf "set output '%s'\n" $BSCAN_IMAGE >> $DIST_GNUPLOT
 	printf "set key outside\n" >> $DIST_GNUPLOT 
 	printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
 		$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $DIST_GNUPLOT
@@ -149,7 +149,7 @@ declare -r R_DISTANCE_THRESHOLD=0.4
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
 declare -r DIST_NOREF=$INPUT_FILE.nrdist
 declare -r DIST_GNUPLOT=$INPUT_FILE.dist.plt
-declare -r DIST_IMAGE=$INPUT_FILE.bscan.png
+declare -r BSCAN_IMAGE=$INPUT_FILE.bscan.png
 
 ################################################################
 # Main
@@ -167,7 +167,7 @@ label_data
 
 echo "Extracting distances for ${labels[*]}"
 extract_distances_noref
-printf "Plotting bootscan, output is %s\n" $DIST_IMAGE
+printf "Plotting bootscan, output is %s\n" $BSCAN_IMAGE
 plot_classic
 echo "Cleaning up"
 cleanup # comment this to see the temporary results

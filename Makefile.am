@@ -20,7 +20,7 @@ EXTRA_DIST = \
 
 bin-dist: distdir
 	cp src/nw_* $(distdir)/src
-	tardir=$(distdir) && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).$(PLATFORM).tar.gz
+	tardir=$(distdir) && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir)-$(PLATFORM).tar.gz
 	$(am__remove_distdir)
 
 #ACLOCAL_AMFLAGS = -I m4
