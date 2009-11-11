@@ -18,7 +18,7 @@ HDR = canvas.h concat.h enode.h hash.h lca.h link.h list.h nodemap.h \
 # is not necessary, it builds just fine)
 NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
 	link.c tree.c nodemap.c hash.c rnode_iterator.c \
-	masprintf.c to_newick.c concat.c lca.c $(HDR)
+	masprintf.c to_newick.c concat.c lca.c error.c $(HDR)
 
 
 AM_YFLAGS = -d

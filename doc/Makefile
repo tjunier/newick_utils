@@ -17,6 +17,5 @@ tutorial.pdf: tutorial.tex
 	pdflatex tutorial.tex
 
 clean:
-	$(RM) *.{out,cmd,aux,log,dvi,toc,eps,plt,cvd} *_svg.svg *_svg.pdf \
-		homino*.{svg,pdf} *.ord.nw
+	$(RM) *.{out,cmd,aux,log,dvi,toc} *_svg.svg *_svg.pdf
 

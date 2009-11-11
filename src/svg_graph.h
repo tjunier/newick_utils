@@ -29,8 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
 
-/* Functions for displaying a tree as SVG. User should call any of the
- * set_svg_*() functions that are needed, then svg_init(), then svg_header(),
+/* Functions for displaying a tree as SVG. This is the visible interface for
+ * client code such as display.c User should call any of the set_svg_*()
+ * functions that are needed, then svg_init(), then svg_header(),
  * display_svg_tree(), and finally svg_footer(). */
 
 struct rooted_tree;

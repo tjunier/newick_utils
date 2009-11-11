@@ -4,6 +4,7 @@ TESTS = test_rnode test_list test_link test_masprintf \
 	test_canvas test_concat test_hash test_lca test_enode \
 	test_nodemap test_to_newick test_tree test_node_set \
 	test_rnode_iterator test_tree_models test_xml_utils \
+	test_error \
 	test_nw_reroot.sh test_nw_rename.sh test_nw_condense.sh \
 	test_nw_display.sh test_nw_indent.sh test_nw_support.sh \
 	test_nw_ed.sh test_nw_topology.sh test_nw_clade.sh \
@@ -15,7 +16,8 @@ check_PROGRAMS = test_rnode test_list test_link \
 		 test_canvas test_concat test_hash test_lca \
 		 test_nodemap test_to_newick test_tree test_node_set \
 		 test_enode test_rnode_iterator test_readline \
-		 test_tree_models test_xml_utils test_masprintf
+		 test_tree_models test_xml_utils test_masprintf \
+		 test_error
 
 check_HEADERS = tree_stubs.h
 
@@ -78,6 +80,8 @@ test_tree_models_SOURCES = test_tree_models.c $(SRC)/tree_models.c \
 test_xml_utils_SOURCES = test_xml_utils.c $(SRC)/xml_utils.c
 
 test_masprintf_SOURCES = test_masprintf.c $(SRC)/masprintf.c
+
+test_error_SOURCES = test_error.c $(SRC)/error.c
 
 clean-local:
 	$(RM) *.out

@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "svg_graph_radial.h"
 #include "tree.h"
 #include "xml_utils.h"
+#include "error.h"
 
 enum { INDIVIDUAL, CLADE, UNKNOWN };
 
@@ -209,6 +210,8 @@ static int get_group_type(const char *type)
 // return checked
 struct llist *read_css_map()
 {
+	/* Most errors are memory errors (but see below) */
+	set_last_error_code(ERR_NOMEM);
 	struct llist *css_map = create_llist();
 	if (NULL == css_map) return NULL;
 
@@ -227,9 +230,14 @@ struct llist *read_css_map()
 		if (NULL == label_list) return NULL;
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) return NULL;
+		/* Next errors are syntax errors */
+		set_last_error_code(ERR_CMAP_SYNTAX);
 		char *style = wt_next_noquote(wtok);
 		if (NULL == style) return NULL; 
 		char *type = wt_next(wtok);
+		if (NULL == type) return NULL;
+		/* Errors are memory again */
+		set_last_error_code(ERR_NOMEM);
 		char *label;
 		while ((label = wt_next(wtok)) != NULL) {
 			if (! append_element(label_list, label)) return NULL;

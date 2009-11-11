@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree.h"
 #include "graph_common.h"
 #include "svg_graph_common.h"
+#include "error.h"
 
 struct parameters {
 	int width;
@@ -382,8 +383,7 @@ int main(int argc, char *argv[])
 	if (params.svg) {
 		set_svg_parameters(params);
 		if(! svg_init()) {
-			fprintf (stderr, "Could not initialize SVG"
-					" (memory problem) - exiting.\n");
+			fprintf (stderr, "%s\n", get_last_error_message());
 			exit(EXIT_FAILURE);
 		}
 	}

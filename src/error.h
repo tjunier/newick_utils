@@ -1,5 +1,4 @@
-/* 
-
+/*
 Copyright (c) 2009 Thomas Junier and Evgeny Zdobnov, University of Geneva
 All rights reserved.
 
@@ -25,53 +24,28 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 */
 
-/* Declarations used by all SVG modules, but not intended for client code. */
+/* error.h: headers and declarations for error-related functions */
 
-#define ROOT_SPACE 10			/* pixels */
-#define LBL_SPACE 10			/* pixels */
-#define LBL_VOFFSET 4			/* pixels */
-#define INNER_LBL_SPACE 4		/* pixels */
-#define edge_length_v_offset -4 	/* pixels */
-#define URL_MAP_SIZE 100		/* bins */
-#define UNSTYLED_CLADE 0
+/* As usual, I avoid using a globally visible variable (like errno), instead I
+ * use setter and getter functions and the variable remains static. */
 
-extern struct hash *url_map;
-extern char *leaf_label_class;
-extern char *inner_label_class;
-extern int graph_width;
-extern int svg_whole_v_shift; 
-extern double label_char_width;
-extern int scale_bar_height;
+enum error_codes {
+	ERR_UNSET,
+	ERR_NOMEM,
+	ERR_NW_SYNTAX,
+	ERR_CMAP_SYNTAX,
+	ERR_CSSMAP_SYNTAX };
 
-/* rnode data for SVG trees */
+/* Sets the error code for the latest error - see error.c */
 
-// TODO: URLs should be passed through the node, too.
+void set_last_error_code(enum error_codes code);
 
-struct svg_data {
-	double top;
-	double bottom;
-	double depth;
-	int group_nb;	/* For attributing styles */
-	char *ornament;	/* SVG decorations */
-	/* ... other node properties ... */
-};
+/* Gets the error code for the latest error */
 
-/* The following are setters, their function should be obvious */
+enum error_codes get_last_error_code();
 
-void set_svg_CSS_map_file(FILE *);
-void set_svg_ornament_map_file(FILE *);
-void set_svg_leaf_label_style(char *);
-void set_svg_inner_label_style(char *);
-void set_svg_edge_label_style(char *);
-void set_svg_plain_node_style(char *);
-void set_svg_root_length(int);
-void set_svg_label_char_width(double);
+/* Gets the error type as a string */
 
-/* Returns the largest power of ten not greater than argument */
-
-double largest_PoT_lte(double);
-
-void draw_scale_bar(int, double, double, double, char *);
+char *get_last_error_message();
