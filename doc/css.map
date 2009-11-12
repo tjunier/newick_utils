@@ -1,4 +1,8 @@
+# Cercopithecidae in red
 stroke:red 			Clade Macaca Cercopithecus
+# Apes (Hominoidea) in pinkish
 stroke:#fa7 			C 	Homo Hylobates 
+# Colobus and Cercopithecus (individually) in green
 stroke:green	Individual	Colobus Cercopithecus
+# Hominines in thick blue
 "stroke-width:2; stroke:blue" 	Clade Homo Pan

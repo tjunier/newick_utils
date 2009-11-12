@@ -77,14 +77,19 @@ genera: human rhinovirus A (\texttt{hrv-a}), human rhinovirus B
 
 \noindent{}I want to see if the tree correctly groups isolates of the same
 species together. So I use a renaming map that maps an isolate name to its
-species:
+species (note by the way that the map file can have comment, whitespace-only
+and empty lines (which are all ignored), just like \textsc{css} maps (see
+\ref{sct_display_svg_css}):
 \begin{verbatim}
+# These species belong to HRV-A
 HRV16 HRV-A
 HRV1B HRV-A
 ...
+# HRV-B
 HRV37 HRV-B
 HRV14 HRV-B
 ...
+# Enterovirus
 POLIO1A HEV
 COXA17 HEV
 \end{verbatim}

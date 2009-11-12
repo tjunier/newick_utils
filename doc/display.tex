@@ -101,7 +101,9 @@ You already know \texttt{-w}, except that for \svg{} the value is in pixels inst
 You can modify node style using \css. This is done by specifying a
 \textit{\css{} map}, which is just a text file that says which style should be
 applied to which node. If file \texttt{css.map} contains the following
-\begin{quote} \verbatiminput{css.map} \end{quote} we can apply the style map to
+\begin{quote}
+\verbatiminput{css.map}
+\end{quote} we can apply the style map to
 the tree above by passing \texttt{-c}, which takes the name of the \css{} file
 as argument:
 
@@ -113,6 +115,9 @@ as argument:
 
 The syntax of the \css{} map file is as follows:
 \begin{itemize}
+	\item A line that starts with a \texttt{\#} (hash) is a comment, and will be
+	ignored, as will be any line that contains only whitespace (space and TAB),
+	as well as empty lines.
 	\item Each line describes one style and the set of nodes to which it applies.
 	A line contains elements separated by whitespace (whitespace between quotes
 	does not count). 
