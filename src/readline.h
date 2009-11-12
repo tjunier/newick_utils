@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include <stdio.h>
+#include <stdbool.h>
 
 enum read_status { READLINE_EOF, READLINE_ERROR };
 
@@ -74,3 +75,9 @@ char *wt_next_noquote(struct word_tokenizer *);
 /* Frees a word_tokenizer */
 
 void destroy_word_tokenizer(struct word_tokenizer *);
+
+/* Returns true IFF line only contains whitespace (as per isspace(), see
+ * isalpha(3)), or if line is empty. Useful when you need to ignore such
+ * lines. */
+
+bool is_all_whitespace(char *line);

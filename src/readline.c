@@ -168,3 +168,14 @@ void destroy_word_tokenizer(struct word_tokenizer *wt)
 	free(wt->string);
 	free(wt);
 }
+
+bool is_all_whitespace(char *line)
+{
+	char *p = line;
+	while ('\0' != *p) {
+		if (! isspace(*p))
+			return false;
+		p++;
+	}
+	return true;
+}

@@ -1,3 +1,5 @@
+# These species belong to HRV-A
+
 HRV16 A
 HRV1B A
 HRV24 A
@@ -11,6 +13,9 @@ HRV2 A
 HRV89 A
 HRV78 A
 HRV12 A
+
+# HRV-B
+
 HRV37 B
 HRV3 B
 HRV14 B
@@ -18,6 +23,9 @@ HRV52 B
 HRV17 B
 HRV93 B
 HRV27 B
+
+# ... and HEV
+
 POLIO3 E
 POLIO2 E
 POLIO1A E
@@ -32,3 +40,10 @@ HEV68 E
 COXA14 E
 COXA6 E
 COXA2 E
+
+# a few blank and whitespace lines, just to check that the program
+# doesn't choke on them:
+  	 	
+
+
+

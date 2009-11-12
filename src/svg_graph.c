@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include <assert.h>
 #include <ctype.h>
-#include <stdbool.h>
+//#include <stdbool.h>
 
 #include "common.h"
 #include "graph_common.h"
@@ -202,20 +202,6 @@ static int get_group_type(const char *type)
 	return result;
 }
 
-/* A helper for the read_*_map() functions - returns true IFF line is entirely
- * whitespace, or empty. */
-
-static bool is_all_whitespace(char *line)
-{
-	char *p = line;
-	while ('\0' != *p) {
-		if (! isspace(*p))
-			return false;
-		p++;
-	}
-	return true;
-}
-
 /* Builds a CSS map structure. This is a list of struct css_map_element, each
  * of which contains a group type (CLADE or INDIVIDUAL), a style specification,
  * and a list of labels. The style will apply to the clade defined by the
@@ -233,7 +219,7 @@ struct llist *read_css_map()
 	char *line;
 	int i = 1;
 	while ((line = read_line(css_map_file)) != NULL) {
-		if (line[0] == '#') continue;	/* comments */
+		if ('#' == line[0]) continue;	/* comments */
 		if (is_all_whitespace(line)) continue;
 
 		struct css_map_element *css_el = malloc(
@@ -309,7 +295,7 @@ struct llist *read_ornament_map()
 
 	char *line;
 	while ((line = read_line(ornament_map_file)) != NULL) {
-		if (line[0] == '#') continue;	/* comments */
+		if ('#' == line[0]) continue;	/* comments */
 		if (is_all_whitespace(line)) continue;
 
 		struct ornament_map_element *oel = malloc(
@@ -382,7 +368,7 @@ struct hash *read_url_map()
 
 	char *line;
 	while ((line = read_line(url_map_file)) != NULL) {
-		if (line[0] == '#') continue;	/* comments */
+		if ('#' == line[0]) continue;	/* comments */
 		if (is_all_whitespace(line)) continue;
 
 		struct word_tokenizer *wtok = create_word_tokenizer(line);

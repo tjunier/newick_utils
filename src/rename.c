@@ -127,6 +127,9 @@ struct hash *read_map(const char *filename)
 
 	char *line;
 	while (NULL != (line = read_line(map_file))) {
+		if ('#' == line[0]) continue; /* comments */
+		if (is_all_whitespace(line)) continue;
+
 		char *key, *value;
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) { perror(NULL); exit(EXIT_FAILURE); }
