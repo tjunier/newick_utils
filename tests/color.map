@@ -1,3 +1,12 @@
+# Comments start with a '#' and are ignored.
+# Empty lines are ignored too:
+
+# ...as are lines consisting only of whitespace:
+   			 
 stroke:blue CLADE Homo Pan
 stroke:red CLADE Cercopithecus Macaca Papio
 stroke:green CLADE Macaca Simias
+
+# an empty line at the end no longer causes Segv:
+
+

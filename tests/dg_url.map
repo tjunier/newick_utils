@@ -1,3 +1,7 @@
+# An example URL map (from Daniel's data).
+# Empty lines and whitespace lines are ignored too:
+   			
+
 Aedes_aegypti http://cegg.unige.ch/mirortho/results?searchterm=Aaeg%&submit=Submit
 'Anopheles gambiae' http://cegg.unige.ch/mirortho/results?searchterm=Agam%&submit=Submit
 'Apis mellifera' http://cegg.unige.ch/mirortho/results?searchterm=Amel%&submit=Submit
@@ -44,3 +48,7 @@ Aedes_aegypti http://cegg.unige.ch/mirortho/results?searchterm=Aaeg%&submit=Subm
 'Xenopus tropicalis' http://cegg.unige.ch/mirortho/results?searchterm=Xtro%&submit=Submit
 'Bos taurus' http://cegg.unige.ch/mirortho/results?searchterm=Btar%&submit=Submit
 'Anolis carolinensis' http://cegg.unige.ch/mirortho/results?searchterm=Acar%&submit=Submit
+
+# Empty line at the end:
+
+

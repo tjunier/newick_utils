@@ -36,8 +36,9 @@ static char *error_messages[] = {
 	"(Error code not set)",
 	"Out of memory",
 	"Syntax error in Newick",
-	"Syntax error in color map",
-	"Syntax error in CSS map"
+	"Syntax error in CSS map",
+	"Syntax error in ornament map",
+	"Syntax error in URL map"
 };
 
 void set_last_error_code(enum error_codes code)

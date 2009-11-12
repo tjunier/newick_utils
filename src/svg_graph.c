@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include <assert.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #include "common.h"
 #include "graph_common.h"
@@ -201,6 +202,20 @@ static int get_group_type(const char *type)
 	return result;
 }
 
+/* A helper for the read_*_map() functions - returns true IFF line is entirely
+ * whitespace, or empty. */
+
+static bool is_all_whitespace(char *line)
+{
+	char *p = line;
+	while ('\0' != *p) {
+		if (! isspace(*p))
+			return false;
+		p++;
+	}
+	return true;
+}
+
 /* Builds a CSS map structure. This is a list of struct css_map_element, each
  * of which contains a group type (CLADE or INDIVIDUAL), a style specification,
  * and a list of labels. The style will apply to the clade defined by the
@@ -218,6 +233,9 @@ struct llist *read_css_map()
 	char *line;
 	int i = 1;
 	while ((line = read_line(css_map_file)) != NULL) {
+		if (line[0] == '#') continue;	/* comments */
+		if (is_all_whitespace(line)) continue;
+
 		struct css_map_element *css_el = malloc(
 				sizeof(struct css_map_element));
 		if (NULL == css_el) return NULL;
@@ -231,7 +249,7 @@ struct llist *read_css_map()
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) return NULL;
 		/* Next errors are syntax errors */
-		set_last_error_code(ERR_CMAP_SYNTAX);
+		set_last_error_code(ERR_CSS_MAP_SYNTAX);
 		char *style = wt_next_noquote(wtok);
 		if (NULL == style) return NULL; 
 		char *type = wt_next(wtok);
@@ -244,6 +262,11 @@ struct llist *read_css_map()
 		}
 		destroy_word_tokenizer(wtok);
 		free(line);
+		/* It is a syntax error if there was no label */
+		if (0 == label_list->count) {
+				set_last_error_code(ERR_CSS_MAP_SYNTAX);
+				return NULL;
+		}
 		css_el->group_type = get_group_type(type); 
 		if (UNKNOWN == css_el->group_type) {
 			fprintf (stderr, "WARNING: unknown group type '%s' (ignored)\n", type);
@@ -279,11 +302,16 @@ struct llist *read_css_map()
 // return checked
 struct llist *read_ornament_map()
 {
+	/* As for read_css_map() */
+	set_last_error_code(ERR_NOMEM);
 	struct llist *ornament_map = create_llist();
 	if (NULL == ornament_map) return NULL;
 
 	char *line;
 	while ((line = read_line(ornament_map_file)) != NULL) {
+		if (line[0] == '#') continue;	/* comments */
+		if (is_all_whitespace(line)) continue;
+
 		struct ornament_map_element *oel = malloc(
 				sizeof(struct ornament_map_element));
 		if (NULL == oel) return NULL;
@@ -296,15 +324,25 @@ struct llist *read_ornament_map()
 		if (NULL == label_list) return NULL;
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) return NULL;
+		/* Next errors are syntax errors */
+		set_last_error_code(ERR_ORN_MAP_SYNTAX);
 		char *ornament = wt_next_noquote(wtok);
 		if (NULL == ornament) return NULL;
 		char *type = wt_next(wtok);
+		if (NULL == type) return NULL;
+		/* Errors are memory again */
+		set_last_error_code(ERR_NOMEM);
 		char *label;
 		while ((label = wt_next(wtok)) != NULL) {
 			if (! append_element(label_list, label)) return NULL;
 		}
 		destroy_word_tokenizer(wtok);
 		free(line);
+		/* It is a syntax error if there was no label */
+		if (0 == label_list->count) {
+				set_last_error_code(ERR_ORN_MAP_SYNTAX);
+				return NULL;
+		}
 		oel->group_type = get_group_type(type); 
 		if (UNKNOWN == oel->group_type) {
 			fprintf (stderr, "WARNING: unknown group type '%s' (ignored)\n", type);
@@ -337,20 +375,31 @@ struct llist *read_ornament_map()
 
 struct hash *read_url_map()
 {
+	/* As for read_css_map() */
+	set_last_error_code(ERR_NOMEM);
 	struct hash *url_map = create_hash(URL_MAP_SIZE);
 	if (NULL == url_map) return NULL;
 
 	char *line;
 	while ((line = read_line(url_map_file)) != NULL) {
+		if (line[0] == '#') continue;	/* comments */
+		if (is_all_whitespace(line)) continue;
+
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) return NULL;
+		/* Next errors are syntax errors */
+		set_last_error_code(ERR_URL_MAP_SYNTAX);
 		char *label = wt_next(wtok);
+		if (NULL == label) return NULL;
 		underscores2spaces(label);
 		remove_quotes(label);
 		char *url = wt_next(wtok);
+		if (NULL == url) return NULL;
 		char *escaped_url = escape_predefined_character_entities(url);
 		char *anchor_attributes;
 		anchor_attributes = masprintf("xlink:href='%s' ", escaped_url);
+		/* Next errors are memory again */
+		set_last_error_code(ERR_NOMEM);
 		if (NULL == anchor_attributes) return NULL;
 		char *att;
 		while ((att = wt_next(wtok)) != NULL) {

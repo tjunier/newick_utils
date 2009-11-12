@@ -1,0 +1,10 @@
+# A red circle with a black border for human and chimp
+"<circle style='fill:red;stroke:black' r='5'/>" I Homo Pan
+
+# Next line intentionally only whitespace
+   		
+# A blue cyan disk with a blue border for all apes
+"<circle style='fill:cyan;stroke:blue' r='5'/>" C Homo Hylobates
+
+# next line intentionally empty
+

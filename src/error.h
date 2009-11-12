@@ -35,8 +35,10 @@ enum error_codes {
 	ERR_UNSET,
 	ERR_NOMEM,
 	ERR_NW_SYNTAX,
-	ERR_CMAP_SYNTAX,
-	ERR_CSSMAP_SYNTAX };
+	ERR_CSS_MAP_SYNTAX,
+	ERR_ORN_MAP_SYNTAX,
+	ERR_URL_MAP_SYNTAX
+};
 
 /* Sets the error code for the latest error - see error.c */
 
