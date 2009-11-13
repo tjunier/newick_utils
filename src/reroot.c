@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <assert.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -43,11 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hash.h"
 #include "common.h"
 
-enum reroot_status { OK, LCA_IS_TREE_ROOT };
+enum reroot_status { REROOT_OK, LCA_IS_TREE_ROOT };
+enum deroot_status { DEROOT_OK, BALANCED, NOT_BIFURCATING };
 
 struct parameters {
 	struct llist *labels;
-	int try_ingroup;
+	bool try_ingroup;
+	bool deroot;
 };
 
 void help(char *argv[])
@@ -107,16 +111,22 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	params.try_ingroup = FALSE;
+	params.try_ingroup = false;
+	params.deroot = false;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hl")) != -1) {
+	while ((opt_char = getopt(argc, argv, "dhl")) != -1) {
 		switch (opt_char) {
+		case '?':
+			exit (EXIT_FAILURE);
+		case 'd':
+			params.deroot = true;
+			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'l':
-			params.try_ingroup = TRUE;
+			params.try_ingroup = true;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -125,31 +135,42 @@ struct parameters get_params(int argc, char *argv[])
 	}
 
 	/* check arguments */
-	if ((argc - optind) >= 2)	{
-		if (0 != strcmp("-", argv[optind])) {
-			FILE *fin = fopen(argv[optind], "r");
-			extern FILE *nwsin;
-			if (NULL == fin) {
-				perror(NULL);
-				exit(EXIT_FAILURE);
-			}
-			nwsin = fin;
-		}
-		struct llist *lbl_list = create_llist();
-		if (NULL == lbl_list) { perror(NULL); exit(EXIT_FAILURE); }
-		optind++;	/* optind is now index of 1st label */
-		for (; optind < argc; optind++) {
-			if (! append_element(lbl_list, argv[optind])) {
-				perror(NULL);
-				exit(EXIT_FAILURE);
-			}
-		}
-		params.labels = lbl_list;
-	} else {
-		fprintf(stderr, "Usage: %s [-hl] <filename|-> <label> [label+]\n",
-				argv[0]);
+	int nargs = argc - optind; /* non-option arguments */
+	int args_ok = true;
+	switch (nargs) {
+	case 0:
+		args_ok = false;
+		break;
+	case 1:
+		if (! params.deroot)
+			args_ok = false;
+	}
+	if (! args_ok) {
+		fprintf(stderr,
+			"Usage: %s [-dhl] <filename|-> <label> [label+]\n",
+			argv[0]);
 		exit(EXIT_FAILURE);
 	}
+	/* read arguments */
+	if (0 != strcmp("-", argv[optind])) {
+		FILE *fin = fopen(argv[optind], "r");
+		extern FILE *nwsin;
+		if (NULL == fin) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+		nwsin = fin;
+	}
+	struct llist *lbl_list = create_llist();
+	if (NULL == lbl_list) { perror(NULL); exit(EXIT_FAILURE); }
+	optind++;	/* optind is now index of 1st label */
+	for (; optind < argc; optind++) {
+		if (! append_element(lbl_list, argv[optind])) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+	}
+	params.labels = lbl_list;
 
 	return params;
 }
@@ -203,7 +224,31 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 		exit(EXIT_FAILURE);
 	}
 
-	return OK;
+	return REROOT_OK;
+}
+
+
+/* De-roots a tree, in the sense that the top node must contain 3 (or more if
+ * the tree isn't strictly bifurcating) children. */
+
+enum deroot_status deroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
+{
+	if (2 != tree->root->children->count)
+		return NOT_BIFURCATING;
+	struct rnode *left_kid = tree->root->children->head->data;
+	struct rnode *right_kid = tree->root->children->tail->data;
+	if (left_kid->children->count < right_kid->children->count)
+		if (! splice_out_rnode(right_kid)) {
+			perror(NULL); exit(EXIT_FAILURE);
+		}
+	else if (left_kid->children->count > right_kid->children->count)
+		if (! splice_out_rnode(left_kid)) {
+			perror(NULL); exit(EXIT_FAILURE);
+		}
+	else 
+		return BALANCED;
+
+	return DEROOT_OK;
 }
 
 /* Returns true IFF arguments (cast to char*) are equal - IOW, the negation
@@ -256,7 +301,7 @@ void try_ingroup(struct rooted_tree *tree, struct parameters params)
 	enum reroot_status result = reroot(tree, ingroup_leaves);
 	char *newick;
 	switch (result) {
-		case OK:
+		case REROOT_OK:
 			newick = to_newick(tree->root);
 			printf ("%s\n", newick);
 			free(newick);
@@ -277,10 +322,12 @@ void try_ingroup(struct rooted_tree *tree, struct parameters params)
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct llist *outgroup_nodes = get_outgroup_nodes(tree, params.labels);
-	enum reroot_status result = reroot(tree, outgroup_nodes);
 	char *newick;
-	switch (result) {
-		case OK:
+	if (! params.deroot) {
+		/* re-root according to outgroup nodes */
+		enum reroot_status result = reroot(tree, outgroup_nodes);
+		switch (result) {
+		case REROOT_OK:
 			newick = to_newick(tree->root);
 			printf ("%s\n", newick);
 			free(newick);
@@ -294,8 +341,32 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 					"- cannot reroot. Try -l.\n");
 			}
 			break;
+		default:
+			assert(0);
+		}
+		destroy_llist(outgroup_nodes);
+	} else {
+		enum deroot_status result = deroot(tree, outgroup_nodes);
+		switch (result) {
+		case DEROOT_OK:
+			newick = to_newick(tree->root);
+			printf ("%s\n", newick);
+			free(newick);
+			break;
+		case NOT_BIFURCATING:
+			fprintf (stderr,
+				"WARNING: tree is already unrooted, or root"
+				" has only 1 child - cannot deroot.\n");
+			break;
+		case BALANCED:
+			fprintf (stderr,
+				"WARNING: can't decide which of root's "
+				"children is the outgroup.\n");
+			break;
+		default:
+			assert(0);
+		}
 	}
-	destroy_llist(outgroup_nodes);
 }
 
 int main(int argc, char *argv[])

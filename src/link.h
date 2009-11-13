@@ -36,8 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * by these methods. You will need either to recompute them, or to avoid
  * relying on them after the call. For example, it is safe to splice out a node
  * and then call to_newick() on the tree's root. On the other hand, the list of
- * nodes in the tree will still contain the spliced-out node (which is good
- * anyway since you need it to free the spliced-out node).*/
+ * nodes in the tree structure will still contain the spliced-out node (which
+ * is good anyway since you need it to free the spliced-out node).*/
 
 enum unlink_rnode_status { UNLINK_RNODE_DONE, UNLINK_RNODE_ROOT_CHILD,
 	UNLINK_RNODE_ERROR };

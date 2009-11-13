@@ -1,3 +1,7 @@
+valgrind, and add section on derooting to tutorial.
+
+all: invalid options should cause an immediate exit, as in reroot.c.
+
 nw_reroot: add option to "de-root" a tree, i.e. to make it suitable as a starting tree for PhyML, etc.
 
 nw_display: try to have the program find out the screen's width when outputting
