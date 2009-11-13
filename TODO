@@ -1,4 +1,4 @@
-valgrind, and add section on derooting to tutorial.
+all: apps should start using destroy_tree_cb() when possible (see display.c).
 
 all: invalid options should cause an immediate exit, as in reroot.c.
 

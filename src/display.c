@@ -376,16 +376,17 @@ int main(int argc, char *argv[])
 	int align_leaves;
 	int with_scale_bar;
 	enum display_status status; 
+	void (*node_destroyer)(struct rnode *) = NULL;
 
 	params = get_params(argc, argv);
 
-	/* for now, SVG can only handle one tree */
 	if (params.svg) {
 		set_svg_parameters(params);
 		if(! svg_init()) {
 			fprintf (stderr, "%s\n", get_last_error_message());
 			exit(EXIT_FAILURE);
 		}
+		node_destroyer = destroy_svg_node_data;
 	}
 
 	while (NULL != (tree = parse_tree())) {
@@ -432,7 +433,7 @@ int main(int argc, char *argv[])
 					assert(0);
 			}
 		}
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree_cb(tree, node_destroyer);
 	}
 
 	return 0;

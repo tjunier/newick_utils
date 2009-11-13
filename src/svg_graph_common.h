@@ -75,3 +75,7 @@ void set_svg_label_char_width(double);
 double largest_PoT_lte(double);
 
 void draw_scale_bar(int, double, double, double, char *);
+
+/* Pass this as a callback to destroy_tree_cb */
+
+void destroy_svg_node_data(struct rnode *);

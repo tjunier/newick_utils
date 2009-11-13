@@ -62,6 +62,10 @@ void collapse_pure_clades(struct rooted_tree *tree);
 
 void destroy_tree(struct rooted_tree *, int free_node_data);
 
+//TODO: replace by this
+
+void destroy_tree_cb(struct rooted_tree *, void (*destroyer)(struct rnode*));
+
 /* Returns the number of leaves of this tree */
 
 int leaf_count(struct rooted_tree *);

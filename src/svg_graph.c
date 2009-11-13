@@ -219,8 +219,11 @@ struct llist *read_css_map()
 	char *line;
 	int i = 1;
 	while ((line = read_line(css_map_file)) != NULL) {
-		if ('#' == line[0]) continue;	/* comments */
-		if (is_all_whitespace(line)) continue;
+		/* Skip comments and lines that are empty or all whitespace */
+		if ('#' == line[0] || is_all_whitespace(line)) {
+			free(line);
+			continue;
+		}
 
 		struct css_map_element *css_el = malloc(
 				sizeof(struct css_map_element));
@@ -295,8 +298,11 @@ struct llist *read_ornament_map()
 
 	char *line;
 	while ((line = read_line(ornament_map_file)) != NULL) {
-		if ('#' == line[0]) continue;	/* comments */
-		if (is_all_whitespace(line)) continue;
+		/* Skip comments and lines that are empty or all whitespace */
+		if ('#' == line[0] || is_all_whitespace(line)) {
+			free(line);
+			continue;
+		}
 
 		struct ornament_map_element *oel = malloc(
 				sizeof(struct ornament_map_element));
@@ -368,8 +374,11 @@ struct hash *read_url_map()
 
 	char *line;
 	while ((line = read_line(url_map_file)) != NULL) {
-		if ('#' == line[0]) continue;	/* comments */
-		if (is_all_whitespace(line)) continue;
+		/* Skip comments and lines that are empty or all whitespace */
+		if ('#' == line[0] || is_all_whitespace(line)) {
+			free(line);
+			continue;
+		}
 
 		struct word_tokenizer *wtok = create_word_tokenizer(line);
 		if (NULL == wtok) return NULL;
@@ -806,3 +815,13 @@ enum display_status display_svg_tree(
 }
 
 void svg_footer() { printf ("</svg>\n"); }
+
+void destroy_svg_node_data (struct rnode *node)
+{
+	struct svg_data *data = node->data;
+	if (NULL != data) {
+		if (NULL != data->ornament)
+			free(data->ornament);
+		free(data);
+	}
+}
