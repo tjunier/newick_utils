@@ -109,16 +109,17 @@ extract_distances_noref()
 
 plot_classic()
 {
-	printf "set terminal png large size 640,400\n" > $DIST_GNUPLOT
+	printf "set size 1,0.7\n" > $DIST_GNUPLOT 
+	printf "set terminal postscript eps color\n" >> $DIST_GNUPLOT
 	printf "set output '%s'\n" $BSCAN_IMAGE >> $DIST_GNUPLOT
 	printf "set key outside\n" >> $DIST_GNUPLOT 
 	printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
 		$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $DIST_GNUPLOT
 	printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $DIST_GNUPLOT
 	printf "set ylabel 'distance to reference [subst./site]'\n" >> $DIST_GNUPLOT
-	printf "plot '%s' using (\$1+(%d/2)):2 with lines title '%s'" $DIST_NOREF $SLICE_WIDTH ${labels_noref[0]} >> $DIST_GNUPLOT
+	printf "plot '%s' using (\$1+(%d/2)):2 with lines linewidth 2 title '%s'" $DIST_NOREF $SLICE_WIDTH ${labels_noref[0]} >> $DIST_GNUPLOT
 	for i in $(seq 2 $((nb_labels-1))); do
-		printf ", '' using (\$1+(%d/2)):%d with lines title '%s'" $SLICE_WIDTH $((i+1)) ${labels_noref[$((i-1))]}
+		printf ", '' using (\$1+(%d/2)):%d with lines linewidth 2 title '%s'" $SLICE_WIDTH $((i+1)) ${labels_noref[$((i-1))]}
 	done >> $DIST_GNUPLOT
 
 	gnuplot $DIST_GNUPLOT
@@ -149,7 +150,7 @@ declare -r R_DISTANCE_THRESHOLD=0.4
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
 declare -r DIST_NOREF=$INPUT_FILE.nrdist
 declare -r DIST_GNUPLOT=$INPUT_FILE.dist.plt
-declare -r BSCAN_IMAGE=$INPUT_FILE.bscan.png
+declare -r DIST_IMAGE=$INPUT_FILE.bscan.eps
 
 ################################################################
 # Main

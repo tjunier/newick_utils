@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* order_tree.h: functions for ordering trees */
 
-/* A helper function, to pass as parameter to qsort() */
+/* A helper function, to pass as parameter to qsort(). This compares node labels. */
 
 int lbl_comparator(const void *, const void *);
 
@@ -37,4 +37,8 @@ int lbl_comparator(const void *, const void *);
  * parametered, if we can think of other interesting orders. NOTE: this
  * function uses (and modifies) the rnode's data attribute. */
 
-int order_tree(struct rooted_tree *tree);
+int order_tree_lbl(struct rooted_tree *tree);
+
+/* Idem, but orders according to number of descendants. */
+
+int order_tree_num_desc(struct rooted_tree *tree);

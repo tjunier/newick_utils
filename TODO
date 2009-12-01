@@ -1,9 +1,13 @@
+order_tree.h: add unit tests for all f()
+
 all: apps should start using destroy_tree_cb() when possible (see display.c).
 
 all: invalid options should cause an immediate exit, as in reroot.c.
 
-nw_display: try to have the program find out the screen's width when outputting
-to a terminal (I think it must be something like isatty() and friends).
+[later] nw_display: try to have the program find out the screen's width when outputting
+to a terminal (I think it must be something like isatty() and friends). --
+apparently there is NO portable way of finding the line length. This has low
+priority for now.
 
 general: apps should use set_parser_input_filename() instead of setting nwsin
 directly.

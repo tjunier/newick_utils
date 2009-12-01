@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -41,15 +42,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "order_tree.h"
 
+enum order_criterion { ORDER_ALNUM_LBL, ORDER_NUM_DESCENDANTS };
+
+struct parameters {
+	enum order_criterion criterion;
+};
+
 void help (char *argv[])
 {
 	printf (
-"Orders nodes by alphabetical order, preserving topology\n"
+"Orders nodes according to various criteria, preserving topology\n"
 "\n"
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-h] <newick trees filename|->\n"
+"%s [-hn] <newick trees filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -60,10 +67,10 @@ void help (char *argv[])
 "Output\n"
 "------\n"
 "\n"
-"Orders the tree and prints it out on standard output. The ordering field\n"
-"is the node's label for leaves, or the first child's order field for inner\n"
-"nodes. The tree's topology is not altered: the biological information\n"
-"contained in the tree is left intact.\n"
+"Orders the tree and prints it out on standard output. By default, the\n"
+"ordering field is the node's label for leaves, or the first child's\n"
+"order field for inner nodes. The tree's topology is not altered: the\n"
+"biological information contained in the tree is left intact.\n"
 "\n"
 "This is useful for comparing trees, because isomorphic trees will yield\n"
 "different Newick representations if the nodes are ordered differently.\n"
@@ -72,6 +79,8 @@ void help (char *argv[])
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
+"    -n: order tree by number of descendants. Nodes with fewer descendans\n"
+"        appear first.\n"
 "\n"
 "Examples\n"
 "--------\n"
@@ -93,15 +102,21 @@ void help (char *argv[])
 	       );
 }
 
-void get_params(int argc, char *argv[])
+struct parameters get_params(int argc, char *argv[])
 {
 
+	struct parameters params;
+	params.criterion = ORDER_ALNUM_LBL;
+
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "h")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hn")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
+		case 'n':
+			params.criterion = ORDER_NUM_DESCENDANTS;
+			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
 			exit (EXIT_FAILURE);
@@ -123,16 +138,27 @@ void get_params(int argc, char *argv[])
 		fprintf(stderr, "Usage: %s [-h] <filename|->\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
+
+	return params;
 }
 
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	
-	get_params(argc, argv);
+	struct parameters params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		if (! order_tree(tree)) { perror(NULL); exit(EXIT_FAILURE); }
+		switch(params.criterion) {
+		case ORDER_ALNUM_LBL:
+			if (! order_tree_lbl(tree)) { perror(NULL); exit(EXIT_FAILURE); }
+			break;
+		case ORDER_NUM_DESCENDANTS:
+			if (! order_tree_num_desc(tree)) { perror(NULL); exit(EXIT_FAILURE); }
+			break;
+		default:
+			assert(0); // programmer error
+		}
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);

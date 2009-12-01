@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h> 	//TODO: rm when debugged
 
 #include "rnode.h"
 #include "tree.h"
@@ -54,7 +55,7 @@ int lbl_comparator(const void *a, const void *b)
 	return cmp;
 }
 
-int order_tree(struct rooted_tree *tree)
+int order_tree_lbl(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
 
@@ -77,7 +78,7 @@ int order_tree(struct rooted_tree *tree)
 				llist_to_array(current->children);
 			if (NULL == kids_array) return FAILURE;
 			destroy_llist(current->children);
-			qsort(kids_array, count, sizeof(struct redge *),
+			qsort(kids_array, count, sizeof(struct rnode *),
 					lbl_comparator);
 			struct llist *ordered_kids_list;
 			ordered_kids_list = array_to_llist(
@@ -88,6 +89,64 @@ int order_tree(struct rooted_tree *tree)
 			// Get sort field from first child ("back-inherit") [?]
 			current->data = kids_array[0]->data;
 			free(kids_array);
+		}
+	}
+
+	return SUCCESS;
+}
+
+int num_desc_comparator(const void *a, const void *b)
+{
+	struct rnode *rnode_a = *((struct rnode **) a);
+	struct rnode *rnode_b = *((struct rnode **) b);
+	int a_num_desc = *((int *) rnode_a->data);
+	int b_num_desc = *((int *) rnode_b->data);
+
+	if (a_num_desc > b_num_desc)
+		return 1;
+	if (a_num_desc < b_num_desc)
+		return -1;
+	return 0;
+}
+
+int order_tree_num_desc(struct rooted_tree *tree)
+{
+	struct list_elem *elem;
+
+	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
+		struct rnode *current = elem->data;
+		/* data is just an int: the number of descendants */
+		current->data = (int *) malloc(sizeof(int));
+		if (NULL == current->data) return FAILURE;
+		if (is_leaf(current)) {
+			*((int *) current->data) = 1;	/* leaves count as 1 */
+		} else {
+			/* Since all children have been visited (because we're
+			 * traversing the tree in parse order), we can just
+			 * order the children on their sort field. */
+			struct rnode ** kids_array;
+			int count = current->children->count;
+			kids_array = (struct rnode **)
+				llist_to_array(current->children);
+			if (NULL == kids_array) return FAILURE;
+			destroy_llist(current->children);
+			qsort(kids_array, count, sizeof(struct rnode *),
+					num_desc_comparator);
+			struct llist *ordered_kids_list;
+			ordered_kids_list = array_to_llist(
+				(void **) kids_array, count);
+			if (NULL == ordered_kids_list) return FAILURE;
+			free(kids_array);
+			current->children = ordered_kids_list;
+
+			/* Get number of descendants as sum of kids' */
+			struct list_elem *el;
+			int nb_descendants = 0;
+			for (el=current->children->head; NULL != el; el=el->next) {
+				struct rnode *kid = el->data;
+				nb_descendants += *((int *) kid->data);
+			}
+			*((int *) current->data) = nb_descendants;
 		}
 	}
 

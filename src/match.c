@@ -183,7 +183,7 @@ struct rooted_tree *get_ordered_pattern_tree(char *pattern)
 	}
 	newick_scanner_clear_string_input();
 
-	if (!order_tree(pattern_tree)) { perror(NULL); exit(EXIT_FAILURE); }
+	if (!order_tree_lbl(pattern_tree)) { perror(NULL); exit(EXIT_FAILURE); }
 
 	return pattern_tree;
 }
@@ -328,7 +328,7 @@ void process_tree(struct rooted_tree *tree, struct hash *pattern_labels,
 	prune_empty_labels(tree);
 	remove_knee_nodes(tree);
 	remove_branch_lengths(tree);	
-	if (! order_tree(tree)) { perror(NULL); exit(EXIT_FAILURE); }
+	if (! order_tree_lbl(tree)) { perror(NULL); exit(EXIT_FAILURE); }
 	char *processed_newick = to_newick(tree->root);
 	int match = (0 == strcmp(processed_newick, pattern_newick));
 	match = params.reverse ? !match : match;
