@@ -87,3 +87,32 @@ outgroup):
 \noindent{}To repeat: all outgroup labels were passed, not just the two
 normally needed to find the last common ancestor -- since, precisely, we can't
 use the \lca.
+
+\subsection{Derooting}
+
+Some programs insist on being passed an unrooted tree, e.g. if you want to
+supply your own tree to PhyML, it has to be "unrooted". Strictly speaking,
+\nw{} trees are always rooted, but there is a convention that if the root has
+three (or more) children, the tree is considered unrooted. You can deroot a
+tree (in this limited sense) by passing option \texttt{-d} to \reroot{}. Here
+is a rooted tree, \texttt{fagales.nw}
+
+\begin{center}
+\includegraphics{reroot_8_svg.pdf}
+\end{center}
+
+\noindent{}we can deroot it thus:
+
+\verbatiminput{reroot_9_svg.cmd}
+\begin{center}
+\includegraphics{reroot_9_svg.pdf}
+\end{center}
+
+\noindent{}this works as follows. The program finds which of the root's two
+children (it is assumed to have two, otherwise the tree is already considered
+unrooted in the above sense) has more children than the other. This is
+considered the ingroup, and the \lca{} of the ingroup is spliced out from the
+tree, attaching its children directly to the root. In this example, the ingroup
+is the Fagaceae - Casuarinaceae clade, and the derooting results in Fagaceae
+being directly attached to the root, as is its sister clade (Myricaceae -
+Casuarinaceae).

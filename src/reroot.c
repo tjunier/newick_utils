@@ -81,6 +81,9 @@ void help(char *argv[])
 "Options\n"
 "-------\n"
 "\n"
+"    -d: deroot - splice out the LCA of the ingroup, attaching its children\n"
+"        to the root. The ingroup is the root's child which has the more\n"
+"        children. The root is expected to have two children.\n"
 "    -h: print this message and exit\n"
 "    -l: lax - if it is not possible to reroot on the outgroup, try the\n"
 "        ingroup - that is, all nodes whose labels were NOT passed as\n"
@@ -237,14 +240,19 @@ enum deroot_status deroot(struct rooted_tree *tree, struct llist *outgroup_nodes
 		return NOT_BIFURCATING;
 	struct rnode *left_kid = tree->root->children->head->data;
 	struct rnode *right_kid = tree->root->children->tail->data;
-	if (left_kid->children->count < right_kid->children->count)
+	/* We splice out the left or right kid of the root, and also free() it. */
+	if (left_kid->children->count < right_kid->children->count) {
 		if (! splice_out_rnode(right_kid)) {
 			perror(NULL); exit(EXIT_FAILURE);
 		}
-	else if (left_kid->children->count > right_kid->children->count)
+		// destroy_rnode(right_kid, NULL);
+	}
+	else if (left_kid->children->count > right_kid->children->count) {
 		if (! splice_out_rnode(left_kid)) {
 			perror(NULL); exit(EXIT_FAILURE);
 		}
+		// destroy_rnode(left_kid, NULL);
+	}
 	else 
 		return BALANCED;
 
@@ -344,7 +352,8 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		default:
 			assert(0);
 		}
-		destroy_llist(outgroup_nodes);
+		free_descendants(tree->root);
+		free(tree);
 	} else {
 		enum deroot_status result = deroot(tree, outgroup_nodes);
 		switch (result) {
@@ -366,7 +375,9 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		default:
 			assert(0);
 		}
+		destroy_tree_cb(tree, NULL);
 	}
+	destroy_llist(outgroup_nodes);
 }
 
 int main(int argc, char *argv[])
@@ -376,13 +387,10 @@ int main(int argc, char *argv[])
 	
 	params = get_params(argc, argv);
 	while (NULL != (tree = parse_tree())) {
-		// fprintf(stderr, "rerooting...\n");
+		/* tree is free()d in process_tree(), as derooting is
+		 * compatible with ordinary free()ing (with destroy_tree()),
+		 * but rerooting is not. */
 		process_tree(tree, params);
-		// NOTE: We CANNOT use destroy_tree() on this tree, since it has
-		// been modified! This is why we do:
-		// fprintf(stderr, "freeing tree...\n");
-		free_descendants(tree->root);
-		free(tree);
 	}
 
 	destroy_llist(params.labels);

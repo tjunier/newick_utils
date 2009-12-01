@@ -134,7 +134,8 @@ void free_descendants(struct rnode *node)
 			assert(0);	/* programmer error */
 	}
 
-	// Frees all nodes "seen" above - which must be all the tree's nodes.
+	// Frees all nodes "seen" above - which must be all the descendants of
+	// 'node'.
 	struct llist *keys = hash_keys(to_free);
 	if (NULL == keys) return;
        	struct list_elem *el;

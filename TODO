@@ -2,8 +2,6 @@ all: apps should start using destroy_tree_cb() when possible (see display.c).
 
 all: invalid options should cause an immediate exit, as in reroot.c.
 
-nw_reroot: add option to "de-root" a tree, i.e. to make it suitable as a starting tree for PhyML, etc.
-
 nw_display: try to have the program find out the screen's width when outputting
 to a terminal (I think it must be something like isatty() and friends).
 
@@ -362,3 +360,7 @@ at the end. read_line() (or whichever it is) should be more robust to this.
 Should also accept comments, and ignore lines consisting only of whitespace.
 Finally, syntax errors in the maps should be reported as such. Same thing for
 other maps (URL, ornaments); ditto with nw_rename which also reads a map.
+
+[done] nw_reroot: add option to "de-root" a tree, i.e. to make it suitable as a
+starting tree for PhyML, etc.
+
