@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "order_tree.h"
 
-enum order_criterion { ORDER_ALNUM_LBL, ORDER_NUM_DESCENDANTS };
+enum order_criterion { ORDER_ALNUM_LBL, ORDER_NUM_DESCENDANTS, ORDER_DELADDERIZE };
 
 struct parameters {
 	enum order_criterion criterion;
@@ -56,7 +56,7 @@ void help (char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hn] <newick trees filename|->\n"
+"%s [-hnL] <newick trees filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -79,6 +79,8 @@ void help (char *argv[])
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
+"    -L: de-ladderize, i.e. alternatively put the nodes with fewer\n"
+"        descendants before or after nodes with more descendants.\n"
 "    -n: order tree by number of descendants. Nodes with fewer descendans\n"
 "        appear first.\n"
 "\n"
@@ -109,11 +111,14 @@ struct parameters get_params(int argc, char *argv[])
 	params.criterion = ORDER_ALNUM_LBL;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hn")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hLn")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
+		case 'L':
+			params.criterion = ORDER_DELADDERIZE;
+			break;
 		case 'n':
 			params.criterion = ORDER_NUM_DESCENDANTS;
 			break;
@@ -152,6 +157,9 @@ int main(int argc, char *argv[])
 		switch(params.criterion) {
 		case ORDER_ALNUM_LBL:
 			if (! order_tree_lbl(tree)) { perror(NULL); exit(EXIT_FAILURE); }
+			break;
+		case ORDER_DELADDERIZE:
+			if (! order_tree_deladderize(tree)) {perror(NULL);exit(EXIT_FAILURE);}
 			break;
 		case ORDER_NUM_DESCENDANTS:
 			if (! order_tree_num_desc(tree)) { perror(NULL); exit(EXIT_FAILURE); }

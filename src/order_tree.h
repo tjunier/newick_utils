@@ -33,6 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int lbl_comparator(const void *, const void *);
 
+/* Idem, but for ordering children by increasing number of descendants */
+
+int num_desc_comparator(const void *a, const void *b);
+
+/* reverse of num_desc_comparator() */
+
+int reverse_num_desc_comparator(const void *a, const void *b);
+
 /* Orders all nodes in the tree, according to lbl_comparator() - this could be
  * parametered, if we can think of other interesting orders. NOTE: this
  * function uses (and modifies) the rnode's data attribute. */
@@ -42,3 +50,7 @@ int order_tree_lbl(struct rooted_tree *tree);
 /* Idem, but orders according to number of descendants. */
 
 int order_tree_num_desc(struct rooted_tree *tree);
+
+/* Idem, but de-ladderizes */
+
+int order_tree_deladderize(struct rooted_tree *tree);

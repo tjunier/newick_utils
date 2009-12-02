@@ -112,9 +112,6 @@ nw_display: output better message when colormap labels are not found
 
 nw_distance: add tests for new selection options (i and f)
 
-nw_order: add function for ordering children by number of descendants, like
-iTOL seems to do.
-
 [later] Add functionality for reducing stair nodes.
 
 [later] Add functionality for directly counting a bipartition from a set of
@@ -368,3 +365,5 @@ other maps (URL, ornaments); ditto with nw_rename which also reads a map.
 [done] nw_reroot: add option to "de-root" a tree, i.e. to make it suitable as a
 starting tree for PhyML, etc.
 
+[done] nw_order: add function for ordering children by number of descendants, like
+iTOL seems to do.
