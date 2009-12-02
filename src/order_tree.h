@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* order_tree.h: functions for ordering trees */
 
+struct rooted_tree;
+
 /* A helper function, to pass as parameter to qsort(). This compares node labels. */
 
 int lbl_comparator(const void *, const void *);

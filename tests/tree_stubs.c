@@ -492,3 +492,49 @@ struct rooted_tree tree_12()
 
 	return result;
 }
+
+/* A tree with short labels, out of alphabetical order */
+/* ((Bee,Ant)f,(Eel,(Dog,Cat)g)h)i; */
+struct rooted_tree tree_13()
+{
+	struct rnode *node_A, *node_B, *node_C, *node_D, *node_E;
+	struct rnode *node_f, *node_g, *node_h, *node_i;
+	struct llist *nodes_in_order;
+	struct rooted_tree result;
+	
+	node_A = create_rnode("Ant", "");
+	node_B = create_rnode("Bee", "");
+	node_C = create_rnode("Cat", "");
+	node_D = create_rnode("Dog", "");
+	node_E = create_rnode("Eel", "");
+	node_f = create_rnode("", "");
+	node_g = create_rnode("", "");
+	node_h = create_rnode("", "");
+	node_i = create_rnode("", "");
+
+	add_child(node_f, node_B);
+	add_child(node_f, node_A);
+	add_child(node_g, node_D);
+	add_child(node_g, node_C);
+	add_child(node_h, node_E);
+	add_child(node_h, node_g);
+	add_child(node_i, node_f);
+	add_child(node_i, node_h);
+
+	nodes_in_order = create_llist();
+	append_element(nodes_in_order, node_B);
+	append_element(nodes_in_order, node_A);
+	append_element(nodes_in_order, node_f);
+	append_element(nodes_in_order, node_D);
+	append_element(nodes_in_order, node_C);
+	append_element(nodes_in_order, node_g);
+	append_element(nodes_in_order, node_E);
+	append_element(nodes_in_order, node_h);
+	append_element(nodes_in_order, node_i);
+
+	result.root = node_i;
+	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
+
+	return result;
+}

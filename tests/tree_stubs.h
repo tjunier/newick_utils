@@ -49,3 +49,7 @@ struct rooted_tree tree_11();
 /* A tree some edges of which have length, and others don't */
 /* ((A,B:1),C); */
 struct rooted_tree tree_12();
+
+/* A tree with short labels, out of alphabetical order */
+/* ((Bee,Ant)f,(Eel,(Dog,Cat)g)h)i; */
+struct rooted_tree tree_13();
