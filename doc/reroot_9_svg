@@ -1,0 +1,1 @@
+nw_reroot -d fagales.nw | nw_display -s -v 20 -
