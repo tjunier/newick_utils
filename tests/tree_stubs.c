@@ -538,3 +538,105 @@ struct rooted_tree tree_13()
 
 	return result;
 }
+
+/* A top-light ladder tree */
+/* (Petromyzon,(Carcharodon,(Xenopus,(Columba,(Equus,Homo)Mammalia)Amniota)Tetrapoda)Gnathostomata)Vertebrata;
+ * */
+struct rooted_tree tree_14()
+{
+	struct rnode *Petromyzon = create_rnode("Petromyzon", "");
+	struct rnode *Carcharodon = create_rnode("Carcharodon", "");
+	struct rnode *Xenopus = create_rnode("Xenopus", "");
+	struct rnode *Columba = create_rnode("Columba", "");
+	struct rnode *Equus = create_rnode("Equus", "");
+	struct rnode *Homo = create_rnode("Homo", "");
+	struct rnode *Mammalia = create_rnode("Mammalia", "");
+	struct rnode *Amniota = create_rnode("Amniota", "");
+	struct rnode *Tetrapoda = create_rnode("Tetrapoda", "");
+	struct rnode *Gnathostomata = create_rnode("Gnathostomata", "");
+	struct rnode *Vertebrata = create_rnode("Vertebrata", "");
+
+	struct llist *nodes_in_order;
+	struct rooted_tree result;
+	
+	add_child(Vertebrata, Petromyzon);
+	add_child(Vertebrata, Gnathostomata);
+	add_child(Gnathostomata, Carcharodon);
+	add_child(Gnathostomata, Tetrapoda);
+	add_child(Tetrapoda, Xenopus);
+	add_child(Tetrapoda, Amniota);
+	add_child(Amniota, Columba);
+	add_child(Amniota, Mammalia);
+	add_child(Mammalia, Equus);
+	add_child(Mammalia, Homo);
+
+	nodes_in_order = create_llist();
+	append_element(nodes_in_order, Petromyzon);
+	append_element(nodes_in_order, Carcharodon);
+	append_element(nodes_in_order, Xenopus);
+	append_element(nodes_in_order, Columba);
+	append_element(nodes_in_order, Equus);
+	append_element(nodes_in_order, Homo);
+	append_element(nodes_in_order, Mammalia);
+	append_element(nodes_in_order, Amniota);
+	append_element(nodes_in_order, Tetrapoda);
+	append_element(nodes_in_order, Gnathostomata);
+	append_element(nodes_in_order, Vertebrata);
+
+	result.root = Vertebrata;
+	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_CLADOGRAM; 	/* should make no difference */
+
+	return result;
+}
+
+/* A top-heavy ladder tree, isomorphic to #14 */
+/* (((((Equus,Homo)Mammalia,Columba)Amniota,Xenopus)Tetrapoda,Carcharodon)Gnathostomata,Petromyzon)Vertebrata; */
+struct rooted_tree tree_15()
+{
+	struct rnode *Petromyzon = create_rnode("Petromyzon", "");
+	struct rnode *Carcharodon = create_rnode("Carcharodon", "");
+	struct rnode *Xenopus = create_rnode("Xenopus", "");
+	struct rnode *Columba = create_rnode("Columba", "");
+	struct rnode *Equus = create_rnode("Equus", "");
+	struct rnode *Homo = create_rnode("Homo", "");
+	struct rnode *Mammalia = create_rnode("Mammalia", "");
+	struct rnode *Amniota = create_rnode("Amniota", "");
+	struct rnode *Tetrapoda = create_rnode("Tetrapoda", "");
+	struct rnode *Gnathostomata = create_rnode("Gnathostomata", "");
+	struct rnode *Vertebrata = create_rnode("Vertebrata", "");
+
+	struct llist *nodes_in_order;
+	struct rooted_tree result;
+	
+	add_child(Mammalia, Equus);
+	add_child(Mammalia, Homo);
+	add_child(Amniota, Mammalia);
+	add_child(Amniota, Columba);
+	add_child(Tetrapoda, Amniota);
+	add_child(Tetrapoda, Xenopus);
+	add_child(Gnathostomata, Tetrapoda);
+	add_child(Gnathostomata, Carcharodon);
+	add_child(Vertebrata, Gnathostomata);
+	add_child(Vertebrata, Petromyzon);
+
+	nodes_in_order = create_llist();
+	append_element(nodes_in_order, Equus);
+	append_element(nodes_in_order, Homo);
+	append_element(nodes_in_order, Mammalia);
+	append_element(nodes_in_order, Columba);
+	append_element(nodes_in_order, Amniota);
+	append_element(nodes_in_order, Xenopus);
+	append_element(nodes_in_order, Tetrapoda);
+	append_element(nodes_in_order, Carcharodon);
+	append_element(nodes_in_order, Gnathostomata);
+	append_element(nodes_in_order, Petromyzon);
+	append_element(nodes_in_order, Vertebrata);
+
+	result.root = Vertebrata;
+	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_CLADOGRAM; 	/* should make no difference */
+
+	return result;
+}
+

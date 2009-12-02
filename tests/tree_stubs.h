@@ -53,3 +53,13 @@ struct rooted_tree tree_12();
 /* A tree with short labels, out of alphabetical order */
 /* ((Bee,Ant)f,(Eel,(Dog,Cat)g)h)i; */
 struct rooted_tree tree_13();
+
+/* A top-light ladder tree */
+/* (Petromyzon,(Carcharodon,(Xenopus,(Columba,(Equus,Homo)Mammalia)Amniota)Tetrapoda)Gnathostomata)Vertebrata;
+ * */
+struct rooted_tree tree_14();
+
+/* A top-heavy ladder tree, isomorphic to #14 */
+/* (((((Equus,Homo)Mammalia,Columba)Amniota,Xenopus)Tetrapoda,Carcharodon)Gnathostomata,Petromyzon)Vertebrata; */
+struct rooted_tree tree_15();
+
