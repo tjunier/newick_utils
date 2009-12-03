@@ -1,0 +1,1 @@
+nw_display -s scala.nw -v 30 -l 'font-style:italic'

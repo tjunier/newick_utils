@@ -51,7 +51,7 @@ int test_order_deladderize()
 {
 	const char *test_name = "test_order_num_desc";
 	struct rooted_tree test_tree = tree_15();
-	order_tree_num_desc(&test_tree);
+	order_tree_deladderize(&test_tree);
 	char *obt_newick = to_newick(test_tree.root);
 	char *exp_newick = "(Petromyzon,((Xenopus,((Equus,Homo)Mammalia,Columba)Amniota)Tetrapoda,Carcharodon)Gnathostomata)Vertebrata;";
 
@@ -73,6 +73,7 @@ int main()
 	printf("Starting reordering test...\n");
 	failures += test_order_lbl();
 	failures += test_order_num_desc();
+	failures += test_order_deladderize();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

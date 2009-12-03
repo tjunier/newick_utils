@@ -1,0 +1,2 @@
+nw_order -c n HRV_cg.nw \
+| nw_display -sSr -b 'visibility:hidden' -v 30 -w 450 -

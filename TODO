@@ -1,4 +1,3 @@
-order_tree.h: add unit tests for all f()
 
 nw_order: how are internal labels handled when sorting alphabetically? For now
 they are ignored, it seems. Should we add an option to handle them?
@@ -7,10 +6,10 @@ all: apps should start using destroy_tree_cb() when possible (see display.c).
 
 all: invalid options should cause an immediate exit, as in reroot.c.
 
-[later] nw_display: try to have the program find out the screen's width when outputting
-to a terminal (I think it must be something like isatty() and friends). --
-apparently there is NO portable way of finding the line length. This has low
-priority for now.
+[later] nw_display: try to have the program find out the screen's width when
+outputting to a terminal (I think it must be something like isatty() and
+friends). -- apparently there is NO portable way of finding the line length.
+This has low priority for now.
 
 general: apps should use set_parser_input_filename() instead of setting nwsin
 directly.
@@ -368,4 +367,7 @@ other maps (URL, ornaments); ditto with nw_rename which also reads a map.
 [done] nw_reroot: add option to "de-root" a tree, i.e. to make it suitable as a
 starting tree for PhyML, etc.
 
-[done] nw_order: add function for ordering children by number of descendants, like iTOL seems to do.
+[done] nw_order: add function for ordering children by number of descendants,
+like iTOL seems to do.
+
+[done] order_tree.h: add unit tests for all f()
