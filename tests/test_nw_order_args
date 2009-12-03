@@ -1,3 +1,4 @@
 def:catarrhini.nw
 mult:catarrhini_wrong_mult.nw
-num: -n tetrapoda.nw
+num: -c n tetrapoda.nw
+dl: -c d top_heavy_ladder.nw

@@ -56,7 +56,7 @@ void help (char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hnL] <newick trees filename|->\n"
+"%s [-c:hn] <newick trees filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -78,14 +78,19 @@ void help (char *argv[])
 "Options\n"
 "-------\n"
 "\n"
+"    -c <criterion>: specify order criterion. Possible criteria are 'a'\n"
+"        (alphanumeric oder of labels), 'n' (number of descendants:\n"
+"        nodes with fewer descendans appear first), 'd' (de-ladderize:\n"
+"        alternately put nodes with fewer descendants before or after\n"
+"        those with more)\n"
+"        The default (i.e., if option -c is not given) is 'a'.\n"
 "    -h: print this message and exit\n"
-"    -L: de-ladderize, i.e. alternatively put the nodes with fewer\n"
-"        descendants before or after nodes with more descendants.\n"
-"    -n: order tree by number of descendants. Nodes with fewer descendans\n"
-"        appear first.\n"
 "\n"
 "Examples\n"
 "--------\n"
+"\n"
+"# De-ladderize tree\n"
+"$ %s -c d ladder.nw\n"
 "\n"
 "# These two trees look different...\n"
 "$ diff -q data/falconiformes data/falconiformes_2 \n"
@@ -100,8 +105,25 @@ void help (char *argv[])
 "Files f1 and f2 are identical\n",
 	argv[0],
 	argv[0],
+	argv[0],
 	argv[0]
 	       );
+}
+
+int get_criterion(char *optarg)
+{
+	switch (optarg[0]) {
+	case 'a':
+		return ORDER_ALNUM_LBL;
+	case 'd':
+		return ORDER_DELADDERIZE;
+	case 'n':
+		return ORDER_NUM_DESCENDANTS;
+	default:
+		fprintf(stderr, "WARNING: unrecognized option '%s', defaulting to 'a'\n",
+				optarg);
+	}
+	return ORDER_ALNUM_LBL;
 }
 
 struct parameters get_params(int argc, char *argv[])
@@ -111,16 +133,13 @@ struct parameters get_params(int argc, char *argv[])
 	params.criterion = ORDER_ALNUM_LBL;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hLn")) != -1) {
+	while ((opt_char = getopt(argc, argv, "c:hn")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
-		case 'L':
-			params.criterion = ORDER_DELADDERIZE;
-			break;
-		case 'n':
-			params.criterion = ORDER_NUM_DESCENDANTS;
+		case 'c':
+			params.criterion = get_criterion(optarg);
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);

@@ -31,5 +31,9 @@ may not be what you want. You can get rid of the branch lengths using
 
 \subsection{Variants}
 
-Passing option \texttt{-n} orders by number of descendants: nodes with fewer
-descendants appear before node with more descendants.
+Other ordering criteria are available through option \texttt{-c}. To order a
+tree by number of descendants (\textit{i.e.}, "light" nodes before "heavy"
+nodes), pass \texttt{-c n}. This has the effect of "ladderizing" trees which are
+heavily imbalanced:
+
+[example here; also a § on deladderize w/ ref to tree-thinking]

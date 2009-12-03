@@ -30,10 +30,31 @@ int test_order_num_desc()
 	const char *test_name = "test_order_num_desc";
 	/* tree is top-heavy */
 	struct rooted_tree test_tree = tree_15();
+	/* expected tree is top-light */
 	struct rooted_tree exp_tree = tree_14();
 	order_tree_num_desc(&test_tree);
 	char *obt_newick = to_newick(test_tree.root);
 	char *exp_newick = to_newick(exp_tree.root);
+
+	if (0 != strcmp(obt_newick, exp_newick)) {
+		printf ("%s: expected '%s', got '%s'.\n",
+			test_name, exp_newick,
+			obt_newick);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_order_deladderize()
+{
+	const char *test_name = "test_order_num_desc";
+	struct rooted_tree test_tree = tree_15();
+	order_tree_num_desc(&test_tree);
+	char *obt_newick = to_newick(test_tree.root);
+	char *exp_newick = "(Petromyzon,((Xenopus,((Equus,Homo)Mammalia,Columba)Amniota)Tetrapoda,Carcharodon)Gnathostomata)Vertebrata;";
+
 
 	if (0 != strcmp(obt_newick, exp_newick)) {
 		printf ("%s: expected '%s', got '%s'.\n",
