@@ -65,6 +65,8 @@ void address_scanner_clear_input()
 "d"	{ adslval.ival = ENODE_DEPTH; return(NUM_FUNC); }
 "b"	{ adslval.ival = ENODE_SUPPORT; return(NUM_FUNC); }
 "a"	{ adslval.ival = ENODE_NB_ANCESTORS; return(NUM_FUNC); }
+"c"	{ adslval.ival = ENODE_NB_CHILDREN; return(NUM_FUNC); }
+"D"	{ adslval.ival = ENODE_NB_DESCENDANTS; return(NUM_FUNC); }
 
 "i"	{ adslval.ival = ENODE_IS_INNER; return(BOOL_FUNC); }
 "r"	{ adslval.ival = ENODE_IS_ROOT; return(BOOL_FUNC); }

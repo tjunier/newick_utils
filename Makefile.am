@@ -10,7 +10,7 @@ EXTRA_DIST = \
 	src/*.sh \
 	src/newick_utils.py \
 	src/nw_info.py \
-	doc/tutorial.pdf \
+	doc/nwutils_tutorial.pdf \
 	doc/Makefile \
 	data/*
 

@@ -77,6 +77,7 @@ struct enode *create_enode_not(struct enode *node)
 	return create_enode(ENODE_NOT, node, NULL, 0);
 }
 
+// TODO: type should be an enum
 struct enode *create_enode_func(int type)
 {
 	return create_enode(type, NULL, NULL, 0);

@@ -10,11 +10,10 @@ all:
 	
 check:
 
-
-tutorial.pdf: tutorial.tex
+nwutils_tutorial.pdf: nwutils_tutorial.tex
 	./make_figures.sh
-	pdflatex tutorial.tex
-	pdflatex tutorial.tex
+	pdflatex nwutils_tutorial.tex
+	pdflatex nwutils_tutorial.tex
 
 clean:
 	$(RM) *.{out,cmd,aux,log,dvi,toc} *_svg.svg *_svg.pdf

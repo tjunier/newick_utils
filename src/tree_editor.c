@@ -122,12 +122,14 @@ void help(char *argv[])
 "greater than 75.\n"
 "\n"
 "The functions are:\n"
-"    a  numeric    number of ancestors of node	\n"
-"    b  numeric    node's support value (or zero)\n"
-"    d  numeric    node's depth (distance to root)\n"
-"    i	boolean    true iff node is strictly internal (i.e., not root!)\n"
-"    l	boolean    true iff node is a leaf\n"
-"    r	boolean    true iff node is the root\n"
+"    a numeric    number of ancestors of node	\n"
+"    b numeric    node's support value (or zero)\n"
+"    d numeric    node's depth (distance to root)\n"
+"    c numeric    node's number of children\n"
+"    D numeric    node's number of descendants\n"
+"    i boolean    true iff node is strictly internal (i.e., not root!)\n"
+"    l boolean    true iff node is a leaf\n"
+"    r boolean    true iff node is the root\n"
 "\n"
 "The operators are:\n"
 "    ==  equality\n"
@@ -274,6 +276,29 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+/* A helper for parse_order_traversal() - gets the number of descendants of a
+ * node. This function is NOT recursive, the node data of all descendants must
+ * have been set already - which is why we're calling it from
+ * parse_order_traversal().
+ * */
+
+int get_nb_descendants(struct rnode *node)
+{
+	struct list_elem *e;
+	struct rnode *kid;
+	struct rnode_data *rndata;
+	int descendants = 0;
+
+	for (e = node->children->head; NULL != e; e = e->next) {
+		kid = e->data;
+		rndata = kid->data;
+		descendants += rndata->nb_descendants;
+		descendants += 1;	/* kid itself (no pun intended :-) ) */
+	}
+
+	return descendants;
+}
+
 /* This allocates the rnode_data structure for each node, and fills it with
  * "top-down" data,  i.e. data for which the parent's value needs to be known
  * (such as depth and number of ancestors). Some values do not depend on the
@@ -326,12 +351,11 @@ void parse_order_traversal(struct rooted_tree *tree)
 	struct rnode *node;
 	struct rnode_data *rndata;
 
-	/* NOTE: for now there is no bottom-up data, but this is where it will
-	 * be set (e.g., number of descendants, etc) */
 	for (el = tree->nodes_in_order->head; NULL != el; el = el -> next) {
 		node = (struct rnode *) el->data;
 		rndata = (struct rnode_data *) node->data;
 		rndata->support = atof(node->label);	
+		rndata->nb_descendants = get_nb_descendants(node);
 	}
 }
 
