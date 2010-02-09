@@ -204,7 +204,7 @@ void destroy_tree_cb(struct rooted_tree *tree,
 		free(current->edge_length_as_string);
 		if (NULL != node_data_destroyer)
 			node_data_destroyer(current);
-		else if (NULL != current->data)
+		else if (NULL != current->data) 
 			free(current->data);
 		free(current);
 	}

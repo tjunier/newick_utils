@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "enode.h"
 #include "rnode.h"
+#include "list.h"
 #include "tree_editor_rnode_data.h"
 
 /* Functions that operate on a tree node (e.g., to return whether or not it is
@@ -134,6 +135,10 @@ float eval_enode(struct enode *node)
 		return data->depth;
 	case ENODE_NB_ANCESTORS:
 		return data->nb_ancestors;
+	case ENODE_NB_DESCENDANTS:
+		return data->nb_descendants;
+	case ENODE_NB_CHILDREN:
+		return current_tree_node->children->count;
 	default:
 		assert(0);	/* programmer error */
 	}

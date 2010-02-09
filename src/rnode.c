@@ -57,6 +57,12 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	if (NULL == node_p->children) return NULL;
 	node_p->parent = NULL;
 	node_p->data = NULL;
+	/* We must initialize to some numeric value, so we use -1 to mean
+	 * unknown/undetermined. Note that negative branch lengths can occur,
+	 * e.g. with neighbor-joining. The reference variable here is
+	 * length_as_string, which will be an empty string ("") if the length
+	 * is not defined (as in cladograms). */
+	node_p->edge_length = -1;
 
 #ifdef SHOW_RNODE_CREATE
 	fprintf(stderr, "creating rnode %p '%s'\n", node_p, node_p->label);
@@ -102,7 +108,12 @@ void dump_rnode(void *arg)
 {
 	struct rnode *node = (struct rnode *) arg;
 
-	printf ("rnode at %p: %s\n", node, node->label);
+	printf ("\nrnode at %p\n", node);
+	printf ("  label at %p = '%s'\n", node->label);
+	printf ("  edge length = '%s'\n", node->edge_length_as_string);
+	printf ("              = %f\n", node->edge_length);
+	printf ("  children    = %p\n", node->children);
+	printf ("  data    = %p\n", node->data);
 }
 
 /* If something fails, we just return. */

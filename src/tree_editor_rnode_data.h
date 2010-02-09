@@ -37,5 +37,6 @@ struct rnode_data {
 	float support;	/* normally derived from label */
 	float depth;	/* from root; normally root's depth == 0 */
 	int nb_ancestors;	/* root has 0 */
+	int nb_descendants;	/* direct (children) and indirect */
 	int stop_mark;	/* to stop processing of a clade, see option -o */
 };

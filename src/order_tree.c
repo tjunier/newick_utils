@@ -66,7 +66,7 @@ int order_tree_lbl(struct rooted_tree *tree)
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
 		struct rnode *current = elem->data;
 		if (is_leaf(current)) {
-			current->data = current->label;
+			current->data = strdup(current->label);
 		} else {
 			/* Since all children have been visited (because we're
 			 * traversing the tree in parse order), we can just
@@ -87,7 +87,7 @@ int order_tree_lbl(struct rooted_tree *tree)
 			current->children = ordered_kids_list;
 
 			// Get sort field from first child ("back-inherit") [?]
-			current->data = kids_array[0]->data;
+			current->data = strdup(kids_array[0]->data);
 			free(kids_array);
 		}
 	}

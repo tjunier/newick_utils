@@ -169,27 +169,29 @@ struct parameters get_params(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
-	
 	struct parameters params = get_params(argc, argv);
+	int (*order_function)(struct rooted_tree *);
+
+	switch(params.criterion) {
+	case ORDER_ALNUM_LBL:
+		order_function =  order_tree_lbl;
+		break;
+	case ORDER_DELADDERIZE:
+		order_function =  order_tree_deladderize;
+		break;
+	case ORDER_NUM_DESCENDANTS:
+		order_function =  order_tree_num_desc;
+		break;
+	default:
+		assert(0); // programmer error
+	}
 
 	while (NULL != (tree = parse_tree())) {
-		switch(params.criterion) {
-		case ORDER_ALNUM_LBL:
-			if (! order_tree_lbl(tree)) { perror(NULL); exit(EXIT_FAILURE); }
-			break;
-		case ORDER_DELADDERIZE:
-			if (! order_tree_deladderize(tree)) {perror(NULL);exit(EXIT_FAILURE);}
-			break;
-		case ORDER_NUM_DESCENDANTS:
-			if (! order_tree_num_desc(tree)) { perror(NULL); exit(EXIT_FAILURE); }
-			break;
-		default:
-			assert(0); // programmer error
-		}
+		if (! order_function(tree)) { perror(NULL); exit(EXIT_FAILURE); }
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+		destroy_tree_cb(tree, NULL);
 	}
 
 	return 0;

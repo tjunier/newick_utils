@@ -62,7 +62,8 @@ struct rnode;
 
 struct rnode {
 	struct rnode *parent;
-	/* When we speak of 'the' edge of a node, we mean the edge that leads to its parent. */
+	/* When we speak of 'the' edge of a node, we mean the edge that leads
+	 * to its parent. */
 	char *edge_length_as_string;	/* Most of the time this is enough, but... */
 	double edge_length; 		/* ...use this when numerical value is needed */
 	struct llist *children;
@@ -79,7 +80,8 @@ struct rnode {
 struct rnode *create_rnode(char *label, char *length_as_string);
 
 /* Destroys the rnode, including the parent edge (if any). If free_data is not
- * NULL, it is called to free the node's data */
+ * NULL, it is called to free the node's data TODO: this should be used in
+ destroy_tree_cb - check.*/
 
 void destroy_rnode(struct rnode *node, void (*free_data)(void*));
 

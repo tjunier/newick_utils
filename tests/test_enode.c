@@ -10,13 +10,20 @@
 static const float SUPPORT = 2.345;
 static const float DEPTH = 3.456;
 static const int NB_ANCESTORS = 3;
+static const int NB_DESCENDANTS = 7;
+static const int NB_CHILDREN = 2;
 
 void setup_current_rnode()
 {
 	struct rnode *node = create_rnode("any", "");
+	struct rnode *kid1 = create_rnode("kid1", "");
+	struct rnode *kid2 = create_rnode("kid2", "");
+	add_child(node, kid1);
+	add_child(node, kid2);
 	struct rnode_data *data = malloc(sizeof(struct rnode_data));
 	if (NULL == data) { perror(NULL); exit(EXIT_FAILURE); }
 	data->nb_ancestors = NB_ANCESTORS;
+	data->nb_descendants = NB_DESCENDANTS;
 	data->depth = DEPTH;
 	data->support = SUPPORT;
 	node->data = data;
@@ -475,6 +482,40 @@ int test_nb_ancestors()
 	return 0;
 }
 
+int test_nb_descendants()
+{
+	const char *test_name = "test_nb_descendants";
+
+	struct enode *expr = create_enode_func(ENODE_NB_DESCENDANTS);
+	setup_current_rnode();
+
+	if (eval_enode(expr) != NB_DESCENDANTS) {
+		printf ("%s: expected %d descendants, got %g.\n",
+				test_name, NB_CHILDREN, eval_enode(expr));
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_nb_children()
+{
+	const char *test_name = "test_nb_children";
+
+	struct enode *expr = create_enode_func(ENODE_NB_CHILDREN);
+	setup_current_rnode();
+
+	if (eval_enode(expr) != NB_CHILDREN) {
+		printf ("%s: expected %d descendants, got %g.\n",
+				test_name, NB_DESCENDANTS, eval_enode(expr));
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -495,6 +536,8 @@ int main()
 	failures += test_support();
 	failures += test_depth();
 	failures += test_nb_ancestors();
+	failures += test_nb_descendants();
+	failures += test_nb_children();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
