@@ -109,8 +109,8 @@ extract_distances_noref()
 
 plot_classic()
 {
-	printf "set size 1,0.7\n" > $GNUPLOT_CODE 
-	printf "set terminal postscript eps color linewidth 3 "TimesRoman" 14\n" >> $GNUPLOT_CODE
+	#printf "set size 1,0.7\n" > $GNUPLOT_CODE 
+	printf "set terminal postscript eps color solid linewidth 3 size 12cm,7cm 18\n" >> $GNUPLOT_CODE
 	printf "set output '%s'\n" $BSCAN_IMAGE >> $GNUPLOT_CODE
 	printf "set key outside\n" >> $GNUPLOT_CODE 
 	printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
