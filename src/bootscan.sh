@@ -22,7 +22,7 @@
 # percent identity. If the sequence with smallest distance changes drastically,
 # you may have a breakpoint.
 
-# Requires Muscle [1], EMBOSS [2], PhyML 2.4 [3], and GNUPlot [5]; as
+# Requires Muscle [1], EMBOSS [2], PhyML 3.0 [3], and GNUPlot [5]; as
 # well as the GNU core utilities [4] (which you probably already have if you're
 # running Linux). The PATH should be set so that these programs are found, as
 # the script cannot use absolute pathnames (for portability).
@@ -33,7 +33,7 @@
 # References
 # [1] http://www.drive5.com/muscle
 # [2] http://emboss.sourceforge.net 
-# [3] http://atgc.lirmm.fr/phyml
+# [3] http://atgc.lirmm.fr/phyml or apt-get in Ubuntu
 # [4] http://www.gnu.org/software/coreutils
 # [5] http://www.gnuplot.info
 
@@ -62,7 +62,7 @@ make_trees()
 {
 	for slice in ${MUSCLE_OUT}_slice_*.phy; do
 		echo " $slice"
-		phyml $slice 0 i 1 $BOOTSTRAPS JC69 4.0 0.0 1 1.0 BIONJ y n > /dev/null
+		phyml -i $slice -o n > /dev/null
 	done
 }
 
@@ -144,13 +144,12 @@ declare -r OUTGROUP=$2
 declare -r REFERENCE=$3
 declare -ri SLICE_WIDTH=300	# residues
 declare -ri SLICE_STEP=50	# slice every SLICE_STEP residues
-declare -ri BOOTSTRAPS=1	
 declare -r R_DISTANCE_THRESHOLD=0.4
 
 declare -r MUSCLE_OUT=$INPUT_FILE.mfa
 declare -r DIST_NOREF=$INPUT_FILE.nrdist
 declare -r DIST_GNUPLOT=$INPUT_FILE.dist.plt
-declare -r DIST_IMAGE=$INPUT_FILE.bscan.eps
+declare -r BSCAN_IMAGE=$INPUT_FILE.bscan.eps
 
 ################################################################
 # Main
