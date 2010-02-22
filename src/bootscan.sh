@@ -109,25 +109,25 @@ extract_distances_noref()
 
 plot_classic()
 {
-	printf "set size 1,0.7\n" > $DIST_GNUPLOT 
-	printf "set terminal postscript eps color\n" >> $DIST_GNUPLOT
-	printf "set output '%s'\n" $BSCAN_IMAGE >> $DIST_GNUPLOT
-	printf "set key outside\n" >> $DIST_GNUPLOT 
+	printf "set size 1,0.7\n" > $GNUPLOT_CODE 
+	printf "set terminal postscript eps color linewidth 3 "TimesRoman" 14\n" >> $GNUPLOT_CODE
+	printf "set output '%s'\n" $BSCAN_IMAGE >> $GNUPLOT_CODE
+	printf "set key outside\n" >> $GNUPLOT_CODE 
 	printf "set title 'Bootscanning of %s WRT %s, slice size %d nt'\n" \
-		$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $DIST_GNUPLOT
-	printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $DIST_GNUPLOT
-	printf "set ylabel 'distance to reference [subst./site]'\n" >> $DIST_GNUPLOT
-	printf "plot '%s' using (\$1+(%d/2)):2 with lines linewidth 2 title '%s'" $DIST_NOREF $SLICE_WIDTH ${labels_noref[0]} >> $DIST_GNUPLOT
+		$INPUT_FILE $REFERENCE $SLICE_WIDTH >> $GNUPLOT_CODE
+	printf "set xlabel 'position of slice centre in alignment [nt]'\n" >> $GNUPLOT_CODE
+	printf "set ylabel 'distance to reference [subst./site]'\n" >> $GNUPLOT_CODE
+	printf "plot '%s' using (\$1+(%d/2)):2 with lines linewidth $LINE_WIDTH title '%s'" $DIST_NOREF $SLICE_WIDTH ${labels_noref[0]} >> $GNUPLOT_CODE
 	for i in $(seq 2 $((nb_labels-1))); do
-		printf ", '' using (\$1+(%d/2)):%d with lines linewidth 2 title '%s'" $SLICE_WIDTH $((i+1)) ${labels_noref[$((i-1))]}
-	done >> $DIST_GNUPLOT
+		printf ", '' using (\$1+(%d/2)):%d with lines linewidth $LINE_WIDTH title '%s'" $SLICE_WIDTH $((i+1)) ${labels_noref[$((i-1))]}
+	done >> $GNUPLOT_CODE
 
-	gnuplot $DIST_GNUPLOT
+	gnuplot $GNUPLOT_CODE
 }
 
 cleanup()
 {
-	rm $MUSCLE_OUT $DIST_NOREF $DIST_GNUPLOT
+	rm $MUSCLE_OUT $DIST_NOREF $GNUPLOT_CODE
 	rm ${MUSCLE_OUT}_slice_*.phy*
 }
 
@@ -139,17 +139,21 @@ if [ $# != 3 ] ; then
 	exit 1
 fi
 
+# General Parameters
 declare -r INPUT_FILE=$1
 declare -r OUTGROUP=$2
 declare -r REFERENCE=$3
+# Alignment options & params
+declare -r MUSCLE_OUT=$INPUT_FILE.mfa
+# Slicing options
 declare -ri SLICE_WIDTH=300	# residues
 declare -ri SLICE_STEP=50	# slice every SLICE_STEP residues
-declare -r R_DISTANCE_THRESHOLD=0.4
-
-declare -r MUSCLE_OUT=$INPUT_FILE.mfa
+# Distance options & params
 declare -r DIST_NOREF=$INPUT_FILE.nrdist
-declare -r DIST_GNUPLOT=$INPUT_FILE.dist.plt
+# Plotting options & params
+declare -r GNUPLOT_CODE=$INPUT_FILE.dist.plt
 declare -r BSCAN_IMAGE=$INPUT_FILE.bscan.eps
+declare -ri LINE_WIDTH=2
 
 ################################################################
 # Main
