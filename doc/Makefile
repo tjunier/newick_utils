@@ -6,7 +6,7 @@
 .PHONY: install
 .PHONY: check
 
-all:
+all: nwutils_tutorial.pdf
 	
 check:
 
