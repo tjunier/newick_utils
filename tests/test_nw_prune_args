@@ -2,3 +2,4 @@ def1: catarrhini.nw Homo
 def2: catarrhini.nw Hominini
 def3: catarrhini.nw Macaca Simias
 multi: catarrhini_mult.nw Homo Pan
+rev: -v fagales.nw Fagaceae Myricaceae Juglandaceae Betulaceae

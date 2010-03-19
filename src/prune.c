@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "nodemap.h"
@@ -45,7 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 
 struct parameters {
-	struct llist *labels;
+	struct llist 	*labels;
+	bool		reverse;
 };
 
 void help(char *argv[])
@@ -56,7 +58,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-h] <newick trees filename|->\n"
+"%s [-hv] <newick trees filename|-> <label> [label+]\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -77,6 +79,9 @@ void help(char *argv[])
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
+"    -v: reverse: prune nodes whose labels are NOT passed on the command\n"
+"        line. NOTE: this will also drop internal nodes if their labels\n"
+"        are not passed. A future option will modify this.\n"
 "\n"
 "Assumptions and Limitations\n"
 "---------------------------\n"
@@ -104,13 +109,17 @@ void help(char *argv[])
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
+	params.reverse = false;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "h")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit (EXIT_SUCCESS);
+		case 'v':
+			params.reverse = true;
+			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
 			exit (EXIT_FAILURE);
@@ -179,6 +188,50 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 	destroy_hash(lbl2node_map);
 }
 
+/* Produces a new list with all labels in the tree that are NOT in 'labels'. */
+// TODO: should in fact implement a Complement function for lists (preserving order
+// in at least one of the lists)
+struct llist *reverse_labels(struct rooted_tree *tree, struct llist *labels)
+{
+	struct llist *rev_labels = create_llist();
+	/* We use a hash for looking up labels, instead of going over the list
+	 * of labels every time (see below) */
+	struct hash *labels_h = create_hash(labels->count);
+	if (NULL == labels_h) {
+		fprintf(stderr, "Memory error -exiting.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	struct list_elem *elem;
+
+	/* fill label hash with the labels */
+	char *PRESENT = "present";
+	for (elem = labels->head; NULL != elem; elem = elem->next) {
+		char *label = elem->data;
+		if (! hash_set(labels_h, label, PRESENT)) {
+			fprintf(stderr, "Memory error -exiting.\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	/* Now iterate over all nodes in the tree and see if their labels are
+	 * found in the labels hash. If not, add them to the 'rev_labels' list.
+	 * */
+	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
+		char *label = ((struct rnode*) elem->data)->label;
+		if (0 == strcmp("", label)) continue;
+		if (NULL == hash_get(labels_h, label)) {
+			if (! append_element(rev_labels, label)) {
+				fprintf(stderr, "Memory error -exiting.\n");
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+	destroy_hash(labels_h);
+
+	return rev_labels;
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
@@ -187,7 +240,14 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, params.labels);
+		if (params.reverse) {
+			struct llist *rev_labels = reverse_labels(tree,
+					params.labels);
+			process_tree(tree, rev_labels);
+			destroy_llist(rev_labels);
+		} else {
+			process_tree(tree, params.labels);
+		}
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);

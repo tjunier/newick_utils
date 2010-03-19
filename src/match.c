@@ -360,11 +360,11 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, pattern_labels, pattern_newick, params);
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	destroy_hash(pattern_labels);
 	free(pattern_newick);
-	destroy_tree(pattern_tree, DONT_FREE_NODE_DATA);
+	destroy_tree(pattern_tree, FREE_NODE_DATA);
 	return 0;
 }
