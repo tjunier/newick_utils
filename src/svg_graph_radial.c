@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "list.h"
 #include "rnode.h"
@@ -38,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "graph_common.h"
 #include "svg_graph_common.h"
 #include "math.h"
+
+extern enum inner_lbl_pos inner_label_pos;
 
 const double PI = 3.14159;
 const int Scale_bar_left_space = 10;
@@ -152,6 +155,18 @@ static void draw_label(struct rnode *node, const double radius,
 	double y_pos;
 
 	if (url) printf ("<a %s>", url);
+
+	switch (inner_label_pos) {
+		case INNER_LBL_LEAVES:
+			break;
+		case INNER_LBL_MIDDLE:
+			break;
+		case INNER_LBL_ROOT:
+			break;
+		default:
+			assert(0);
+	}
+
 	if (cos(mid_angle) >= 0)  {
 		x_pos = radius * cos(mid_angle);
 		y_pos = radius * sin(mid_angle);
@@ -177,6 +192,7 @@ static void draw_label(struct rnode *node, const double radius,
 			x_pos, y_pos,
 			x_pos, y_pos, node->label);
 	}
+
 	if (url) printf("</a>");
 }
 

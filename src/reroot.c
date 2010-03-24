@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "hash.h"
 #include "common.h"
+#include "link.h"
 
 enum reroot_status { REROOT_OK, LCA_IS_TREE_ROOT };
 enum deroot_status { DEROOT_OK, BALANCED, NOT_BIFURCATING };
@@ -234,7 +235,7 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 /* De-roots a tree, in the sense that the top node must contain 3 (or more if
  * the tree isn't strictly bifurcating) children. */
 
-enum deroot_status deroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
+enum deroot_status deroot(struct rooted_tree *tree)
 {
 	if (2 != tree->root->children->count)
 		return NOT_BIFURCATING;
@@ -355,7 +356,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		free_descendants(tree->root);
 		free(tree);
 	} else {
-		enum deroot_status result = deroot(tree, outgroup_nodes);
+		enum deroot_status result = deroot(tree);
 		switch (result) {
 		case DEROOT_OK:
 			newick = to_newick(tree->root);
