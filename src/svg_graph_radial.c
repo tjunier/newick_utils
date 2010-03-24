@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "list.h"
 #include "rnode.h"
@@ -44,6 +45,7 @@ extern enum inner_lbl_pos inner_label_pos;
 
 const double PI = 3.14159;
 const int Scale_bar_left_space = 10;
+const int NUDGE_DISTANCE = 3;	/* px */
 
 /* If this is zero, the label's baseline is aligned on the branch. Use it to
  * nudge the labels a small angle. Unfortunately the correct amount will depend
@@ -148,28 +150,50 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 
 /* Draws a node label */
 
-static void draw_label(struct rnode *node, const double radius,
-		double mid_angle, const char *class, const char *url)
+static void draw_label(struct rnode *node, double radius,
+		double mid_angle, const double r_scale,
+		const char *class, const char *url)
 {
 	double x_pos;
 	double y_pos;
+	/* Will set this to true when the label must be drawn parallel to the
+	 * branch, rather than on the exact same line */
+	bool nudge = false;
 
 	if (url) printf ("<a %s>", url);
 
-	switch (inner_label_pos) {
-		case INNER_LBL_LEAVES:
-			break;
-		case INNER_LBL_MIDDLE:
-			break;
-		case INNER_LBL_ROOT:
-			break;
-		default:
-			assert(0);
+	if (is_inner_node(node)) {
+		struct svg_data *parent_data = NULL;
+		double parent_radius = -1;
+		switch (inner_label_pos) {
+			case INNER_LBL_LEAVES:
+				break;
+			case INNER_LBL_MIDDLE:
+				parent_data = node->parent->data;
+				parent_radius = svg_root_length + (
+					r_scale * parent_data->depth);
+				radius = 0.5 * (radius + parent_radius);
+				nudge = true;
+				break;
+			case INNER_LBL_ROOT:
+				parent_data = node->parent->data;
+				parent_radius = svg_root_length + (
+					r_scale * parent_data->depth);
+				radius = parent_radius;
+				nudge = true;
+				break;
+			default:
+				assert(0);
+		}
 	}
 
 	if (cos(mid_angle) >= 0)  {
 		x_pos = radius * cos(mid_angle);
 		y_pos = radius * sin(mid_angle);
+		if (nudge) {
+			x_pos -= (NUDGE_DISTANCE * cos(mid_angle + PI / 2));
+			y_pos -= (NUDGE_DISTANCE * sin(mid_angle + PI / 2));
+		}
 		printf("<text class='%s' "
 		       "transform='rotate(%g,%g,%g)' "
 		       "x='%.4f' y='%.4f'>%s</text>",
@@ -182,6 +206,10 @@ static void draw_label(struct rnode *node, const double radius,
 		mid_angle += svg_left_label_angle_correction;
 		x_pos = radius * cos(mid_angle);
 		y_pos = radius * sin(mid_angle);
+		if (nudge) {
+			x_pos += (NUDGE_DISTANCE * cos(mid_angle + PI / 2));
+			y_pos += (NUDGE_DISTANCE * sin(mid_angle + PI / 2));
+		}
 		printf(	"<text class='%s' "
 			"style='text-anchor:end;' "
 			"transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
@@ -234,7 +262,8 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 
 		/* draw label IFF it is nonempty */
 		if (0 != strcmp(node->label, ""))
-			draw_label(node, radius, mid_angle, class, url);
+			draw_label(node, radius, mid_angle, r_scale,
+					class, url);
 		/* TODO: add this when node labels work */
 		/*
 		if (! is_root(node)) {
