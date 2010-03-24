@@ -59,12 +59,16 @@ struct svg_data {
 	/* ... other node properties ... */
 };
 
+/* defined in graph_common.h, as it is also used by client code. */
+enum inner_lbl_pos;
+
 /* The following are setters, their function should be obvious */
 
 void set_svg_CSS_map_file(FILE *);
 void set_svg_ornament_map_file(FILE *);
 void set_svg_leaf_label_style(char *);
 void set_svg_inner_label_style(char *);
+void set_svg_inner_label_pos(enum inner_lbl_pos);
 void set_svg_edge_label_style(char *);
 void set_svg_plain_node_style(char *);
 void set_svg_root_length(int);

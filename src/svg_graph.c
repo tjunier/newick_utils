@@ -99,6 +99,7 @@ struct hash *url_map = NULL;
 int graph_width = -1;
 int svg_whole_v_shift = -1; 	/* Vertical translation of whole graph */
 double label_char_width = -1;
+enum inner_lbl_pos inner_label_pos = -1;
 
 /* These are setters for the external variables. This way I can keep most of
  * them static. I just don't like variables open to anyone, maybe I did too
@@ -113,6 +114,7 @@ void set_svg_CSS_map_file(FILE * map) { css_map_file = map; }
 void set_svg_ornament_map_file(FILE * map) { ornament_map_file = map; }
 void set_svg_leaf_label_style(char *style) { leaf_label_style = style; }
 void set_svg_inner_label_style(char *style) { inner_label_style = style; }
+void set_svg_inner_label_pos(enum inner_lbl_pos pos) { inner_label_pos = pos; }
 void set_svg_edge_label_style(char *style) { edge_label_style = style; }
 void set_svg_plain_node_style(char *style) { plain_node_style = style; }
 void set_svg_label_char_width(double width) { label_char_width = width; }

@@ -45,24 +45,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "svg_graph_common.h"
 #include "error.h"
 
+// TODO: switch the logical ints to bools (stdbool.h)
+
 struct parameters {
-	int width;
-	int svg;
-	FILE *css_map;	
-	FILE *url_map;
-	FILE *ornament_map;		/* SVG */
-	char *leaf_label_style;		/* CSS */
-	char *inner_label_style;	/* CSS */
-	char *edge_label_style;		/* CSS */
-	char *plain_node_style;		/* CSS */
-	double leaf_vskip;
-	int svg_style;			/* radial or orthogonal */
-	char *branch_length_unit;
-	double label_angle_correction;
-	double left_label_angle_correction;
-	int root_length;
-	double label_char_width;	/* for estimating label length */
-	int no_scale_bar;		/* suppresses scale bar if true */
+	int 	width;
+	int 	svg;
+	FILE 	*css_map;	
+	FILE 	*url_map;
+	FILE 	*ornament_map;		/* SVG */
+	char 	*leaf_label_style;		/* CSS */
+	char 	*inner_label_style;	/* CSS */
+	char 	*edge_label_style;		/* CSS */
+	char 	*plain_node_style;		/* CSS */
+	double 	leaf_vskip;
+	int 	svg_style;			/* radial or orthogonal */
+	char 	*branch_length_unit;
+	double 	label_angle_correction;
+	double 	left_label_angle_correction;
+	int 	root_length;
+	double 	label_char_width;	/* for estimating label length */
+	int 	no_scale_bar;		/* suppresses scale bar if true */
+	enum 	inner_lbl_pos inner_label_pos;	/* where to put the label */
 };
 
 void help(char* argv[])
@@ -73,7 +76,7 @@ void help(char* argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-aAbcdhilrRsuUvwW] <tree filename|->\n"
+"%s [-aAbcdhiIlLrRsuUvwW] <tree filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -129,6 +132,9 @@ void help(char* argv[])
 "    -i <string>: CSS for inner node labels. [only SVG]\n"
 "       Default: 'font-size:small;font-family:sans'.\n"    
 "       setting 'visibility:hidden' disables printing of inner node labels.\n"
+"    -I <char> sets the position of the inner node label. Valid options are\n"
+"       'l' (near the leaves), 'm' (middle) or 'r' (near the root). Default\n"
+"       is 'l'.\n"
 "    -l <string>: CSS for leaf node labels. [only SVG]\n"
 "       Default: 'font-size:medium;font-family:sans'.\n"    
 "       setting 'visibility:hidden' disables printing of leaf node labels.\n"
@@ -194,6 +200,18 @@ void help(char* argv[])
 	      );
 }
 
+enum inner_lbl_pos get_inner_label_pos(char *optarg)
+{
+	switch (optarg[0]) {
+		case 'l':
+			return INNER_LBL_LEAVES;
+		case 'm':
+			return INNER_LBL_MIDDLE;
+		case 'r':
+			return INNER_LBL_ROOT;
+	}
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
@@ -215,13 +233,14 @@ struct parameters get_params(int argc, char *argv[])
 	params.root_length = ROOT_SPACE;
 	params.label_char_width = 8.0;
 	params.no_scale_bar = FALSE;
+	params.inner_label_pos = INNER_LBL_LEAVES;
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
 	const int DEFAULT_WIDTH_CHARS = 80;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:l:o:rR:sSu:U:v:w:W:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:o:rR:sSu:U:v:w:W:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -246,6 +265,9 @@ struct parameters get_params(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 		case 'i':
 			params.inner_label_style = optarg;
+			break;
+		case 'I':
+			params.inner_label_pos = get_inner_label_pos(optarg);
 			break;
 		case 'l':
 			params.leaf_label_style = optarg;
@@ -347,6 +369,7 @@ void set_svg_parameters(struct parameters params)
 	set_svg_ornament_map_file(params.ornament_map);
 	set_svg_leaf_label_style(params.leaf_label_style);
 	set_svg_inner_label_style(params.inner_label_style);
+	set_svg_inner_label_pos(params.inner_label_pos);
 	set_svg_edge_label_style(params.edge_label_style);
 	set_svg_plain_node_style(params.plain_node_style);
 	set_svg_root_length(params.root_length);

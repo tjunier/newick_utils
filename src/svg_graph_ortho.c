@@ -29,13 +29,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "list.h"
 #include "rnode.h"
 #include "hash.h"
 #include "node_pos_alloc.h"
+#include "graph_common.h"
 #include "svg_graph_common.h"
+
+extern enum inner_lbl_pos inner_label_pos;
 
 /* Prevents labels of single-child nodes from being crossed over by the child
  * branch. */
@@ -112,6 +117,54 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 	printf("</g>");
 }
 
+/* Draws a node label */
+
+void draw_label(double svg_h_pos, double svg_mid_pos, double h_scale,
+		struct rnode *node, char *class, char *url)
+{
+	/* Defaults: use node's position */
+	double h_pos = svg_h_pos + LBL_SPACE;
+	double v_pos = svg_mid_pos + LBL_VOFFSET; 
+
+	if (url) printf ("<a %s>", url);
+
+	bool v_nudge = false;	/* set to true if label across branch */
+
+	/* inner node label can be positioned in various ways */
+	if (is_inner_node(node)) {
+		struct svg_data *parent_data;
+		switch (inner_label_pos) {
+			case INNER_LBL_LEAVES:
+				/* just use defaults */
+				break;
+			case INNER_LBL_MIDDLE:
+				break;
+			case INNER_LBL_ROOT:
+				/* label near root */
+				parent_data = node->parent->data;
+				double svg_parent_h_pos = ROOT_SPACE + (
+					h_scale * parent_data->depth);
+				svg_h_pos = svg_parent_h_pos;
+				v_nudge = true;
+				break;
+			default:
+				assert(0);
+		}
+	}
+
+	if (1 == children_count(node))
+		v_nudge = true;
+
+	if (v_nudge)
+		v_pos -= KNEE_NODE_V_NUDGE;
+
+	printf("<text class='%s' "
+	       "x='%.4f' y='%.4f'>%s</text>",
+		class, h_pos, v_pos, node->label);
+
+	if (url) printf ("</a>");
+}
+
 /* Prints the node text (labels and lengths) in a <g> element, orthogonal */
 
 void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
@@ -143,17 +196,9 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 
 		/* draw label IFF it is nonempty */
 
-		if (0 != strcmp(node->label, "")) {
-			if (url) printf ("<a %s>", url);
-			double vpos = svg_mid_pos + LBL_VOFFSET; 
-			if (1 == children_count(node))
-				vpos -= KNEE_NODE_V_NUDGE;
-			printf("<text class='%s' "
-			       "x='%.4f' y='%.4f'>%s</text>",
-				class, svg_h_pos + LBL_SPACE,
-				vpos, node->label);
-			if (url) printf ("</a>");
-		}
+		if (0 != strcmp(node->label, "")) 
+			draw_label(svg_h_pos, svg_mid_pos, h_scale,
+					node, class, url);
 
 		/* Branch lengths */
 
