@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree.h"
 #include "hash.h"
 #include "node_pos_alloc.h"
+#include "graph_common.h"
 #include "svg_graph_common.h"
 #include "math.h"
 
@@ -142,6 +143,43 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 	printf("</g>");
 }
 
+/* Draws a node label */
+
+static void draw_label(struct rnode *node, const double radius,
+		double mid_angle, const char *class, const char *url)
+{
+	double x_pos;
+	double y_pos;
+
+	if (url) printf ("<a %s>", url);
+	if (cos(mid_angle) >= 0)  {
+		x_pos = radius * cos(mid_angle);
+		y_pos = radius * sin(mid_angle);
+		printf("<text class='%s' "
+		       "transform='rotate(%g,%g,%g)' "
+		       "x='%.4f' y='%.4f'>%s</text>",
+			class,
+			mid_angle / (2*PI) * 360,
+			x_pos, y_pos,
+			x_pos, y_pos, node->label);
+	}
+	else {
+		mid_angle += svg_left_label_angle_correction;
+		x_pos = radius * cos(mid_angle);
+		y_pos = radius * sin(mid_angle);
+		printf(	"<text class='%s' "
+			"style='text-anchor:end;' "
+			"transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
+		       "x='%.4f' y='%.4f'>%s</text>",
+			class,
+			mid_angle / (2*PI) * 360,
+			x_pos, y_pos,
+			x_pos, y_pos,
+			x_pos, y_pos, node->label);
+	}
+	if (url) printf("</a>");
+}
+
 /* Prints the node text (labels and lengths) in a <g> element, radial */
 
 void draw_text_radial (struct rooted_tree *tree, const double r_scale,
@@ -161,16 +199,13 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		double radius = svg_root_length + (r_scale * node_data->depth);
 		double mid_angle =
 			0.5 * a_scale * (node_data->top+node_data->bottom);
-		double x_pos;
-		double y_pos;
 
 		mid_angle += svg_label_angle_correction;
 
-		double lbl_space;
 		if (is_leaf(node))
-			lbl_space = LBL_SPACE;
+			radius += LBL_SPACE;
 		else
-			lbl_space = INNER_LBL_SPACE;
+			radius += INNER_LBL_SPACE;
 
 		char *url = NULL;
 		if (url_map) url = hash_get(url_map, node->label);
@@ -182,35 +217,8 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 			class = inner_label_class;
 
 		/* draw label IFF it is nonempty */
-		if (0 != strcmp(node->label, "")) {
-			if (url) printf ("<a %s>", url);
-			if (cos(mid_angle) >= 0)  {
-				x_pos = (radius+lbl_space) * cos(mid_angle);
-				y_pos = (radius+lbl_space) * sin(mid_angle);
-				printf("<text class='%s' "
-				       "transform='rotate(%g,%g,%g)' "
-				       "x='%.4f' y='%.4f'>%s</text>",
-					class,
-					mid_angle / (2*PI) * 360,
-					x_pos, y_pos,
-					x_pos, y_pos, node->label);
-			}
-			else {
-				mid_angle += svg_left_label_angle_correction;
-				x_pos = (radius+lbl_space) * cos(mid_angle);
-				y_pos = (radius+lbl_space) * sin(mid_angle);
-				printf(	"<text class='%s' "
-					"style='text-anchor:end;' "
-				       	"transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
-				       "x='%.4f' y='%.4f'>%s</text>",
-					class,
-					mid_angle / (2*PI) * 360,
-					x_pos, y_pos,
-					x_pos, y_pos,
-					x_pos, y_pos, node->label);
-			}
-			if (url) printf("</a>");
-		}
+		if (0 != strcmp(node->label, ""))
+			draw_label(node, radius, mid_angle, class, url);
 		/* TODO: add this when node labels work */
 		/*
 		if (! is_root(node)) {

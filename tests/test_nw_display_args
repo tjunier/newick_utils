@@ -23,3 +23,6 @@ orn: -s -o ornament.map catarrhini.nw
 Il: -s -Il -b 'visibility:hidden' simiiformes.nw
 Im: -s -Im -b 'visibility:hidden' simiiformes.nw
 Ir: -s -Ir -b 'visibility:hidden' simiiformes.nw
+Ilr: -sr -Il -b 'visibility:hidden' simiiformes.nw
+Imr: -sr -Im -b 'visibility:hidden' simiiformes.nw
+Irr: -sr -Ir -b 'visibility:hidden' simiiformes.nw
