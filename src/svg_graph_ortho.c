@@ -43,8 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern enum inner_lbl_pos inner_label_pos;
 
 /* Prevents labels of single-child nodes from being crossed over by the child
- * branch. */
+ * branch. Also used when putting inner labels near root. TODO: change name*/
 const int KNEE_NODE_V_NUDGE = 6;
+const int INNER_LBL_H_NUDGE = 2;
 
 double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
 
@@ -119,8 +120,9 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 
 /* Draws a node label */
 
-void draw_label(double svg_h_pos, double svg_mid_pos, double h_scale,
-		struct rnode *node, char *class, char *url)
+void draw_label(const double svg_h_pos, const double svg_mid_pos,
+		const double h_scale, struct rnode *node,
+		const char *class, const char *url)
 {
 	/* Defaults: use node's position */
 	double h_pos = svg_h_pos + LBL_SPACE;
@@ -132,19 +134,25 @@ void draw_label(double svg_h_pos, double svg_mid_pos, double h_scale,
 
 	/* inner node label can be positioned in various ways */
 	if (is_inner_node(node)) {
-		struct svg_data *parent_data;
+		struct svg_data *parent_data = NULL;
+		double svg_parent_h_pos = -1;
 		switch (inner_label_pos) {
 			case INNER_LBL_LEAVES:
 				/* just use defaults */
 				break;
 			case INNER_LBL_MIDDLE:
+				parent_data = node->parent->data;
+				svg_parent_h_pos = ROOT_SPACE + (
+					h_scale * parent_data->depth);
+				h_pos = 0.5 * (svg_h_pos + svg_parent_h_pos);
+				v_nudge = true;
 				break;
 			case INNER_LBL_ROOT:
 				/* label near root */
 				parent_data = node->parent->data;
-				double svg_parent_h_pos = ROOT_SPACE + (
+				svg_parent_h_pos = ROOT_SPACE + (
 					h_scale * parent_data->depth);
-				svg_h_pos = svg_parent_h_pos;
+				h_pos = svg_parent_h_pos + INNER_LBL_H_NUDGE;;
 				v_nudge = true;
 				break;
 			default:

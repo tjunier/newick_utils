@@ -109,7 +109,7 @@ void dump_rnode(void *arg)
 	struct rnode *node = (struct rnode *) arg;
 
 	printf ("\nrnode at %p\n", node);
-	printf ("  label at %p = '%s'\n", node->label);
+	printf ("  label at %p = '%s'\n", node->label, node->label);
 	printf ("  edge length = '%s'\n", node->edge_length_as_string);
 	printf ("              = %f\n", node->edge_length);
 	printf ("  children    = %p\n", node->children);
