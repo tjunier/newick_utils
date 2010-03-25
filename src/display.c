@@ -442,7 +442,9 @@ int main(int argc, char *argv[])
 			svg_footer();
 		} else {
 			prettify_labels(tree);
-			status = display_tree(tree, params.width, align_leaves);
+			status = display_tree(tree, params.width,
+					align_leaves,
+					params.inner_label_pos);
 			switch(status) {
 				case DISPLAY_OK:
 					break;

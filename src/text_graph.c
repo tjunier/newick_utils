@@ -68,8 +68,9 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 		case INNER_LBL_LEAVES:
 			/* rint() rounds halfay, better than automatic
 			 * double->int conversion */
-			h_pos = ROOT_SPACE + rint(scale * pos->depth) +
-				LBL_SPACE;
+			h_pos = rint(ROOT_SPACE + (scale * pos->depth));
+
+			//h_pos =  rint(ROOT_SPACE + scale * pos->depth) + LBL_SPACE;
 			break;
 		case INNER_LBL_MIDDLE:
 		case INNER_LBL_ROOT:
@@ -83,7 +84,7 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 
 		/* draw node */
 		canvas_draw_vline(canvas, h_pos, top, bottom);
-		canvas_write(canvas, h_pos, mid, node->label);
+		canvas_write(canvas, h_pos + LBL_SPACE, mid, node->label);
 		if (is_root(node)) {
 			canvas_write(canvas, 0, mid, "=");
 		} else {
