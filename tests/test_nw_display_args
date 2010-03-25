@@ -26,3 +26,5 @@ Ir: -s -Ir -b 'visibility:hidden' simiiformes.nw
 Ilr: -sr -Il -b 'visibility:hidden' simiiformes.nw
 Imr: -sr -Im -b 'visibility:hidden' simiiformes.nw
 Irr: -sr -Ir -b 'visibility:hidden' simiiformes.nw
+Ilt: -Il -b 'visibility:hidden' simiiformes.nw
+Irt: -Ir -b 'visibility:hidden' simiiformes.nw

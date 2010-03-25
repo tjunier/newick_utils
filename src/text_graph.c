@@ -63,28 +63,12 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 		if (align_leaves && is_leaf(node))
 			pos->depth = dmax;
 
-		int h_pos = -1;
-		switch (inner_label_pos) {
-		case INNER_LBL_LEAVES:
-			/* rint() rounds halfay, better than automatic
-			 * double->int conversion */
-			h_pos = rint(ROOT_SPACE + (scale * pos->depth));
-
-			//h_pos =  rint(ROOT_SPACE + scale * pos->depth) + LBL_SPACE;
-			break;
-		case INNER_LBL_MIDDLE:
-		case INNER_LBL_ROOT:
-		default:
-			assert(0);
-		}
-
+		int h_pos = rint(ROOT_SPACE + (scale * pos->depth));
 		int top = rint(2*pos->top);
 		int bottom = rint(2*pos->bottom);
 		int mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */
-
 		/* draw node */
 		canvas_draw_vline(canvas, h_pos, top, bottom);
-		canvas_write(canvas, h_pos + LBL_SPACE, mid, node->label);
 		if (is_root(node)) {
 			canvas_write(canvas, 0, mid, "=");
 		} else {
@@ -93,6 +77,35 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		}
 
+		/* print label */
+		if (is_inner_node(node)) {
+			double parent_depth = (
+				(struct simple_node_pos *)
+					node->parent->data)->depth;
+			switch (inner_label_pos) {
+			case INNER_LBL_LEAVES:
+				/* rint() rounds halfay, better than automatic
+				 * double->int conversion */
+				h_pos = rint(ROOT_SPACE + (scale * pos->depth));
+				h_pos += LBL_SPACE;
+				break;
+			case INNER_LBL_MIDDLE:
+				h_pos = rint(ROOT_SPACE + (scale *
+					(parent_depth + pos->depth) / 2));
+				break;
+			case INNER_LBL_ROOT:
+				h_pos = rint(ROOT_SPACE + (scale *
+					parent_depth));
+				h_pos += LBL_SPACE;
+				break;
+			default:
+				assert(0);
+			}
+		} else {
+			// Root or leaves
+			h_pos += LBL_SPACE;
+		}
+		canvas_write(canvas, h_pos, mid, node->label);
 	}
 }
 
