@@ -36,10 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "parser.h"
 #include "to_newick.h"
+#include "list.h"
 #include "tree.h"
 #include "rnode.h"
-#include "list.h"
-#include "common.h"
+#include "masprintf.h"
 
 void help(char *argv[])
 {
@@ -119,28 +119,31 @@ void get_params(int argc, char *argv[])
 
 void process_tree(struct rooted_tree *tree)
 {
-	struct list_elem *elem;
-	struct llist nodes_in_reverse_order = 
+	struct list_elem *el;
 	
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		struct rnode *current = (struct rnode *) elem->data;
-		if (! params.show_branch_lengths) {
-			if (NULL != current->parent) {
-				char *length = current->edge_length_as_string;
-				length[0] = '\0';
-			}
+	for (el = tree->nodes_in_order->head; NULL != el; el =el->next) {
+		struct rnode *current = (struct rnode *) el->data;
+		if (is_root(current)) {
+			/* set to none */
+			free(current->edge_length_as_string);
+			current->edge_length_as_string = strdup("");
 		}
-		if (! params.show_inner_labels) {
-			if (! is_leaf(current)) {
-				char *label = current->label;
-				label[0] = '\0';
-			}
-		}
-		if (! params.show_leaf_labels) {
-			if (is_leaf(current)) {
-				char *label = current->label;
-				label[0] = '\0';
-			}
+		else {
+			double age = -1.0;
+			if (strcmp("", current->edge_length_as_string) == 0)
+				age = 0.0;
+			else 
+				age = atof(current->edge_length_as_string);	
+
+			/* Note: we are assuming that only leaves can have an
+			 * empty length_as_string. Thus we do not check
+			 * for emptiness before calling atof(). */
+			double parent_age = atof(current->parent->
+				edge_length_as_string);
+			double edge_length = parent_age - age;
+			free(current->edge_length_as_string);
+			current->edge_length_as_string = masprintf("%g",
+					edge_length);
 		}
 	}
 }
@@ -152,11 +155,11 @@ int main (int argc, char* argv[])
 	get_params(argc, argv);
 
 	while ((tree = parse_tree()) != NULL) {
-		process_tree(tree, params);
+		process_tree(tree);
 		char *newick = to_newick(tree->root);
 		printf ("%s\n", newick);
 		free(newick);
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree(tree, DONT_FREE_NODE_DATA);
 	}
 
 	return 0;

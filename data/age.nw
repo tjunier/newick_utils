@@ -1,0 +1,9 @@
+[In this tree, branch "lengths" are really ages (in Mya); use nw_age
+to convert to durations.]
+(
+	(
+		Gnathostomata,
+		Conodonta:200
+	)Vertebrata:530,
+	Urochordata
+)Chordata:540;

@@ -1,9 +1,3 @@
-Add new program nw_age, to convert a tree with branch length representing
-(paleontological) ages to a regular Newick tree, with branch lengths
-representing durations.
-
-nw_display: add an option for drawing inner node labels near the parent.
-
 nw_order: how are internal labels handled when sorting alphabetically? For now
 they are ignored, it seems. Should we add an option to handle them?
 
@@ -376,3 +370,10 @@ starting tree for PhyML, etc.
 like iTOL seems to do.
 
 [done] order_tree.h: add unit tests for all f()
+
+[done] Add new program nw_age, to convert a tree with branch length
+representing (paleontological) ages to a regular Newick tree, with branch
+lengths representing durations.
+
+[done] nw_display: add an option for drawing inner node labels near the parent.
+
