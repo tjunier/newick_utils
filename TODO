@@ -1,3 +1,7 @@
+Add new program nw_age, to convert a tree with branch length representing
+(paleontological) ages to a regular Newick tree, with branch lengths
+representing durations.
+
 nw_display: add an option for drawing inner node labels near the parent.
 
 nw_order: how are internal labels handled when sorting alphabetically? For now
