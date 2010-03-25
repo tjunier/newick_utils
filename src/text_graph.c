@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdlib.h>
 #include <math.h>
+#include <assert.h>
 
 #include "canvas.h"
 #include "tree.h"
@@ -49,7 +50,8 @@ static const int ROOT_SPACE = 1;
  * set_node_depth()). */
 
 void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
-		const double scale, int align_leaves, double dmax)
+		const double scale, int align_leaves, double dmax,
+		enum inner_lbl_pos inner_label_pos)
 {
 	struct list_elem *elem;
 
@@ -61,16 +63,27 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 		if (align_leaves && is_leaf(node))
 			pos->depth = dmax;
 
-		/* rint() rounds halfay, better than automatic double->int
-		 * conversion */
-		int h_pos = rint(ROOT_SPACE + (scale * pos->depth));
+		int h_pos = -1;
+		switch (inner_label_pos) {
+		case INNER_LBL_LEAVES:
+			/* rint() rounds halfay, better than automatic
+			 * double->int conversion */
+			h_pos = ROOT_SPACE + rint(scale * pos->depth) +
+				LBL_SPACE;
+			break;
+		case INNER_LBL_MIDDLE:
+		case INNER_LBL_ROOT:
+		default:
+			assert(0);
+		}
+
 		int top = rint(2*pos->top);
 		int bottom = rint(2*pos->bottom);
 		int mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */
 
 		/* draw node */
 		canvas_draw_vline(canvas, h_pos, top, bottom);
-		canvas_write(canvas, h_pos + LBL_SPACE, mid, node->label);
+		canvas_write(canvas, h_pos, mid, node->label);
 		if (is_root(node)) {
 			canvas_write(canvas, 0, mid, "=");
 		} else {
@@ -86,7 +99,11 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 have to be passed, increasing coupling and diminishing implementation hiding.
 What's more, we can't assume that the new tree will fit in the old canvas. */
 
-enum display_status display_tree(struct rooted_tree *tree, int width, int align_leaves)
+enum display_status display_tree(
+		struct rooted_tree *tree,
+		int width,
+		int align_leaves,
+		enum inner_lbl_pos inner_label_pos)
 {	
 	/* set node positions */
 	alloc_simple_node_pos(tree);
@@ -106,7 +123,8 @@ enum display_status display_tree(struct rooted_tree *tree, int width, int align_
 	scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	if (0.0 == hd.d_max ) { scale = 1; } 	/* one-node trees */
 	canvasp = create_canvas(width, 2 * num_leaves);
-	write_to_canvas(canvasp, tree, scale, align_leaves, hd.d_max);
+	write_to_canvas(canvasp, tree, scale, align_leaves, hd.d_max,
+			inner_label_pos);
 
 	/* output */
 	canvas_dump(canvasp);
