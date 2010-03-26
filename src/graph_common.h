@@ -42,7 +42,12 @@ void underscores2spaces(char *);
 void remove_quotes(char *);
 
 /* Prettify the labels by changing underscores to spaces and removing quotes.
- * ARgument is changed. Do not call this before printing out Newick, or the
+ * Argument is changed. Do not call this before printing out Newick, or the
  * labels will be invalid. */
 
 void prettify_labels(struct rooted_tree *);
+
+/* Returns how many tick intervals can be fitted in a scale bar for a total
+ * length of n */
+
+int scalebar_ticks(double x);

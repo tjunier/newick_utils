@@ -640,3 +640,35 @@ struct rooted_tree tree_15()
 	return result;
 }
 
+/* A tree with labels that have spaces, or quotes */
+/* (('Falco peregrinus', Falco_eleonorae),'Falco_rusticolus'); */
+struct rooted_tree tree_16()
+{
+	struct rnode *peregrinus = create_rnode("'Falco peregrinus'", "");
+	struct rnode *eleonorae = create_rnode("Falco_eleonorae", "");
+	struct rnode *pereg_eleo = create_rnode("", "");
+	struct rnode *rusticolus = create_rnode("'Falco_rusticolus'", "");
+	struct rnode *root = create_rnode("", "");
+
+	struct llist *nodes_in_order;
+	struct rooted_tree result;
+	
+	add_child(pereg_eleo, peregrinus);
+	add_child(pereg_eleo, eleonorae);
+	add_child(root, pereg_eleo);
+	add_child(root, rusticolus);
+
+	nodes_in_order = create_llist();
+	append_element(nodes_in_order, peregrinus);
+	append_element(nodes_in_order, eleonorae);
+	append_element(nodes_in_order, pereg_eleo);
+	append_element(nodes_in_order, rusticolus);
+	append_element(nodes_in_order, root);
+
+	result.root = root;
+	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_CLADOGRAM; 	/* should make no difference */
+
+	return result;
+}
+

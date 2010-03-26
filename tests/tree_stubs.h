@@ -63,3 +63,6 @@ struct rooted_tree tree_14();
 /* (((((Equus,Homo)Mammalia,Columba)Amniota,Xenopus)Tetrapoda,Carcharodon)Gnathostomata,Petromyzon)Vertebrata; */
 struct rooted_tree tree_15();
 
+/* A tree with labels that have spaces, or quotes */
+/* (('Falco peregrinus', Falco_eleonorae),'Falco_rusticolus'); */
+struct rooted_tree tree_16();

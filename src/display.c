@@ -210,6 +210,7 @@ enum inner_lbl_pos get_inner_label_pos(char *optarg)
 		case 'r':
 			return INNER_LBL_ROOT;
 	}
+	return -1;	// TODO: handle invalid chars
 }
 
 struct parameters get_params(int argc, char *argv[])

@@ -71,3 +71,8 @@ void prettify_labels (struct rooted_tree *tree)
 		remove_quotes(current->label);
 	}
 }
+
+int scalebar_ticks(double x)
+{
+	int low_log10 = log10(x);
+}
