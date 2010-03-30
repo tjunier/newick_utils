@@ -38,4 +38,4 @@ enum inner_lbl_pos;
 
 enum display_status display_tree(struct rooted_tree *,
 		int width, int align_leaves, enum inner_lbl_pos,
-		bool with_scalebar);
+		bool with_scalebar, char *units);

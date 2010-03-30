@@ -446,7 +446,8 @@ int main(int argc, char *argv[])
 			status = display_tree(tree, params.width,
 					align_leaves,
 					params.inner_label_pos,
-					with_scale_bar);
+					with_scale_bar,
+					params.branch_length_unit);
 			switch(status) {
 				case DISPLAY_OK:
 					break;
