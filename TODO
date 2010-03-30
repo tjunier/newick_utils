@@ -377,3 +377,7 @@ lengths representing durations.
 
 [done] nw_display: add an option for drawing inner node labels near the parent.
 
+[done] add a function for "guessing" the best between-tick interval for the
+scale bar
+
+[done] add tests for graph_common.c
