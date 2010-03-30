@@ -52,6 +52,7 @@ extern enum parser_status_type newick_parser_status;
 
 extern int lineno;
 char *nwsget_text();
+extern int nwslex (void);
 
 void nwserror(char *s)
 {

@@ -415,14 +415,14 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		align_leaves = is_cladogram(tree);
-		if (params.svg) {
-			/* show scale bar IFF tree is NOT a cladogram. Since
-			 * is_cladogram() takes some time to run, we just look
-			 * up  'align_leaves' which has the same value. */
-			with_scale_bar = !align_leaves;
-			/* User can also suppress scale bar */
-			if (params.no_scale_bar) with_scale_bar = FALSE;
+		/* show scale bar IFF tree is NOT a cladogram. Since
+		 * is_cladogram() takes some time to run, we just look
+		 * up  'align_leaves' which has the same value. */
+		with_scale_bar = !align_leaves;
+		/* User can also suppress scale bar */
+		if (params.no_scale_bar) with_scale_bar = FALSE;
 
+		if (params.svg) {
 			svg_header(leaf_count(tree), with_scale_bar);
 			svg_run_params_comment(argc, argv);
 			status = display_svg_tree(tree,
@@ -445,7 +445,8 @@ int main(int argc, char *argv[])
 			prettify_labels(tree);
 			status = display_tree(tree, params.width,
 					align_leaves,
-					params.inner_label_pos);
+					params.inner_label_pos,
+					with_scale_bar);
 			switch(status) {
 				case DISPLAY_OK:
 					break;

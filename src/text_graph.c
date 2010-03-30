@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "canvas.h"
 #include "tree.h"
@@ -44,12 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const int LBL_SPACE = 2;
 static const int ROOT_SPACE = 1;
+static const int SCALEBAR_SPACE = 4;
 
 /* Writes the nodes to the canvas. Assumes that the edges have been
  * attributed a double value in field 'length' (in this case, it is done in
  * set_node_depth()). */
 
-void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
+void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		const double scale, int align_leaves, double dmax,
 		enum inner_lbl_pos inner_label_pos)
 {
@@ -109,6 +111,22 @@ void write_to_canvas(struct canvas *canvas, struct rooted_tree *tree,
 	}
 }
 
+void draw_scalebar(struct canvas *canvas, const double scale,
+		const double dmax)
+{
+	int v_pos = canvas->height - SCALEBAR_SPACE;
+	int h_start = ROOT_SPACE;
+	int h_end = ROOT_SPACE + scale * dmax;
+	canvas_draw_hline(canvas, v_pos, h_start, h_end);
+	float interval = tick_interval(dmax);
+	float x = 0;
+	while (x <= dmax) {
+		canvas_write(canvas, rint(scale * x), v_pos, "|");
+		x += interval;
+	}
+
+}
+
 /* We create a new canvas every time - we could reuse one, but this would then
 have to be passed, increasing coupling and diminishing implementation hiding.
 What's more, we can't assume that the new tree will fit in the old canvas. */
@@ -117,8 +135,10 @@ enum display_status display_tree(
 		struct rooted_tree *tree,
 		int width,
 		int align_leaves,
-		enum inner_lbl_pos inner_label_pos)
+		enum inner_lbl_pos inner_label_pos,
+		bool with_scalebar)
 {	
+
 	/* set node positions */
 	alloc_simple_node_pos(tree);
 	int num_leaves = set_node_vpos_cb(tree,
@@ -133,13 +153,19 @@ enum display_status display_tree(
 	double scale = -1;
 	struct canvas *canvasp;
 
+	int scalebar_space = 0;
+	if (with_scalebar)
+		scalebar_space = SCALEBAR_SPACE;
 	/* create canvas and draw nodes on it */
 	scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	if (0.0 == hd.d_max ) { scale = 1; } 	/* one-node trees */
-	canvasp = create_canvas(width, 2 * num_leaves);
-	write_to_canvas(canvasp, tree, scale, align_leaves, hd.d_max,
+	canvasp = create_canvas(width, 2 * num_leaves + scalebar_space);
+	draw_tree(canvasp, tree, scale, align_leaves, hd.d_max,
 			inner_label_pos);
+	if (with_scalebar)
+		draw_scalebar(canvasp, scale, hd.d_max);
 
+	
 	/* output */
 	canvas_dump(canvasp);
 

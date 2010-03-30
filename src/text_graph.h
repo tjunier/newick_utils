@@ -27,6 +27,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+#include <stdbool.h>
+
 struct rooted_tree;
 enum inner_lbl_pos;
 
@@ -35,4 +37,5 @@ enum inner_lbl_pos;
  * (surprise!) - useful for cladograms.  */
 
 enum display_status display_tree(struct rooted_tree *,
-		int width, int align_leaves, enum inner_lbl_pos);
+		int width, int align_leaves, enum inner_lbl_pos,
+		bool with_scalebar);
