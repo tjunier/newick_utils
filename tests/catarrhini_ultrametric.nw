@@ -1,0 +1,28 @@
+(
+  (
+    (
+      (
+        Gorilla:25,
+        (
+          Pan:15,
+          Homo:15
+        )Hominini:10
+      )Homininae:15,
+      Pongo:40
+    )Hominidae:15,
+    Hylobates:55
+  ):10,
+  (
+    (
+      (
+        Macaca:10,
+        Papio:10
+      ):20,
+      Cercopithecus:30
+    )Cercopithecinae:25,
+    (
+      Simias:50,
+      Colobus:50
+    )Colobinae:5
+  )Cercopithecidae:10
+);

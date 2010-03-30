@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const int LBL_SPACE = 2;
 static const int ROOT_SPACE = 1;
-static const int SCALEBAR_SPACE = 3;
+static const int SCALEBAR_SPACE = 4;
 
 /* Writes the nodes to the canvas. Assumes that the edges have been
  * attributed a double value in field 'length' (in this case, it is done in

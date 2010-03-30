@@ -28,3 +28,5 @@ Imr: -sr -Im -b 'visibility:hidden' simiiformes.nw
 Irr: -sr -Ir -b 'visibility:hidden' simiiformes.nw
 Ilt: -Il -b 'visibility:hidden' simiiformes.nw
 Irt: -Ir -b 'visibility:hidden' simiiformes.nw
+tnobar: -S catarrhini.nw
+tunit: -u 'million years' catarrhini_ultrametric.nw
