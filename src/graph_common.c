@@ -29,6 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <stdio.h>
+#include <limits.h>
 
 #include "tree.h"
 #include "list.h"
@@ -72,7 +75,46 @@ void prettify_labels (struct rooted_tree *tree)
 	}
 }
 
-int scalebar_ticks(double x)
+int tick_interval(double x)
 {
-	int low_log10 = log10(x);
+	int low_log10 = rint(log10(x));
+	int high_log10 = low_log10 + 1;
+	/* powers of ten below and above x, e.g. if x = 230, low_PoT = 100 and
+	 * high_PoT = 1000. */
+	double low_PoT = exp(low_log10 * log(10));
+	double high_PoT = exp(high_log10 * log(10));
+	printf ("lo PoT: %g, hi PoT: %g\n", low_PoT, high_PoT);
+
+	/* We will divide the powers of ten by the following. This will yield
+	 * "reasonable" potential intervals between tick bars with values like
+	 * 10, 250, 500, etc. */
+	int divisors[] = {2, 4, 5, 10};
+	/* We prefer 4 or 5 divisions */
+	int preferred_num_tick_intervals[] = {4,5};
+
+	double penalty = INT_MAX;
+	double best_tick_interval = -1;
+	double worst_penalty = INT_MAX;
+	int i = -1;
+	for (i = 0; i < 4; i++) {
+		double tick_interval = low_PoT / divisors[i];
+		int num_tick_intervals = floor(x / tick_interval);
+		double remainder = x - (num_tick_intervals * tick_interval);
+		double relative_error = remainder / x;
+		int j = -1;
+		for (j = 0; j < 2; j++) {
+			penalty = 10 * abs( num_tick_intervals
+				- preferred_num_tick_intervals[j])
+				+ 1000 * abs(relative_error);
+			if (penalty < worst_penalty) {
+				worst_penalty = penalty;
+				best_tick_interval = tick_interval;
+			}
+			printf ("%g = %d * %g + %g (%g)\n",
+					x, num_tick_intervals,
+					tick_interval, remainder, penalty);
+		}
+	}
+
+	return best_tick_interval;
 }

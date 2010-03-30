@@ -50,4 +50,4 @@ void prettify_labels(struct rooted_tree *);
 /* Returns how many tick intervals can be fitted in a scale bar for a total
  * length of n */
 
-int scalebar_ticks(double x);
+int tick_interval(double x);

@@ -84,13 +84,18 @@ int test_prettify_labels()
 	return 0;
 }
 
-int test_scalebar_ticks()
+int test_tick_interval()
 {
-	char *test_name = "test_scalebar_ticks";
+	char *test_name = "test_tick_interval";
 
 	int obt, exp;
 
-	obt = scalebar_ticks(100);
+	obt = tick_interval(734);
+	obt = tick_interval(100);
+	obt = tick_interval(0.012);
+	obt = tick_interval(52);
+	obt = tick_interval(1003);
+	obt = tick_interval(234);
 	exp = 5;
 	if (obt != exp) {
 		printf ("%s: expected %d, got %d\n", test_name, exp, obt);
@@ -108,6 +113,7 @@ int main()
 	failures += test_underscores2spaces();
 	failures += test_remove_quotes();
 	failures += test_prettify_labels();
+	failures += test_tick_interval();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
