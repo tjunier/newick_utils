@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "canvas.h"
 #include "tree.h"
@@ -42,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "node_pos_alloc.h"
 #include "common.h"
 #include "graph_common.h"
+#include "masprintf.h"
 
 static const int LBL_SPACE = 2;
 static const int ROOT_SPACE = 1;
@@ -122,6 +124,11 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 	float x = 0;
 	while (x <= dmax) {
 		canvas_write(canvas, rint(scale * x), v_pos, "|");
+		char *tick_lbl = masprintf("%g", x);
+		int tick_lbl_len = strlen(tick_lbl);
+		canvas_write(canvas, rint(scale * x) - tick_lbl_len + 1,
+				v_pos + 1, tick_lbl);
+		free (tick_lbl);
 		x += interval;
 	}
 

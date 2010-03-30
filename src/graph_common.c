@@ -78,12 +78,13 @@ void prettify_labels (struct rooted_tree *tree)
 double tick_interval(double x)
 {
 	int low_log10 = rint(log10(x));
-	int high_log10 = low_log10 + 1;
+	// int high_log10 = low_log10 + 1;
 	/* powers of ten below and above x, e.g. if x = 230, low_PoT = 100 and
 	 * high_PoT = 1000. */
 	double low_PoT = exp(low_log10 * log(10));
-	double high_PoT = exp(high_log10 * log(10));
-	printf ("lo PoT: %g, hi PoT: %g\n", low_PoT, high_PoT);
+	//TODO: maybe we don't need to consider Hi PoT
+	//double high_PoT = exp(high_log10 * log(10));
+	//printf ("lo PoT: %g, hi PoT: %g\n", low_PoT, high_PoT);
 
 	/* We will divide the powers of ten by the following. This will yield
 	 * "reasonable" potential intervals between tick bars with values like
