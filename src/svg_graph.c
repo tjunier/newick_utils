@@ -717,60 +717,24 @@ void draw_scale_bar(int hpos, double vpos,
 	 * longer than half the tree's depth), then we draw tick marks inside
 	 * it instead. */
 
-	const int big_tick_height = 5; 			/* px */
-	const int units_text_voffset = -18;		/* px */
+	const int big_tick_height = 7; 			/* px */
+	const int units_text_voffset = -20;		/* px */
+	const double interval = tick_interval(d_max);	/* user units */
 	const int lbl_vspace = 2;			/* px */
 	const int lbl_hspace = 2;			/* px */
-	double pot = largest_PoT_lte(d_max);		/* tree units */
-	double scale_length = pot * h_scale;		/* px */
-
-	printf ("<g transform='translate(%d,%g)'>", hpos, vpos); 
-
-	if (2 * pot > d_max) {
-		/* print base line and 1/10th tick marks */
-		printf ("<path style='stroke:black' d='M 0 0 h %g'/>",
-				scale_length);
-		int i;
-		for (i = 0; i <= 10; i++)
-			printf ("<path style='stroke:black' d='M %g 0 v %d'/>",
-				i * (scale_length/10), -big_tick_height);
-		/* print 0, middle, and end labels */
-		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:start' x='0' y='%d'>0</text>",
-			-big_tick_height -lbl_vspace);
-		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:end' x='%g' y='%d'>%g</text>",
-			scale_length, -big_tick_height - lbl_vspace, pot);
-		printf ("<text style='font-size:small;stroke:none;"
-			"text-anchor:end' x='%g' y='%d'>%g</text>",
-			scale_length/2, -big_tick_height - lbl_vspace, pot/2);
-	} else {
-		/* Print as many multiples of 'scale_length' as  will fit */
-
-		/* Find how many multiples fit */
-		int multiples;
-		for (multiples = 0; (multiples+1)*pot < d_max; multiples++)
-			;
-		
-		/* Print base line and tick marks */
-		printf ("<g style='stroke:black;stroke-linecap:round'>");
-		printf ("<path style='stroke:black' d='M 0 0 h %g'/>",
-				multiples * scale_length);
-		int i;
-		for (i = 0; i <= multiples; i++) {
-			printf ("<path style='stroke:black' d='M %g 0 v %d'/>",
-				i*scale_length, -big_tick_height);
-		}
-		printf ("</g>");
-
-		/* Print tick labels */
-		printf ("<g style='font-size:small;stroke:none;text-anchor:end'>");
-		for (i = 0; i <= multiples; i++) { 
-			printf ("<text x='%g' y='%d'>%g</text>",
-				i*scale_length + lbl_hspace, -big_tick_height - lbl_vspace, i*pot);
-		}
-		printf ("</g>");
+	printf ("<g transform='translate(%d,%g)' style='stroke:black;stroke-width:1' >", hpos, vpos); 
+	printf ("<path d='M 0 0 h %g'/>", h_scale * d_max);  
+	double x = 0;
+	while (x <= d_max) {
+		printf ("<path d='M %g 0 v -%d'/>", h_scale * x, big_tick_height);
+		printf ("<text style='stroke:none;text-anchor:end'"
+			" x='%g' y='-%d'>%g</text>", h_scale * x + lbl_hspace,
+				(big_tick_height + lbl_vspace), x);
+		x += interval;
+				
 	}
+
+	/* Print scalebar units */
 	printf ("<text style='font-size:small;stroke:none' x='0' y='%d'>"
 		"%s</text>", units_text_voffset, branch_length_unit);
 	printf ("</g>");
