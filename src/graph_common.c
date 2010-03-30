@@ -75,16 +75,17 @@ void prettify_labels (struct rooted_tree *tree)
 	}
 }
 
+/* This function takes a length and returns a smaller length that can be used
+ * to build a scale bar ("tick interval"). Ideally, the tick interval should
+ * meet the following criteria: i) the original length should be approximately
+ * 4 or 5 intervals long; ii) the intervals should be a power of 10 divided by
+ * 2, 4, 5, or 10 (i.e., only numbers like 10, 25, 500, 200 and their multiples
+ * by a power of 10). */
+
 double tick_interval(double x)
 {
 	int low_log10 = rint(log10(x));
-	// int high_log10 = low_log10 + 1;
-	/* powers of ten below and above x, e.g. if x = 230, low_PoT = 100 and
-	 * high_PoT = 1000. */
 	double low_PoT = exp(low_log10 * log(10));
-	//TODO: maybe we don't need to consider Hi PoT
-	//double high_PoT = exp(high_log10 * log(10));
-	//printf ("lo PoT: %g, hi PoT: %g\n", low_PoT, high_PoT);
 
 	/* We will divide the powers of ten by the following. This will yield
 	 * "reasonable" potential intervals between tick bars with values like
@@ -97,13 +98,19 @@ double tick_interval(double x)
 	double best_tick_interval = -1;
 	double worst_penalty = INT_MAX;
 	int i = -1;
+	/* try each divisor in turn */
 	for (i = 0; i < 4; i++) {
+		/* a candidate interval */
 		double tick_interval = low_PoT / divisors[i];
+		/* we use floor() instead of rint() so that we never exceed x */
 		int num_tick_intervals = floor(x / tick_interval);
 		double remainder = x - (num_tick_intervals * tick_interval);
+		/* error in % */
 		double relative_error = 100 * fabs(remainder / x);
 		int j = -1;
 		for (j = 0; j < 2; j++) {
+			/* difference between current preferred number of tick
+			 * intevals and actual number of tick intervals */
 			int tick_diff = abs(num_tick_intervals -
 					preferred_num_tick_intervals[j]);
 			penalty = 10 * tick_diff + relative_error;
@@ -111,12 +118,6 @@ double tick_interval(double x)
 				worst_penalty = penalty;
 				best_tick_interval = tick_interval;
 			}
-			/*
-			printf ("%g = %d * %g + %g (%d, %2.0f%% -> %g)\n",
-					x, num_tick_intervals,
-					tick_interval, remainder,
-					tick_diff, relative_error, penalty);
-			*/
 		}
 	}
 

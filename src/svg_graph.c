@@ -724,15 +724,32 @@ void draw_scale_bar(int hpos, double vpos,
 	const int lbl_hspace = 2;			/* px */
 	printf ("<g transform='translate(%d,%g)' style='stroke:black;stroke-width:1' >", hpos, vpos); 
 	printf ("<path d='M 0 0 h %g'/>", h_scale * d_max);  
-	double x = 0;
-	while (x <= d_max) {
-		printf ("<path d='M %g 0 v -%d'/>", h_scale * x, big_tick_height);
-		printf ("<text style='stroke:none;text-anchor:end'"
-			" x='%g' y='-%d'>%g</text>", h_scale * x + lbl_hspace,
+
+	if (scalebar_zero_at_root) {
+		double x = 0;
+		while (x <= d_max) {
+			printf ("<path d='M %g 0 v -%d'/>", h_scale * x,
+				big_tick_height);
+			printf ("<text style='stroke:none;text-anchor:end'"
+				" x='%g' y='-%d'>%g</text>",
+				h_scale * x + lbl_hspace,
 				(big_tick_height + lbl_vspace), x);
-		x += interval;
-				
+			x += interval;
+		}
+	} else {
+		/* Time units: zero is at max depth */
+		double x = d_max;
+		while (x >= 0) {
+			printf ("<path d='M %g 0 v -%d'/>", h_scale * x,
+				big_tick_height);
+			printf ("<text style='stroke:none;text-anchor:end'"
+				" x='%g' y='-%d'>%g</text>",
+				h_scale * x + lbl_hspace,
+				(big_tick_height + lbl_vspace), d_max - x);
+			x -= interval;
+		}
 	}
+
 
 	/* Print scalebar units */
 	printf ("<text style='font-size:small;stroke:none' x='0' y='%d'>"

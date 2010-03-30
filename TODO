@@ -381,3 +381,12 @@ lengths representing durations.
 scale bar
 
 [done] add tests for graph_common.c
+
+[done] add scale bars for ASCII graphs
+
+[done] use the new function for tick intervals (scale bar) also for SVG
+(already used for ASCII)
+
+[done] nw_display: add an option for "reversing" the scale, setting 0 at the
+tree's max depth instead of at the root, and going backward. This is useful
+when the branch length are in units of time (hence option -t was chosen).

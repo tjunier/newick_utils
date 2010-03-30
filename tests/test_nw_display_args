@@ -31,3 +31,4 @@ Irt: -Ir -b 'visibility:hidden' simiiformes.nw
 tnobar: -S catarrhini.nw
 tunit: -u 'million years' catarrhini_ultrametric.nw
 time: -t -u 'million years ago' duration.nw
+stime: -s -t -u 'million years ago' duration.nw
