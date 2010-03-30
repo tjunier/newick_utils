@@ -114,23 +114,38 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 }
 
 void draw_scalebar(struct canvas *canvas, const double scale,
-		const double dmax, char *units)
+		const double dmax, char *units, bool scale_zero_at_root)
 {
 	int v_pos = canvas->height - SCALEBAR_SPACE;
 	int h_start = ROOT_SPACE;
 	int h_end = ROOT_SPACE + scale * dmax;
 	canvas_draw_hline(canvas, v_pos, h_start, h_end);
 	float interval = tick_interval(dmax);
-	float x = 0;
-	while (x <= dmax) {
-		int tick_h_pos = ROOT_SPACE + rint(scale * x);
-		canvas_write(canvas, tick_h_pos, v_pos, "|");
-		char *tick_lbl = masprintf("%g", x);
-		int tick_lbl_len = strlen(tick_lbl);
-		canvas_write(canvas, tick_h_pos - tick_lbl_len + 1,
-				v_pos + 1, tick_lbl);
-		free (tick_lbl);
-		x += interval;
+	if (scale_zero_at_root) {
+		float x = 0;
+		while (x <= dmax) {
+			int tick_h_pos = ROOT_SPACE + rint(scale * x);
+			canvas_write(canvas, tick_h_pos, v_pos, "|");
+			char *tick_lbl = masprintf("%g", x);
+			int tick_lbl_len = strlen(tick_lbl);
+			canvas_write(canvas, tick_h_pos - tick_lbl_len + 1,
+					v_pos + 1, tick_lbl);
+			free (tick_lbl);
+			x += interval;
+		}
+	} else {
+		/* scale zero at max depth */
+		float x = dmax;
+		while (x >= 0) {
+			int tick_h_pos = ROOT_SPACE + rint(scale * x);
+			canvas_write(canvas, tick_h_pos, v_pos, "|");
+			char *tick_lbl = masprintf("%g", dmax - x);
+			int tick_lbl_len = strlen(tick_lbl);
+			canvas_write(canvas, tick_h_pos - tick_lbl_len + 1,
+					v_pos + 1, tick_lbl);
+			free (tick_lbl);
+			x -= interval;
+		}
 	}
 	canvas_write(canvas, h_start, v_pos + 2, units);
 
@@ -146,7 +161,8 @@ enum display_status display_tree(
 		int align_leaves,
 		enum inner_lbl_pos inner_label_pos,
 		bool with_scalebar,
-		char *branch_length_units)
+		char *branch_length_units,
+		bool scale_zero_at_root)
 {	
 
 	/* set node positions */
@@ -173,7 +189,8 @@ enum display_status display_tree(
 	draw_tree(canvasp, tree, scale, align_leaves, hd.d_max,
 			inner_label_pos);
 	if (with_scalebar)
-		draw_scalebar(canvasp, scale, hd.d_max, branch_length_units);
+		draw_scalebar(canvasp, scale, hd.d_max, branch_length_units,
+				scale_zero_at_root);
 
 	
 	/* output */
