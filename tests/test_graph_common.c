@@ -87,47 +87,48 @@ int test_prettify_labels()
 int test_tick_interval()
 {
 	char *test_name = "test_tick_interval";
+	double tolerance = 0.00001;
 
 	double obt, exp;
 
 	obt = tick_interval(734);
 	exp = 100;
-	if (obt != exp) {
-		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
+	if (fabs(obt - exp) > tolerance) {
+		printf ("%s: expected %.12f, got %.12f\n", test_name, exp, obt);
 		return 1;
 	}
 
 	obt = tick_interval(100);
 	exp = 20;
-	if (obt != exp) {
+	if (fabs(obt - exp) > tolerance) {
 		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
 		return 1;
 	}
 
 	obt = tick_interval(0.012);
 	exp = 0.002;
-	if (obt != exp) {
+	if (fabs(obt - exp) > tolerance) {
 		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
 		return 1;
 	}
 
 	obt = tick_interval(52);
 	exp = 10;
-	if (obt != exp) {
+	if (fabs(obt - exp) > tolerance) {
 		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
 		return 1;
 	}
 
 	obt = tick_interval(1003);
-	exp = 200;
-	if (obt != exp) {
+	exp = 250;
+	if (fabs(obt - exp) > tolerance) {
 		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
 		return 1;
 	}
 
 	obt = tick_interval(234);
 	exp = 50;
-	if (obt != exp) {
+	if (fabs(obt - exp) > tolerance) {
 		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
 		return 1;
 	}

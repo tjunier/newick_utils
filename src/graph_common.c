@@ -75,7 +75,7 @@ void prettify_labels (struct rooted_tree *tree)
 	}
 }
 
-int tick_interval(double x)
+double tick_interval(double x)
 {
 	int low_log10 = rint(log10(x));
 	int high_log10 = low_log10 + 1;
