@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extern char *indent_string;
 extern char *eol;
+extern int yylex(void);
 
 void help(char *argv[])
 {

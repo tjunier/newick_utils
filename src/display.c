@@ -52,9 +52,9 @@ struct parameters {
 	int 	svg;
 	FILE 	*css_map;	
 	FILE 	*url_map;
-	FILE 	*ornament_map;		/* SVG */
+	FILE 	*ornament_map;			/* SVG */
 	char 	*leaf_label_style;		/* CSS */
-	char 	*inner_label_style;	/* CSS */
+	char 	*inner_label_style;		/* CSS */
 	char 	*edge_label_style;		/* CSS */
 	char 	*plain_node_style;		/* CSS */
 	double 	leaf_vskip;
@@ -66,6 +66,7 @@ struct parameters {
 	double 	label_char_width;	/* for estimating label length */
 	int 	no_scale_bar;		/* suppresses scale bar if true */
 	enum 	inner_lbl_pos inner_label_pos;	/* where to put the label */
+	bool	scale_zero_at_root;	/* if false, at max depth */
 };
 
 void help(char* argv[])
@@ -160,6 +161,9 @@ void help(char* argv[])
 "       will generate as many SVG files as there are Newick trees in\n"
 "       many_trees.nw. The files will be named tree_01.svg, tree_02.svg, etc.\n"
 "    -S: suppress scale bar (ignored for cladograms)\n"
+"    -t: set the zero of the scale at the maximum depth instead of the root.\n"
+"       This is useful when the branch lengths are in time units: zero marks\n"
+"       the present, and the scale shows the age of the ancestral nodes.\n"
 "    -u <string>: string is used as unit name for scale bar (ignored\n"
 "       if no scale bar is drawn).\n"
 "    -U <URL_filename>: use specified URL map [only SVG]. A URL map\n"
@@ -235,13 +239,14 @@ struct parameters get_params(int argc, char *argv[])
 	params.label_char_width = 8.0;
 	params.no_scale_bar = FALSE;
 	params.inner_label_pos = INNER_LBL_LEAVES;
+	params.scale_zero_at_root = true;
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
 	const int DEFAULT_WIDTH_CHARS = 80;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:o:rR:sSu:U:v:w:W:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:o:rR:sStu:U:v:w:W:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -290,6 +295,9 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'S':
 			params.no_scale_bar = TRUE;
+			break;
+		case 't':
+			params.scale_zero_at_root = false;
 			break;
 		case 'u':
 			params.branch_length_unit = optarg;
@@ -447,7 +455,8 @@ int main(int argc, char *argv[])
 					align_leaves,
 					params.inner_label_pos,
 					with_scale_bar,
-					params.branch_length_unit);
+					params.branch_length_unit,
+					params.scale_zero_at_root);
 			switch(status) {
 				case DISPLAY_OK:
 					break;

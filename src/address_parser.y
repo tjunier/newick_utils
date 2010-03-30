@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "enode.h"
 
+extern int adslex (void);
+
 /* The root of the expression (when represented as a parse tree) */
 extern struct enode *expression_root;
 

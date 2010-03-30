@@ -3,6 +3,7 @@
 
 #include "hash.h"
 #include "list.h"
+#include "masprintf.h"
 
 struct test_data {
 	int value;
@@ -125,8 +126,7 @@ int test_make_hash_key()
 {
 	char *test_name = "test_make_hash_key";
 	struct llist *list = create_llist();
-	char *list_address;
-       	asprintf(&list_address, "%p", list);
+	char *list_address = masprintf("%p", list);
 
 	if (strcmp(list_address, make_hash_key(list)) != 0) {
 		printf ("%s: expected key %s, got %s.\n", test_name,
