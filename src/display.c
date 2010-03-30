@@ -383,6 +383,7 @@ void set_svg_parameters(struct parameters params)
 	set_svg_plain_node_style(params.plain_node_style);
 	set_svg_root_length(params.root_length);
 	set_svg_label_char_width(params.label_char_width);
+	set_svg_scalebar_zero_at_root(params.scale_zero_at_root);
 }
 
 /* Prints an XML comment containing the command line parameters, so that the

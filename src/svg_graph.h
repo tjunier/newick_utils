@@ -27,6 +27,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+#include <stdbool.h>
+
 enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
 
 
@@ -46,6 +49,7 @@ void set_svg_style(int);
 void set_svg_URL_map_file(FILE *);
 void set_svg_label_angle_correction(double);
 void set_svg_left_label_angle_correction(double);
+void set_svg_scalebar_zero_at_root(bool);
 
 /* Call this before calling svg_header(), etc, but _after_ the set_svg*()
  * functions. It will launch the initializations liek reading the color map,
