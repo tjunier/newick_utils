@@ -88,17 +88,47 @@ int test_tick_interval()
 {
 	char *test_name = "test_tick_interval";
 
-	int obt, exp;
+	double obt, exp;
 
 	obt = tick_interval(734);
-	obt = tick_interval(100);
-	obt = tick_interval(0.012);
-	obt = tick_interval(52);
-	obt = tick_interval(1003);
-	obt = tick_interval(234);
-	exp = 5;
+	exp = 100;
 	if (obt != exp) {
-		printf ("%s: expected %d, got %d\n", test_name, exp, obt);
+		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
+		return 1;
+	}
+
+	obt = tick_interval(100);
+	exp = 20;
+	if (obt != exp) {
+		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
+		return 1;
+	}
+
+	obt = tick_interval(0.012);
+	exp = 0.002;
+	if (obt != exp) {
+		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
+		return 1;
+	}
+
+	obt = tick_interval(52);
+	exp = 10;
+	if (obt != exp) {
+		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
+		return 1;
+	}
+
+	obt = tick_interval(1003);
+	exp = 200;
+	if (obt != exp) {
+		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
+		return 1;
+	}
+
+	obt = tick_interval(234);
+	exp = 50;
+	if (obt != exp) {
+		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
 		return 1;
 	}
 

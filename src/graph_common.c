@@ -100,19 +100,22 @@ int tick_interval(double x)
 		double tick_interval = low_PoT / divisors[i];
 		int num_tick_intervals = floor(x / tick_interval);
 		double remainder = x - (num_tick_intervals * tick_interval);
-		double relative_error = remainder / x;
+		double relative_error = 100 * fabs(remainder / x);
 		int j = -1;
 		for (j = 0; j < 2; j++) {
-			penalty = 10 * abs( num_tick_intervals
-				- preferred_num_tick_intervals[j])
-				+ 1000 * abs(relative_error);
+			int tick_diff = abs(num_tick_intervals -
+					preferred_num_tick_intervals[j]);
+			penalty = 10 * tick_diff + relative_error;
 			if (penalty < worst_penalty) {
 				worst_penalty = penalty;
 				best_tick_interval = tick_interval;
 			}
-			printf ("%g = %d * %g + %g (%g)\n",
+			/*
+			printf ("%g = %d * %g + %g (%d, %2.0f%% -> %g)\n",
 					x, num_tick_intervals,
-					tick_interval, remainder, penalty);
+					tick_interval, remainder,
+					tick_diff, relative_error, penalty);
+			*/
 		}
 	}
 
