@@ -1,3 +1,5 @@
+new program: nw_stats, prints info about a tree such as number of nodes, type (cladogram, phylogram, ultrametric, etc).
+
 nw_order: how are internal labels handled when sorting alphabetically? For now
 they are ignored, it seems. Should we add an option to handle them?
 

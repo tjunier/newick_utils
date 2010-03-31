@@ -27,7 +27,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-/* nw_duration - read a tree with node ages (absolute) and recode it as lengths (durations) */
+/* nw_stats - prints statistics and properties of trees */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,16 +35,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 
 #include "parser.h"
-#include "to_newick.h"
-#include "list.h"
+//#include "list.h"
 #include "tree.h"
 #include "rnode.h"
-#include "masprintf.h"
+//#include "masprintf.h"
+
+struct parameters {
+
+};
+
+/*
+struct tree_properties {
+	int num_leaves;
+	int num_nodes;
+	enum tree_type type;
+}
+*/
 
 void help(char *argv[])
 {
 	printf (
-"Convert node ages to durations\n"
+"Prints statistics about trees\n"
 "\n"
 "Synopsis\n"
 "--------\n"
@@ -55,18 +66,14 @@ void help(char *argv[])
 "-----\n"
 "\n"
 "Argument is the name of a file that contains Newick trees, or '-' (in\n"
-"which case trees are read from standard input). The branch \"lengths\"\n"
-"are interpreted as (absolute) dates, e.g. in Mya.\n"
+"which case trees are read from standard input).\n"
 "\n"
 "Output\n"
 "------\n"
 "\n"
-"Prints the input trees with branch lengths representing elapsed time.\n"
-"This is handy if you have data about ages rather than durations, e.g.\n"
-"you will typically know that two sister clades split 450 Mya, or that\n"
-"some clade lasted from the early Devonian to the present. By using the\n"
-"Newick format's 'length' slot to code ages, you can use this program\n"
-"to generate a tree with correct branch lengths.\n"
+"Prints information about the trees in the input, one line per tree.\n"
+"By default, each line contains the following fields: type, number of\n"
+"leaves [TODO: add rest here]\n"
 "\n"
 "Options\n"
 "-------\n"
@@ -76,16 +83,9 @@ void help(char *argv[])
 "Examples\n"
 "--------\n"
 "\n"
-"# File data/vertebrates.nw is age-encoded (every node's \"length\" is\n"
-"# actually the age (in million years ago) when the branch split into\n"
-"# the daughter branches). To get a usual, duration-encoded tree:\n"
+"# default statistics:\n"
 "\n"
-"$ %s data/vertebrates.nw\n"
-"\n"
-"# This works well with options -Ir, -t and -u to nw_display:\n"
-"\n"
-"$ %s data/vertebrates.nw | nw_display -Ir -t -u 'million years ago' -\n",
-	argv[0],
+"$ %s data/catarrhini.nw\n",
 	argv[0],
 	argv[0]
 		);
@@ -93,7 +93,6 @@ void help(char *argv[])
 
 void get_params(int argc, char *argv[])
 {
-
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "h")) != -1) {
@@ -119,7 +118,7 @@ void get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-bhIL] <filename|->\n", argv[0]);
+		fprintf(stderr, "Usage: %s [-h] <filename|->\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -128,30 +127,24 @@ void process_tree(struct rooted_tree *tree)
 {
 	struct list_elem *el;
 	
+	switch (get_tree_type(tree)) {
+	case TREE_TYPE_CLADOGRAM:
+		printf("Cladogram");
+		break;
+	case TREE_TYPE_PHYLOGRAM:
+		printf("Phylogram");
+		break;
+	case TREE_TYPE_NEITHER:
+		printf("neither");
+		break;
+	case TREE_TYPE_UNKNOWN:
+		printf("Unknown"); /* should not get here! */
+		break;
+	}
+
 	for (el = tree->nodes_in_order->head; NULL != el; el =el->next) {
 		struct rnode *current = (struct rnode *) el->data;
-		if (is_root(current)) {
-			/* set to none */
-			free(current->edge_length_as_string);
-			current->edge_length_as_string = strdup("");
-		}
-		else {
-			double age = -1.0;
-			if (strcmp("", current->edge_length_as_string) == 0)
-				age = 0.0;
-			else 
-				age = atof(current->edge_length_as_string);	
 
-			/* Note: we are assuming that only leaves can have an
-			 * empty length_as_string. Thus we do not check
-			 * for emptiness before calling atof(). */
-			double parent_age = atof(current->parent->
-				edge_length_as_string);
-			double edge_length = parent_age - age;
-			free(current->edge_length_as_string);
-			current->edge_length_as_string = masprintf("%g",
-					edge_length);
-		}
 	}
 }
 
@@ -163,10 +156,7 @@ int main (int argc, char* argv[])
 
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree);
-		char *newick = to_newick(tree->root);
-		printf ("%s\n", newick);
-		free(newick);
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
 	return 0;
