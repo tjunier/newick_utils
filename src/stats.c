@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 
 #include "parser.h"
-//#include "list.h"
+#include "list.h"
 #include "tree.h"
 #include "rnode.h"
 //#include "masprintf.h"
@@ -44,15 +44,14 @@ struct parameters {
 
 };
 
-/*
 struct tree_properties {
-	int num_leaves;
-	int num_nodes;
 	enum tree_type type;
-}
-*/
+	int num_nodes;
+	int num_leaves;
+	int num_dichotomies;
+};
 
-void help(char *argv[])
+static void help(char *argv[])
 {
 	printf (
 "Prints statistics about trees\n"
@@ -91,7 +90,7 @@ void help(char *argv[])
 		);
 }
 
-void get_params(int argc, char *argv[])
+static void get_params(int argc, char *argv[])
 {
 
 	int opt_char;
@@ -123,29 +122,56 @@ void get_params(int argc, char *argv[])
 	}
 }
 
-void process_tree(struct rooted_tree *tree)
+static int get_num_dichotomies(struct rooted_tree *tree)
 {
+	int dichotomies = 0;
 	struct list_elem *el;
-	
-	switch (get_tree_type(tree)) {
-	case TREE_TYPE_CLADOGRAM:
-		printf("Cladogram");
-		break;
-	case TREE_TYPE_PHYLOGRAM:
-		printf("Phylogram");
-		break;
-	case TREE_TYPE_NEITHER:
-		printf("neither");
-		break;
-	case TREE_TYPE_UNKNOWN:
-		printf("Unknown"); /* should not get here! */
-		break;
-	}
-
 	for (el = tree->nodes_in_order->head; NULL != el; el =el->next) {
 		struct rnode *current = (struct rnode *) el->data;
-
+		int num_kids = current->children->count;
+		if (2 == num_kids)
+			dichotomies++;
 	}
+	return dichotomies;
+}
+
+static char *type_string(enum tree_type type)
+{
+	switch(type) {
+	case TREE_TYPE_CLADOGRAM:
+		return "Cladogram";
+	case TREE_TYPE_PHYLOGRAM:
+		return "Phylogram";
+	case TREE_TYPE_NEITHER:
+		return "Neither";
+	case TREE_TYPE_UNKNOWN:
+		return "Unknown";	/* weird! should not happen. */
+	}
+	return NULL; /* dummy, won't compile with -Wall otherwise */
+}
+
+static void write_info (struct tree_properties *props)
+{
+	/* for now there is only one output format, but we could add more */
+	// later: switch on the format, or pass output function ptr */
+	printf("Type\t#nodes\t#leaves\t#dichot\n");
+	printf("%s\t%d\t%d\t%d\n",
+			type_string(props->type),
+			props->num_nodes,
+			props->num_leaves,
+			props->num_dichotomies);
+}
+
+static void process_tree(struct rooted_tree *tree)
+{
+	struct tree_properties props;
+
+	props.type = get_tree_type(tree);
+	props.num_nodes = tree->nodes_in_order->count;
+	props.num_leaves = leaf_count(tree);
+	props.num_dichotomies = get_num_dichotomies(tree);
+
+	write_info(&props);
 }
 
 int main (int argc, char* argv[])
