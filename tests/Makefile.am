@@ -10,7 +10,7 @@ TESTS = test_rnode test_list test_link test_masprintf \
 	test_nw_ed.sh test_nw_topology.sh test_nw_clade.sh \
 	test_nw_distance.sh test_nw_labels.sh test_nw_prune.sh \
 	test_nw_order.sh test_nw_match.sh test_nw_trim.sh \
-	test_nw_gen.sh test_nw_age.sh
+	test_nw_gen.sh test_nw_duration.sh
 
 check_PROGRAMS = test_rnode test_list test_link \
 		 test_canvas test_concat test_hash test_lca \

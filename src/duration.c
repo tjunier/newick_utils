@@ -76,9 +76,16 @@ void help(char *argv[])
 "Examples\n"
 "--------\n"
 "\n"
-"# Convert an age-encoded tree into regular Newick:\n"
+"# File data/vertebrates.nw is age-encoded (every node's \"length\" is\n"
+"# actually the age (in million years ago) when the branch split into\n"
+"# the daughter branches). To get a usual, duration-encoded tree:\n"
 "\n"
-"$ %s data/age.nw\n",
+"$ %s data/vertebrates.nw\n"
+"\n"
+"# This works well with options -Ir, -t and -u to nw_display:\n"
+"\n"
+"$ %s data/vertebrates.nw | nw_display -Ir -t -u 'million years ago' -\n",
+	argv[0],
 	argv[0],
 	argv[0]
 		);

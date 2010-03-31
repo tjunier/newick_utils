@@ -5,7 +5,7 @@ BUILT_SOURCES = newick_parser.h newick_scanner.c newick_parser.c \
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 	       nw_condense nw_support nw_ed nw_topology nw_distance \
 	       nw_labels nw_prune nw_order nw_match nw_gen nw_trim \
-	       nw_age
+	       nw_duration
 
 # I mention all headers here, so they're included in the distro (otherwise this
 # is not necessary, it builds just fine)
@@ -86,8 +86,8 @@ nw_gen_LDADD = libnw.la
 nw_trim_SOURCES = trim.c
 nw_trim_LDADD = @LEXLIB@ libnw.la
 
-nw_age_SOURCES = age.c
-nw_age_LDADD = @LEXLIB@ libnw.la
+nw_duration_SOURCES = duration.c
+nw_duration_LDADD = @LEXLIB@ libnw.la
 
 # Removes automatically generated C code (Lex & YACC)
 #
