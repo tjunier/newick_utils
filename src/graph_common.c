@@ -94,9 +94,9 @@ double tick_interval(double x)
 	/* We prefer 4 or 5 divisions */
 	int preferred_num_tick_intervals[] = {4,5};
 
-	double penalty = INT_MAX;
+	int penalty = INT_MAX;
 	double best_tick_interval = -1;
-	double worst_penalty = INT_MAX;
+	int worst_penalty = INT_MAX;
 	int i = -1;
 	/* try each divisor in turn */
 	for (i = 0; i < 4; i++) {
@@ -106,7 +106,7 @@ double tick_interval(double x)
 		int num_tick_intervals = floor(x / tick_interval);
 		double remainder = x - (num_tick_intervals * tick_interval);
 		/* error in % */
-		double relative_error = 100 * fabs(remainder / x);
+		int relative_error = rint(100 * fabs(remainder / x));
 		int j = -1;
 		for (j = 0; j < 2; j++) {
 			/* difference between current preferred number of tick
