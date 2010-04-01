@@ -121,7 +121,7 @@ int test_tick_interval()
 	}
 
 	obt = tick_interval(1003);
-	exp = 200;
+	exp = 250;
 	if (fabs(obt - exp) > tolerance) {
 		printf ("%s: expected %g, got %g\n", test_name, exp, obt);
 		return 1;
