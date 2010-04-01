@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "parser.h"
 #include "list.h"
@@ -40,15 +41,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 //#include "masprintf.h"
 
-struct parameters {
-
-};
+enum stats_output_format {STATS_OUTPUT_LINE, STATS_OUTPUT_COLUMN};
 
 struct tree_properties {
 	enum tree_type type;
 	int num_nodes;
 	int num_leaves;
 	int num_dichotomies;
+};
+
+struct parameters {
+	enum stats_output_format output_format;
+	void (* output_function)(struct tree_properties *);
+	bool headers;
 };
 
 static void help(char *argv[])
@@ -59,7 +64,7 @@ static void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-h] <newick trees filename|->\n"
+"%s [-hHf:] <newick trees filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -78,6 +83,8 @@ static void help(char *argv[])
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
+"    -f [lc]: format in lines (l) or columns (c). Default is c.\n"
+"    -H: suppress headers.\n"
 "\n"
 "Examples\n"
 "--------\n"
@@ -90,12 +97,68 @@ static void help(char *argv[])
 		);
 }
 
-static void get_params(int argc, char *argv[])
+static char *type_string(enum tree_type type)
 {
+	switch(type) {
+	case TREE_TYPE_CLADOGRAM:
+		return "Cladogram";
+	case TREE_TYPE_PHYLOGRAM:
+		return "Phylogram";
+	case TREE_TYPE_NEITHER:
+		return "Neither";
+	case TREE_TYPE_UNKNOWN:
+		return "Unknown";	/* weird! should not happen. */
+	}
+	return NULL; /* dummy, won't compile with -Wall otherwise */
+}
+
+static void print_line(struct tree_properties *props)
+{
+	printf("%s\t%d\t%d\t%d\n",
+		type_string(props->type),
+		props->num_nodes,
+		props->num_leaves,
+		props->num_dichotomies);
+}
+
+static void print_column(struct tree_properties *props)
+{
+	printf("Type:\t%s\n#nodes:\t%d\n#leaves:\t%d\n#dichotomies:\t%d\n",
+		type_string(props->type),
+		props->num_nodes,
+		props->num_leaves,
+		props->num_dichotomies);
+}
+
+static struct parameters get_params(int argc, char *argv[])
+{
+	struct parameters params;
+
+	params.output_function = print_column;
+	params.output_format = STATS_OUTPUT_COLUMN;
+	params.headers = false;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "h")) != -1) {
+	while ((opt_char = getopt(argc, argv, "f:Hh")) != -1) {
 		switch (opt_char) {
+		case 'f':
+			switch (optarg[0]) {
+			case 'l':
+			case 'L':
+				params.output_format = STATS_OUTPUT_LINE;
+				params.output_function = print_line;
+				break;
+			case 'c':
+			case 'C':
+				break;	/* keep defaults */
+			default:
+				fprintf (stderr,
+				"WARNING: wrong argument to option -f\n");
+			}
+			break;
+		case 'H':
+			params.headers = false;
+			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
@@ -117,9 +180,11 @@ static void get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-h] <filename|->\n", argv[0]);
+		fprintf(stderr, "Usage: %s [-fHh] <filename|->\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
+
+	return params;
 }
 
 static int get_num_dichotomies(struct rooted_tree *tree)
@@ -135,34 +200,8 @@ static int get_num_dichotomies(struct rooted_tree *tree)
 	return dichotomies;
 }
 
-static char *type_string(enum tree_type type)
-{
-	switch(type) {
-	case TREE_TYPE_CLADOGRAM:
-		return "Cladogram";
-	case TREE_TYPE_PHYLOGRAM:
-		return "Phylogram";
-	case TREE_TYPE_NEITHER:
-		return "Neither";
-	case TREE_TYPE_UNKNOWN:
-		return "Unknown";	/* weird! should not happen. */
-	}
-	return NULL; /* dummy, won't compile with -Wall otherwise */
-}
-
-static void write_info (struct tree_properties *props)
-{
-	/* for now there is only one output format, but we could add more */
-	// later: switch on the format, or pass output function ptr */
-	printf("Type\t#nodes\t#leaves\t#dichot\n");
-	printf("%s\t%d\t%d\t%d\n",
-			type_string(props->type),
-			props->num_nodes,
-			props->num_leaves,
-			props->num_dichotomies);
-}
-
-static void process_tree(struct rooted_tree *tree)
+static void process_tree(struct rooted_tree *tree,
+		void(* output_function)(struct tree_properties *))
 {
 	struct tree_properties props;
 
@@ -171,17 +210,17 @@ static void process_tree(struct rooted_tree *tree)
 	props.num_leaves = leaf_count(tree);
 	props.num_dichotomies = get_num_dichotomies(tree);
 
-	write_info(&props);
+	output_function(&props);
 }
 
 int main (int argc, char* argv[])
 {
+
+	struct parameters params = get_params(argc, argv);
+
 	struct rooted_tree *tree;
-
-	get_params(argc, argv);
-
 	while ((tree = parse_tree()) != NULL) {
-		process_tree(tree);
+		process_tree(tree, params.output_function);
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
 
