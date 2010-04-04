@@ -118,7 +118,7 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 {
 	int v_pos = canvas->height - SCALEBAR_SPACE;
 	int h_start = ROOT_SPACE;
-	int h_end = ROOT_SPACE + scale * dmax;
+	int h_end = ROOT_SPACE + rint(scale * dmax);
 	canvas_draw_hline(canvas, v_pos, h_start, h_end);
 	float interval = tick_interval(dmax);
 	if (scale_zero_at_root) {
