@@ -39,7 +39,7 @@ char *escape_predefined_character_entities(const char *string)
 				     argument */
 
 	/* This allocates for enough characters even if all chars in the
-	 * argument ahve to be escaped, and all of them have the longest
+	 * argument have to be escaped, and all of them have the longest
 	 * possible escape  - like this we're absolutely sure our escaped
 	 * string will fit. And don't worry, we're going to free the unused
 	 * memory. */
@@ -81,6 +81,7 @@ char *escape_predefined_character_entities(const char *string)
 	free(s);
 
 	size_t new_length = strlen(result) + 1;
+	// TODO: Cygwin's realloc() chokes on this
 	result = realloc(result, new_length);
 
 	return result;
