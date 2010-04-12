@@ -1,3 +1,7 @@
+nw_prune: add test for the case when a parentless node is unlinked (happens if
+that node's parent was previously unlined too). But do this only when the inner
+node case is handled too (loot at nw_prune -h).
+
 new program: nw_stats, prints info about a tree such as number of nodes, type (cladogram, phylogram, ultrametric, etc).
 
 nw_order: how are internal labels handled when sorting alphabetically? For now
