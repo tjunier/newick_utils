@@ -169,6 +169,9 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 					label);
 			continue;
 		}
+		/* parent may have been unlinked already, so let's check */
+		if (NULL == goner->parent)
+			continue;
 		enum unlink_rnode_status result = unlink_rnode(goner);
 		switch(result) {
 		case UNLINK_RNODE_DONE:
