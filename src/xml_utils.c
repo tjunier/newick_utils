@@ -80,9 +80,15 @@ char *escape_predefined_character_entities(const char *string)
 	*result_end = '\0';
 	free(s);
 
-	size_t new_length = strlen(result) + 1;
-	// TODO: Cygwin's realloc() chokes on this
-	result = realloc(result, new_length);
+/* Cygwin's realloc() chokes on this, I'm not sure why. I understand that it is
+ * dangerous to ignore the return value (as the data may have been moved),
+ * but I do update the 'return' pointer to the new value. Oh well, we'll have
+ * go with a little excess memory under Cygwin, unless I find out what's going
+ * on here. */
 
+#ifndef __CYGWIN__
+	size_t new_length = strlen(result) + 1;
+	result = realloc(result, new_length); /* NULL handled by caller */
+#endif
 	return result;
 }
