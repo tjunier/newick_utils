@@ -30,10 +30,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "rnode.h"
 #include "list.h"
 #include "concat.h"
+#include "common.h"
+#include "rnode_iterator.h"
+#include "hash.h"
 
 /* returns the length part of a node, e.g. ":12.345" */
 
@@ -108,4 +112,81 @@ char *to_newick(struct rnode *node)
 	if (NULL == result) return NULL;
 	result = append_to(result, ";");
 	return result;
+}
+
+int dump_newick(struct rnode *node)
+{
+	struct rnode_iterator *it;
+	struct rnode *current;
+	struct hash *seen;
+	char *key;
+
+	it = create_rnode_iterator(node);
+	if (NULL == it) {
+		perror(NULL);
+		return FAILURE;
+	}
+	seen = create_hash(10000);	// TODO: allow to pass hint
+	if (NULL == seen) {
+		perror(NULL);
+		return FAILURE;
+	}
+
+	/* the starting node (root) starts out as 'seen' */
+	key = make_hash_key(node);
+	if (! hash_set(seen, key, node)) {
+		perror(NULL);
+		return FAILURE;
+	}
+	free(key);
+
+	printf("(");
+	while ((current = rnode_iterator_next(it)) != NULL) {
+		// printf ("%s ", current->label);
+		if (is_leaf(current)) {
+			/* leaf: just print label */
+			printf("%s", current->label);
+			if (strcmp("", current->edge_length_as_string) != 0)
+					printf(":%s", current->edge_length_as_string);
+		}
+		else {
+			/* inner node: behaviour depends on whether we've
+			 * already 'seen' this node or not. */
+			key = make_hash_key(current);
+			if (NULL == hash_get(seen, key)) {
+				/* not seen: print '(' */
+				if(! hash_set(seen, key, current)) {
+					perror(NULL);
+					return FAILURE;
+				}
+				printf("(");
+			} else {
+				if (NULL == get_next_unvisited_child(it)) {
+					printf(")%s", current->label);
+					if (strcmp("",
+					current->edge_length_as_string) != 0)
+						printf(":%s", current->edge_length_as_string);
+				}
+				else
+					printf(",");
+			}
+			free(key);
+		}
+		//printf("\n");
+	}
+	printf(";\n");
+
+	/* See why rnode_iterator_next() returned NULL */
+	switch (it->status) {
+		case RNODE_ITERATOR_END:
+			break;	/* Ok */
+		case RNODE_ITERATOR_ERROR:
+			return FAILURE;
+		default:
+			assert(0);	/* programmer error */
+	}
+
+
+	destroy_rnode_iterator(it);
+	return SUCCESS;
 }

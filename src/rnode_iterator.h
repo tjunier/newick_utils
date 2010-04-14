@@ -59,6 +59,10 @@ void destroy_rnode_iterator(struct rnode_iterator *);
 
 struct rnode *rnode_iterator_next(struct rnode_iterator *);
 
+/* Returns the next unvisited child of the current node, or NULL if all the children have been visited. */
+
+struct rnode * get_next_unvisited_child(struct rnode_iterator *iter);
+
 /* TODO: these are client functions, they may belong elsewhere */
 
 /* Returns the list of nodes that descend from the argument node, in parse

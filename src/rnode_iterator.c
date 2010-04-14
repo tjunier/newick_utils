@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const int INIT_HASH_SIZE = 1000;
 
+// TODO: add hash size hint as param
 struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 {
 	struct rnode_iterator *iter;
@@ -80,7 +81,7 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
  * polytomous. For dichotomous trees, the present approach is probably the
  * best. */
 
-static struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
+struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 {
 	struct list_elem *elem;
 

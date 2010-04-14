@@ -78,6 +78,6 @@ struct llist *hash_keys(struct hash *);
 void destroy_hash(struct hash *);
 
 /* Returns a string representation of an address, suitable for use as a hash
- * key. */
+ * key. Allocates storage, use free() when no longer needed. */
 
 char *make_hash_key(void *addr);

@@ -32,7 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct rnode;
 
 /* Returns a Newick representation of the tree. Memory is allocated, don't
- * forget to free() it. */
-/* Returns NULL in case of failure (which will be a memory allocation problem). */
+ * forget to free() it. Returns NULL in case of failure (which will be a memory
+ * allocation problem). WARNING: the current implementation is recursive, and
+ * hence is slow for big trees.  */
 
-char *to_newick(struct rnode* node);
+char *to_newick(struct rnode* root);
+
+/* Dumps the newick rooted at 'root' to stdout. */
+
+void dump_newick(struct rnode* root);
