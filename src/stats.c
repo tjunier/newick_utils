@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 #include "tree.h"
 #include "rnode.h"
-//#include "masprintf.h"
+#include "common.h"
 
 enum stats_output_format {STATS_OUTPUT_LINE, STATS_OUTPUT_COLUMN};
 
@@ -48,6 +48,8 @@ struct tree_properties {
 	int num_nodes;
 	int num_leaves;
 	int num_dichotomies;
+	int num_leaf_labels;
+	int num_inner_labels;
 };
 
 struct parameters {
@@ -114,20 +116,27 @@ static char *type_string(enum tree_type type)
 
 static void print_line(struct tree_properties *props)
 {
-	printf("%s\t%d\t%d\t%d\n",
+	printf("%s\t%d\t%d\t%d\t%d\t%d\n",
 		type_string(props->type),
 		props->num_nodes,
 		props->num_leaves,
-		props->num_dichotomies);
+		props->num_dichotomies,
+		props->num_leaf_labels,
+		props->num_inner_labels
+		);
 }
 
 static void print_column(struct tree_properties *props)
 {
-	printf("Type:\t%s\n#nodes:\t%d\n#leaves:\t%d\n#dichotomies:\t%d\n",
+	printf("Type:\t%s\n#nodes:\t%d\n#leaves:\t%d\n#dichotomies:\t%d\n"
+		"#leaf labels:\t%d\n#inner labels:\t%d\n",
 		type_string(props->type),
 		props->num_nodes,
 		props->num_leaves,
-		props->num_dichotomies);
+		props->num_dichotomies,
+		props->num_leaf_labels,
+		props->num_inner_labels
+		);
 }
 
 static struct parameters get_params(int argc, char *argv[])
@@ -187,17 +196,46 @@ static struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-static int get_num_dichotomies(struct rooted_tree *tree)
+/* Iterate once over all nodes, updating various statistics */
+
+static int get_properties(struct rooted_tree *tree,
+		struct tree_properties *props)
 {
-	int dichotomies = 0;
+	props->num_dichotomies = 0;
+	props->num_leaf_labels = 0;
+	props->num_inner_labels = 0;
+
 	struct list_elem *el;
 	for (el = tree->nodes_in_order->head; NULL != el; el =el->next) {
 		struct rnode *current = (struct rnode *) el->data;
 		int num_kids = current->children->count;
+		/* tests */
 		if (2 == num_kids)
-			dichotomies++;
+			props->num_dichotomies++;
+		if (0 != strcmp("", current->label)) {
+			if (is_leaf(current))
+				props->num_leaf_labels++;
+			if (is_inner_node(current))
+				props->num_inner_labels++;
+		}
 	}
-	return dichotomies;
+	return SUCCESS;
+}
+
+
+static void write_info (struct tree_properties *props)
+{
+	/* for now there is only one output format, but we could add more */
+	// later: switch on the format, or pass output function ptr */
+	printf("Type\t\t#nodes\t#leaves\t#dichot\t#l-lbl\t#i-lbl\n");
+	printf("%s\t%d\t%d\t%d\t%d\t%d\n",
+			type_string(props->type),
+			props->num_nodes,
+			props->num_leaves,
+			props->num_dichotomies,
+			props->num_leaf_labels,
+			props->num_inner_labels
+			);
 }
 
 static void process_tree(struct rooted_tree *tree,
@@ -208,8 +246,10 @@ static void process_tree(struct rooted_tree *tree,
 	props.type = get_tree_type(tree);
 	props.num_nodes = tree->nodes_in_order->count;
 	props.num_leaves = leaf_count(tree);
-	props.num_dichotomies = get_num_dichotomies(tree);
-
+	if (! get_properties(tree, &props)) {
+		perror("Could not get tree properties");
+		exit(EXIT_FAILURE);
+	}
 	output_function(&props);
 }
 
