@@ -5,6 +5,7 @@
 #include "tree.h"
 #include "parser.h"
 #include "to_newick.h"
+#include "rnode_iterator.h"
 
 void get_params(int argc, char *argv[])
 {
@@ -32,7 +33,8 @@ int main(int argc, char *argv[])
 	get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		dump_newick(tree->root);
+		//dump_newick(tree->root);
+		struct llist *nodes_in_order = get_nodes_in_order(tree->root);
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
 	

@@ -359,8 +359,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		default:
 			assert(0);
 		}
-		free_descendants(tree->root);
-		free(tree);
+		destroy_tree_cb(tree, NULL);
 	} else {
 		enum deroot_status result = deroot(tree);
 		switch (result) {

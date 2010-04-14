@@ -69,6 +69,10 @@ struct rnode {
 	struct llist *children;
 	char *label;
 	void *data;	/* app-dependent data for this node */
+	/* enables traversing by iterators. (intentionally an int rather than a
+	 * bool, because if we allow many values we don't need to iterate again
+	 * to reset everything to 0 */
+	int seen;
 };
 
 /* allocates a rnode and returns a pointer to it, or exits. If 'label' is NULL

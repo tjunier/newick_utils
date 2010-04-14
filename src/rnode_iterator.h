@@ -39,7 +39,6 @@ struct rnode_iterator
 {
 	struct rnode *root;	/* starting point */
 	struct rnode *current;
-	struct hash *seen;
 	enum iter_status status;
 };
 

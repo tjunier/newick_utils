@@ -28,6 +28,11 @@ int test_create_rnode()
 		printf ("%s: parent should be NULL.\n", test_name);
 		return 1;
 	}
+	if (0 != nodep->seen) {
+		printf("%s: 'seen' should be 0 (got %d)\n", test_name,
+				nodep->seen);
+		return 1;
+	}
 	printf("%s ok.\n", test_name);
 	return 0;
 }

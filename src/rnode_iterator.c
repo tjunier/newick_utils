@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const int INIT_HASH_SIZE = 1000;
 
-// TODO: add hash size hint as param
 struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 {
 	struct rnode_iterator *iter;
@@ -49,8 +48,6 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 	if (NULL == iter) return NULL;
 
 	iter->root = iter->current = root;
-	iter->seen = create_hash(INIT_HASH_SIZE);
-	if (NULL == iter->seen) return NULL;
 	iter->status = RNODE_ITERATOR_INIT;
 
 	return iter;
@@ -58,7 +55,6 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 
 void destroy_rnode_iterator (struct rnode_iterator *it)
 {
-	destroy_hash(it->seen);
 	free(it);
 }
 
@@ -88,12 +84,8 @@ struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 	for (elem = iter->current->children->head; NULL != elem;
 			elem = elem->next) {
 		struct rnode *child = elem->data;
-		char *node_hash_key = make_hash_key(child);
-		if (NULL == hash_get(iter->seen, node_hash_key)) {
-			free(node_hash_key);
+		if (0 == child->seen)
 			return child;
-		}
-		free(node_hash_key);
 	}
 	return NULL;	/* no unvisited child left */
 }
@@ -107,27 +99,17 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	 * in the target tree). The single node is in this case both a leaf (no
 	 * children) and the root (no parent). Hence the double test below. */
 	if (is_leaf(iter->current) && ! is_root(iter->current)) {
-		if (! hash_set(iter->seen, current_node_hash_key, SEEN)) {
-			iter->status = RNODE_ITERATOR_ERROR;
-			return NULL;
-		}
+		iter->current->seen = 1;	 /* mark as seen */
 		iter->current = iter->current->parent;
-		free(current_node_hash_key);
 		return iter->current;
 	} else {
 		struct rnode *next_child = get_next_unvisited_child(iter);
 		if (NULL != next_child) {
 			/* proceed to next child */
 			iter->current = next_child;
-			free(current_node_hash_key);
 			return iter->current;
 		} else {
-			if (! hash_set(iter->seen, current_node_hash_key,
-						SEEN)) {
-				iter->status = RNODE_ITERATOR_ERROR;
-				return NULL;
-			}
-			free(current_node_hash_key);
+			iter->current->seen = 1;	 /* mark as seen */
 			if (iter->current == iter->root) {
 				iter->status = RNODE_ITERATOR_END;
 				return NULL;
@@ -180,21 +162,21 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	destroy_llist(traversal);
 
 	/* This keeps only the first 'visit' through any node */
-	// TODO: can't this be done in the first traversal, above?
+	// TODO: can't this be done in the first traversal, above? - No, it
+	// can't, else we'd keep only the first instance of each node, while we
+	// want the last one.
 	struct list_elem *el;
 	for (el = reverse_traversal->head; NULL != el; el = el->next) {
 		current = el->data;
-		current_hash_key = make_hash_key(current);
-		if (NULL == hash_get(seen, current_hash_key)) {
+		/* Nodes will have been seen by the iterator above, hence they
+		 * start with a 'seen' value of 1. */
+		if (current->seen == 1) {
 			/* Not seen yet? add to list, and mark as seen (hash) */
 			if (! append_element
 					(nodes_in_reverse_order, current))
 				return NULL;
-			/* Could use anything - existential hash */
-			if (! hash_set(seen, current_hash_key, current))
-				return NULL;
+			current->seen = 2;
 		}
-		free(current_hash_key);
 	}
 
 	destroy_llist(reverse_traversal);
@@ -203,6 +185,11 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	destroy_llist(nodes_in_reverse_order);
 	destroy_hash(seen);
 
+	/* remove the 'seen' marks */
+	for (el = nodes_in_order->head; NULL != el; el = el->next) {
+		current = el->data;
+		current->seen = 0;
+	}
 	return nodes_in_order;
 }
 

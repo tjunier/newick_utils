@@ -89,11 +89,12 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	}
 
 	tree->root = new_root;
-	/* TODO: The tree's structure was changed, so 'nodes_in_order' is now
-	 * invalid. when get_nodes_in_order() is fixed, we shall use it here.
-	 * For now we annull it so it cannot be used. */
         destroy_llist(tree->nodes_in_order);
-	tree->nodes_in_order = NULL;
+	tree->nodes_in_order = get_nodes_in_order(tree->root);
+	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
+		struct rnode *node = elem->data;
+		node->seen = 0;
+	}
 
 	return SUCCESS;
 }
