@@ -33,6 +33,11 @@ int test_create_rnode()
 				nodep->seen);
 		return 1;
 	}
+	if (NULL != nodep->current_child_elem) {
+		printf("%s: 'current_child_elem' should be NULL (got %p)\n", test_name,
+				nodep->current_child_elem);
+		return 1;
+	}
 	printf("%s ok.\n", test_name);
 	return 0;
 }

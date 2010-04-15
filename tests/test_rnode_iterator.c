@@ -429,6 +429,87 @@ int test_get_leaf_label_map()
 	return 0;
 }
 
+int test_reset_current_child_elem()
+{
+	const char *test_name = "test_current_child_elem";
+
+	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
+	struct rooted_tree tree = tree_3();
+	struct hash *nodemap = create_label2node_map(tree.nodes_in_order);
+	struct rnode *node_i = hash_get(nodemap, "i");
+	struct rnode *node_f = hash_get(nodemap, "f");
+	struct rnode *node_A = hash_get(nodemap, "A");
+	struct rnode *node_B = hash_get(nodemap, "B");
+	struct rnode *node_h = hash_get(nodemap, "h");
+	struct rnode *node_C = hash_get(nodemap, "C");
+	struct rnode *node_g = hash_get(nodemap, "g");
+	struct rnode *node_D = hash_get(nodemap, "D");
+	struct rnode *node_E = hash_get(nodemap, "E");
+
+
+
+	// Now, we reset:
+	reset_current_child_elem(&tree);
+
+	if (node_i->current_child_elem != NULL) { 
+		printf ("%s: reset_current_child_elem should"
+			" have reset current_child_elem to NULL, "
+			" got %d.\n", test_name, node_i->current_child_elem);
+		return 1;
+	}
+	if (node_f->current_child_elem != NULL) { 
+		printf ("%s: reset_current_child_elem should"
+			" have reset current_child_elem to NULL, "
+			" got %d.\n", test_name, node_f->current_child_elem);
+		return 1;
+	}
+	if (node_A->current_child_elem != NULL) { 
+		printf ("%s: reset_current_child_elem should"
+			" have reset current_child_elem to NULL, "
+			" got %d.\n", test_name, node_A->current_child_elem);
+		return 1;
+	}
+	if (node_B->current_child_elem != NULL) { 
+		printf ("%s: reset_current_child_elem should"
+			" have reset current_child_elem to NULL, "
+			" got %d.\n", test_name, node_B->current_child_elem);
+		return 1;
+	}
+	if (node_h->current_child_elem != NULL) { 
+		printf ("%s: reset_current_child_elem should"
+			" have reset current_child_elem to NULL, "
+			" got %d.\n", test_name, node_h->current_child_elem);
+		return 1;
+	}
+	if (node_C->current_child_elem != NULL) { 
+		printf ("%s: reset_current_child_elem should"
+			" have reset current_child_elem to NULL, "
+			" got %d.\n", test_name, node_C->current_child_elem);
+		return 1;
+	}
+	if (node_g->current_child_elem != NULL) { 
+		printf ("%s: reset_current_child_elem should"
+			" have reset current_child_elem to NULL, "
+			" got %d.\n", test_name, node_g->current_child_elem);
+		return 1;
+	}
+	if (node_D->current_child_elem != NULL) { 
+		printf ("%s: reset_current_child_elem should"
+			" have reset current_child_elem to NULL, "
+			" got %d.\n", test_name, node_D->current_child_elem);
+		return 1;
+	}
+	if (node_E->current_child_elem != NULL) { 
+		printf ("%s: reset_current_child_elem should"
+			" have reset current_child_elem to NULL, "
+			" got %d.\n", test_name, node_E->current_child_elem);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -439,6 +520,7 @@ int main()
 	failures += test_get_nodes_in_order();
 	failures += test_get_nodes_in_order_linear();
 	failures += test_get_nodes_in_order_part_linear();
+	failures += test_reset_current_child_elem();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

@@ -1,10 +1,12 @@
 /* A program for exploring ideas */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "tree.h"
 #include "parser.h"
 #include "to_newick.h"
+#include "rnode.h"
 #include "rnode_iterator.h"
 
 void get_params(int argc, char *argv[])
@@ -33,6 +35,13 @@ int main(int argc, char *argv[])
 	get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
+		/*
+		struct rnode_iterator *it = create_rnode_iterator(tree->root);
+		struct rnode *current;
+		while ((current = rnode_iterator_next(it)) != NULL) {
+			printf ("%s\n", current->label);
+		}
+		*/
 		//dump_newick(tree->root);
 		struct llist *nodes_in_order = get_nodes_in_order(tree->root);
 		destroy_tree(tree, FREE_NODE_DATA);

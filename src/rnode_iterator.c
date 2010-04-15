@@ -36,17 +36,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hash.h"
 #include "list.h"
 #include "rnode.h"
+#include "tree.h"
 
-#define SEEN "SEEN"	// TODO: probably obsolete
+/* The functions in this module provide an iterator interface on a node and its
+ * descendents, allowing traversal. The low-level rnode_iterator and functions
+ * that call it directly (such as rnode_iterator_next()) visit the tree by
+ * following edges (depth first, and visiting each child node in order). All
+ * nodes except leaves are thus visited more than once. Higher-level functions
+ * (like get_nodes_in_order()) can discard already-visited nodes and produce
+ * e.g. post-order traversals, etc. */
+
+/* In general, there is no need to use these functions because most operations
+ * can be done using a tree's 'nodes_in_order' list. Looping on this list will
+ * be faster than iterating on a subtree. But there are exceptions:
+
+ o the 'nodes_in_order' list may be outdated (e.g. because nodes were inserted,
+   deleted, etc) - in that case, the list should be reconstructed with
+   get_nodes_in_order(), which uses the rnode iterator.
+ 
+ o the 'nodes_in_order' list may not contain all the needed information (this
+   is the case when outputting Newick).
+
+ */
 
 /* NOTE: functions in this module now rely on the 'seen' member of struct
  * rnode. The former approach, namely to 'remember' visited nodes with hash
  * tables, proved too slow. It is implicitly assumed that the 'seen' member of
- * each node in the tree is zero before the functions are called. */
+ * each node in the tree is zero before the functions are called. You can use
+ * the convenience function reset_seen() for this. */
 
-// TODO: ensure that 'seen' is zero everywhere before returning */
+/* Another possible imlementation would be to use a stack of nodes to visit,
+ * and processing the top node until the statck is empty. Processing would mean
+ * pushing all the node's children, then removing the node. But I'm not sure it
+ * would be faster than using 'seen' flags. */
 
 static const int INIT_HASH_SIZE = 1000;
+
+/* see note above about the 'seen' member of struct rnode */
 
 struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 {
@@ -68,22 +94,6 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
 /* Returns the current node's next un-visited child, or NULL if there is none.
  * Will return NULL if node has no children. */
 
-/* TODO: currently, this function "remembers" visited nodes (in the iter->seen
- * hash). At every call, it traverses the current node's children list until if
- * finds at child it has not seen. This takes O(n) time, for n children. Since
- * this function will be called once per child, the result is O(n²). This could
- * be improved by "remembering" the last list_elem visited in the children
- * list. Since this has a pointer to the next element, getting the next
- * unvisited child takes constant time. There just needs to be a stack of
- * "remembered" list_elem structures in struct rnode_iterator (instead of the
- * hash, which has the added benefit of using up less space). When going down
- * to a child, the current list_elem is pushed on the stack, and it is popped
- * out of it when going back up. */
-
-/* Note however that this will only make a difference for trees that are
- * polytomous. For dichotomous trees, the present approach is probably the
- * best. */
-
 struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 {
 	struct list_elem *elem;
@@ -99,44 +109,52 @@ struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
 
 struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 {
-	char *current_node_hash_key = make_hash_key(iter->current);
-
 	/* We have to consider the case of a single-node tree (this happens
 	 * e.g. in nw_match if none of the labels in the pattern tree is found
 	 * in the target tree). The single node is in this case both a leaf (no
 	 * children) and the root (no parent). Hence the double test below. */
 	if (is_leaf(iter->current) && ! is_root(iter->current)) {
-		iter->current->seen = 1;	 /* mark as seen */
 		iter->current = iter->current->parent;
 		return iter->current;
-	} else {
-		struct rnode *next_child = get_next_unvisited_child(iter);
-		if (NULL != next_child) {
-			/* proceed to next child */
-			iter->current = next_child;
-			return iter->current;
+	}
+
+	// TODO: this case may in fact be handled by the next one.
+	if (is_leaf(iter->current)) {
+		iter->current = iter->current->parent;
+		return iter->current;
+	}
+
+	if (iter->current->current_child_elem
+	    == iter->current->children->tail) {
+		if (iter->root == iter->current) {
+			iter->status = RNODE_ITERATOR_END;
+			return NULL;
 		} else {
-			iter->current->seen = 1;	 /* mark as seen */
-			if (iter->current == iter->root) {
-				iter->status = RNODE_ITERATOR_END;
-				return NULL;
-			} else {
-				iter->current = iter->current->parent;
-				return iter->current;
-			}
+			iter->current = iter->current->parent;
+			return iter->current;
 		}
 	}
+
+	if (NULL == iter->current->current_child_elem) 
+		iter->current->current_child_elem =
+			iter->current->children->head;
+	else
+		iter->current->current_child_elem =
+			iter->current->current_child_elem->next;
+
+	struct rnode *next = iter->current->current_child_elem->data;
+	iter->current = next;
+	return next;
 }
 
 /* Computes the list by doing a tree traversal, then reversing it, printing out
  * each node the first time it sees it. */
+/* see note above about the 'seen' member of struct rnode */
 
 struct llist *get_nodes_in_order(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);
 	if (NULL == it) return NULL;
-	struct hash *seen = create_hash(INIT_HASH_SIZE);
-	if (NULL == seen) return NULL;
 	struct rnode *current;
 	struct llist *traversal = create_llist();
 	if (NULL == traversal) return NULL;
@@ -144,14 +162,14 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	struct llist *nodes_in_reverse_order = create_llist();
 	if (NULL == nodes_in_reverse_order) return NULL;
 	struct llist *nodes_in_order;
-	char *current_hash_key;
 
 	/* Iterates over the whole tree - note that a node is visited more than
 	 * once, except leaves. */
 	while ((current = rnode_iterator_next(it)) != NULL) {
+		current->seen = 0;
 		if (! append_element (traversal, current)) return NULL;
 	}
-	/* rnode_iterator_next() returned NULL: see why */
+	/* rnode_iterator_next() returned NULL: see why */ // TODO: obsolete
 	switch (it->status) {
 		case RNODE_ITERATOR_END:
 			break;	/* Ok */
@@ -169,20 +187,17 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	destroy_llist(traversal);
 
 	/* This keeps only the first 'visit' through any node */
-	// TODO: can't this be done in the first traversal, above? - No, it
-	// can't, else we'd keep only the first instance of each node, while we
-	// want the last one.
 	struct list_elem *el;
 	for (el = reverse_traversal->head; NULL != el; el = el->next) {
 		current = el->data;
 		/* Nodes will have been seen by the iterator above, hence they
 		 * start with a 'seen' value of 1. */
-		if (current->seen == 1) {
+		if (current->seen == 0) {
 			/* Not seen yet? add to list, and mark as seen (hash) */
 			if (! append_element
 					(nodes_in_reverse_order, current))
 				return NULL;
-			current->seen = 2;
+			current->seen = 1;
 		}
 	}
 
@@ -190,7 +205,6 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	nodes_in_order = llist_reverse(nodes_in_reverse_order);
 	if (NULL == nodes_in_order) return NULL;
 	destroy_llist(nodes_in_reverse_order);
-	destroy_hash(seen);
 
 	/* remove the 'seen' marks */
 	for (el = nodes_in_order->head; NULL != el; el = el->next) {
@@ -199,6 +213,11 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	}
 	return nodes_in_order;
 }
+
+/* Returns a label->node map of (labeled) leaves */
+/* Nodes' 'seen' member must be zero - see note above about the 'seen' member of struct rnode */
+// TODO: this function should use the tree's nodes_in_order list. If invalid or
+// NULL, it should be computed by calling get_nodes_in_order() on the root. 
 
 struct hash *get_leaf_label_map(struct rnode *root)
 {
@@ -230,4 +249,14 @@ struct hash *get_leaf_label_map(struct rnode *root)
 	destroy_rnode_iterator(it);
 
 	return result;
+}
+
+void reset_current_child_elem(struct rooted_tree *tree)
+{
+	struct list_elem *el;
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+		current->current_child_elem = NULL;
+	}
 }

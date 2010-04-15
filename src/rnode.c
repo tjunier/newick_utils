@@ -63,6 +63,7 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	 * length_as_string, which will be an empty string ("") if the length
 	 * is not defined (as in cladograms). */
 	node_p->edge_length = -1;
+	node_p->current_child_elem = NULL;
 	node_p->seen = 0;
 
 #ifdef SHOW_RNODE_CREATE

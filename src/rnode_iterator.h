@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode;
 struct llist;
+struct rooted_tree;
+
 enum iter_status { RNODE_ITERATOR_INIT, RNODE_ITERATOR_END,
 	RNODE_ITERATOR_ERROR };
 
@@ -39,6 +41,7 @@ struct rnode_iterator
 {
 	struct rnode *root;	/* starting point */
 	struct rnode *current;
+	// TODO: probably obsolete due to iterator no longer allocating a hash, etc.
 	enum iter_status status;
 };
 
@@ -75,3 +78,7 @@ struct llist *get_nodes_in_order(struct rnode *);
 /* Returns NULL in case of malloc() problems. */
 
 struct hash *get_leaf_label_map(struct rnode *root);
+
+/* Resets all 'current_child_elem' pointers in 'tree's nodes to NULL. */
+
+void reset_current_child_elem (struct rooted_tree *tree);

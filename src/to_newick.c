@@ -142,7 +142,7 @@ int dump_newick(struct rnode *node)
 
 	printf("(");
 	while ((current = rnode_iterator_next(it)) != NULL) {
-		// printf ("%s ", current->label);
+		// fprintf (stderr, "%s: seen: %d\n", current->label, current->seen);
 		if (is_leaf(current)) {
 			/* leaf: just print label */
 			printf("%s", current->label);
