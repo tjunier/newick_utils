@@ -447,15 +447,15 @@ int test_reset_current_child_elem()
 	struct rnode *node_E = hash_get(nodemap, "E");
 
 	/* Set the value to non-NULL (it is set to NULL on node creation) */
-	node_i->current_child_elem = 1;
-	node_f->current_child_elem = 1;
-	node_A->current_child_elem = 1;
-	node_B->current_child_elem = 1;
-	node_h->current_child_elem = 1;
-	node_C->current_child_elem = 1;
-	node_g->current_child_elem = 1;
-	node_D->current_child_elem = 1;
-	node_E->current_child_elem = 1;
+	node_i->current_child_elem = (void *) 1;
+	node_f->current_child_elem = (void *) 1;
+	node_A->current_child_elem = (void *) 1;
+	node_B->current_child_elem = (void *) 1;
+	node_h->current_child_elem = (void *) 1;
+	node_C->current_child_elem = (void *) 1;
+	node_g->current_child_elem = (void *) 1;
+	node_D->current_child_elem = (void *) 1;
+	node_E->current_child_elem = (void *) 1;
 
 	// Now, we reset:
 	reset_current_child_elem(&tree);
@@ -463,55 +463,55 @@ int test_reset_current_child_elem()
 	if (node_i->current_child_elem != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %d.\n", test_name, node_i->current_child_elem);
+			" got %p.\n", test_name, node_i->current_child_elem);
 		return 1;
 	}
 	if (node_f->current_child_elem != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %d.\n", test_name, node_f->current_child_elem);
+			" got %p.\n", test_name, node_f->current_child_elem);
 		return 1;
 	}
 	if (node_A->current_child_elem != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %d.\n", test_name, node_A->current_child_elem);
+			" got %p.\n", test_name, node_A->current_child_elem);
 		return 1;
 	}
 	if (node_B->current_child_elem != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %d.\n", test_name, node_B->current_child_elem);
+			" got %p.\n", test_name, node_B->current_child_elem);
 		return 1;
 	}
 	if (node_h->current_child_elem != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %d.\n", test_name, node_h->current_child_elem);
+			" got %p.\n", test_name, node_h->current_child_elem);
 		return 1;
 	}
 	if (node_C->current_child_elem != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %d.\n", test_name, node_C->current_child_elem);
+			" got %p.\n", test_name, node_C->current_child_elem);
 		return 1;
 	}
 	if (node_g->current_child_elem != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %d.\n", test_name, node_g->current_child_elem);
+			" got %p.\n", test_name, node_g->current_child_elem);
 		return 1;
 	}
 	if (node_D->current_child_elem != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %d.\n", test_name, node_D->current_child_elem);
+			" got %p.\n", test_name, node_D->current_child_elem);
 		return 1;
 	}
 	if (node_E->current_child_elem != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %d.\n", test_name, node_E->current_child_elem);
+			" got %p.\n", test_name, node_E->current_child_elem);
 		return 1;
 	}
 

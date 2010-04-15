@@ -238,16 +238,16 @@ void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 			}
 		}
 	}
+
+	destroy_llist(target_tree->nodes_in_order);
+	target_tree->nodes_in_order = get_nodes_in_order(target_tree->root);
+	reset_current_child_elem(target_tree);
 }
 
 void prune_empty_labels(struct rooted_tree *target_tree)
 {
-	/* I'm getting the lilst of nodes dynamically, because the tree has
-	 * been altered. */
-	struct llist *nodes_in_order = get_nodes_in_order(target_tree->root);
-	if (NULL == nodes_in_order) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *el;
-	for (el=nodes_in_order->head; NULL != el; el=el->next) {
+	for (el=target_tree->nodes_in_order->head; NULL != el; el=el->next) {
 		struct rnode *current = el->data;
 		char *label = current->label;
 		if (is_leaf(current)) {
@@ -272,7 +272,6 @@ void prune_empty_labels(struct rooted_tree *target_tree)
 			}
 		}
 	}
-	destroy_llist(nodes_in_order);
 }
 
 void remove_branch_lengths(struct rooted_tree *target_tree)
@@ -319,12 +318,14 @@ void remove_knee_nodes(struct rooted_tree *tree)
 void process_tree(struct rooted_tree *tree, struct hash *pattern_labels,
 		char *pattern_newick, struct parameters params)
 {
-	// show_node_children_numbers(tree);
+	/* NOTE: whenever I alter the tree structure, I rebuild nodes_in_order
+	 * as soon as possible. Then I no longer need to guard against this
+	 * list being invalid. WARNING: I did this just enough to make all
+	 * tests pass, NOT systemytically after each tree-function call. It may
+	 * be necessary to do it more thoroughly later on. */
 	char *original_newick = to_newick(tree->root);
 	remove_inner_node_labels(tree);
 	prune_extra_labels(tree, pattern_labels);
-	/* NOTE prune_extra_labels() has altered topology! tree->nodes_in_order
-	 * is now invalid. */
 	prune_empty_labels(tree);
 	remove_knee_nodes(tree);
 	remove_branch_lengths(tree);	

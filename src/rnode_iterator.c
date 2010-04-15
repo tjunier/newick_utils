@@ -81,7 +81,6 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 	if (NULL == iter) return NULL;
 
 	iter->root = iter->current = root;
-	iter->status = RNODE_ITERATOR_INIT;
 
 	return iter;
 }
@@ -122,7 +121,6 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	if (iter->current->current_child_elem
 	    == iter->current->children->tail) {
 		if (iter->root == iter->current) {
-			iter->status = RNODE_ITERATOR_END;
 			return NULL;
 		} else {
 			iter->current = iter->current->parent;
@@ -163,16 +161,6 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	while ((current = rnode_iterator_next(it)) != NULL) {
 		current->seen = 0;
 		if (! append_element (traversal, current)) return NULL;
-	}
-	/* rnode_iterator_next() returned NULL: see why */ // TODO: obsolete
-	switch (it->status) {
-		case RNODE_ITERATOR_END:
-			break;	/* Ok */
-		case RNODE_ITERATOR_ERROR:
-			return NULL;
-		case RNODE_ITERATOR_INIT: /* should now be end or error */
-		default:
-			assert(0);	/* programmer error */
 	}
 
 	destroy_rnode_iterator(it);
@@ -230,15 +218,6 @@ struct hash *get_leaf_label_map(struct rnode *root)
 						return NULL;
 			}
 		}
-	}
-	/* See why rnode_iterator_next() returned NULL */
-	switch (it->status) {
-		case RNODE_ITERATOR_END:
-			break;	/* Ok */
-		case RNODE_ITERATOR_ERROR:
-			return NULL;
-		default:
-			assert(0);	/* programmer error */
 	}
 
 	destroy_rnode_iterator(it);

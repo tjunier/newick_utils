@@ -119,6 +119,9 @@ void dump_rnode(void *arg)
 }
 
 /* If something fails, we just return. */
+// TODO: consider just computing the nodes_in_order list and free()ing as
+// usual; if not possible then add as an example (in rnode_iterator.[ch]) of
+// when this is not possible
 void free_descendants(struct rnode *node)
 {
 	const int HASH_SIZE = 1000; 	/* pretty arbitrary */
@@ -136,15 +139,6 @@ void free_descendants(struct rnode *node)
 			if (! hash_set(to_free, node_hash_key, current))
 				return; 
                 free(node_hash_key);
-	}
-	/* rnode_iterator_next() returned NULL: see why */
-	switch (it->status) {
-		case RNODE_ITERATOR_END:
-			break;	/* Ok */
-		case RNODE_ITERATOR_ERROR:
-			return;
-		default:
-			assert(0);	/* programmer error */
 	}
 
 	// Frees all nodes "seen" above - which must be all the descendants of

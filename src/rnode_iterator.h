@@ -55,15 +55,10 @@ struct rnode;
 struct llist;
 struct rooted_tree;
 
-enum iter_status { RNODE_ITERATOR_INIT, RNODE_ITERATOR_END,
-	RNODE_ITERATOR_ERROR };
-
 struct rnode_iterator
 {
 	struct rnode *root;	/* starting point */
 	struct rnode *current;
-	// TODO: probably obsolete due to iterator no longer allocating a hash, etc.
-	enum iter_status status;
 };
 
 
