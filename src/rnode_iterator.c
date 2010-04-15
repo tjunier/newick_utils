@@ -37,7 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 #include "rnode.h"
 
-#define SEEN "SEEN"
+#define SEEN "SEEN"	// TODO: probably obsolete
+
+/* NOTE: functions in this module now rely on the 'seen' member of struct
+ * rnode. The former approach, namely to 'remember' visited nodes with hash
+ * tables, proved too slow. It is implicitly assumed that the 'seen' member of
+ * each node in the tree is zero before the functions are called. */
+
+// TODO: ensure that 'seen' is zero everywhere before returning */
 
 static const int INIT_HASH_SIZE = 1000;
 
