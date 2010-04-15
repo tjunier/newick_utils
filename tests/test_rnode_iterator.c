@@ -446,7 +446,16 @@ int test_reset_current_child_elem()
 	struct rnode *node_D = hash_get(nodemap, "D");
 	struct rnode *node_E = hash_get(nodemap, "E");
 
-
+	/* Set the value to non-NULL (it is set to NULL on node creation) */
+	node_i->current_child_elem = 1;
+	node_f->current_child_elem = 1;
+	node_A->current_child_elem = 1;
+	node_B->current_child_elem = 1;
+	node_h->current_child_elem = 1;
+	node_C->current_child_elem = 1;
+	node_g->current_child_elem = 1;
+	node_D->current_child_elem = 1;
+	node_E->current_child_elem = 1;
 
 	// Now, we reset:
 	reset_current_child_elem(&tree);

@@ -42,8 +42,10 @@ int main(int argc, char *argv[])
 			printf ("%s\n", current->label);
 		}
 		*/
-		//dump_newick(tree->root);
+		dump_newick(tree->root);
+		/*
 		struct llist *nodes_in_order = get_nodes_in_order(tree->root);
+		*/
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
 	

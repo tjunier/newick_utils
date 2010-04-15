@@ -91,20 +91,15 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
 	free(it);
 }
 
-/* Returns the current node's next un-visited child, or NULL if there is none.
- * Will return NULL if node has no children. */
+/* Returns true IFF there are more children to visit on the current node. */
 
-struct rnode * get_next_unvisited_child(struct rnode_iterator *iter)
+bool more_children_to_visit (struct rnode_iterator *iter)
 {
-	struct list_elem *elem;
-
-	for (elem = iter->current->children->head; NULL != elem;
-			elem = elem->next) {
-		struct rnode *child = elem->data;
-		if (0 == child->seen)
-			return child;
-	}
-	return NULL;	/* no unvisited child left */
+	if  (iter->current->current_child_elem
+	    != iter->current->children->tail) 
+		return true;
+	else
+		return false;
 }
 
 struct rnode *rnode_iterator_next(struct rnode_iterator *iter)

@@ -118,31 +118,18 @@ int dump_newick(struct rnode *node)
 {
 	struct rnode_iterator *it;
 	struct rnode *current;
-	struct hash *seen;
-	char *key;
 
 	it = create_rnode_iterator(node);
 	if (NULL == it) {
 		perror(NULL);
 		return FAILURE;
 	}
-	seen = create_hash(10000);	// TODO: allow to pass hint
-	if (NULL == seen) {
-		perror(NULL);
-		return FAILURE;
-	}
-
-	/* the starting node (root) starts out as 'seen' */
-	key = make_hash_key(node);
-	if (! hash_set(seen, key, node)) {
-		perror(NULL);
-		return FAILURE;
-	}
-	free(key);
+	
+	it->root->seen = 1;
 
 	printf("(");
 	while ((current = rnode_iterator_next(it)) != NULL) {
-		// fprintf (stderr, "%s: seen: %d\n", current->label, current->seen);
+		 //fprintf (stderr, "%s: seen: %d\n", current->label, current->seen);
 		if (is_leaf(current)) {
 			/* leaf: just print label */
 			printf("%s", current->label);
@@ -152,40 +139,24 @@ int dump_newick(struct rnode *node)
 		else {
 			/* inner node: behaviour depends on whether we've
 			 * already 'seen' this node or not. */
-			key = make_hash_key(current);
-			if (NULL == hash_get(seen, key)) {
+			if (0 == current->seen) {
 				/* not seen: print '(' */
-				if(! hash_set(seen, key, current)) {
-					perror(NULL);
-					return FAILURE;
-				}
+				current->seen = 1;
 				printf("(");
 			} else {
-				if (NULL == get_next_unvisited_child(it)) {
+				if (more_children_to_visit(it)) {
+					printf(",");
+				}
+				else {
 					printf(")%s", current->label);
 					if (strcmp("",
 					current->edge_length_as_string) != 0)
 						printf(":%s", current->edge_length_as_string);
 				}
-				else
-					printf(",");
 			}
-			free(key);
 		}
-		//printf("\n");
 	}
 	printf(";\n");
-
-	/* See why rnode_iterator_next() returned NULL */
-	switch (it->status) {
-		case RNODE_ITERATOR_END:
-			break;	/* Ok */
-		case RNODE_ITERATOR_ERROR:
-			return FAILURE;
-		default:
-			assert(0);	/* programmer error */
-	}
-
 
 	destroy_rnode_iterator(it);
 	return SUCCESS;

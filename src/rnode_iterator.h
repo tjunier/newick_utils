@@ -27,8 +27,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-/* functions for iterating over a rnode hierarchy given its root, and utility
- * functions that depend on those */
+
+/* The functions in this module provide an iterator interface on a node and its
+ * descendents, allowing traversal. The low-level rnode_iterator and functions
+ * that call it directly (such as rnode_iterator_next()) visit the tree by
+ * following edges (depth first, and visiting each child node in order). All
+ * nodes except leaves are thus visited more than once. Higher-level functions
+ * (like get_nodes_in_order()) can discard already-visited nodes and produce
+ * e.g. post-order traversals, etc. */
+
+/* In general, there is no need to use these functions because most operations
+ * can be done using a tree's 'nodes_in_order' list. Looping on this list will
+ * be faster than iterating on a subtree. But there are exceptions:
+
+ o the 'nodes_in_order' list may be outdated (e.g. because nodes were inserted,
+   deleted, etc) - in that case, the list should be reconstructed with
+   get_nodes_in_order(), which uses the rnode iterator.
+ 
+ o the 'nodes_in_order' list may not contain all the needed information (this
+   is the case when outputting Newick).
+
+ */
+
+#include <stdbool.h>
 
 struct rnode;
 struct llist;
@@ -61,9 +82,9 @@ void destroy_rnode_iterator(struct rnode_iterator *);
 
 struct rnode *rnode_iterator_next(struct rnode_iterator *);
 
-/* Returns the next unvisited child of the current node, or NULL if all the children have been visited. */
+/* Returns true IFF there are more children to visit on the current node. */
 
-struct rnode * get_next_unvisited_child(struct rnode_iterator *iter);
+bool more_children_to_visit (struct rnode_iterator *);
 
 /* TODO: these are client functions, they may belong elsewhere */
 
