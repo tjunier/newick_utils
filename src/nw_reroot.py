@@ -19,7 +19,7 @@ def main():
 	for tree in Tree.parse_newick_input(filename):
 		outgroup = tree.get_node_with_label(label)
 		tree.reroot(outgroup)
-		print tree.to_newick()
+		tree.dump_newick()
 
 if __name__ == "__main__":
 	main()

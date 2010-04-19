@@ -94,6 +94,9 @@ void help(char* argv[])
 "drawn with leaves aligned. Otherwise, the tree is assumed to be a\n"
 "phylogram: branch lengths are honored and a scale bar is drawn.\n"
 "\n"
+"SVG trees can be converted to other graphics formats with converters\n"
+"such as Inkscape (e.g. to PDF) or ImageMagick (e.g. to PNG or JPEG).\n"
+"\n"
 "Options\n"
 "-------\n"
 "\n"
@@ -191,11 +194,18 @@ void help(char* argv[])
 "# display tree as SVG, using a color map\n"
 "$ %s -s -c data/color.map data/catarrhini\n"
 "\n"
+"# ditto, convert to other graphics formats\n"
+"$ %s -s -c data/color.map data/catarrhini > catarrhini.svg\n"
+"$ convert catarrhini.svg catarrhini.png	# PNG, with ImageMagick\n"
+"$ convert catarrhini.svg catarrhini.jpeg	# JPEG, with ImageMagick\n"
+"$ inkscape -z -f catarrhini.svg -A catarrhini.pdf # PDF, with Inkscape\n" 
+"\n"
 "# the same; no branch lengths\n"
 "$ %s -s -b 'visibility:hidden' -c data/color.map data/catarrhini\n"
 "\n"
 "# radial tree, leaf labels in italics\n"
 "$ %s -s -r -l 'font-style:italics' data/catarrhini\n",
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],

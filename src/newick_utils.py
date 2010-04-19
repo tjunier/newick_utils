@@ -108,6 +108,8 @@ libnw.parse_tree.restype = POINTER(rooted_tree)
 
 libnw.to_newick.argtypes = [POINTER(rnode)]
 libnw.to_newick.restype = c_char_p
+libnw.dump_newick.argtypes = [POINTER(rnode)]
+libnw.dump_newick.restype = None
 
 libnw.is_leaf.argtypes = [POINTER(rnode)]
 libnw.children_count.argtypes = [POINTER(rnode)]
@@ -240,8 +242,12 @@ class Tree(object):
 			c_node_p = cast(data, POINTER(rnode))
 			Rnode(c_node_p)
 
+	def dump_newick(self):
+		'''Prints Newick to stdout (iterative, fast)'''
+		libnw.dump_newick(self.tree.root)
+
 	def to_newick(self):
-		'''Returns a Newick representation of the tree.'''
+		'''Returns a Newick representation of the tree (recursive, slow).'''
 		return libnw.to_newick(self.tree.root)
 
 	def get_nodes(self):
