@@ -120,6 +120,9 @@ libnw.lca_from_labels_multi.restype = POINTER(rnode)
 libnw.get_tree_type.argtypes = [POINTER(rooted_tree)]
 libnw.reroot_tree.argtypes = [POINTER(rooted_tree), POINTER(rnode)]
 
+libnw.create_label2node_map.argtypes = [POINTER(llist)]
+libnw.create_label2node_map.restype = POINTER(hash)
+
 ################################################################
 # User-land Python classes
 

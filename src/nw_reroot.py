@@ -16,10 +16,16 @@ def main():
 
 	label = sys.argv[2]
 
-	for tree in Tree.parse_newick_input(filename):
-		outgroup = tree.get_node_with_label(label)
-		tree.reroot(outgroup)
-		tree.dump_newick()
+#	for tree in Tree.parse_newick_input(filename):
+#		outgroup = tree.get_node_with_label(label)
+#		tree.reroot(outgroup)
+#		tree.dump_newick()
+
+	tree = libnw.parse_tree()
+	lbl2node = libnw.create_label2node_map(tree.contents.nodes_in_order)
+	node = libnw.hash_get(lbl2node, "Homo")
+	node = cast(node, POINTER(rnode))
+	print node.contents.label
 
 if __name__ == "__main__":
 	main()
