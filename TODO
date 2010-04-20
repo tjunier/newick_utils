@@ -403,3 +403,7 @@ function
 [done] to_newick() is recursive, which makes it slow. Write an iterative
 version. (f() is called dump_newick(), writes to stdout instead of into a
 buffer, and is indeed much faster for large trees).
+
+[done] rewrite rnode_iterator without using hashes
+
+[done] Valgrind everything
