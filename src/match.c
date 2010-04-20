@@ -360,12 +360,26 @@ int main(int argc, char *argv[])
 	newick_scanner_set_file_input(params.target_trees);
 
 	while (NULL != (tree = parse_tree())) {
+		/* Keep a list of the original nodes. We're going to unlink
+		 * some, which will then be "invisible" and can't be free()d
+		 * the usual way. */
+		struct llist *original_nodes_in_order =
+			shallow_copy(tree->nodes_in_order);
+		/* No nodes are free()d in here... */
 		process_tree(tree, pattern_labels, pattern_newick, params);
-		destroy_tree(tree, FREE_NODE_DATA);
+		/* Now we free the original nodes */
+		struct list_elem *el = original_nodes_in_order->head;
+		for (; NULL != el; el = el->next) {
+			struct rnode *current = el->data;
+			destroy_rnode(current, NULL);
+		}
+		destroy_llist(original_nodes_in_order);
+		destroy_llist(tree->nodes_in_order);
+		free(tree);
 	}
 
 	destroy_hash(pattern_labels);
 	free(pattern_newick);
-	destroy_tree(pattern_tree, FREE_NODE_DATA);
+	destroy_tree_cb_2(pattern_tree, NULL);
 	return 0;
 }

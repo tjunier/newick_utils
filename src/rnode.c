@@ -73,7 +73,7 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	return node_p;
 }
 
-void destroy_rnode(struct rnode *node, void (*free_data)(void*))
+void destroy_rnode(struct rnode *node, void (*free_data)(void *))
 {
 #ifdef SHOW_RNODE_DESTROY
 	fprintf (stderr, " freeing rnode %p '%s'\n", node, node->label);
@@ -81,8 +81,13 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void*))
 	destroy_llist(node->children);
 	free(node->label);
 	free(node->edge_length_as_string);
+	/* if free_data is not NULL, we call it to free the node data (use this
+	 * when the data cannot just be free()d); otherwise we just free()
+	 * node->data  */
 	if (NULL != free_data)
 		free_data(node->data);
+	else if (NULL != node->data)
+		free(node->data);
 	free(node);
 }
 

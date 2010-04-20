@@ -66,6 +66,10 @@ void destroy_tree(struct rooted_tree *, int free_node_data);
 
 void destroy_tree_cb(struct rooted_tree *, void (*destroyer)(struct rnode*));
 
+//TODO: ...or even better, by this (but change the name):
+
+void destroy_tree_cb_2(struct rooted_tree *, void (*destroyer)(void *));
+
 /* Returns the number of leaves of this tree */
 
 int leaf_count(struct rooted_tree *);

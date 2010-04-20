@@ -308,14 +308,8 @@ void try_ingroup(struct rooted_tree *tree, struct parameters params)
 	struct llist *ingroup_leaves;
 	ingroup_leaves = get_ingroup_leaves(tree, params.labels);
 	enum reroot_status result = reroot(tree, ingroup_leaves);
-	char *newick;
 	switch (result) {
 		case REROOT_OK:
-			/*
-			newick = to_newick(tree->root);
-			printf ("%s\n", newick);
-			free(newick);
-			*/
 			dump_newick(tree->root);
 			break;
 		case LCA_IS_TREE_ROOT:
@@ -334,17 +328,11 @@ void try_ingroup(struct rooted_tree *tree, struct parameters params)
 void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct llist *outgroup_nodes = get_outgroup_nodes(tree, params.labels);
-	char *newick;
 	if (! params.deroot) {
 		/* re-root according to outgroup nodes */
 		enum reroot_status result = reroot(tree, outgroup_nodes);
 		switch (result) {
 		case REROOT_OK:
-			/*
-			newick = to_newick(tree->root);
-			printf ("%s\n", newick);
-			free(newick);
-			*/
 			dump_newick(tree->root);
 			break;
 		case LCA_IS_TREE_ROOT:
@@ -364,11 +352,6 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		enum deroot_status result = deroot(tree);
 		switch (result) {
 		case DEROOT_OK:
-			/*
-			newick = to_newick(tree->root);
-			printf ("%s\n", newick);
-			free(newick);
-			*/
 			dump_newick(tree->root);
 			break;
 		case NOT_BIFURCATING:

@@ -250,6 +250,10 @@ class Tree(object):
 		'''Returns a Newick representation of the tree (recursive, slow).'''
 		return libnw.to_newick(self.tree.root)
 
+	def dump_newick(self):
+		'''Dumps the tree as Newick to stdout (fast)'''
+		libnw.dump_newick(self.tree.root)
+
 	def get_nodes(self):
 		'''Returns an iterator over all the tree's nodes, in post-order'''
 		nodes_in_order = Llist(self.tree.nodes_in_order.contents)

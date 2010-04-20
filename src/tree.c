@@ -160,8 +160,7 @@ void destroy_tree(struct rooted_tree *tree, int free_node_data)
 	struct list_elem *e;
 
 	/* Traversing in post-order ensures that children list's data are
-	 * already empty when we destroy the list (since the lists contain
-	 * children edges) */
+	 * already empty when we destroy the list */
 	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
 		struct rnode *current = e->data;
 		destroy_llist(current->children);
@@ -205,6 +204,22 @@ void destroy_tree_cb(struct rooted_tree *tree,
 		else if (NULL != current->data) 
 			free(current->data);
 		free(current);
+	}
+
+	destroy_llist(tree->nodes_in_order);
+	free(tree);
+}
+
+void destroy_tree_cb_2(struct rooted_tree *tree,
+		void (*node_data_destroyer)(void *))
+{
+	struct list_elem *e;
+
+	/* Traversing in post-order ensures that children list's data are
+	 * already empty when we destroy the list */
+	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
+		struct rnode *current = e->data;
+		destroy_rnode(current, node_data_destroyer);
 	}
 
 	destroy_llist(tree->nodes_in_order);
