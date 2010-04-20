@@ -407,3 +407,6 @@ buffer, and is indeed much faster for large trees).
 [done] rewrite rnode_iterator without using hashes
 
 [done] Valgrind everything
+
+[done] replace to_newick() with dump_newick() wherever possible - there were
+a few places where this caused side effects, so I put a TODO marker.

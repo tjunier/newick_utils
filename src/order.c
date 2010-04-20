@@ -188,9 +188,7 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		if (! order_function(tree)) { perror(NULL); exit(EXIT_FAILURE); }
-		char *newick = to_newick(tree->root);
-		printf ("%s\n", newick);
-		free(newick);
+		dump_newick(tree->root);
 		destroy_tree_cb(tree, NULL);
 	}
 

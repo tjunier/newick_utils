@@ -152,10 +152,8 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
 		struct rnode *current = (struct rnode *) elem->data;
 		if (! params.show_branch_lengths) {
-			if (NULL != current->parent) {
-				char *length = current->edge_length_as_string;
-				length[0] = '\0';
-			}
+			char *length = current->edge_length_as_string;
+			length[0] = '\0';
 		}
 		if (! params.show_inner_labels) {
 			if (! is_leaf(current)) {
@@ -181,9 +179,7 @@ int main (int argc, char* argv[])
 
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params);
-		char *newick = to_newick(tree->root);
-		printf ("%s\n", newick);
-		free(newick);
+		dump_newick(tree->root);
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
 

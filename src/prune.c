@@ -251,9 +251,7 @@ int main(int argc, char *argv[])
 		} else {
 			process_tree(tree, params.labels);
 		}
-		char *newick = to_newick(tree->root);
-		printf ("%s\n", newick);
-		free(newick);
+		dump_newick(tree->root);
 		/* NOTE: the tree was modified, but no nodes were added so it
 		 * should be possible to use destroy_tree() */
 		destroy_tree(tree, DONT_FREE_NODE_DATA);

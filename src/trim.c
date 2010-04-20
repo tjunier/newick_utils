@@ -240,9 +240,7 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, params);
-		char *newick = to_newick(tree->root);
-		printf ("%s\n", newick);
-		free(newick);
+		dump_newick(tree->root);
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
 

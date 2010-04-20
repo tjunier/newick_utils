@@ -139,9 +139,7 @@ int main(int argc, char *argv[])
 		tree = parse_tree();
 		if (NULL != tree) {
 			collapse_pure_clades(tree);
-			char *newick = to_newick(tree->root);
-			printf ("%s\n", newick);
-			free(newick);
+			dump_newick(tree->root);
 			destroy_tree(tree, DONT_FREE_NODE_DATA);
 		}
 		else switch (newick_parser_status) {

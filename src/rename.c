@@ -218,9 +218,7 @@ void process_tree(struct rooted_tree *tree, struct hash *rename_map,
 		}
 	}
 
-	char *newick = to_newick(tree->root);
-	printf ("%s\n", newick);
-	free(newick);
+	dump_newick(tree->root);
 }
 
 int main(int argc, char *argv[])

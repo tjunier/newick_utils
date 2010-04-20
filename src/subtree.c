@@ -297,6 +297,8 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		if (! is_root(subtree_root))
 			subtree_root = subtree_root->parent;
 
+	// TODO: could not replace to_newick() by dump_newick() due to side
+	// effects. Investigate.
 
 	if (NULL != subtree_root) {
 		if ((! params.check_monophyly) ||

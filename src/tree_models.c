@@ -119,9 +119,7 @@ int geometric_tree(double prob_node_has_children)
 		}
 	}
 
-	char *newick = to_newick(root);
-	printf("%s\n", newick);
-	free(newick);
+	dump_newick(root);
 	destroy_llist(leaves_queue);
 
 	return SUCCESS;
@@ -206,12 +204,11 @@ struct rnode *create_child_with_time_limit(double time_limit)
 	return kid;
 }
 
-void free_data(char *newick, struct llist *leaves_queue,
+void free_data(struct llist *leaves_queue,
 		struct rnode *root, struct llist *all_children)
 {
 	struct rnode *kid;
 
-	free(newick);
 	destroy_llist(leaves_queue);
 
 	destroy_rnode(root, NULL);
@@ -284,10 +281,9 @@ int time_limited_tree(double branch_termination_rate, double duration)
 		} 
 	}
 
-	char *newick = to_newick(root);
-	printf("%s\n", newick);
+	dump_newick(root);
 
-	free_data(newick, leaves_queue, root, all_children);
+	free_data(leaves_queue, root, all_children);
 
 	return SUCCESS;
 }

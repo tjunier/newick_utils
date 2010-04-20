@@ -401,6 +401,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		if (eval_enode(expression_root)) {
 			switch (params.action) {
 			case ACTION_SUBTREE:
+				// TODO: try to replace by dump_newick()
 				newick = to_newick(current);
 				printf("%s\n", newick);
 				free(newick);
@@ -477,9 +478,7 @@ int main(int argc, char* argv[])
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, params);
 		if (params.show_tree) {
-			char *newick = to_newick(tree->root);
-			printf("%s\n", newick);
-			free(newick);
+			dump_newick(tree->root);
 		}
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
