@@ -202,7 +202,7 @@ struct llist *get_nodes_in_order(struct rnode *root)
 // TODO: this function should use the tree's nodes_in_order list. If invalid or
 // NULL, it should be computed by calling get_nodes_in_order() on the root. 
 
-struct hash *get_leaf_label_map(struct rnode *root)
+struct hash *get_leaf_label_map_from_node(struct rnode *root)
 {
 	struct rnode_iterator *it = create_rnode_iterator(root);
 	if (NULL == it) return NULL;

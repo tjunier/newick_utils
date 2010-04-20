@@ -93,7 +93,7 @@ struct llist *get_nodes_in_order(struct rnode *);
 /* Returns a label->rnode map of all leaves that descend from 'root' */
 /* Returns NULL in case of malloc() problems. */
 
-struct hash *get_leaf_label_map(struct rnode *root);
+struct hash *get_leaf_label_map_from_node(struct rnode *root);
 
 /* Resets all 'current_child_elem' pointers in 'tree's nodes to NULL. */
 

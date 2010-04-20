@@ -235,7 +235,7 @@ int is_monophyletic(struct llist *descendants, struct rnode *subtree_root)
 {
 	int result = TRUE;
 
-	struct hash *leaf_map = get_leaf_label_map(subtree_root);
+	struct hash *leaf_map = get_leaf_label_map_from_node(subtree_root);
 	if (NULL == leaf_map) { perror(NULL); exit(EXIT_FAILURE); }
 	if (leaf_map->count != descendants->count) {
 		result = FALSE;

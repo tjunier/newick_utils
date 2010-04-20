@@ -391,14 +391,14 @@ int test_get_nodes_in_order_part_linear()
 	return 0;
 }
 
-int test_get_leaf_label_map()
+int test_get_leaf_label_map_from_node()
 {
 
-	const char *test_name = "test_get_leaf_label_map";
+	const char *test_name = "test_get_leaf_label_map_from_node";
 
 	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 	struct rooted_tree tree = tree_3();
-	struct hash *map = get_leaf_label_map(tree.root);
+	struct hash *map = get_leaf_label_map_from_node(tree.root);
 
 	if (5 != map->count) {
 		printf ("%s: expected hash count of 5, got %d.\n", test_name, map->count);
@@ -525,7 +525,7 @@ int main()
 	printf("Starting rnode iterator test...\n");
 	failures += test_iterator();
 	failures += test_iterator_midtree();
-	failures += test_get_leaf_label_map();
+	failures += test_get_leaf_label_map_from_node();
 	failures += test_get_nodes_in_order();
 	failures += test_get_nodes_in_order_linear();
 	failures += test_get_nodes_in_order_part_linear();
