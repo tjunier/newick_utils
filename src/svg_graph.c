@@ -504,6 +504,7 @@ int set_group_numbers(struct rooted_tree *tree)
 		struct svg_data *node_data = node->data;
 		struct rnode *parent = node->parent;
 		struct svg_data *parent_data = parent->data;
+		fprintf (stderr, "parent group: %d, ", parent_data->group_nb);
 		/* Inherit parent node's style (clade number) IFF 
 		    node has no style of its own */
 		fprintf(stderr, "group nb: %d - ", node_data->group_nb);
