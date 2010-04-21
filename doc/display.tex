@@ -39,6 +39,19 @@ If the tree is a phylogram, \display{} prints a scale bar. Its units can be
 specified with option \texttt{-u}, the default is substitutions per site. To
 suppress the scale bar, pass the \texttt{-S} switch.
 
+\subsubsection{Placement of Inner Node Labels}
+
+Option \texttt{-I} controls the placement of inner node labels. It takes an
+argument, which can be \texttt{l} (lowercase l -- towards the leaves),
+\texttt{m} (in the middle), or \texttt{r} (towards the root). The default
+behaviour is \texttt{l}.  Here is the above tree, with inner labels near the
+root:
+
+\verbatiminput{display_14_txt.cmd}
+\begin{samepage}
+\verbatiminput{display_14_txt.out}
+\end{samepage}
+
 \subsection[As SVG]{As Scalable Vector Graphics}
 \label{sct_display_svg}
 
@@ -90,7 +103,8 @@ string in \svg.  This means it is hard to ensure the scale bar will not overlap
 with a node label, unless one places it far away in a corner, which is what I do
 for now. An improvement to this is on my TODO list.}, and \texttt{-u} specifies
 its units; \texttt{-w} governs the tree's width, except that for \svg{} the
-value is in pixels instead of columns. 
+value is in pixels instead of columns; \texttt{-I} controls the placement of inner node
+labels. 
 
 \subsubsection{Radial trees}
 
@@ -113,7 +127,6 @@ the tree above by passing \texttt{-c}, which takes the name of the \css{} file
 as argument:
 
 \verbatiminput{display_5_svg.cmd}
-
 \begin{center}
  \includegraphics{display_5_svg.pdf}
 \end{center}
@@ -201,9 +214,9 @@ Instead, we set their \css{} style to \texttt{opacity:0}
 What if we want to change the default style? Say we want the branches in blue,
 and two pixels wide? That's option \texttt{-d}:
 
-\verbatiminput{display_11_svg.cmd}
+\verbatiminput{display_13_svg.cmd}
 \begin{center}
-  \includegraphics{display_11_svg.pdf}
+  \includegraphics{display_13_svg.pdf}
 \end{center}
 
 \subsection{Ornaments}
