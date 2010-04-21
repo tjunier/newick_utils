@@ -505,10 +505,14 @@ int set_group_numbers(struct rooted_tree *tree)
 		struct svg_data *parent_data = parent->data;
 		/* Inherit parent node's style (clade number) IFF 
 		    node has no style of its own */
+		fprintf(stderr, "group nb: %d - ", node_data->group_nb);
 		if (UNSTYLED_CLADE == node_data->group_nb) {
 			node_data->group_nb = parent_data->group_nb;
 			fprintf(stderr, "group set to %d\n", node_data->group_nb);
-		}
+		} 
+		// debug...
+		else 
+			fprintf(stderr, "group inherited (%d)\n", node_data->group_nb);
 				
 	}
 	destroy_llist(nodes_in_reverse_order);
