@@ -51,6 +51,8 @@ name & type & meaning \\
 \hline
 \texttt{a} & numeric & number of ancestors of node	 \\
 \texttt{b} & numeric & node's support value (or zero) \\
+\texttt{c} & numeric & node's number of children (direct) \\
+\texttt{D} & numeric & node's number of descendants (includes children) \\
 \texttt{d} & numeric & node's depth (distance to root) \\
 \texttt{i} & boolean & true iff node is strictly internal (i.e., not root!) \\
 \texttt{l} (ell) & boolean & true iff node is a leaf \\
@@ -92,6 +94,7 @@ expression & selects: \\
 \texttt{i \& (b >= 95)} & internal nodes with support greater than 95\% \\ 
 \texttt{i \& (b < 50)} & unsupported nodes (less than 50\%) \\
 \texttt{!r} & all nodes except the root \\
+\texttt{c > 2} & multifurcating nodes
 \end{tabular}
 \end{center}
 

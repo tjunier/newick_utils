@@ -71,7 +71,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-nh] <newick trees filename|-> <address> <action>\n"
+"%s [-hnor] <newick trees filename|-> <address> <action>\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -268,7 +268,7 @@ struct parameters get_params(int argc, char *argv[])
 			 exit(EXIT_FAILURE);
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-hn] <filename|-> <address> <operation>\n",
+		fprintf(stderr, "Usage: %s [-hnro] <filename|-> <address> <operation>\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}

@@ -1,4 +1,5 @@
-\section{Converting Node Ages to Durations}
+\section{Converting
+Node Ages to Durations}
 \label{sct_duration}
 
 Sometimes you have information about the \textit{age} of a node rather than the
@@ -8,7 +9,9 @@ length of its branch. Consider the following phylogeny of major chordate groups:
  \includegraphics{duration_1_svg.pdf}
 \end{center}
 
-Suppose we have the following information about the age of certain events:
+Suppose we have the following information about the age of certain events (not
+that it matters, I found it in Wikipedia and the Palaeos website
+(\url{www.palaeos.com}):
 
 \smallskip
 \begin{tabular}{lr}
@@ -28,8 +31,14 @@ this:
 \verbatiminput{duration_2_nw.out}
 \end{samepage}
 
-\noindent{}Note that the \texttt{Gnathostomata} leaf has no age: this means it
-did not go extinct (you and I are gnathostomes\footnote{Well, at least \textit{I} am one}); the same goes for urochordates.
+\noindent{}The "branch length" of \texttt{Vertebrata} becomes \texttt{530},
+because the vertebrate lineage split into conodonts and gnathostomes at that
+date\footnote{Of course there are other branches in the vertebrate lineage, but
+they are not shown in this tree}. Note that the \texttt{Gnathostomata} leaf has
+no age: this means that there are still living gnathostomes (such as you and
+I\footnote{Well, at least \textit{I} am one}); the same goes for urochordates.
+The \texttt{Conodonta}, on the other hand, has an age although it is a leaf:
+this is because the conodonts went extinct, around \texttt{200} Mya.
 
 Now, if we were to display this tree without further ado, it would be nonsense.
 We have to convert the ages into durations, and this is the function of
@@ -40,7 +49,7 @@ We have to convert the ages into durations, and this is the function of
  \includegraphics{duration_3_svg.pdf}
 \end{center}
 
-\noindent{}We can improve the scale bar by supplying option \texttt{-t} to
+\noindent{}We can improve the graph by supplying option \texttt{-t} to
 \display{}: this aligns the origin of the scale bar with the leaves and counts
 backwards. To top it off, we'll specify the units as million years ago:
 
@@ -48,5 +57,18 @@ backwards. To top it off, we'll specify the units as million years ago:
 \begin{center}
  \includegraphics{duration_4_svg.pdf}
 \end{center}
+
+
+Since you're curious, here is what the \texttt{age.nw} tree looks like if we
+"forget" to run it through \duration:
+
+\verbatiminput{duration_5_svg.cmd}
+\begin{center}
+ \includegraphics{duration_5_svg.pdf}
+\end{center}
+
+\noindent{}Now it looks as though only the conodonts are still alive, while the
+gnathostomes and urochordates each had brief flashes of existence 200 and 730
+million years ago, respectively. Don't show this to a palaeontologist.
 
 
