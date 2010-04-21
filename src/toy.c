@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -32,23 +35,17 @@ int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;
 
-	get_params(argc, argv);
-
-	while (NULL != (tree = parse_tree())) {
-		/*
-		struct rnode_iterator *it = create_rnode_iterator(tree->root);
-		struct rnode *current;
-		while ((current = rnode_iterator_next(it)) != NULL) {
-			printf ("%s\n", current->label);
-		}
-		*/
-		dump_newick(tree->root);
-		/*
-		struct llist *nodes_in_order = get_nodes_in_order(tree->root);
-		*/
-		destroy_tree(tree, FREE_NODE_DATA);
-	}
+	char *name = "tests/color.map";
+	FILE *file = fopen(name, "r");
+	if (NULL == file) {perror(NULL); exit(EXIT_FAILURE);}
+	char *line = NULL;
+	int line_buf_size = 0;
 	
+	int bytes_read;
+	while ((bytes_read = getline(&line, &line_buf_size, file)) != -1) {
+		printf("bytes read: %d\n", bytes_read);
+		printf("contents: %s\n", line);
+	}
+	free(line);
 	return 0;
 }
-

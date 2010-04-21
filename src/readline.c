@@ -43,6 +43,17 @@ char * read_line(FILE *file)
 	long len = 0L;
 	int c;
 	
+#ifdef __CYGWIN__
+	line = NULL;
+	int line_buf_size = 0;
+	
+	int bytes_read;
+	bytes_read = getline(&line, &line_buf_size, file);
+	if (bytes_read < 0) return NULL;
+	return line;
+
+#endif
+
 	/* return NULL if EOF */
 	if (feof(file)) return NULL;
 
@@ -83,6 +94,8 @@ char * read_line(FILE *file)
 	/* consumes newline (otherwise gets stuck here...) */
 	fgetc(file);
 
+	printf("returning %s\n", line);
+	fflush(stdout);
 	return line;
 }
 

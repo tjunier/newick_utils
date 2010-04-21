@@ -150,6 +150,130 @@ int test_word_tokenizer_3()
 	return 0;
 }
 
+int test_readline_1()
+{
+	const char *test_name = "test_readline_1";
+
+	FILE *input = fopen("readline_test.txt", "r");
+
+	char *line, *exp;
+
+	exp = "A simple line.";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "Another line.";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_readline_2()
+{
+	const char *test_name = "test_readline_2";
+
+	FILE *input = fopen("color.map", "r");
+
+	char *line, *exp;
+
+	exp = "# Comments start with a '#' and are ignored.";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "# Empty lines are ignored too:";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "# ...as are lines consisting only of whitespace:";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "   \t\t\t ";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "stroke:blue CLADE Homo Pan";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "stroke:red CLADE Cercopithecus Macaca Papio";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "stroke:green CLADE Macaca Simias";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "# an empty line at the end no longer causes Segv:";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+
+	exp = "";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	exp = "";
+	line = read_line(input);
+	if (strcmp(exp, line) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp, line);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -157,6 +281,8 @@ int main()
 	failures += test_word_tokenizer_1();
 	failures += test_word_tokenizer_2();
 	failures += test_word_tokenizer_3();
+	failures += test_readline_1();
+	failures += test_readline_2();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
