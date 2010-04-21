@@ -148,6 +148,14 @@ char *wt_next(struct word_tokenizer *wt)
 	/* Copy the word into the allocated space, terminating the string */
 	strncpy(word, wt->word_start, wlen);
 	word[wlen] = '\0';
+#ifdef __CYGWIN__
+	/* for some reason a final, empty token may be returned under Cygwin.
+	 * */
+	if (strcmp("", word) == 0) {
+		next_token_status = NEXT_TOKEN_END;
+		return NULL;
+	}
+#endif
 	/* Set the next word's start pos to just after the present word's end. */
 
 	wt->word_start = wt->word_stop + 1;

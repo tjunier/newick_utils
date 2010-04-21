@@ -492,31 +492,23 @@ int set_group_numbers(struct rooted_tree *tree)
 		lca_data->group_nb = css_el->group_nb;
 	}
 
+
 	/* Now propagate the styles to the descendants */
 	struct llist *nodes_in_reverse_order;
 	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
 	if (NULL == nodes_in_reverse_order) return FAILURE;
 	struct list_elem *el; /* TODO: can't I reuse elem from above? */
 	el = nodes_in_reverse_order->head->next;	/* skip root */
-	fprintf (stderr, "Root grp#: %d\n",
-			((struct svg_data *)((struct rnode *)nodes_in_reverse_order->head->data)->data)->group_nb);
 	for (;  NULL != el; el = el->next) {
 		struct rnode *node = el->data;
-		fprintf (stderr, "node: %p (%s), ", node, node->label);
 		struct svg_data *node_data = node->data;
 		struct rnode *parent = node->parent;
 		struct svg_data *parent_data = parent->data;
-		fprintf (stderr, "parent group: %d, ", parent_data->group_nb);
 		/* Inherit parent node's style (clade number) IFF 
 		    node has no style of its own */
-		fprintf(stderr, "group nb: %d - ", node_data->group_nb);
 		if (UNSTYLED_CLADE == node_data->group_nb) {
 			node_data->group_nb = parent_data->group_nb;
-			fprintf(stderr, "group set to %d\n", node_data->group_nb);
 		} 
-		// debug...
-		else 
-			fprintf(stderr, "group inherited (%d)\n", node_data->group_nb);
 				
 	}
 	destroy_llist(nodes_in_reverse_order);
