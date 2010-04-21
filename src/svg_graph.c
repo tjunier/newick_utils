@@ -500,6 +500,7 @@ int set_group_numbers(struct rooted_tree *tree)
 	el = nodes_in_reverse_order->head->next;	/* skip root */
 	for (;  NULL != el; el = el->next) {
 		struct rnode *node = el->data;
+		fprintf (stderr, "node: %p (%s), ", node, node->label);
 		struct svg_data *node_data = node->data;
 		struct rnode *parent = node->parent;
 		struct svg_data *parent_data = parent->data;
