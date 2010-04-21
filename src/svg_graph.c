@@ -490,8 +490,6 @@ int set_group_numbers(struct rooted_tree *tree)
 		if (NULL == lca) return FAILURE;
 		struct svg_data *lca_data = lca->data;
 		lca_data->group_nb = css_el->group_nb;
-		// DEBUG
-		printf("set CSS group #%d\n", lca_data->group_nb);
 	}
 
 	/* Now propagate the styles to the descendants */
@@ -509,6 +507,7 @@ int set_group_numbers(struct rooted_tree *tree)
 		    node has no style of its own */
 		if (UNSTYLED_CLADE == node_data->group_nb) {
 			node_data->group_nb = parent_data->group_nb;
+			fprintf(stderr, "group set to %d\n", node_data->group_nb);
 		}
 				
 	}

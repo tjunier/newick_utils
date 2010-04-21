@@ -94,7 +94,6 @@ char * read_line(FILE *file)
 	/* consumes newline (otherwise gets stuck here...) */
 	fgetc(file);
 
-	printf("returning %s\n", line);
 	fflush(stdout);
 	return line;
 }
