@@ -8,6 +8,10 @@
 
 all: nwutils_tutorial.pdf
 	
+%_txt.cmd : %_txt
+	echo -n '$ ' > $@	
+	cat $< >> $@
+	sh < $< 2>&1 | fold | expand > $*.out
 
 check:
 
