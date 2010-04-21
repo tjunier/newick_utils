@@ -1,0 +1,52 @@
+\section{Converting Node Ages to Durations}
+\label{sct_duration}
+
+Sometimes you have information about the \textit{age} of a node rather than the
+length of its branch. Consider the following phylogeny of major chordate groups:
+
+\begin{center}
+ \includegraphics{duration_1_svg.pdf}
+\end{center}
+
+Suppose we have the following information about the age of certain events:
+
+\smallskip
+\begin{tabular}{lr}
+\textbf{event} & \textbf{age} (million years ago)\\
+\hline
+split of vertebrates into gnathostomes and conodonts & 530 \\
+extinction of conodonts & 200 \\
+split of chordates into vertebrates and urochordates & 540 \\
+\end{tabular}
+\smallskip
+
+\noindent{}We can use the branch length field of Newick to specify ages, like
+this:
+
+\begin{samepage}
+\verbatiminput{duration_2_nw.cmd}
+\verbatiminput{duration_2_nw.out}
+\end{samepage}
+
+\noindent{}Note that the \texttt{Gnathostomata} leaf has no age: this means it
+did not go extinct (you and I are gnathostomes\footnote{Well, at least \textit{I} am one}); the same goes for urochordates.
+
+Now, if we were to display this tree without further ado, it would be nonsense.
+We have to convert the ages into durations, and this is the function of
+\duration{}:
+
+\verbatiminput{duration_3_svg.cmd}
+\begin{center}
+ \includegraphics{duration_3_svg.pdf}
+\end{center}
+
+\noindent{}We can improve the scale bar by supplying option \texttt{-t} to
+\display{}: this aligns the origin of the scale bar with the leaves and counts
+backwards. To top it off, we'll specify the units as million years ago:
+
+\verbatiminput{duration_4_svg.cmd}
+\begin{center}
+ \includegraphics{duration_4_svg.pdf}
+\end{center}
+
+
