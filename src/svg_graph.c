@@ -498,6 +498,8 @@ int set_group_numbers(struct rooted_tree *tree)
 	if (NULL == nodes_in_reverse_order) return FAILURE;
 	struct list_elem *el; /* TODO: can't I reuse elem from above? */
 	el = nodes_in_reverse_order->head->next;	/* skip root */
+	fprintf (stderr, "Root grp#: %d\n",
+			((struct svg_data *)((struct rnode *)nodes_in_reverse_order->head->data)->data)->group_nb);
 	for (;  NULL != el; el = el->next) {
 		struct rnode *node = el->data;
 		fprintf (stderr, "node: %p (%s), ", node, node->label);
