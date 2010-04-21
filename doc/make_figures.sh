@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo  "This program is obsolete, just type make"
+exit 0
+
 # Some figures in the docs are the direct output of nw_* commands. This script
 # runs them so that the docs are up-to-date and accurate.
 

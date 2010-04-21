@@ -41,6 +41,8 @@ all: nwutils_tutorial.pdf
 ################################################################
 # Variables
 
+PATH := ../src/:$(PATH)	# try just-compiled versions first
+
 regular_svg_commands = $(wildcard *_svg)
 regular_svg_command_strings = $(addsuffix .cmd, $(regular_svg_commands))
 regular_pdfs = $(addsuffix .pdf, $(regular_svg_commands))
@@ -60,6 +62,9 @@ homino_svgs = homino_0.svg homino_1.svg homino_2.svg homino_3.svg homino_4.svg h
 
 # Empty, but needed (otherwise 'make check' will complain)
 check:
+
+show:
+	echo $(PATH)
 
 nwutils_tutorial.pdf: *.tex \
 	$(regular_pdfs) \

@@ -33,6 +33,12 @@ available for display (the default is 80):
 \verbatiminput{display_2_txt.out}
 \end{samepage}
 
+\subsubsection{Scale Bar}
+
+If the tree is a phylogram, \display{} prints a scale bar. Its units can be
+specified with option \texttt{-u}, the default is substitutions per site. To
+suppress the scale bar, pass the \texttt{-S} switch.
+
 \subsection[As SVG]{As Scalable Vector Graphics}
 \label{sct_display_svg}
 
@@ -70,21 +76,21 @@ $ inkscape -f catarrhini.svg -A catarrhini.pdf
 \begin{center}
  \includegraphics{display_3_svg.pdf}
 \end{center}
-All \svg{} images shown in this document were processed in the same way. In the
-rest of this document we will usually skip the redirection into an \svg{} file
+All \svg{} images shown in this tutorial were processed in the same way. In the
+rest of the document we will usually skip the redirection into an \svg{} file
 and omit the \svg{}-to-\textsc{pdf} conversion step.
 
-\subsubsection{Scale Bar}
+\subsubsection{Text-mode options}
 
-If the tree is a phylogram, \display{} prints a scale bar.\footnote{The
-positioning of the scale bar is a bit crude, especially for radial trees. This
-is mainly because of the "\svg{} string length curse", that is, the
-impossibility of finding out the length of a text string in \svg. This means it
-is hard to ensure the scale bar will not overlap with a node label, unless one
-places it far away in a corner, which is what I do for now. An improvement to
-this is on my TODO list.} Its units can be specified with option \texttt{-u},
-the default is substitutions per site. To suppress the scale bar, pass the
-\texttt{-S} switch.
+Options for \ascii{} trees also work for \svg{}: \texttt{-S} suppresses the
+scale bar\footnote{The positioning of the scale bar is a bit crude in \svg{}
+mode, especially for radial trees. This is mainly because of the "\svg{} string
+length curse", that is, the impossibility of finding out the length of a text
+string in \svg.  This means it is hard to ensure the scale bar will not overlap
+with a node label, unless one places it far away in a corner, which is what I do
+for now. An improvement to this is on my TODO list.}, and \texttt{-u} specifies
+its units; \texttt{-w} governs the tree's width, except that for \svg{} the
+value is in pixels instead of columns. 
 
 \subsubsection{Radial trees}
 
@@ -93,7 +99,6 @@ You can make radial trees by passing the \texttt{-r} switch:
 \begin{center}
 \includegraphics{display_4_svg.pdf}
 \end{center}
-You already know \texttt{-w}, except that for \svg{} the value is in pixels instead of columns. 
 
 \subsubsection{Using CSS}
 \label{sct_display_svg_css}
@@ -165,8 +170,8 @@ width).  Likewise, \texttt{Individual} overrides \texttt{Clade}, which is why
 
 \bigskip
 
-Styles can also be applied to labels. Option \texttt{-l} specifies the leaf
-label style, option \texttt{-i} the inner node label style, and option
+Styles can also be applied to labels. Option \texttt{-l} (lowercase l) specifies
+the leaf label style, option \texttt{-i} the inner node label style, and option
 \texttt{-b} the branch length style. For example, the following tree, which was
 produced using defaults, could be improved a bit:
 
@@ -192,6 +197,14 @@ labels. Note that we did not \emph{discard} the branch lengths (we could do
 this with \topology), because doing so would reduce the tree to a cladogram.
 Instead, we set their \css{} style to \texttt{opacity:0}
 (\texttt{visibility:hidden} also works).
+
+What if we want to change the default style? Say we want the branches in blue,
+and two pixels wide? That's option \texttt{-d}:
+
+\verbatiminput{display_11_svg.cmd}
+\begin{center}
+  \includegraphics{display_11_svg.pdf}
+\end{center}
 
 \subsection{Ornaments}
 
