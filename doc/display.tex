@@ -37,7 +37,11 @@ available for display (the default is 80):
 
 If the tree is a phylogram, \display{} prints a scale bar. Its units can be
 specified with option \texttt{-u}, the default is substitutions per site. To
-suppress the scale bar, pass the \texttt{-S} switch.
+suppress the scale bar, pass the \texttt{-S} switch. The scale bar can also "go
+backwards" (option \texttt{-t}), \ie{} the scale bar's zero is aligned with the
+leaves and units increase towards the root. This is handy when the units are
+ages, \eg{} in millions of years ago, but it only makes much sense if the leaves
+themselves are aligned. See \ref{sct_duration} for an example.
 
 \subsubsection{Placement of Inner Node Labels}
 
