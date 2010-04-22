@@ -13,15 +13,12 @@
 \chapter{Python Bindings}
 \label{chap_python_lib}
 
-% TODO: revise this §
-Although the \nutils{} are primarily intended for shell use, it is also
-possible to use (some of) their functionalities in Python programs\footnote{Or
-C programs, for that matter: the app code is well separated from the library
-code, which can serve as an \textsc{api}.}. While the \nutils{} are written in
-C, the \texttt{ctypes} module\footnote{Available in Python 2.5 and up} makes it
-easy to access the \texttt{libnw} library from Python, and the distribution
-contains a module, \texttt{newick\_utils.py}, that provides an object-oriented
-interface to the underlying C code.
+Although the \nutils{} are primarily designed for shell use, it is also possible
+to use their functions from Python programs: all the core functionality of the
+utilities is bundled in a C library, \texttt{libnw}, which can be accessed
+through Python's \texttt{ctypes} module. The distribution contains a file,
+\texttt{newick\_utils.py}, that provides the Python to C mappings; it also
+builds an object-oriented interface over it.
 
 Let's say we want to add a utility that prints simple statistics about trees,
 like the number of nodes, the depth, whether it is a cladogram or a phylogram,

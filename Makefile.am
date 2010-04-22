@@ -1,4 +1,4 @@
-SUBDIRS = src tests doc
+SUBDIRS = src tests 
 EXTRA_DIST = \
 	BSD_license \
 	tests/*_args \
