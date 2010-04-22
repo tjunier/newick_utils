@@ -1,0 +1,2 @@
+nw_prune -v vrt2_top.nw Mammalia Fugu Bombina Tetrao Sorex \
+| nw_display -s -
