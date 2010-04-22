@@ -10,8 +10,22 @@ preinstalled, but some distributions (\eg, Ubuntu) do not install \textsc{gcc},
 etc. by default. Check that you have \textsc{gcc}, Bison, Flex, and the
 \textsc{gnu} autotools, including Libtool. The same goes for Cygwin. On MacOS X,
 you need to install XCode (\url{http://developer.apple.com/tools/xcode}).
+Here are the versions I use (as reported by passing \texttt{--version} to the
+program):
 
-The package uses the \textsc{gnu} autotools, like many other open source
+\medskip
+\begin{tabular}{lll}
+Autoconf	& autoconf (GNU Autoconf) & 2.63 \\
+Automake	& automake (GNU automake) & 1.11.1 \\
+Bison  		& bison (GNU Bison) 			& 2.4.1 \\ 
+Flex			& flex 										& 2.5.35 \\
+GCC 			& gcc (GCC) 							& 4.4.1 20090725 (Red Hat 4.4.1-2) \\
+Libtool		& ltmain.sh (GNU libtool) & 2.2.6b \\
+Make			& GNU Make 								& 3.81
+\end{tabular}
+\medskip
+
+\noindent{}The package uses the \textsc{gnu} autotools, like many other open source
 software packages. So all you need to do is the usual
 \begin{verbatim}
 $ tar xzf newick-utils-x.y.z.tar.gz
@@ -22,14 +36,15 @@ $ make check
 # make install
 \end{verbatim}
 The \texttt{make check} is optional, but you should try it anyway. Note that
-the \gen{} test may fail - this is due to differences in random number
+the \gen{} test may fail - this is due to differences in pseudo-random number
 generators, as far as I can tell.
 
 
 \section{As binaries}
 
-Since version 1.1, there is also a binary distribution. The name of the archive
-matches \texttt{newick-utils-<version>-<platform>.tar.gz}. All you need to do is:
+Since version 1.1, there are also binary distribution for some platforms. The
+name of the archive matches \texttt{newick-utils-<version>-<platform>.tar.gz}.
+All you need to do is:
 
 \begin{verbatim}
 $ tar xzf newick-utils-<vesion>-<platform>.tar.gz
@@ -44,7 +59,5 @@ $ cd tests
 $ for test in test*.sh; do ./$test; done 
 \end{verbatim}
 
-\noindent{}any failure will generate a \texttt{FAIL} message (which you could filter with \texttt{grep}, etc).
-
-You can then copy/move the binaries wherever it suits you.
+\noindent{}any failure will generate a \texttt{FAIL} message (which you could filter with \texttt{grep}, etc).  You can then copy/move the binaries wherever it suits you.
 

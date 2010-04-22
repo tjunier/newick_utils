@@ -58,9 +58,11 @@ text_commands = $(wildcard *_txt)
 text_command_strings = $(addsuffix .cmd, $(text_commands))
 text_command_outputs = $(addsuffix .out, $(text_commands))
 
-homino_pdfs = homino_0.pdf homino_1.pdf homino_2.pdf homino_3.pdf homino_4.pdf homino_5.pdf homino_6.pdf
+homino = homino_0 homino_1 homino_2 homino_3 homino_4 homino_5 homino_6
+homino_pdfs = $(addsuffix .pdf, $(homino))
+homino_svgs = $(addsuffix .svg, $(homino))
 
-homino_svgs = homino_0.svg homino_1.svg homino_2.svg homino_3.svg homino_4.svg homino_5.svg homino_6.svg
+nodes_vs_depth_pdfs = star.pdf balanced.pdf short_leaves.pdf
 
 ################################################################
 # Targets
@@ -79,7 +81,7 @@ nwutils_tutorial.pdf: *.tex \
 	$(newick_command_strings) \
 	$(text_command_strings) \
 	$(text_command_outputs) \
-	$(homino_pdfs) bootscan_1.pdf
+	$(homino_pdfs) $(nodes_vs_depth_pdfs) bootscan_1.pdf
 	pdflatex nwutils_tutorial.tex
 	pdflatex nwutils_tutorial.tex
 
@@ -88,8 +90,6 @@ HRV_3UTR.dna.bscan.eps:
 
 bootscan_1.pdf: HRV_3UTR.dna.bscan.eps
 	epstopdf HRV_3UTR.dna.bscan.eps --outfile $@
-
-nodes_vs_depth_pdfs = star.pdf balanced.pdf short_leaves.pdf
 
 $(nodes_vs_depth_pdfs) : %.pdf : %
 	nodes_vs_depth.sh $< 40
