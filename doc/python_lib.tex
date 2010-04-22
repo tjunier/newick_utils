@@ -13,14 +13,15 @@
 \chapter{Python Bindings}
 \label{chap_python_lib}
 
+% TODO: revise this §
 Although the \nutils{} are primarily intended for shell use, it is also
 possible to use (some of) their functionalities in Python programs\footnote{Or
 C programs, for that matter: the app code is well separated from the library
-code, which can serve as an \textsc{api}}. While the \nutils{} are written in
+code, which can serve as an \textsc{api}.}. While the \nutils{} are written in
 C, the \texttt{ctypes} module\footnote{Available in Python 2.5 and up} makes it
-easy to access them from Python, and the distribution contains a module,
-\texttt{newick\_utils.py}, that provides an object-oriented interface to the
-underlying C code.
+easy to access the \texttt{libnw} library from Python, and the distribution
+contains a module, \texttt{newick\_utils.py}, that provides an object-oriented
+interface to the underlying C code.
 
 Let's say we want to add a utility that prints simple statistics about trees,
 like the number of nodes, the depth, whether it is a cladogram or a phylogram,
@@ -60,8 +61,11 @@ added our own function, \texttt{count\_polytomies}, which takes a \texttt{Tree}
 object as argument.
 
 As another example, a simple implementation of \reroot{} is found in
-\texttt{src/nw\_reroot.py}. Its performance is almost as good as \reroot{}'s,
-especially on large input.
+\texttt{src/nw\_reroot.py}. It demonstrates two approaches: a heavily
+object-oriented one, in which the user mainly calls methods on Python objects,
+and a "thin" one, in which the calls are essentially to C functions through
+\texttt{libnw}. While not as fast as \reroot{}, its performance is still quite
+acceptable, especially in "thin" mode.
 
 \section{API Documentation}
 

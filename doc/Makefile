@@ -1,6 +1,7 @@
 
 .PHONY: all
 .PHONY: clean
+.PHONY: clean-images
 .PHONY: distclean
 .PHONY: distdir
 .PHONY: install
@@ -41,7 +42,11 @@ all: nwutils_tutorial.pdf
 ################################################################
 # Variables
 
-PATH := ../src/:$(PATH)	# try just-compiled versions first
+# Some scripts (e.g. bootscan.sh) are found in ../src (they are not installed
+# by make install). By putting ../src *before* the PATH, we ensure that the
+# version of newick utils used is the latest compiled one.
+
+PATH := ../src/:$(PATH)	
 
 regular_svg_commands = $(wildcard *_svg)
 regular_svg_command_strings = $(addsuffix .cmd, $(regular_svg_commands))
@@ -63,6 +68,7 @@ homino_svgs = homino_0.svg homino_1.svg homino_2.svg homino_3.svg homino_4.svg h
 # Empty, but needed (otherwise 'make check' will complain)
 check:
 
+# to show the value of variables (debugging)
 show:
 	echo $(PATH)
 
@@ -73,14 +79,20 @@ nwutils_tutorial.pdf: *.tex \
 	$(newick_command_strings) \
 	$(text_command_strings) \
 	$(text_command_outputs) \
-	$(homino_pdfs)
+	$(homino_pdfs) bootscan_1.pdf
 	pdflatex nwutils_tutorial.tex
 	pdflatex nwutils_tutorial.tex
+
+HRV_3UTR.dna.bscan.eps:
+	bootscan.sh HRV_3UTR.dna HRV-93 CL073908
+
+bootscan_1.pdf: HRV_3UTR.dna.bscan.eps
+	epstopdf HRV_3UTR.dna.bscan.eps --outfile $@
 
 nodes_vs_depth_pdfs = star.pdf balanced.pdf short_leaves.pdf
 
 $(nodes_vs_depth_pdfs) : %.pdf : %
-	../src/nodes_vs_depth.sh $< 40
+	nodes_vs_depth.sh $< 40
 	epstopdf $*.eps
 
 $(homino_svgs) : hominoidea.nw
@@ -91,8 +103,10 @@ $(homino_pdfs) : %.pdf : %.svg
 	inkscape -f $< -A $@
 
 clean:
-	$(RM) *.{out,cmd,aux,log,dvi,toc} *_svg.svg *_svg.pdf \
-		homino_?.{svg,pdf}
+	$(RM) *.{out,cmd,aux,log,dvi,toc}
 
-distclean: clean
+clean-images: clean
+	$(RM) *.eps *_svg.svg *_svg.pdf homino_?.{svg,pdf}
+
+distclean: clean-images
 	$(RM) nwutils_tutorial.pdf

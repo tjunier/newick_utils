@@ -1,2 +1,3 @@
 nw_rename falconiformes falconiformes_vern2.map \
-| nw_condense - | nw_display -s -S -v 20 -
+| nw_condense - \
+| nw_display -s -S -v 20 -b opacity:0 -
