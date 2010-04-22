@@ -31,7 +31,7 @@ $ nw_reroot mytrees.nw Dmelano | nw_topology -
 \end{verbatim}
 As you can see, it is straightforward to pipe \nutils{} together, and of course they can be mixed freely with any other shell program (see e.g. \ref{sct_counting_leaves}).
 
-\subsection*{Organization of This Document}
+\subsection*{About This Document}
 
 This tutorial is organized as follows: chapter \ref{chap_general} discusses
 common features of the \nutils, chapter \ref{chap_simple} shows examples of
@@ -46,27 +46,32 @@ the tree graphics were produced.
 The files for all the examples in this tutorial can be found in
 subdirectory \texttt{data}.
 
+All the program outputs are generated on-the-fly just before the document is run
+through \LaTeX{}, so they represent the actual output of the latest version of
+the utilities.
+
 \begin{table}[b]
 \begin{tabular}{ll}
 {\bf Program} & {\bf Function } \\
 \hline
-\clade	&	Extracts subtrees specified by node labels\\
+\clade		&	Extracts subtrees specified by node labels\\
 \condense	&	Condenses (simplifies) trees \\
 \display	&	Shows trees as graphs (\ascii{} graphics or \svg) \\
 \duration & Convert node ages into duration \\
 \distance	&	Prints distances between nodes, in various ways \\
-\ed	&	Stream editor (\textit{\`{a} la} \texttt{sed} or \texttt{awk}) \\
-\gen	&	Random tree generator \\
+\ed				&	Stream editor (\textit{\`{a} la} \texttt{sed} or \texttt{awk}) \\
+\gen			&	Random tree generator \\
 \nwindent	&	Shows Newick in indented form \\ 
-\labels	&	Prints node labels \\
-\match	&	Finds matches of a tree in another one \\
-\order	&	Orders tree (preserving topology) \\
-\prune	&	Removes branches based on labels \\ 
-\rename	&	Changes node labels according to a mapping \\
-\reroot	&	(Re)roots the tree \\
+\labels		&	Prints node labels \\
+\match		&	Finds matches of a tree in another one \\
+\order		&	Orders tree (preserving topology) \\
+\prune		&	Removes branches based on labels \\ 
+\rename		&	Changes node labels according to a mapping \\
+\reroot		&	(Re)roots the tree \\
+\stats		&	Prints tree statistics and properties \\
 \support	&	Computes bootstrap support of a tree given replicate trees \\
 \topology & Alters branch properties, preserving topology \\
-\trim & Trims a tree at a specified depth
+\trim 		& Trims a tree at a specified depth
 \end{tabular}	
 \caption{The \nutils{} and their functions}
 \label{tbl_prog_list}
