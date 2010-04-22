@@ -62,7 +62,7 @@ make_trees()
 {
 	for slice in ${MUSCLE_OUT}_slice_*.phy; do
 		echo " $slice"
-		phyml -i $slice -o n > /dev/null
+		phyml -i $slice -b 0 -o n > /dev/null
 	done
 }
 
