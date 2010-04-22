@@ -102,11 +102,14 @@ $(homino_svgs) : hominoidea.nw
 $(homino_pdfs) : %.pdf : %.svg
 	inkscape -f $< -A $@
 
+# removes auxiliary and intermediary files (including SVG and EPS)
 clean:
-	$(RM) *.{out,cmd,aux,log,dvi,toc}
+	$(RM) *.{out,cmd,aux,log,dvi,toc} *.eps *_svg.svg 
 
+# like clean, plus removes all PDFs except the main target
 clean-images: clean
-	$(RM) *.eps *_svg.svg *_svg.pdf homino_?.{svg,pdf}
+	$(RM) *_svg.pdf homino_?.{svg,pdf} $(nodes_vs_depth_pdfs) bootscan_1.pdf
 
+# leaves a blank slate to start from scratch
 distclean: clean-images
 	$(RM) nwutils_tutorial.pdf
