@@ -410,3 +410,5 @@ buffer, and is indeed much faster for large trees).
 
 [done] replace to_newick() with dump_newick() wherever possible - there were
 a few places where this caused side effects, so I put a TODO marker.
+
+[done] moved to Git. Repository in fuji.unige.ch:/home/junier/depot/newick_utils.git
