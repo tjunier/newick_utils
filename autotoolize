@@ -1,0 +1,25 @@
+I'm trying to get the Git repository to be better than what it was when I was
+using Subversion - not that it was a problem with Subversion per se, it's just
+that I've embarked on a big change, so I might as well try and fix this while
+I'm at it.
+
+Basiclly, I want only the source files to be in the repository: anything that
+can be generated should not be there, because i) it's  a waste of space, and
+ii) local versions may conflict.
+
+The idea is, then, that after doing a git clone, you should just need to run
+./configure -- since this is what happens when you compile from source.
+
+So, my repository being in an unknown state, I did:
+
+$ autoreconf --install
+
+which should make it ./configure - runnable. Then I did
+
+$ ./configure && make check
+
+All went smoothly, so
+
+$ make distclean.
+
+This I'll use as a starting point.
