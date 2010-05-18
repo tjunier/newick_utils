@@ -22,4 +22,24 @@ All went smoothly, so
 
 $ make distclean.
 
-This I'll use as a starting point.
+This I'll use as a starting point. I did:
+
+$ git add .
+$ git st
+
+...
+#	new file:   autom4te.cache/output.0
+#	new file:   autom4te.cache/output.1
+#	new file:   autom4te.cache/requests
+#	new file:   autom4te.cache/traces.0
+#	new file:   autom4te.cache/traces.1
+...
+
+Hmm, I have an inkling that all the cache contents should not really be under
+version control, so I'll ignore them:
+
+$ git reset HEAD autom4te.cache/*
+$ cat > .gitignore
+autom4te.cache
+
+And then I committed.
