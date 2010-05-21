@@ -6,6 +6,7 @@
 \usepackage[usenames,dvipsnames]{color}
 \usepackage{listings}
 \usepackage{pifont}
+\usepackage{bibentry}
 
 % This looks better than CM
 \usepackage{palatino}
@@ -58,12 +59,13 @@
 \newcommand{\Hrule}[1]{\rule{\linewidth}{#1}}
 
 \begin{document}
+\nobibliography*
 
 \begin{titlepage}
 \begin{center}
 \Hrule{0.5mm} \\[0.8cm]
 {\Huge Newick Utilities Tutorial} \\[0.5cm]
-Version 1.2.0 -- \today \\
+Version 1.3.0 -- \today \\
 \medskip
 Thomas Junier \texttt{thomas.junier@unige.ch} \\
 Computational Evolutionary Genomics Group \\
@@ -100,7 +102,7 @@ Swiss Institute of Bioinformatics \\
 \include{installing}
 
 \bibliographystyle{plain}
-\bibliography{references.bib}
+\bibliography{references}
 
 % \include{tree_axioms}
 
