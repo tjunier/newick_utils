@@ -74,7 +74,7 @@ check:
 show:
 	echo $(PATH)
 
-nwutils_tutorial.pdf: *.tex \
+nwutils_tutorial.pdf: *.tex *.bib \
 	$(regular_pdfs) \
 	$(regular_svg_command_strings) \
 	$(newick_command_outputs) \
@@ -82,6 +82,8 @@ nwutils_tutorial.pdf: *.tex \
 	$(text_command_strings) \
 	$(text_command_outputs) \
 	$(homino_pdfs) $(nodes_vs_depth_pdfs) bootscan_1.pdf
+	pdflatex nwutils_tutorial.tex
+	bibtex   nwutils_tutorial.aux
 	pdflatex nwutils_tutorial.tex
 	pdflatex nwutils_tutorial.tex
 
@@ -104,11 +106,11 @@ $(homino_pdfs) : %.pdf : %.svg
 
 # removes auxiliary and intermediary files (including SVG and EPS)
 clean:
-	$(RM) *.{out,cmd,aux,log,dvi,toc} *.eps *_svg.svg 
+	$(RM) $(text_command_outputs) $(newick_command_outputs) $(text_command_strings) $(regular_svg_command_strings) $(newick_command_strings) *.aux *.log *.dvi *.toc *.eps *.bbl *.blg *_svg.svg
 
 # like clean, plus removes all PDFs except the main target
 clean-images: clean
-	$(RM) *_svg.pdf homino_?.{svg,pdf} $(nodes_vs_depth_pdfs) bootscan_1.pdf
+	$(RM) *_svg.pdf $(homino_pdfs) $(homino_svgs) $(nodes_vs_depth_pdfs) bootscan_1.pdf
 
 # leaves a blank slate to start from scratch
 distclean: clean-images
