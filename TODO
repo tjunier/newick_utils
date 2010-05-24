@@ -1,8 +1,8 @@
+*BUG* try nw_display on ./bug
+
 nw_prune: add test for the case when a parentless node is unlinked (happens if
 that node's parent was previously unlined too). But do this only when the inner
 node case is handled too (loot at nw_prune -h).
-
-new program: nw_stats, prints info about a tree such as number of nodes, type (cladogram, phylogram, ultrametric, etc).
 
 nw_order: how are internal labels handled when sorting alphabetically? For now
 they are ignored, it seems. Should we add an option to handle them?
@@ -95,6 +95,7 @@ nw_prune: remove complement (i.e., keep specified nodes and prune the rest);
 allow selection of a branch by its LCA.
 
 nw_display: craft test tree for numeric verification of lengths and positions
+
 
 nw_display: use CSS in scale bar
 
@@ -412,3 +413,8 @@ buffer, and is indeed much faster for large trees).
 a few places where this caused side effects, so I put a TODO marker.
 
 [done] moved to Git. Repository in fuji.unige.ch:/home/junier/depot/newick_utils.git
+
+[done] new program: nw_stats, prints info about a tree such as number of nodes, type (cladogram, phylogram, ultrametric, etc).
+
+--- I now put version markers in the TODO. Everything before this was in:
+--- v. 1.3.0 ---
