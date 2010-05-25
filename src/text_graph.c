@@ -81,6 +81,10 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		}
 
+		/* Don't bother printing label if it is "" */
+		if (strcmp(node->label, "") == 0)
+			continue;
+
 		/* print label */
 		if (is_inner_node(node)) {
 			double parent_depth = (
@@ -128,8 +132,10 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 			canvas_write(canvas, tick_h_pos, v_pos, "|");
 			char *tick_lbl = masprintf("%g", x);
 			int tick_lbl_len = strlen(tick_lbl);
-			canvas_write(canvas, tick_h_pos - tick_lbl_len + 1,
-					v_pos + 1, tick_lbl);
+			int tick_lbl_pos = tick_h_pos - tick_lbl_len + 1;
+			if (tick_lbl_pos < ROOT_SPACE)
+				tick_lbl_pos = ROOT_SPACE;
+			canvas_write(canvas, tick_lbl_pos, v_pos + 1, tick_lbl);
 			free (tick_lbl);
 			x += interval;
 		}
@@ -141,7 +147,10 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 			canvas_write(canvas, tick_h_pos, v_pos, "|");
 			char *tick_lbl = masprintf("%g", dmax - x);
 			int tick_lbl_len = strlen(tick_lbl);
-			canvas_write(canvas, tick_h_pos - tick_lbl_len + 1,
+			int tick_lbl_pos = tick_h_pos - tick_lbl_len + 1;
+			if (tick_lbl_pos < ROOT_SPACE)
+				tick_lbl_pos = ROOT_SPACE;
+			canvas_write(canvas, tick_lbl_pos,
 					v_pos + 1, tick_lbl);
 			free (tick_lbl);
 			x -= interval;

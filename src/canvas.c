@@ -90,11 +90,12 @@ void canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop
 
 void canvas_write(struct canvas *canvasp, int col, int line, char *text)
 {
+	assert(col >= 0);
+	assert(col < canvasp->width);
 	int text_length = strlen(text);
 	int space_left = canvasp->width - col;
 	int min = text_length < space_left ? text_length : space_left;
 	char *dest = canvasp->lines[line]+col;
-
 	strncpy(dest, text, min);
 }
 

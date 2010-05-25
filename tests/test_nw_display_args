@@ -32,3 +32,5 @@ tnobar: -S catarrhini.nw
 tunit: -u 'million years' catarrhini_ultrametric.nw
 time: -t -u 'million years ago' duration.nw
 stime: -s -t -u 'million years ago' duration.nw
+tiny: tiny_lengths.nw 
+tiny_t: -t tiny_lengths.nw 
