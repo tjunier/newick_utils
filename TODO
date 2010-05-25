@@ -91,9 +91,6 @@ WRONG, it works allright.
 [partly done] nw_display: SVG ortho, align middle of label, rather than bottom,
 to branch.  Try with some SVG property.
 
-nw_prune: remove complement (i.e., keep specified nodes and prune the rest);
-allow selection of a branch by its LCA.
-
 nw_display: craft test tree for numeric verification of lengths and positions
 
 nw_display: use CSS in scale bar
@@ -407,6 +404,9 @@ buffer, and is indeed much faster for large trees).
 [done] rewrite rnode_iterator without using hashes
 
 [done] Valgrind everything
+
+[done] nw_prune: remove complement (i.e., keep specified nodes and prune the
+rest); allow selection of a branch by its LCA. -- nw_prune -v
 
 [done] replace to_newick() with dump_newick() wherever possible - there were
 a few places where this caused side effects, so I put a TODO marker.
