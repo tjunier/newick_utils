@@ -198,7 +198,9 @@ struct rnode *lca_from_labels_multi (struct rooted_tree *tree,
 		}
 	}
 
-	// TODO: handle case with no nodes found
+	/* No nodes were found that matched the labels */
+	if (0 == descendants->count)
+		return NULL;
 
 	struct rnode *result = lca_from_nodes (tree, descendants);
 	if (NULL == result) return NULL;

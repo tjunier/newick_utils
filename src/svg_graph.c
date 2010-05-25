@@ -487,6 +487,11 @@ int set_group_numbers(struct rooted_tree *tree)
 		if (CLADE != css_el->group_type) continue;
 		struct llist *labels = css_el->labels;
 		struct rnode *lca = lca_from_labels_multi(tree, labels);
+		// TODO: lca_from_labels_multi() needs to distinguish NULL
+		// values due to a real, irrecoverable  problem (e.g., memory)
+		// from NULLs due to no labels found (which only prevents
+		// coloring but does not mean we have to abort).
+		// Use functions in error.h
 		if (NULL == lca) return FAILURE;
 		struct svg_data *lca_data = lca->data;
 		lca_data->group_nb = css_el->group_nb;
