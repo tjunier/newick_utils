@@ -38,7 +38,8 @@ static char *error_messages[] = {
 	"Syntax error in Newick",
 	"Syntax error in CSS map",
 	"Syntax error in ornament map",
-	"Syntax error in URL map"
+	"Syntax error in URL map",
+	"No matching nodes found"
 };
 
 void set_last_error_code(enum error_codes code)

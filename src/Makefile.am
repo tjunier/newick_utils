@@ -35,8 +35,7 @@ libnw_la_SOURCES = $(NW_CORE)
 nw_display_SOURCES = display.c canvas.c text_graph.c \
 		simple_node_pos.c svg_graph.c readline.c \
 		node_pos_alloc.c xml_utils.c graph_common.c \
-		svg_graph_ortho.c svg_graph_radial.c
-
+		svg_graph_ortho.c svg_graph_radial.c 
 nw_display_LDADD = @LEXLIB@ -lm libnw.la
 
 nw_clade_SOURCES = subtree.c
@@ -92,8 +91,9 @@ nw_duration_LDADD = @LEXLIB@ libnw.la
 nw_stats_SOURCES = stats.c
 nw_stats_LDADD = @LEXLIB@ libnw.la
 
-nw_toy_SOURCES = toy.c
-nw_toy_LDADD = @LEXLIB@ libnw.la
+# disabled for release
+#nw_toy_SOURCES = toy.c
+#nw_toy_LDADD = @LEXLIB@ libnw.la
 
 # Removes automatically generated C code (Lex & YACC)
 #
