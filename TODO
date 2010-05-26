@@ -1,5 +1,3 @@
-*BUG* try nw_display on ./bug
-
 nw_prune: add test for the case when a parentless node is unlinked (happens if
 that node's parent was previously unlined too). But do this only when the inner
 node case is handled too (loot at nw_prune -h).
@@ -115,8 +113,6 @@ nw_display: add examples to help text.
 
 nw_gen: check that help is up-to-date (seems to me that it still describes the
 old function)
-
-nw_display: output better message when colormap labels are not found
 
 nw_distance: add tests for new selection options (i and f)
 
@@ -418,3 +414,8 @@ a few places where this caused side effects, so I put a TODO marker.
 
 --- I now put version markers in the TODO. Everything before this was in:
 --- v. 1.3.0 ---
+
+[done] fixed bug 2010-05-24.1 (nw_display text-mode scale bar wrong when tick labels were too long, causing memory error).
+
+[done] nw_display: output better message when colormap labels are not found --
+program now just ignores the color map if it can't be applied.
