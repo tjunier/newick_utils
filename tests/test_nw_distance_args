@@ -17,3 +17,5 @@ multi: -tn forest_ind.nw
 mt: -mm -t catarrhini.nw
 nml: -n -ml dist_meth_xpl.nw
 nmt: -n -mm -t catarrhini.nw
+nsf: -n -s f dist_meth_xpl.nw
+nsi: -n -s i dist_meth_xpl.nw

@@ -114,8 +114,6 @@ nw_display: add examples to help text.
 nw_gen: check that help is up-to-date (seems to me that it still describes the
 old function)
 
-nw_distance: add tests for new selection options (i and f)
-
 [later] Add functionality for reducing stair nodes.
 
 [later] Add functionality for directly counting a bipartition from a set of
@@ -419,3 +417,8 @@ a few places where this caused side effects, so I put a TODO marker.
 
 [done] nw_display: output better message when colormap labels are not found --
 program now just ignores the color map if it can't be applied.
+
+[done] nw_distance: add tests for new selection options (i and f)
+
+[done] add clause details to test output (see tests/test_summary.sh)
+
