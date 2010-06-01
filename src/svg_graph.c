@@ -492,7 +492,18 @@ int set_group_numbers(struct rooted_tree *tree)
 		// from NULLs due to no labels found (which only prevents
 		// coloring but does not mean we have to abort).
 		// Use functions in error.h
-		if (NULL == lca) return FAILURE;
+		if (NULL == lca) {
+			enum error_codes err = get_last_error_code();
+			switch (err) {
+			case ERR_NOMEM:
+				return FAILURE;
+			case ERR_NO_MATCHING_NODES:
+				return SUCCESS;
+			default:
+				assert(0);	/* should not happen */
+			}
+		}
+
 		struct svg_data *lca_data = lca->data;
 		lca_data->group_nb = css_el->group_nb;
 	}

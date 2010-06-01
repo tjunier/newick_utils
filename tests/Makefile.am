@@ -42,7 +42,8 @@ test_hash_SOURCES = test_hash.c $(SRC)/hash.c $(SRC)/list.c $(SRC)/masprintf.c
 
 test_lca_SOURCES = test_lca.c $(SRC)/lca.c $(SRC)/list.c $(SRC)/nodemap.c \
 	$(SRC)/link.c $(SRC)/rnode.c $(SRC)/hash.c \
-	$(SRC)/rnode_iterator.c tree_stubs.c $(SRC)/masprintf.c 
+	$(SRC)/rnode_iterator.c tree_stubs.c $(SRC)/masprintf.c \
+	$(SRC)/error.c
 
 test_nodemap_SOURCES = test_nodemap.c $(SRC)/nodemap.c \
 	$(SRC)/rnode.c $(SRC)/list.c $(SRC)/hash.c \

@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 #include "hash.h"
 #include "nodemap.h"
+#include "error.h"
 
 struct rooted_tree *lca2w_tree;
 
@@ -172,6 +173,9 @@ struct rnode *lca_from_labels(struct rooted_tree *tree, struct llist *labels)
 struct rnode *lca_from_labels_multi (struct rooted_tree *tree, 
 		struct llist *labels)
 {
+	/* If something happens, it's most likely to be a memory problem: */
+	set_last_error_code(ERR_NOMEM);
+
 	/* Make a hash of lists of nodes of the same label */
 	struct hash *nodes_by_label;
        	nodes_by_label = create_label2node_list_map(tree->nodes_in_order);
@@ -199,8 +203,10 @@ struct rnode *lca_from_labels_multi (struct rooted_tree *tree,
 	}
 
 	/* No nodes were found that matched the labels */
-	if (0 == descendants->count)
+	if (0 == descendants->count) {
+		set_last_error_code(ERR_NO_MATCHING_NODES);
 		return NULL;
+	}
 
 	struct rnode *result = lca_from_nodes (tree, descendants);
 	if (NULL == result) return NULL;

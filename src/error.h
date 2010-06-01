@@ -37,7 +37,8 @@ enum error_codes {
 	ERR_NW_SYNTAX,
 	ERR_CSS_MAP_SYNTAX,
 	ERR_ORN_MAP_SYNTAX,
-	ERR_URL_MAP_SYNTAX
+	ERR_URL_MAP_SYNTAX,
+	ERR_NO_MATCHING_NODES
 };
 
 /* Sets the error code for the latest error - see error.c */
