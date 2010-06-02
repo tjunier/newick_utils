@@ -86,7 +86,6 @@ static void help(char *argv[])
 "\n"
 "    -h: print this message and exit\n"
 "    -f [lc]: format in lines (l) or columns (c). Default is c.\n"
-"    -H: suppress headers.\n"
 "\n"
 "Examples\n"
 "--------\n"

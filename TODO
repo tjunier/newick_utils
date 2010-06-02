@@ -422,3 +422,7 @@ program now just ignores the color map if it can't be applied.
 
 [done] add clause details to test output (see tests/test_summary.sh)
 
+[done] nw_ed now accepts constants
+
+[done] fixed bug 2010-06-02.1 (nw_display hangs with single-node trees (default params) - see test_nw_display_1node)
+

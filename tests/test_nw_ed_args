@@ -8,3 +8,5 @@ n_l:-n catarrhini.nw '1 == 1' l
 multi: -no forest_ind.nw 'a >= 4' s
 d_s:-n catarrhini.nw 'D == 2' s
 c_s:-n falc_families.nw 'c > 2' s
+const_1: -n catarrhini.nw 1 s 
+const_0: -n catarrhini.nw 0 s 

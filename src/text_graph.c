@@ -138,6 +138,8 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 			canvas_write(canvas, tick_lbl_pos, v_pos + 1, tick_lbl);
 			free (tick_lbl);
 			x += interval;
+			if (dmax == 0)
+				break;
 		}
 	} else {
 		/* scale zero at max depth */

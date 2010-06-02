@@ -129,6 +129,14 @@ factor: comparison
 		}
 		$$ = not;
 	}
+	| CONST {
+		struct enode *n = create_enode_constant($1);
+		if (NULL == n) {
+			expression_root = NULL;
+			YYACCEPT;
+		}
+		$$ = n;
+	}
 
 comparison: comparand COMPARATOR comparand {
 		struct enode *c = create_enode_op($2, $1, $3);
