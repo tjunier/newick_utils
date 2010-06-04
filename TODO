@@ -426,3 +426,4 @@ program now just ignores the color map if it can't be applied.
 
 [done] fixed bug 2010-06-02.1 (nw_display hangs with single-node trees (default params) - see test_nw_display_1node)
 
+suggestion 2010-06-03.01 by Sudeep Mehrotra: text ornaments for radial trees 
