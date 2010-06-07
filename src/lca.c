@@ -205,6 +205,8 @@ struct rnode *lca_from_labels_multi (struct rooted_tree *tree,
 	/* No nodes were found that matched the labels */
 	if (0 == descendants->count) {
 		set_last_error_code(ERR_NO_MATCHING_NODES);
+		destroy_llist(descendants);
+		destroy_label2node_list_map(nodes_by_label);
 		return NULL;
 	}
 
