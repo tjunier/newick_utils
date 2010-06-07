@@ -1,2 +1,4 @@
 "<circle style='fill:red;stroke:black' r='5'/>" I Homo Pan
 "<circle style='fill:cyan;stroke:blue' r='5'/>" C Homo Hylobates
+"<text style='font-style:italic'>Borneo</text>"				I Pongo
+"<text>plains</text>"				I Gorilla
