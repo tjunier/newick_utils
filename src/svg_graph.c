@@ -66,6 +66,7 @@ struct css_map_element {
 
 struct ornament_map_element {
 	int group_type;	/* INDIVIDUAL or CLADE */
+	bool text;
 	char *ornament;	/* an SVG snippet */
 	struct llist *labels;
 };
@@ -348,6 +349,11 @@ struct llist *read_ornament_map()
 			continue;
 		}
 		oel->ornament = ornament;
+		/* ornament is considered text IFF it begins with '<text' */
+		if (strstr(ornament, "<text") == ornament)
+			oel->text = true;
+		else
+			oel->text = false;
 		oel->labels = label_list;
 		if (! append_element(ornament_map, oel))
 			return NULL;

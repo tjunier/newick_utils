@@ -139,15 +139,75 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 				svg_par_x_pos, svg_par_y_pos);
 		}
 		/* draw ornament, if any */
-		if (NULL != node_data->ornament) 
-			printf ("<g transform='rotate(%.4f,0,0) translate(%.4f,%.4f)'>%s</g>",
-					svg_mid_angle / (2*PI) * 360,
+		if (NULL != node_data->ornament) {
+			if (node_data->text) {
+				if (cos(svg_mid_angle) >= 0) 
+					printf ("<g transform='rotate(%g,%g,%g)"
+						" translate(%g,%g)'>%s</g>",
+						svg_mid_angle / (2*PI) * 360,
+						svg_mid_x_pos, svg_mid_y_pos,
+						svg_mid_x_pos, svg_mid_y_pos,
+						node_data->ornament);
+				else 
+					printf ("<g transform='rotate(180,%g,%g)"
+						" rotate(%g,%g,%g)"
+						" translate(%g,%g)'>%s</g>",
+						svg_mid_x_pos, svg_mid_y_pos,
+						svg_mid_angle / (2*PI) * 360,
+						svg_mid_x_pos, svg_mid_y_pos,
+						svg_mid_x_pos, svg_mid_y_pos,
+						node_data->ornament);
+			} else {
+				printf ("<g  translate(%g,%g)'>%s</g>",
 					svg_mid_x_pos, svg_mid_y_pos,
 					node_data->ornament);
-		
-
+			}
+		}
 	}
 	printf("</g>");
+}
+
+/* lower-level label drawing */
+
+void place_label(const char *label, const double radius, double mid_angle,
+		const double r_scale, const bool nudge, const char *class)
+{
+	double x_pos;
+	double y_pos;
+
+	if (cos(mid_angle) >= 0)  {
+		x_pos = radius * cos(mid_angle);
+		y_pos = radius * sin(mid_angle);
+		if (nudge) {
+			x_pos -= (NUDGE_DISTANCE * cos(mid_angle + PI / 2));
+			y_pos -= (NUDGE_DISTANCE * sin(mid_angle + PI / 2));
+		}
+		printf("<text class='%s' "
+		       "transform='rotate(%g,%g,%g)' "
+		       "x='%.4f' y='%.4f'>%s</text>",
+			class,
+			mid_angle / (2*PI) * 360,
+			x_pos, y_pos,
+			x_pos, y_pos, label);
+	}
+	else {
+		mid_angle += svg_left_label_angle_correction;
+		x_pos = radius * cos(mid_angle);
+		y_pos = radius * sin(mid_angle);
+		if (nudge) {
+			x_pos += (NUDGE_DISTANCE * cos(mid_angle + PI / 2));
+			y_pos += (NUDGE_DISTANCE * sin(mid_angle + PI / 2));
+		}
+		printf(	"<text class='%s' "
+			"style='text-anchor:end;' "
+			"transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
+		       "x='%.4f' y='%.4f'>%s</text>",
+			class,
+			mid_angle / (2*PI) * 360,
+			x_pos, y_pos,
+			x_pos, y_pos,
+			x_pos, y_pos, label);
+	}
 }
 
 /* Draws a node label */
@@ -156,8 +216,6 @@ static void draw_label(struct rnode *node, double radius,
 		double mid_angle, const double r_scale,
 		const char *class, const char *url)
 {
-	double x_pos;
-	double y_pos;
 	/* Will set this to true when the label must be drawn parallel to the
 	 * branch, rather than on the exact same line */
 	bool nudge = false;
@@ -189,39 +247,7 @@ static void draw_label(struct rnode *node, double radius,
 		}
 	}
 
-	if (cos(mid_angle) >= 0)  {
-		x_pos = radius * cos(mid_angle);
-		y_pos = radius * sin(mid_angle);
-		if (nudge) {
-			x_pos -= (NUDGE_DISTANCE * cos(mid_angle + PI / 2));
-			y_pos -= (NUDGE_DISTANCE * sin(mid_angle + PI / 2));
-		}
-		printf("<text class='%s' "
-		       "transform='rotate(%g,%g,%g)' "
-		       "x='%.4f' y='%.4f'>%s</text>",
-			class,
-			mid_angle / (2*PI) * 360,
-			x_pos, y_pos,
-			x_pos, y_pos, node->label);
-	}
-	else {
-		mid_angle += svg_left_label_angle_correction;
-		x_pos = radius * cos(mid_angle);
-		y_pos = radius * sin(mid_angle);
-		if (nudge) {
-			x_pos += (NUDGE_DISTANCE * cos(mid_angle + PI / 2));
-			y_pos += (NUDGE_DISTANCE * sin(mid_angle + PI / 2));
-		}
-		printf(	"<text class='%s' "
-			"style='text-anchor:end;' "
-			"transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
-		       "x='%.4f' y='%.4f'>%s</text>",
-			class,
-			mid_angle / (2*PI) * 360,
-			x_pos, y_pos,
-			x_pos, y_pos,
-			x_pos, y_pos, node->label);
-	}
+	place_label(node->label, radius, mid_angle, r_scale, nudge, class);
 
 	if (url) printf("</a>");
 }
