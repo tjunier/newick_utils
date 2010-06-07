@@ -144,7 +144,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 			 * with "<text" */
 			if (strstr(node_data->ornament, "<text") == 
 					node_data->ornament) {
-				// printf("<g style='stroke:none'>");
+				printf("<g style='stroke:none;fill:black'>");
 				if (cos(svg_mid_angle) >= 0) {
 					printf ("<g style='text-anchor:end'"
 						" transform='rotate(%g,%g,%g)"
@@ -164,7 +164,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 						svg_mid_x_pos, svg_mid_y_pos,
 						node_data->ornament);
 				}
-				//printf("</g>");
+				printf("</g>");
 			} else {
 				printf ("<g transform='"
 					"translate(%.4f,%.4f)'>%s</g>",
