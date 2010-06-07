@@ -426,4 +426,9 @@ program now just ignores the color map if it can't be applied.
 
 [done] fixed bug 2010-06-02.1 (nw_display hangs with single-node trees (default params) - see test_nw_display_1node)
 
-suggestion 2010-06-03.01 by Sudeep Mehrotra: text ornaments for radial trees 
+[done] suggestion 2010-06-03.01 by Sudeep Mehrotra: text ornaments for radial
+trees 
+
+Slashes in labels (such as those of Influenzavirus) cause the parser to choke
+(unless they are quoted). Look into the grammar, if slashes are OK then modify
+the scanner.
