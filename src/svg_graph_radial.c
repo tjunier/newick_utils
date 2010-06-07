@@ -138,27 +138,44 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 				svg_mid_x_pos, svg_mid_y_pos,
 				svg_par_x_pos, svg_par_y_pos);
 		}
-		/* draw ornament, if any */
+		/* draw ornament, if any */ // TODO: refactor into own f()
 		if (NULL != node_data->ornament) {
-			if (node_data->text) {
-				if (cos(svg_mid_angle) >= 0) 
-					printf ("<g transform='rotate(%g,%g,%g)"
-						" translate(%g,%g)'>%s</g>",
+			/* ornament is considered text IFF it starts
+			 * with "<text" */
+			if (strstr(node_data->ornament, "<text") == 
+					node_data->ornament) {
+				printf("<g style='stroke:none;fill:black'>");
+				if (cos(svg_mid_angle) >= 0) {
+					svg_mid_x_pos -= (NUDGE_DISTANCE *
+						cos(svg_mid_angle + PI / 2));
+					svg_mid_y_pos -= (NUDGE_DISTANCE *
+						sin(svg_mid_angle + PI / 2));
+					printf ("<g style='text-anchor:end'"
+						" transform='rotate(%g,%g,%g)"
+						" translate(%.4f,%.4f)'>%s</g>",
 						svg_mid_angle / (2*PI) * 360,
 						svg_mid_x_pos, svg_mid_y_pos,
 						svg_mid_x_pos, svg_mid_y_pos,
 						node_data->ornament);
-				else 
-					printf ("<g transform='rotate(180,%g,%g)"
-						" rotate(%g,%g,%g)"
-						" translate(%g,%g)'>%s</g>",
+				} else {
+					svg_mid_x_pos += (NUDGE_DISTANCE *
+						cos(svg_mid_angle + PI / 2));
+					svg_mid_y_pos += (NUDGE_DISTANCE *
+						sin(svg_mid_angle + PI / 2));
+					printf ("<g transform='"
+						"rotate(180,%g,%g) "
+						"rotate(%g,%g,%g) "
+						"translate(%.4f,%.4f)'>%s</g>",
 						svg_mid_x_pos, svg_mid_y_pos,
 						svg_mid_angle / (2*PI) * 360,
 						svg_mid_x_pos, svg_mid_y_pos,
 						svg_mid_x_pos, svg_mid_y_pos,
 						node_data->ornament);
+				}
+				printf("</g>");
 			} else {
-				printf ("<g  translate(%g,%g)'>%s</g>",
+				printf ("<g transform='"
+					"translate(%.4f,%.4f)'>%s</g>",
 					svg_mid_x_pos, svg_mid_y_pos,
 					node_data->ornament);
 			}

@@ -109,11 +109,26 @@ void draw_branches_ortho (struct rooted_tree *tree, const double h_scale,
 				 svg_mid_pos, svg_h_pos, svg_mid_pos);
 		}
 		/* draw ornament, if any */
-		if (NULL != node_data->ornament)
-			printf ("<g transform='translate(%.4f,%.4f)'>%s</g>",
-					svg_h_pos, svg_mid_pos,
+		if (NULL != node_data->ornament) {
+			/* ornament is considered text IFF it starts
+			 * with "<text" */
+			if (strstr(node_data->ornament, "<text") == 
+					node_data->ornament) {
+				printf ("<g style='text-anchor:end;"
+					"stroke:none;fill:black'"
+					" transform='"
+					"translate(%g,%g)'>%s</g>",
+					svg_h_pos,
+					svg_mid_pos + edge_length_v_offset,
 					node_data->ornament);
+			} else { /* not text */
+				printf ("<g transform='"
+					"translate(%g,%g)'>%s</g>",
+						svg_h_pos, svg_mid_pos,
+						node_data->ornament);
+			}
 
+		}
 	}
 	printf("</g>");
 }
