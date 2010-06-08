@@ -433,4 +433,8 @@ Slashes in labels (such as those of Influenzavirus) cause the parser to choke
 (unless they are quoted). Look into the grammar, if slashes are OK then modify
 the scanner.
 
-Update tutorial: text ornaments
+[done] added a test program for the Newick scanner
+
+add a test program for the Newick parser
+
+[done] Update tutorial: text ornaments
