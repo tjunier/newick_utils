@@ -1,4 +1,4 @@
-# red disk with black border for human and chimp
 "<circle style='fill:red;stroke:black' r='5'/>" I Homo Pan
-# cyan disk with blue border for ape clade
 "<circle style='fill:cyan;stroke:blue' r='5'/>" C Homo Hylobates
+"<text style='font-style:italic'>Borneo</text>"	I Pongo
+"<text>west</text>"				I Gorilla

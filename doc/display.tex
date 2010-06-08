@@ -231,11 +231,17 @@ same syntax as the \css{} map, except that you specify \svg{} elements rather
 than \css{} styles. The \texttt{Individual} keyword means that all nodes named
 on a given line sport the corresponding ornament, while \texttt{Clade} means
 that only the clade's \lca{} must be adorned. The ornament is translated in
-such a way that its (0,0) coordinate corresponds to the position of the node (for now it is not rotated, but this may come in a future release).
+such a way that its (0,0) coordinate corresponds to the position of the node.
+In radial graphs, text ornaments are rotated like node labels.
 
 The following file, \texttt{ornament.map}, instructs to draw a red circle with
 a black border on \texttt{Homo} and \texttt{Pan}, and a cyan circle with a blue
-border on the root of the \texttt{Homo} - \texttt{Hylobates} clade. The \svg{}
+border on the root of the \texttt{Homo} - \texttt{Hylobates} clade.
+\texttt{Gorilla} node will be annotated with the word "plains", and
+\texttt{Pongo} with "Borneo" in italics\footnote{In fact, to annotate that these
+are the Western gorilla and the Borneo orang-utan, it would be simpler just to
+label the corresponding leaves accordingly, \ie, \texttt{Gorilla\_gorilla} and
+\texttt{Pongo\_pygmaeus}. But this is just an example\ldots}. The \svg{}
 is enclosed in double quotes because it contains spaces - note that single
 quotes are used for the values of \xml{} attributes. The ornament map is
 specified with option \texttt{-o}:
@@ -246,7 +252,11 @@ specified with option \texttt{-o}:
 \begin{center}
  \includegraphics{display_8_svg.pdf}
 \end{center}
-Ornaments and \css{} can be combined:
+
+\noindent{}Text ornaments are special: they follow the node's parent edge, and are aligned
+with the edge's tip. In radial trees, this means that they are rotated like
+regular node labels.  Ornaments and \css{} can be combined:
+
 \verbatiminput{display_9_svg.cmd}
 \begin{center}
  \includegraphics{display_9_svg.pdf}
