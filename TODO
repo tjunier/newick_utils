@@ -429,9 +429,10 @@ program now just ignores the color map if it can't be applied.
 [done] suggestion 2010-06-03.01 by Sudeep Mehrotra: text ornaments for radial
 trees 
 
-Slashes in labels (such as those of Influenzavirus) cause the parser to choke
-(unless they are quoted). Look into the grammar, if slashes are OK then modify
-the scanner.
+[done] Slashes in labels (such as those of Influenzavirus) cause the parser to
+choke (unless they are quoted). Look into the grammar, if slashes are OK then
+modify the scanner. -- Slashes are indeed Ok; new version now works with DG's
+problem trees. Will add them to the test case unless he sees a problem with it.
 
 [done] added a test program for the Newick scanner
 

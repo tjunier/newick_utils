@@ -87,17 +87,24 @@ void newick_scanner_set_file_input(FILE *input)
 
 %}
 
+/* See http://evolution.genetics.washington.edu/phylip/newick_doc.html for the
+ * grammar of Newick. Do info flex for the regexp syntax. */ 
+
 %%
 
 ('[^']*')+	{
+	/* quoted string (one or more) */
 	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
-[a-zA-Z0-9_.+-]+	{
+[[:graph:]]{-}[();,:']+	{
+	/* printable characters except ();,:' */
 	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
-[a-zA-Z0-9_.+-]+([ ][a-zA-Z0-9_.+-]+)+	{
+[[:graph:]]{-}[();,:']+([[:print:]]{-}[();,:'])+[[:graph:]]{-}[();,:']+ {
+	/* the same, with possible spaces in the middle (technically not
+	 * Newick, but can be fixed */
 	nwslval.sval = (char *) space2underscore(strdup(yytext));
 	fprintf (stderr, "WARNING: spaces found in label '%s' - converting to underscores.\n",
 			yytext);
