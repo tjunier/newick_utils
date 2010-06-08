@@ -89,7 +89,7 @@ void newick_scanner_set_file_input(FILE *input)
 
 %%
 
-'[^']*'	{
+('[^']*')+	{
 	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
