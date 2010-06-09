@@ -436,6 +436,8 @@ problem trees. Will add them to the test case unless he sees a problem with it.
 
 [done] added a test program for the Newick scanner
 
-add a test program for the Newick parser
+[done] add a test program for the Newick parser 
 
-[done] Update tutorial: text ornaments
+[done] Update tutorial: text ornamentso
+
+add tests for the parser, complete the "slashes" scanner test case

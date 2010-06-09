@@ -1,9 +1,15 @@
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h> 
 
 #include "rnode.h"
 #include "list.h"
 #include "parser.h"
 #include "newick_parser.h"
+
+extern FILE *nwsin;
 
 int nwslex (void);
 struct rnode *root;
@@ -341,6 +347,114 @@ int test_label_chars()
 	return 0;
 }
 
+int test_slash_and_space()
+{
+	/* Part of a tree that caused the lexer to choke. Thanks to Daniel
+	 * Gerlach for pointing this one out. */
+	char *test_name = "test_slash_and_space";
+
+	// This seems to work...
+	/* mmap() the file wo we can pass the string to the lexer */
+	int fd = open("slash_and_space.nw", O_RDONLY);
+	if (-1 == fd) { perror(NULL); return 1; }
+	struct stat buf;
+	int status = fstat(fd, &buf);
+	if (-1 == status) { perror(NULL); return 1; }
+	off_t length = buf.st_size;
+	char *newick = mmap(NULL, length, PROT_READ, MAP_PRIVATE,
+			fd, 0);
+	newick_scanner_set_string_input(newick);
+
+	// This ought to be simpler than the mmap() way above, but does not
+	// work, I don't know why.
+	/*
+	FILE *input = fopen("slash_and_space.nw", "r");
+	if (NULL == input) { perror(NULL); return 1; }
+	nwsin = input;
+	*/
+
+	int token_type = -1;
+	char *exp;
+
+	token_type = nwslex();
+	if (O_PAREN != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, O_PAREN, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (O_PAREN != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, O_PAREN, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (LABEL != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, LABEL, token_type);
+		return 1;
+	}
+	exp = "B/Washington/05/2009_gi_255529494_gb_GQ451489";
+	if (strcmp(nwslval.sval, exp) != 0) {
+		printf ("%s: expected label '%s', got '%s'\n",
+				test_name, exp, nwslval.sval);
+		return 1;
+	}
+	token_type = nwslex();
+	if (COLON != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, COLON, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (LABEL != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, LABEL, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (COMMA != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, COMMA, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (O_PAREN != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, O_PAREN, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (LABEL != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, LABEL, token_type);
+		return 1;
+	}
+	exp = "B/Indiana/04/2009_gi_255529556_gb_GQ451547"; 
+	if (strcmp(nwslval.sval, exp) != 0) {
+		printf ("%s: expected label '%s', got '%s'\n",
+				test_name, exp, nwslval.sval);
+		return 1;
+	}
+	/*
+	token_type = nwslex();
+	if (C_PAREN != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, C_PAREN, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (token_type > 0) {
+		printf ("%s: expected EOF, got %d\n",
+				test_name, EOF, token_type);
+		return 1;
+	}
+	*/
+
+	printf("%s: ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -351,6 +465,7 @@ int main()
 	failures += test_quoted_labels();
 	failures += test_space_in_labels();
 	failures += test_catenated_quoted_labels();
+	failures += test_slash_and_space();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
