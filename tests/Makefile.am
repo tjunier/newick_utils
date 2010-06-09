@@ -1,6 +1,7 @@
 AM_CFLAGS = -I ../src
 
-TESTS = test_newick_scanner test_rnode test_list test_link test_masprintf \
+TESTS = test_newick_scanner test_newick_parser test_rnode test_list \
+	test_link test_masprintf \
 	test_canvas test_concat test_hash test_lca test_enode \
 	test_nodemap test_to_newick test_tree test_node_set \
 	test_rnode_iterator test_tree_models test_xml_utils \
@@ -18,7 +19,8 @@ check_PROGRAMS = test_rnode test_list test_link test_newick_scanner \
 		 test_nodemap test_to_newick test_tree test_node_set \
 		 test_enode test_rnode_iterator test_readline \
 		 test_tree_models test_xml_utils test_masprintf \
-		 test_error test_order_tree test_graph_common
+		 test_error test_order_tree test_graph_common \
+		 test_newick_parser
 
 check_HEADERS = tree_stubs.h
 
@@ -27,7 +29,11 @@ SRC = $(top_builddir)/src
 test_newick_scanner_SOURCES = test_newick_scanner.c $(SRC)/newick_scanner.c \
 	$(SRC)/newick_parser.c $(SRC)/rnode.c $(SRC)/rnode_iterator.c \
 	$(SRC)/list.c $(SRC)/hash.c $(SRC)/masprintf.c $(SRC)/link.c
-test_newick_scanner_LDADD = @LEXLIB@ 
+
+test_newick_parser_SOURCES = test_newick_parser.c $(SRC)/parser.c \
+	$(SRC)/newick_scanner.c $(SRC)/newick_parser.c $(SRC)/list.c \
+	$(SRC)/rnode.c $(SRC)/link.c $(SRC)/hash.c $(SRC)/rnode_iterator.c \
+	$(SRC)/masprintf.c $(SRC)/to_newick.c $(SRC)/concat.c
 
 test_rnode_SOURCES = test_rnode.c $(SRC)/rnode.c $(SRC)/list.c \
 	$(SRC)/rnode_iterator.c $(SRC)/hash.c $(SRC)/masprintf.c

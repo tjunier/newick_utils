@@ -32,6 +32,9 @@ address_scanner.c: address_scanner.l
 lib_LTLIBRARIES = libnw.la
 libnw_la_SOURCES = $(NW_CORE)
 
+# TODO: check if @LEXLIB@ is really needed everywhere. tests/Makefile.am
+# doesn't have it, and it doesn't seem to cause problems.
+
 nw_display_SOURCES = display.c canvas.c text_graph.c \
 		simple_node_pos.c svg_graph.c readline.c \
 		node_pos_alloc.c xml_utils.c graph_common.c \
