@@ -42,6 +42,8 @@ enum parser_status_type newick_parser_status;
 
 int nwsparse(); // TODO: rm this if fails
 
+// TODO: use this f() in the apps' get_param() 
+
 int set_parser_input_filename (char *filename)
 {
 	extern FILE *nwsin;
@@ -86,4 +88,3 @@ struct rooted_tree *parse_tree()
 		return NULL;
 	}
 }
-
