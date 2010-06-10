@@ -350,28 +350,13 @@ int test_label_chars()
 int test_slash_and_space()
 {
 	/* Part of a tree that caused the lexer to choke. Thanks to Daniel
-	 * Gerlach for pointing this one out. */
+	 * Gerlach for pointing this one out. Also spaces to the labels, to
+	 * make test case stricter.*/
 	char *test_name = "test_slash_and_space";
-
-	// This seems to work...
-	/* mmap() the file wo we can pass the string to the lexer */
-	int fd = open("slash_and_space.nw", O_RDONLY);
-	if (-1 == fd) { perror(NULL); return 1; }
-	struct stat buf;
-	int status = fstat(fd, &buf);
-	if (-1 == status) { perror(NULL); return 1; }
-	off_t length = buf.st_size;
-	char *newick = mmap(NULL, length, PROT_READ, MAP_PRIVATE,
-			fd, 0);
-	newick_scanner_set_string_input(newick);
-
-	// This ought to be simpler than the mmap() way above, but does not
-	// work, I don't know why.
-	/*
+	
 	FILE *input = fopen("slash_and_space.nw", "r");
 	if (NULL == input) { perror(NULL); return 1; }
-	nwsin = input;
-	*/
+	newick_scanner_set_file_input(input);
 
 	int token_type = -1;
 	char *exp;
