@@ -440,10 +440,12 @@ problem trees. Will add them to the test case unless he sees a problem with it.
 
 [done] Update tutorial: text ornaments
 
-add tests for the parser, complete the "slashes" scanner test case
+[done] add tests for the parser, complete the "slashes" scanner test case
 
 check nudging of node labels (needed esp. for small trees)
 
-Newick scanner chokes on comments: add test.
+[done] Newick scanner chokes on comments: add test.
 
-Doc: add section about the 'arguments' XML comment in the SVG files
+[done] Doc: add section about the 'arguments' XML comment in the SVG files
+
+test handling of 's in labels beyond lexer: nw_display tests/irish.nw
