@@ -22,8 +22,8 @@ int test_simple()
 
 	/* Note: this is a valid Newick string, but since we're checking the
 	 * scanner, it doesn't have to be - see test_garbled()  */
-	char *newick = "((A,B),C);";
-	newick_scanner_set_string_input(newick);
+	char *input = "((A,B),C);";
+	newick_scanner_set_string_input(input);
 
 	int token_type = -1;
 
@@ -117,8 +117,8 @@ int test_garbled()
 {
 	const char *test_name = "test_garbled";
 
-	char *newick = ")ABC(;(,";
-	newick_scanner_set_string_input(newick);
+	char *input = ")ABC(;(,";
+	newick_scanner_set_string_input(input);
 
 	int token_type = -1;
 
@@ -178,8 +178,8 @@ int test_quoted_labels()
 {
 	const char *test_name = "test_quoted_labels";
 
-	char *newick = "('abc(/)def')";
-	newick_scanner_set_string_input(newick);
+	char *input = "('abc(/)def')";
+	newick_scanner_set_string_input(input);
 
 	int token_type = -1;
 
@@ -221,8 +221,8 @@ int test_space_in_labels()
 {
 	const char *test_name = "test_space_in_labels";
 
-	char *newick = "(A space-containing label)";
-	newick_scanner_set_string_input(newick);
+	char *input = "(A space-containing label)";
+	newick_scanner_set_string_input(input);
 
 	int token_type = -1;
 
@@ -265,8 +265,8 @@ int test_catenated_quoted_labels()
 {
 	const char *test_name = "test_catenated_quoted_labels";
 
-	char *newick = "('abc''def''gh(/)ij')";
-	newick_scanner_set_string_input(newick);
+	char *input = "('abc''def''gh(/)ij')";
+	newick_scanner_set_string_input(input);
 
 	int token_type = -1;
 
@@ -308,8 +308,8 @@ int test_label_chars()
 {
 	const char *test_name = "test_label_chars";
 
-	char *newick = "(la/bel)";
-	newick_scanner_set_string_input(newick);
+	char *input = "(la/bel)";
+	newick_scanner_set_string_input(input);
 
 	int token_type = -1;
 
@@ -440,6 +440,49 @@ int test_slash_and_space()
 	return 0;
 }
 
+int test_comments()
+{
+	const char *test_name = "test_comments";
+
+	char *input = "[a comment](a,(b,c));[another comment]";
+	newick_scanner_set_string_input(input);
+
+	int token_type = -1;
+
+	token_type = nwslex();
+	if (O_PAREN != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, O_PAREN, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (LABEL != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, LABEL, token_type);
+		return 1;
+	}
+	if (strcmp(nwslval.sval, "la/bel") != 0) {
+		printf ("%s: expected label 'la/bel', got '%s'\n",
+				test_name, nwslval.sval);
+		return 1;
+	}
+	token_type = nwslex();
+	if (C_PAREN != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, C_PAREN, token_type);
+		return 1;
+	}
+	token_type = nwslex();	/* EOF */
+	if (token_type > 0) {
+		printf ("%s: expected EOF, got %d\n",
+				test_name, EOF, token_type);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -451,6 +494,7 @@ int main()
 	failures += test_space_in_labels();
 	failures += test_catenated_quoted_labels();
 	failures += test_slash_and_space();
+	failures += test_comments();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

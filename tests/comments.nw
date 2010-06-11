@@ -1,0 +1,121 @@
+[until 1960]
+(
+	(
+		Homo
+	)Hominidae,
+	(
+		Pan,
+		Gorilla,
+		Pongo,
+		Hylobates
+	)Pongidae
+)Hominoidea;
+[1964: molecular biology (Goodman)]
+(
+	(
+		Homo
+	)Hominidae,
+	(
+		Pan,
+		Gorilla,
+		Pongo
+	)Pongidae,
+	(
+		Hylobates
+	)Hylobatidae
+)Hominoidea;
+[gibbons as outgroup]
+(
+	(
+		(
+			Homo
+		)Homininae,
+		(
+			Pan,
+			Gorilla,
+			Pongo
+		)Ponginae
+	)Hominidae,
+	(
+		Hylobates
+	)Hylobatidae
+)Hominoidea;
+[1974: orangs as outgroup to Homininae]
+(
+	(
+		(
+			Homo,
+			Pan,
+			Gorilla
+		)Homininae,
+		(
+			Pongo
+		)Ponginae
+	)Hominidae,
+	(
+		Hylobates
+	)Hylobatidae
+)Hominoidea;
+[attempt at resolving trichotomy]
+(
+	(
+		(
+			(
+				Homo
+			)Hominini,
+			(
+				Pan,
+				Gorilla
+			)Gorillini
+		)Homininae,
+		(
+			Pongo
+		)Ponginae
+	)Hominidae,
+	(
+		Hylobates
+	)Hylobatidae
+)Hominoidea;
+[Goodman 1990: gorillas as outgroup in Homininae]
+(
+	(
+		(
+			(
+				Homo,
+				Pan
+			)Hominini,
+			(
+				Gorilla
+			)Gorillini
+		)Homininae,
+		(
+			Pongo
+		)Ponginae
+	)Hominidae,
+	(
+		Hylobates
+	)Hylobatidae
+)Hominoidea;
+[Split of Hylobates into 4 genera]
+(
+	(
+		(
+			(
+				Homo,
+				Pan
+			)Hominini,
+			(
+				Gorilla
+			)Gorillini
+		)Homininae,
+		(
+			Pongo
+		)Ponginae
+	)Hominidae,
+	(
+		Hylobates,
+		Hoolock,
+		Symphalangus,
+		Nomascus
+	)Hylobatidae
+)Hominoidea;
