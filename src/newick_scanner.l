@@ -97,12 +97,12 @@ void newick_scanner_set_file_input(FILE *input)
 	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
-[[:graph:]]{-}[();,:']+	{
+[[:graph:]]{-}[();,:'\[\]]+	{
 	/* printable characters except ();,:' */
 	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
-[[:graph:]]{-}[();,:']+([[:print:]]{-}[();,:'])+[[:graph:]]{-}[();,:']+ {
+[[:graph:]]{-}[();,:'\[\]]+([[:print:]]{-}[();,:'\[\]])+[[:graph:]]{-}[();,:'\[\]]+ {
 	/* the same, with possible spaces in the middle (technically not
 	 * Newick, but can be fixed */
 	nwslval.sval = (char *) space2underscore(strdup(yytext));

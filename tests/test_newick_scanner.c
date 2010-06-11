@@ -444,7 +444,7 @@ int test_comments()
 {
 	const char *test_name = "test_comments";
 
-	char *input = "[a comment](a,(b,c));[another comment]";
+	char *input = "[comment](a,(b,c));[another comment]";
 	newick_scanner_set_string_input(input);
 
 	int token_type = -1;
@@ -461,8 +461,48 @@ int test_comments()
 				test_name, LABEL, token_type);
 		return 1;
 	}
-	if (strcmp(nwslval.sval, "la/bel") != 0) {
-		printf ("%s: expected label 'la/bel', got '%s'\n",
+	if (strcmp(nwslval.sval, "a") != 0) {
+		printf ("%s: expected label 'a', got '%s'\n",
+				test_name, nwslval.sval);
+		return 1;
+	}
+	token_type = nwslex();
+	if (COMMA != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, COMMA, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (O_PAREN != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, O_PAREN, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (LABEL != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, LABEL, token_type);
+		return 1;
+	}
+	if (strcmp(nwslval.sval, "b") != 0) {
+		printf ("%s: expected label 'b', got '%s'\n",
+				test_name, nwslval.sval);
+		return 1;
+	}
+	token_type = nwslex();
+	if (COMMA != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, COMMA, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (LABEL != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, LABEL, token_type);
+		return 1;
+	}
+	if (strcmp(nwslval.sval, "c") != 0) {
+		printf ("%s: expected label 'c', got '%s'\n",
 				test_name, nwslval.sval);
 		return 1;
 	}
@@ -470,6 +510,18 @@ int test_comments()
 	if (C_PAREN != token_type) {
 		printf ("%s: expected token type %d, got %d\n",
 				test_name, C_PAREN, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (C_PAREN != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, C_PAREN, token_type);
+		return 1;
+	}
+	token_type = nwslex();
+	if (SEMICOLON != token_type) {
+		printf ("%s: expected token type %d, got %d\n",
+				test_name, SEMICOLON, token_type);
 		return 1;
 	}
 	token_type = nwslex();	/* EOF */
