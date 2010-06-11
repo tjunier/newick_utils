@@ -60,7 +60,10 @@ void cap_tree(char *eol)
 	indent(indent_level, indent_string);
 	printf("(%s", eol); indent_level++;
 }
-\)('[^']*'|[a-zA-Z0-9_.+-]+)?(:[0-9.]+)?[,;]?	{
+\)('[^']*'|[[:graph:]]{-}[(),:']+)?(:[0-9.]+)?[,;]?	{
+	/* possible label (quoted or unquoted), then maybe length. This rule
+	 * handles both unquoted or quoted labels - more terse, but less readable...
+	 * */
 	indent_level--;
 	indent(indent_level, indent_string);
 	printf("%s%s", yytext, eol);
