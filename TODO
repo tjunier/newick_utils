@@ -448,4 +448,6 @@ check nudging of node labels (needed esp. for small trees)
 
 [done] Doc: add section about the 'arguments' XML comment in the SVG files
 
+[done] fix nw_inden's lexer so that it handles slashes. 
+
 test handling of 's in labels beyond lexer: nw_display tests/irish.nw

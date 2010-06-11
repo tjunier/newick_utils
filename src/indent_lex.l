@@ -46,7 +46,13 @@ void cap_tree(char *eol)
 
 %%
 
-('[^']*'|[a-zA-Z0-9_.+-]+)?(:[0-9.]+)?,?	{
+('[^']*')?(:[0-9.]+)?,?	{
+	/* possible quoted label, then maybe length */
+	indent(indent_level, indent_string);
+	printf("%s%s", yytext, eol);
+}
+([[:graph:]]{-}[(),:']+)?(:[0-9.]+)?,?	{
+	/* possible unquoted label, then maybe length */
 	indent(indent_level, indent_string);
 	printf("%s%s", yytext, eol);
 }
