@@ -301,6 +301,20 @@ But \texttt{forest\_svg} isn't valid \svg{} -- it is a concatenation of many \sv
 \end{quote}
 This will produce one \svg{} file per tree in \texttt{forest.nw}, named \texttt{tree\_01.svg}, \texttt{tree\_02.svg}, etc.
 
+\subsubsection{\display{} \texttt{-s} stores its arguments}
+
+When run in \svg{} mode, \display{} "remembers" its arguments, that is, it puts
+them in an \xml{} comment with the keyword \texttt{arguments}. It is then
+trivial to retrieve them:
+
+\verbatiminput{display_15_txt.cmd}
+\verbatiminput{display_16_txt.cmd}
+\verbatiminput{display_16_txt.out}
+
+\noindent{}This is handy when one wants to re-use a set of options on another
+tree, especially after a while when one doesn't remember the exact values of the
+parameters, or which was the input tree, etc. 
+
 \subsection{Options not Covered}
 
 \display{} has many options, and we will not describe them all here - all of

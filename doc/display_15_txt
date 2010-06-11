@@ -1,0 +1,1 @@
+nw_display -sr -S -w 450 -o b2r.map HRV_ingrp.nw > HRV_ingrp.svg
