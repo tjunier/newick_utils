@@ -432,7 +432,8 @@ trees
 [done] Slashes in labels (such as those of Influenzavirus) cause the parser to
 choke (unless they are quoted). Look into the grammar, if slashes are OK then
 modify the scanner. -- Slashes are indeed Ok; new version now works with DG's
-problem trees. Will add them to the test case unless he sees a problem with it.
+problem trees of IVB; added partial IVB tree to test cases (with his
+permission).
 
 [done] added a test program for the Newick scanner
 
@@ -450,4 +451,7 @@ check nudging of node labels (needed esp. for small trees)
 
 [done] fix nw_inden's lexer so that it handles slashes. 
 
+[done] Setup a public Git repository
+
 test handling of 's in labels beyond lexer: nw_display tests/irish.nw
+
