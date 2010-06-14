@@ -48,29 +48,34 @@ int test_simple()
 		return 1;
 }
 
-/* The test__jf_* tests all test trees from Felsenstein's description of Newick
+/* This tests all test trees from Felsenstein's description of Newick
  * at http://evolution.genetics.washington.edu/phylip/newicktree.html, which is
  * the closest thing to an official description. */
 
-int test_jf_1()
+int test_jf()
 {
 
-	char *test_name = "test_jf_1";
+	char *test_name = "test_jf";
 
-	char *newick = "(B,(A,C,E),D);";
+	int failures = 0;
 
-	newick_scanner_set_string_input(newick);
+	failures += check_tree(test_name, "(B,(A,C,E),D);");
+	failures += check_tree(test_name, "(,(,,),);");
+	failures += check_tree(test_name, "(B:6.0,(A:5.0,C:3.0,E:4.0):5.0,D:11.0);");
+	failures += check_tree(test_name, "(B:6.0,(A:5.0,C:3.0,E:4.0)Ancestor1:5.0,D:11.0);");
+	failures += check_tree(test_name, "((raccoon:19.19959,bear:6.80041):0.84600,((sea_lion:11.99700,seal:12.00300):7.52973,((monkey:100.85930,cat:47.14069):20.59201,weasel:18.87953):2.09460):3.87382,dog:25.46154);");
+	failures += check_tree(test_name, "(Bovine:0.69395,(Gibbon:0.36079,(Orang:0.33636,(Gorilla:0.17147,(Chimp:0.19268,Human:0.11927):0.08386):0.06124):0.15057):0.54939,Mouse:1.21460):0.10;");
+	failures += check_tree(test_name, "(Bovine:0.69395,(Hylobates:0.36079,(Pongo:0.33636,(G._Gorilla:0.17147,(P._paniscus:0.19268,H._sapiens:0.11927):0.08386):0.06124):0.15057):0.54939,Rodent:1.21460);");
+	failures += check_tree(test_name, "A;");
+	failures += check_tree(test_name, "((A,B),(C,D));");
+	failures += check_tree(test_name, "(Alpha,Beta,Gamma,Delta,,Epsilon,,,);");
+	failures += check_tree(test_name, "(B,(A,D),C);");
+	failures += check_tree(test_name, "(A,(B,C),D);");
+	failures += check_tree(test_name, "((A,D),(C,B));");
 
-	struct rooted_tree *tree = parse_tree();
-	char *obt = to_newick(tree->root);
-	if (strcmp(obt, newick) != 0) {
-		printf ("%s: expected '%s', got '%s'\n", test_name,
-				newick, obt);
-		return 1;
-	}
-
-	printf ("%s: ok.\n", test_name);
-	return 0;
+	if (failures == 0)
+		printf ("%s: ok.\n", test_name);
+	return failures;
 }
 
 int main()
@@ -78,7 +83,7 @@ int main()
 	int failures = 0;
 	printf("Starting newick parser test...\n");
 	failures += test_simple();
-	failures += test_jf_1();
+	failures += test_jf();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
