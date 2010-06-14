@@ -1,6 +1,10 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "rnode.h"
 #include "to_newick.h"
@@ -177,6 +181,64 @@ int test_bug1()
 	return 0;
 }
 
+int test_dump_simple()
+{
+	const char *test_name = "test_dump_simple";
+	char *result;
+	struct rnode *node_a;
+	struct rnode *node_b;
+	char *exp = "(a:12);";
+
+	node_a = create_rnode("a", "12");
+	node_b = create_rnode("", "");
+	add_child(node_b, node_a);
+
+	/* dump_newick() writes to standard output. If we want to check what it
+	 * wrote, we have to redirect its output to a file. This can be done
+	 * easily with dup() or dup2(). But this is not the end of the story,
+	 * because we want to resume writing to the old stdout after
+	 * dump_newick() has done its job -- we have to print a summary of how
+	 * the test went, and of course there are other tests down te line. I
+	 * found two ways of doing this: */
+
+	/* This works, and conforms to C99, but what if the terminal isn't
+	 * /dev/tty? */
+	/*
+	FILE *out = freopen("test.out", "w", stdout);
+	dump_newick(node_b);
+	freopen("/dev/tty", "w", out);
+	*/
+
+	/* This also works, and may be more portable, but involves fork()ing a
+	 * child process: overkill? */
+	int fd = creat("test.out", S_IWUSR | S_IRUSR);
+	if (-1 == fd) { perror(NULL); return 1; }
+	pid_t pid = fork();
+	if (-1 == pid) { perror(NULL); return 1; }
+	if (0 == pid) {
+		/* child */
+		close(STDOUT_FILENO);
+		dup(fd);
+		dump_newick(node_b);
+		exit(EXIT_SUCCESS);
+	} else {
+		/* parent */
+		wait(NULL);
+	}
+
+	// TODO here: read (mmap?) the output file, and compare it with the
+	// expected Newick string. This should replace the following block.
+	result = to_newick(node_b);
+	if (strcmp(exp, result) != 0) {
+		printf("%s: expected '%s', got '%s'.\n",
+				test_name, exp, result);
+		return 1;
+	}
+
+	printf("%s: ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -187,6 +249,7 @@ int main()
 	failures += test_nested_1();
 	failures += test_nested_2();
 	failures += test_bug1();
+	failures += test_dump_simple();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
