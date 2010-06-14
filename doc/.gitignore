@@ -1,1 +1,12 @@
 .*.sw?
+*.out
+*.cmd
+*_svg.pdf
+*.eps
+*.aux
+*.log
+*.svg
+*.bbl
+*.blg
+*.toc
+*.pdf
