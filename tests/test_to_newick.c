@@ -12,6 +12,58 @@
 #include "link.h"
 #include "concat.h"
 
+/* dump_newick() writes to standard output. If we want to check what it wrote,
+ * we have to redirect its output to a file. This can be done easily with dup()
+ * or dup2(). But this is not the end of the story, because we want to resume
+ * writing to the old stdout after dump_newick() has done its job -- we have to
+ * print a summary of how the test went, and of course there are other tests
+ * down te line. I found two ways of doing this: */
+
+int dump_newick_to_file(struct rnode *node, char *outname)
+{
+
+	/* This works, and conforms to C99, but what if the terminal isn't
+	 * /dev/tty? */
+	/*
+	FILE *out = freopen("test.out", "w", stdout);
+	dump_newick(node_b);
+	freopen("/dev/tty", "w", out);
+	*/
+
+	/* This also works, and may be more portable, but involves fork()ing a
+	 * child process: overkill? */
+	int fd = open(outname, O_CREAT | O_TRUNC | O_RDWR, S_IWUSR | S_IRUSR);
+	if (-1 == fd) return -1;
+	pid_t pid = fork();
+	if (-1 == pid) return -1; 
+	if (0 == pid) {
+		/* child */
+		close(STDOUT_FILENO);
+		if (-1 == dup(fd)) {
+			perror("dup");
+			close(fd);
+			exit(EXIT_FAILURE);
+		}
+		dump_newick(node);
+		close(fd);
+		exit(EXIT_SUCCESS);
+	} else {
+		/* parent */
+		wait(NULL);
+		return fd;
+	}
+}
+
+char *mmap_output(int fd)
+{
+	struct stat buf;
+	if (-1 == fstat(fd, &buf)) return NULL;
+	char *output = mmap(NULL, buf.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (NULL == output) return NULL;
+
+	return output;
+}
+
 int test_trivial()
 {
 	const char *test_name = "test_trivial";
@@ -195,50 +247,16 @@ int test_dump_simple()
 	node_b = create_rnode("", "");
 	add_child(node_b, node_a);
 
-	/* dump_newick() writes to standard output. If we want to check what it
-	 * wrote, we have to redirect its output to a file. This can be done
-	 * easily with dup() or dup2(). But this is not the end of the story,
-	 * because we want to resume writing to the old stdout after
-	 * dump_newick() has done its job -- we have to print a summary of how
-	 * the test went, and of course there are other tests down te line. I
-	 * found two ways of doing this: */
-
-	/* This works, and conforms to C99, but what if the terminal isn't
-	 * /dev/tty? */
-	/*
-	FILE *out = freopen("test.out", "w", stdout);
-	dump_newick(node_b);
-	freopen("/dev/tty", "w", out);
-	*/
-
-	/* This also works, and may be more portable, but involves fork()ing a
-	 * child process: overkill? */
 	char *outname = concat(test_name, ".out");
 	if (NULL == outname) { perror(NULL); return 1; }
-	int fd = open(outname, O_CREAT | O_RDWR, S_IWUSR | S_IRUSR);
-	if (-1 == fd) { perror(NULL); return 1; }
-	pid_t pid = fork();
-	if (-1 == pid) { perror(NULL); return 1; }
-	if (0 == pid) {
-		/* child */
-		close(STDOUT_FILENO);
-		if (-1 == dup(fd)) {
-			perror("dup");
-			close(fd);
-			exit(EXIT_FAILURE);
-		}
-		dump_newick(node_b);
-		close(fd);
-		exit(EXIT_SUCCESS);
-	} else {
-		/* parent */
-		wait(NULL);
-	}
 
-	struct stat buf;
-	if (-1 == fstat(fd, &buf)) { perror("fstat"); return 1; }
-	char *obt = mmap(NULL, buf.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	if (NULL == obt) { perror("mmap"); return 1; }
+	/* dump the newick into a file (by redirecting stdout) */
+	int fd = dump_newick_to_file(node_b, outname);
+	if (-1 == fd) { perror(NULL); return 1; }
+
+	/* read the output into a string */
+	char *obt = mmap_output(fd);
+	if (NULL == obt) { perror(NULL); return 1; }
 
 	if (strcmp(exp, obt) != 0) {
 		printf("%s: expected '%s', got '%s'.\n", test_name, exp, obt);
