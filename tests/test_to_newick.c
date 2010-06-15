@@ -11,6 +11,8 @@
 #include "to_newick.h"
 #include "link.h"
 #include "concat.h"
+#include "parser.h"
+#include "tree.h"
 
 /* dump_newick() writes to standard output. If we want to check what it wrote,
  * we have to redirect its output to a file. This can be done easily with dup()
@@ -268,6 +270,78 @@ int test_dump_simple()
 	return 0;
 }
 
+/* (a:12,(b:5,c:7)d:3)e; */
+int test_dump_nested_2()
+{
+	char *test_name = "test_dump_nested_2";
+	char *result;
+	struct rnode *node_a;
+	struct rnode *node_b;
+	struct rnode *node_c;
+	struct rnode *node_d;
+	struct rnode *node_e;
+	char *exp = "(a:12,(b:5,c:7)d:3)e:4;\n";
+
+	node_a = create_rnode("a", "12");
+	node_b = create_rnode("b", "5");
+	node_c = create_rnode("c", "7");
+	node_d = create_rnode("d", "3");
+	node_e = create_rnode("e", "4");
+	add_child(node_d, node_b);
+	add_child(node_d, node_c);
+	add_child(node_e, node_a);
+	add_child(node_e, node_d);
+
+	char *outname = concat(test_name, ".out");
+	if (NULL == outname) { perror(NULL); return 1; }
+
+	int fd = dump_newick_to_file(node_e, outname);
+	if (-1 == fd) { perror(NULL); return 1; }
+
+	char *obt = mmap_output(fd);
+	if (NULL == obt) { perror(NULL); return 1; }
+
+	if (strcmp(exp, obt) != 0) {
+		printf("%s: expected '%s', got '%s'.\n",
+				test_name, exp, obt);
+		return 1;
+	}
+
+	printf("%s: ok.\n", test_name);
+	unlink(outname);
+	return 0;
+}
+
+int test_bug2()
+{
+	char *test_name = "test_bug2";
+	char *newick = "(Bovine:0.69395,(Gibbon:0.36079,(Orang:0.33636,(Gorilla:0.17147,(Chimp:0.19268,Human:0.11927):0.08386):0.06124):0.15057):0.54939,Mouse:1.21460):0.10;";
+
+	newick_scanner_set_string_input(newick);
+
+	struct rooted_tree *tree = parse_tree();
+	struct rnode *root = tree->root;
+	if (strcmp("", root->label) != 0) {
+		printf("%s: expected empty root label, got '%s'\n",
+				test_name, root->label);
+		return 1;
+	}
+	if (strcmp("0.10", root->edge_length_as_string) != 0) {
+		printf("%s: expected root edge length 0.10 , got '%s'\n",
+				test_name, root->edge_length_as_string);
+		return 1;
+	}
+	char *obt = to_newick(tree->root);
+	if (strcmp(obt, newick) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name,
+				newick, obt);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -278,7 +352,9 @@ int main()
 	failures += test_nested_1();
 	failures += test_nested_2();
 	failures += test_bug1();
+	failures += test_bug2();
 	failures += test_dump_simple();
+	failures += test_dump_nested_2();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

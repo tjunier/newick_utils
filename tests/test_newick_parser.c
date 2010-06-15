@@ -16,6 +16,8 @@ enum parser_status_type newick_parser_status;
 /* NOTE: we can use to_newick() to check the parser's output because this
  * function is independently tested on trees constructed without the parser
  * (see test_to_newick) */
+/* NOTE HOWEVER: one of the test cases below (test_jf) actually uncovered a bug
+ * in to_newick()... This should serve as a lesson :-) */
 
 int check_tree(char *test_name, char *newick)
 {
@@ -23,6 +25,7 @@ int check_tree(char *test_name, char *newick)
 
 	struct rooted_tree *tree = parse_tree();
 	char *obt = to_newick(tree->root);
+
 	if (strcmp(obt, newick) != 0) {
 		printf ("%s: expected '%s', got '%s'\n", test_name,
 				newick, obt);
