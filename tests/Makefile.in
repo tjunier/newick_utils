@@ -164,7 +164,8 @@ test_rnode_iterator_LDADD = $(LDADD)
 am_test_to_newick_OBJECTS = test_to_newick.$(OBJEXT) \
 	to_newick.$(OBJEXT) rnode.$(OBJEXT) link.$(OBJEXT) \
 	concat.$(OBJEXT) list.$(OBJEXT) rnode_iterator.$(OBJEXT) \
-	hash.$(OBJEXT) masprintf.$(OBJEXT)
+	hash.$(OBJEXT) masprintf.$(OBJEXT) parser.$(OBJEXT) \
+	newick_scanner.$(OBJEXT) newick_parser.$(OBJEXT)
 test_to_newick_OBJECTS = $(am_test_to_newick_OBJECTS)
 test_to_newick_LDADD = $(LDADD)
 am_test_tree_OBJECTS = test_tree.$(OBJEXT) tree.$(OBJEXT) \
@@ -378,7 +379,8 @@ test_nodemap_SOURCES = test_nodemap.c $(SRC)/nodemap.c \
 test_to_newick_SOURCES = test_to_newick.c $(SRC)/to_newick.c \
 	$(SRC)/rnode.c $(SRC)/link.c $(SRC)/concat.c \
 	$(SRC)/list.c $(SRC)/rnode_iterator.c $(SRC)/hash.c \
-	$(SRC)/masprintf.c
+	$(SRC)/masprintf.c $(SRC)/parser.c $(SRC)/newick_scanner.c \
+	$(SRC)/newick_parser.c
 
 test_tree_SOURCES = test_tree.c $(SRC)/tree.c $(SRC)/rnode.c $(SRC)/list.c \
 	$(SRC)/to_newick.c $(SRC)/nodemap.c $(SRC)/link.c $(SRC)/concat.c \

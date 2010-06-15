@@ -63,7 +63,8 @@ test_nodemap_SOURCES = test_nodemap.c $(SRC)/nodemap.c \
 test_to_newick_SOURCES = test_to_newick.c $(SRC)/to_newick.c \
 	$(SRC)/rnode.c $(SRC)/link.c $(SRC)/concat.c \
 	$(SRC)/list.c $(SRC)/rnode_iterator.c $(SRC)/hash.c \
-	$(SRC)/masprintf.c
+	$(SRC)/masprintf.c $(SRC)/parser.c $(SRC)/newick_scanner.c \
+	$(SRC)/newick_parser.c
 
 test_tree_SOURCES = test_tree.c $(SRC)/tree.c $(SRC)/rnode.c $(SRC)/list.c \
 	$(SRC)/to_newick.c $(SRC)/nodemap.c $(SRC)/link.c $(SRC)/concat.c \
