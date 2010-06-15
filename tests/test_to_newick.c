@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
+#include <sys/mman.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +10,7 @@
 #include "rnode.h"
 #include "to_newick.h"
 #include "link.h"
+#include "concat.h"
 
 int test_trivial()
 {
@@ -183,11 +185,11 @@ int test_bug1()
 
 int test_dump_simple()
 {
-	const char *test_name = "test_dump_simple";
+	char *test_name = "test_dump_simple";
 	char *result;
 	struct rnode *node_a;
 	struct rnode *node_b;
-	char *exp = "(a:12);";
+	char *exp = "(a:12);\n";
 
 	node_a = create_rnode("a", "12");
 	node_b = create_rnode("", "");
@@ -211,31 +213,40 @@ int test_dump_simple()
 
 	/* This also works, and may be more portable, but involves fork()ing a
 	 * child process: overkill? */
-	int fd = creat("test.out", S_IWUSR | S_IRUSR);
+	char *outname = concat(test_name, ".out");
+	if (NULL == outname) { perror(NULL); return 1; }
+	int fd = open(outname, O_CREAT | O_RDWR, S_IWUSR | S_IRUSR);
 	if (-1 == fd) { perror(NULL); return 1; }
 	pid_t pid = fork();
 	if (-1 == pid) { perror(NULL); return 1; }
 	if (0 == pid) {
 		/* child */
 		close(STDOUT_FILENO);
-		dup(fd);
+		if (-1 == dup(fd)) {
+			perror("dup");
+			close(fd);
+			exit(EXIT_FAILURE);
+		}
 		dump_newick(node_b);
+		close(fd);
 		exit(EXIT_SUCCESS);
 	} else {
 		/* parent */
 		wait(NULL);
 	}
 
-	// TODO here: read (mmap?) the output file, and compare it with the
-	// expected Newick string. This should replace the following block.
-	result = to_newick(node_b);
-	if (strcmp(exp, result) != 0) {
-		printf("%s: expected '%s', got '%s'.\n",
-				test_name, exp, result);
+	struct stat buf;
+	if (-1 == fstat(fd, &buf)) { perror("fstat"); return 1; }
+	char *obt = mmap(NULL, buf.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (NULL == obt) { perror("mmap"); return 1; }
+
+	if (strcmp(exp, obt) != 0) {
+		printf("%s: expected '%s', got '%s'.\n", test_name, exp, obt);
 		return 1;
 	}
 
 	printf("%s: ok.\n", test_name);
+	unlink(outname);
 	return 0;
 }
 
