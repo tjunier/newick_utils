@@ -110,6 +110,7 @@ char *to_newick(struct rnode *node)
 	char *result;
 	result = subtree(node);
 	if (NULL == result) return NULL;
+	fprintf(stderr, "result: >%s<\n", result);
 	result = append_to(result, ";");
 	return result;
 }
@@ -129,7 +130,7 @@ int dump_newick(struct rnode *node)
 
 	printf("(");
 	while ((current = rnode_iterator_next(it)) != NULL) {
-		 //fprintf (stderr, "%s: seen: %d\n", current->label, current->seen);
+		 // fprintf (stderr, "%s (%s): seen: %d\n", current->label, current->edge_length_as_string, current->seen);
 		if (is_leaf(current)) {
 			/* leaf: just print label */
 			printf("%s", current->label);
