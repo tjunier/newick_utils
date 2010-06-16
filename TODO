@@ -443,15 +443,17 @@ permission).
 
 [done] add tests for the parser, complete the "slashes" scanner test case
 
-check nudging of node labels (needed esp. for small trees)
-
 [done] Newick scanner chokes on comments: add test.
 
 [done] Doc: add section about the 'arguments' XML comment in the SVG files
 
-[done] fix nw_inden's lexer so that it handles slashes. 
+[done] fix nw_indent's lexer so that it handles slashes. 
 
-[done] Setup a public Git repository
+[done] Setup a public Git repository -- experimental on own ws
+
+[done] fix bug in to_newick(): edges of root nodes were not printed (these are rare, admittedly, but nonetheless valid Newick).
 
 test handling of 's in labels beyond lexer: nw_display tests/irish.nw
+
+check nudging of node labels (needed esp. for small trees)
 
