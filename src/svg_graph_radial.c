@@ -187,7 +187,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 /* lower-level label drawing */
 
 void place_label(const char *label, const double radius, double mid_angle,
-		const double r_scale, const bool nudge, const char *class)
+		 const bool nudge, const char *class)
 {
 	double x_pos;
 	double y_pos;
@@ -264,7 +264,7 @@ static void draw_label(struct rnode *node, double radius,
 		}
 	}
 
-	place_label(node->label, radius, mid_angle, r_scale, nudge, class);
+	place_label(node->label, radius, mid_angle, nudge, class);
 
 	if (url) printf("</a>");
 }
@@ -292,7 +292,7 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		mid_angle += svg_label_angle_correction;
 
 		if (is_leaf(node))
-			radius += LBL_SPACE;
+			radius += label_space;
 		else
 			radius += INNER_LBL_SPACE;
 
@@ -359,7 +359,7 @@ void params_as_svg_comment (struct h_data hd, double node_area_width,
 	       	label_char_width,
 	       	hd.l_max,
 		svg_root_length,
-	       	LBL_SPACE,
+	       	label_space,
 		hd.d_max,
 	       	label_char_width * hd.l_max,
 		node_area_width,
@@ -380,7 +380,7 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 	/* TODO: why twice svg_root_length? */
 	double node_area_width = 0.5 * graph_width
 			- label_char_width * hd.l_max
-			- svg_root_length - LBL_SPACE;
+			- svg_root_length - label_space;
 	r_scale = node_area_width / hd.d_max;
 
 	// params_as_svg_comment(hd, node_area_width, r_scale);

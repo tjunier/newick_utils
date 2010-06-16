@@ -140,7 +140,7 @@ void draw_label(const double svg_h_pos, const double svg_mid_pos,
 		const char *class, const char *url)
 {
 	/* Defaults: use node's position */
-	double h_pos = svg_h_pos + LBL_SPACE;
+	double h_pos = svg_h_pos + label_space;
 	double v_pos = svg_mid_pos + LBL_VOFFSET; 
 
 	if (url) printf ("<a %s>", url);
@@ -258,7 +258,7 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	h_scale = (graph_width
 			- label_char_width * hd.l_max
 			- ROOT_SPACE
-			- LBL_SPACE
+			- label_space
 		) / hd.d_max;
 
 	/* Tree is in a separate group - may be useful when (if?) there are

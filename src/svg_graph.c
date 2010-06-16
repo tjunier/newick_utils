@@ -102,6 +102,7 @@ int svg_whole_v_shift = -1; 	/* Vertical translation of whole graph */
 double label_char_width = -1;
 enum inner_lbl_pos inner_label_pos = -1;
 bool scalebar_zero_at_root = true;
+int label_space = 10;
 
 /* These are setters for the external variables. This way I can keep most of
  * them static. I just don't like variables open to anyone, maybe I did too
@@ -121,6 +122,7 @@ void set_svg_edge_label_style(char *style) { edge_label_style = style; }
 void set_svg_plain_node_style(char *style) { plain_node_style = style; }
 void set_svg_label_char_width(double width) { label_char_width = width; }
 void set_svg_scalebar_zero_at_root(bool at_root) { scalebar_zero_at_root = at_root; }
+void add_to_svg_label_space(int correction) { label_space += correction; }
 
 /************************** functions *****************************/
 

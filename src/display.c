@@ -67,6 +67,7 @@ struct parameters {
 	int 	no_scale_bar;		/* suppresses scale bar if true */
 	enum 	inner_lbl_pos inner_label_pos;	/* where to put the label */
 	bool	scale_zero_at_root;	/* if false, at max depth */
+	int	label_space_correction;	/* between a node and its label */
 };
 
 void help(char* argv[])
@@ -77,7 +78,7 @@ void help(char* argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-aAbcdhiIlLrRsuUvwW] <tree filename|->\n"
+"%s [-aAbcdhiIlLnorRstuUvwW] <tree filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -146,6 +147,8 @@ void help(char* argv[])
 "       setting 'visibility:hidden' disables printing of leaf node labels.\n"
 "       Note: if you change this, you will probably need to adjust the\n"
 "       space allocated to leaf labels - see option -W.\n"
+"    -n <number> add this number of pixels to the horizontal position of\n"
+"       node labels. [SVG only]\n"
 "    -o <filename>: use specified file as ornament map. Works like the CSS\n"
 "       map (see option -c), except that it specifies arbitrary SVG snippets\n"
 "       instead of CSS styles. For example, the following\n"
@@ -252,13 +255,14 @@ struct parameters get_params(int argc, char *argv[])
 	params.no_scale_bar = FALSE;
 	params.inner_label_pos = INNER_LBL_LEAVES;
 	params.scale_zero_at_root = true;
+	params.label_space_correction = 0;	/* px */
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
 	const int DEFAULT_WIDTH_CHARS = 80;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:o:rR:sStu:U:v:w:W:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:n:o:rR:sStu:U:v:w:W:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -295,6 +299,9 @@ struct parameters get_params(int argc, char *argv[])
 			if (NULL == params.ornament_map) {
 				perror(NULL); exit(EXIT_FAILURE);
 			}
+			break;
+		case 'n':
+			params.label_space_correction = atoi(optarg);
 			break;
 		case 'r':
 			params.svg_style = SVG_RADIAL;
@@ -372,6 +379,10 @@ struct parameters get_params(int argc, char *argv[])
  * display_svg_tree(), but then this would make svg_graph.c dependent on struct
  * parameters, increasing coupling. I don't like this. */
 
+/* Also, I could set all these variables directly in get_parameters(), but I
+ * think it's best to keep functions distinct -- get_parameters()'s job is to,
+ * well, get the parameters, other functions then have to act on them. */
+
 void set_svg_parameters(struct parameters params)
 {
 	set_svg_width(params.width);
@@ -396,6 +407,7 @@ void set_svg_parameters(struct parameters params)
 	set_svg_root_length(params.root_length);
 	set_svg_label_char_width(params.label_char_width);
 	set_svg_scalebar_zero_at_root(params.scale_zero_at_root);
+	add_to_svg_label_space(params.label_space_correction);
 }
 
 /* Prints an XML comment containing the command line parameters, so that the

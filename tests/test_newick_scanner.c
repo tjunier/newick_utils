@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h> 
+#include <string.h>
 
 #include "rnode.h"
 #include "list.h"
@@ -11,10 +12,16 @@
 
 extern FILE *nwsin;
 
+/* These could be put in a header file (e.g. parser.h), but they are not really
+ * meant to be public (they are used only in the parser), so I just declare
+ * them here instead. TODO: well, maybe parser.h is a good idea... some
+ * functions /are/ used elsewhere, e.g. newick_scanner_set_string_input().  */
+
 int nwslex (void);
 struct rnode *root;
 struct llist *nodes_in_order;
 enum parser_status_type newick_parser_status;
+void newick_scanner_set_string_input(char *);
 
 int test_simple()
 {
@@ -105,7 +112,7 @@ int test_simple()
 	token_type = nwslex();	/* EOF */
 	if (token_type > 0) {
 		printf ("%s: expected EOF, got %d\n",
-				test_name, EOF, token_type);
+				test_name, token_type);
 		return 1;
 	}
 
@@ -166,7 +173,7 @@ int test_garbled()
 	token_type = nwslex();	/* EOF */
 	if (token_type > 0) {
 		printf ("%s: expected EOF, got %d\n",
-				test_name, EOF, token_type);
+				test_name, token_type);
 		return 1;
 	}
 
@@ -209,7 +216,7 @@ int test_quoted_labels()
 	token_type = nwslex();	/* EOF */
 	if (token_type > 0) {
 		printf ("%s: expected EOF, got %d\n",
-				test_name, EOF, token_type);
+				test_name, token_type);
 		return 1;
 	}
 
@@ -253,7 +260,7 @@ int test_space_in_labels()
 	token_type = nwslex();	/* EOF */
 	if (token_type > 0) {
 		printf ("%s: expected EOF, got %d\n",
-				test_name, EOF, token_type);
+				test_name, token_type);
 		return 1;
 	}
 
@@ -296,7 +303,7 @@ int test_catenated_quoted_labels()
 	token_type = nwslex();	/* EOF */
 	if (token_type > 0) {
 		printf ("%s: expected EOF, got %d\n",
-				test_name, EOF, token_type);
+				test_name, token_type);
 		return 1;
 	}
 
@@ -339,7 +346,7 @@ int test_label_chars()
 	token_type = nwslex();	/* EOF */
 	if (token_type > 0) {
 		printf ("%s: expected EOF, got %d\n",
-				test_name, EOF, token_type);
+				test_name, token_type);
 		return 1;
 	}
 
