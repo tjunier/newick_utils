@@ -47,12 +47,12 @@ char *length(struct rnode *node)
 	if (NULL == result) return NULL;
 	*result = '\0';
 
-	if (NULL != node->parent) {
-		if (strlen(node->edge_length_as_string) > 0) {
-			result = append_to(result, ":");
-			result = append_to(result,
-				       node->edge_length_as_string);	
-		}
+	assert(NULL != node->edge_length_as_string);
+
+	if (strlen(node->edge_length_as_string) > 0) {
+		result = append_to(result, ":");
+		result = append_to(result,
+			       node->edge_length_as_string);	
 	}
 
 	return result;
@@ -110,7 +110,6 @@ char *to_newick(struct rnode *node)
 	char *result;
 	result = subtree(node);
 	if (NULL == result) return NULL;
-	fprintf(stderr, "result: >%s<\n", result);
 	result = append_to(result, ";");
 	return result;
 }

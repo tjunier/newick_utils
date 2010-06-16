@@ -473,7 +473,7 @@ int test_unlink_rnode_rad_leaf()
 		assert(0); /* programmer error */
 	}
 
-	char * exp = "(A:1,B:1,C:1)e;";
+	char * exp = "(A:1,B:1,C:1)e:1;";
 	char * obt = to_newick(t.root);
 
 	if (strcmp(exp, obt) != 0) {
