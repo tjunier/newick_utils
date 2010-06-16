@@ -55,6 +55,10 @@ void remove_quotes(char *s)
 		switch (*c) {
 		// maybe a case for double quotes here later?
 		case '\'':
+			if ('\'' == *(c+1)) {
+				s[i] = '\'';
+				i++;
+			}
 			break;
 		default:
 			s[i] = *c;
