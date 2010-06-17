@@ -13,6 +13,7 @@ nb_unit_test_cases=$( grep 'failures +=' test_*.c | wc -l)
 nb_app_test_cases=$(
 	wc -l test_nw_*_args | grep total | awk '{print $1}')
 
+printf "\n"
 printf "%0d unit test cases\n" $nb_unit_test_cases
 printf "%0d application test cases\n" $nb_app_test_cases
 printf "total: %0d cases.\n" $((nb_app_test_cases + 
