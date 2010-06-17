@@ -38,3 +38,4 @@ tiny_t: -t tiny_lengths.nw
 cmap_nomatch: -s -c color.map falconiformes.nw
 1node: single_node.nw
 nudge: -s -n -5 catarrhini.nw
+apos: apos.nw

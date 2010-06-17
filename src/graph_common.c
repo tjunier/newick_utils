@@ -58,6 +58,7 @@ void remove_quotes(char *s)
 			if ('\'' == *(c+1)) {
 				s[i] = '\'';
 				i++;
+				c++;
 			}
 			break;
 		default:

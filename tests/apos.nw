@@ -1,9 +1,10 @@
 [test apostrophes in labels with Irish surnames - and a few others :-) ]
 (
  	(
-		'al''Tor',
+		'al''Thor',
 		'Tel''Aran''Rhiod'
 	),
+	'''many''''apos''',
 	(
 		'O''Hara',
 		'O''Sullivan'
