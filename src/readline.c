@@ -89,7 +89,8 @@ char * read_line(FILE *file)
 		return NULL;
 	}
 
-	fgets(line, len+1, file);
+	/* suppress compiler warnings */
+	char *unused = fgets(line, len+1, file);
 
 	/* consumes newline (otherwise gets stuck here...) */
 	fgetc(file);
