@@ -1,14 +1,14 @@
-#!/bin/sh
+#!/bin/bash +B
 
 # All app test scripts are links to this one. Exactly what binary to test will
 # be derived from the link's name. The test cases themselves are in a file
 # whose name is derived in the same way.
 
-# This is not found in the Bourne shell...
-#shopt -s -o nounset
+# I can't use these in strict Bourne shell, so I use a sed command
+#prog=${0%.sh}	# derive tested program's name from own name
+#prog=${prog#*_}
 
-prog=${0%.sh}	# derive tested program's name from own name
-prog=${prog#*_}
+prog=`echo $0 | sed -e 's|\.sh$||' -e 's/^.*test_//'`
 args_file=test_${prog}_args
 
 echo "Testing program: $prog"
