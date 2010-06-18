@@ -453,7 +453,13 @@ permission).
 
 [done] fix bug in to_newick(): edges of root nodes were not printed (these are rare, admittedly, but nonetheless valid Newick).
 
-test handling of 's in labels beyond lexer: nw_display tests/irish.nw
+[done] test handling of 's in labels beyond lexer: nw_display tests/irish.nw
 
-check nudging of node labels (needed esp. for small trees)
+[done] check nudging of node labels (needed esp. for small trees) -- option -n now nudges all labels in ortho trees, and leaf labels in radial trees.
+
+[done] Public git repository on Gitorious: git://gitorious.org/newick_utilities/newick_utilities.git
+
+In radial trees, there are two variables that govern radial nudging of labels:
+one for leaf labels, and one for inner node labels. Is this really necessary?
+If not, make everything governable by -n.
 
