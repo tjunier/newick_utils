@@ -1,4 +1,4 @@
-#!/bin/bash +B
+#!/bin/sh
 
 # All app test scripts are links to this one. Exactly what binary to test will
 # be derived from the link's name. The test cases themselves are in a file
