@@ -19,7 +19,7 @@
  * or dup2(). But this is not the end of the story, because we want to resume
  * writing to the old stdout after dump_newick() has done its job -- we have to
  * print a summary of how the test went, and of course there are other tests
- * down te line. I found two ways of doing this: */
+ * down the line. I found two ways of doing this: */
 
 int dump_newick_to_file(struct rnode *node, char *outname)
 {
