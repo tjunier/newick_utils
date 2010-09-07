@@ -1,6 +1,24 @@
 nw_label: add option for printing out only the root's label (handy when
 extracting a clade's support value)
 
+nw_display: it could be possible to write multiple SVG files, in case of more
+than one input tree, by redirecting STDOUT to multiple files (using
+fork(), dup() like I do in test_to_newick.c). We should make it optional, so
+the default filtering behaviour is not broken. It would have the added benefit
+of parallelism (not that it woudl make a huge difference, as this is typically
+not too slow).
+
+general: try to handle extended newick. (Warning: I'm refering to .nhx
+(http://www.phylosoft.org/NHX), NOT the Extended Newick (eNewick) of
+(http://dmi.uib.es/~gcardona/BioInfo/enewick.html#XNetGen) - which is also an
+interesting idea BTW). Adapting the parser should not be too hard. We already
+have tests for it. Adding fields to struct rnode is trivial.  But the question
+is: how do we handle old-style newick? Do we always use the new structure, even
+if most of the fields will be empty? This would waste memory in most cases (but
+then, how much? is this a big problem?) Or do we pass an option to do so (might
+be best) ? But then the option should be the same for all programs. Since we're
+running out of letters, it might be time to start using long options anyway...
+
 nw_prune: add test for the case when a parentless node is unlinked (happens if
 that node's parent was previously unlined too). But do this only when the inner
 node case is handled too (loot at nw_prune -h).
@@ -462,8 +480,8 @@ permission).
 
 [done] Public git repository on Gitorious: git://gitorious.org/newick_utilities/newick_utilities.git
 
+[done] Removed bashism in test_nw_prog (bug 2010-06-17.01, found by L. Palmeira)
 In radial trees, there are two variables that govern radial nudging of labels:
 one for leaf labels, and one for inner node labels. Is this really necessary?
 If not, make everything governable by -n.
 
-Removed bashism in test_nw_prog (bug 2010-06-17.01, found by L. Palmeira)
