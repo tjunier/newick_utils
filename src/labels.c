@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "parser.h"
 #include "tree.h"
@@ -41,8 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 
 struct parameters {
-	int show_inner_labels;
-	int show_leaf_labels;
+	bool show_inner_labels;
+	bool show_leaf_labels;
+	bool show_only_root_label;
 	char separator;
 };
 
@@ -54,7 +56,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hILt] <newick trees filename|->\n"
+"%s [-hILrt] <newick trees filename|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -66,7 +68,7 @@ void help(char *argv[])
 "------\n"
 "\n"
 "By default, prints all labels that occur in the tree, in the same order as\n"
-"in the Newick, one per line.\n"
+"in the Newick, one per line. Empty labels produce no output.\n"
 "\n"
 "Options\n"
 "-------\n"
@@ -74,6 +76,7 @@ void help(char *argv[])
 "    -h: print this message and exit\n"
 "    -I: don't print labels of inner nodes\n"
 "    -L: don't print leaf labels\n"
+"    -r: print only the root's label\n"
 "    -t: TAB-separated - print on a single line, separated by tab stops.\n"
 "\n"
 "Examples\n"
@@ -96,21 +99,25 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	/* defaults */
-	params.show_inner_labels = 1;
-	params.show_leaf_labels = 1;
+	params.show_inner_labels = true;
+	params.show_leaf_labels = true;
+	params.show_only_root_label = false;
 	params.separator = '\n';
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hILt")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hILrt")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'I':
-			params.show_inner_labels = FALSE;
+			params.show_inner_labels = false;
 			break;
 		case 'L':
-			params.show_leaf_labels = FALSE;
+			params.show_leaf_labels = false;
+			break;
+		case 'r':
+			params.show_only_root_label = true;
 			break;
 		case 't':
 			params.separator = '\t';
@@ -146,6 +153,11 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 
 	struct list_elem *elem;
 	int first_line = 1;
+
+	if (params.show_only_root_label) {
+		printf ("%s\n", tree->root->label);
+		return;
+	}
 
 	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
 		struct rnode *current = (struct rnode *) elem->data;

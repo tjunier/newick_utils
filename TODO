@@ -1,3 +1,5 @@
+nw_stats: should say if root is labeled or not.
+
 nw_label: add option for printing out only the root's label (handy when
 extracting a clade's support value)
 
