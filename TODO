@@ -1,3 +1,6 @@
+nw_label: add option for printing out only the root's label (handy when
+extracting a clade's support value)
+
 nw_prune: add test for the case when a parentless node is unlinked (happens if
 that node's parent was previously unlined too). But do this only when the inner
 node case is handled too (loot at nw_prune -h).
