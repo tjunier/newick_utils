@@ -4,7 +4,7 @@
 # be derived from the link's name. The test cases themselves are in a file
 # whose name is derived in the same way.
 
-set -v
+# set -v
 
 # I can't use these in strict Bourne shell, so I use a sed command
 #prog=${0%.sh}	# derive tested program's name from own name
