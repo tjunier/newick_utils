@@ -47,6 +47,9 @@ const double PI = 3.14159;
 const int Scale_bar_left_space = 10;
 const int NUDGE_DISTANCE = 3;	/* px */
 
+// TODO: the svg_ prefix that many variables have is probably not really
+// necessary. Also, replace logical ints by booleans.
+
 /* If this is zero, the label's baseline is aligned on the branch. Use it to
  * nudge the labels a small angle. Unfortunately the correct amount will depend
  * on the graph's diameter and the label font size. */
@@ -79,51 +82,86 @@ void set_svg_root_length(int length)
 
 /* TODO: all functions should be declared static unless used outside this module */
 
+/* Draws the arc for inner nodes, including root */
+
+static void draw_inner_node_arc(double svg_top_angle,
+		double svg_bottom_angle, double svg_radius,
+		int group_nb, int large_arc_flag)
+{
+	double svg_top_x_pos = svg_radius * cos(svg_top_angle);
+	double svg_top_y_pos = svg_radius * sin(svg_top_angle);
+	double svg_bot_x_pos = svg_radius * cos(svg_bottom_angle);
+	double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
+	printf("<path class='clade_%d'"
+	       " d='M%.4f,%.4f A%4f,%4f 0 %d 1 %.4f %.4f'/>",
+		group_nb,
+		svg_top_x_pos, svg_top_y_pos,
+		svg_radius, svg_radius,
+		large_arc_flag,
+		svg_bot_x_pos, svg_bot_y_pos);
+}
+
+static void draw_radial_line(struct rnode *node, const double r_scale,
+		double svg_mid_angle, double svg_mid_x_pos,
+		double svg_mid_y_pos, int group_nb)
+{
+	struct svg_data *parent_data = node->parent->data;
+	double svg_parent_radius = svg_root_length + (
+		r_scale * parent_data->depth);
+	double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
+	double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
+	printf ("<line class='clade_%d' "
+		"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
+		group_nb,
+		svg_mid_x_pos, svg_mid_y_pos,
+		svg_par_x_pos, svg_par_y_pos);
+}
+
+/* Draws the ornament associated with node_data. Does NOT check for NULL --
+ * this should be done by the caller. */
+
 static void draw_ornament (struct svg_data *node_data,
 		double svg_mid_angle, double svg_mid_x_pos,
-		double svg_mid_y_pos
-		)
+		double svg_mid_y_pos)
 {
-	if (NULL != node_data->ornament) {
-		/* ornament is considered text IFF it starts
-		 * with "<text" */
-		if (strstr(node_data->ornament, "<text") == 
-				node_data->ornament) {
-			printf("<g style='stroke:none;fill:black'>");
-			if (cos(svg_mid_angle) >= 0) {
-				svg_mid_x_pos -= (NUDGE_DISTANCE *
-					cos(svg_mid_angle + PI / 2));
-				svg_mid_y_pos -= (NUDGE_DISTANCE *
-					sin(svg_mid_angle + PI / 2));
-				printf ("<g style='text-anchor:end'"
-					" transform='rotate(%g,%g,%g)"
-					" translate(%.4f,%.4f)'>%s</g>",
-					svg_mid_angle / (2*PI) * 360,
-					svg_mid_x_pos, svg_mid_y_pos,
-					svg_mid_x_pos, svg_mid_y_pos,
-					node_data->ornament);
-			} else {
-				svg_mid_x_pos += (NUDGE_DISTANCE *
-					cos(svg_mid_angle + PI / 2));
-				svg_mid_y_pos += (NUDGE_DISTANCE *
-					sin(svg_mid_angle + PI / 2));
-				printf ("<g transform='"
-					"rotate(180,%g,%g) "
-					"rotate(%g,%g,%g) "
-					"translate(%.4f,%.4f)'>%s</g>",
-					svg_mid_x_pos, svg_mid_y_pos,
-					svg_mid_angle / (2*PI) * 360,
-					svg_mid_x_pos, svg_mid_y_pos,
-					svg_mid_x_pos, svg_mid_y_pos,
-					node_data->ornament);
-			}
-			printf("</g>");
+	/* ornament is considered text IFF it starts
+	 * with "<text" */
+	if (strstr(node_data->ornament, "<text") == 
+			node_data->ornament) {
+		printf("<g style='stroke:none;fill:black'>");
+		if (cos(svg_mid_angle) >= 0) {
+			svg_mid_x_pos -= (NUDGE_DISTANCE *
+				cos(svg_mid_angle + PI / 2));
+			svg_mid_y_pos -= (NUDGE_DISTANCE *
+				sin(svg_mid_angle + PI / 2));
+			printf ("<g style='text-anchor:end'"
+				" transform='rotate(%g,%g,%g)"
+				" translate(%.4f,%.4f)'>%s</g>",
+				svg_mid_angle / (2*PI) * 360,
+				svg_mid_x_pos, svg_mid_y_pos,
+				svg_mid_x_pos, svg_mid_y_pos,
+				node_data->ornament);
 		} else {
+			svg_mid_x_pos += (NUDGE_DISTANCE *
+				cos(svg_mid_angle + PI / 2));
+			svg_mid_y_pos += (NUDGE_DISTANCE *
+				sin(svg_mid_angle + PI / 2));
 			printf ("<g transform='"
+				"rotate(180,%g,%g) "
+				"rotate(%g,%g,%g) "
 				"translate(%.4f,%.4f)'>%s</g>",
+				svg_mid_x_pos, svg_mid_y_pos,
+				svg_mid_angle / (2*PI) * 360,
+				svg_mid_x_pos, svg_mid_y_pos,
 				svg_mid_x_pos, svg_mid_y_pos,
 				node_data->ornament);
 		}
+		printf("</g>");
+	} else {
+		printf ("<g transform='"
+			"translate(%.4f,%.4f)'>%s</g>",
+			svg_mid_x_pos, svg_mid_y_pos,
+			node_data->ornament);
 	}
 }
 
@@ -160,36 +198,21 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 
 		/* draw node (arc), except for leaves */
 		if (! is_leaf(node)) {
-			double svg_top_x_pos = svg_radius * cos(svg_top_angle);
-			double svg_top_y_pos = svg_radius * sin(svg_top_angle);
-			double svg_bot_x_pos = svg_radius * cos(svg_bottom_angle);
-			double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
-			printf("<path class='clade_%d'"
-			       " d='M%.4f,%.4f A%4f,%4f 0 %d 1 %.4f %.4f'/>",
-				group_nb,
-				svg_top_x_pos, svg_top_y_pos,
-				svg_radius, svg_radius,
-				large_arc_flag,
-				svg_bot_x_pos, svg_bot_y_pos);
+			draw_inner_node_arc(svg_top_angle, svg_bottom_angle,
+					svg_radius, group_nb, large_arc_flag);
 		}
 		/* draw radial line */
 		if (is_root(node)) {
 			printf("<line x1='0' y1='0' x2='%.4f' y2='%.4f'/>",
 				svg_mid_x_pos, svg_mid_y_pos);
 		} else {
-			struct svg_data *parent_data = node->parent->data;
-			double svg_parent_radius = svg_root_length + (
-				r_scale * parent_data->depth);
-			double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
-			double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
-			printf ("<line class='clade_%d' "
-				"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
-				group_nb,
-				svg_mid_x_pos, svg_mid_y_pos,
-				svg_par_x_pos, svg_par_y_pos);
+			draw_radial_line(node, r_scale, svg_mid_angle,
+					svg_mid_x_pos, svg_mid_y_pos,
+					group_nb);
 		}
-		/* draw ornament, if any */ // TODO: refactor into own f()
-		draw_ornament(node_data, svg_mid_angle, svg_mid_x_pos,
+		/* draw ornament, if any */ 
+		if (NULL != node_data->ornament)
+			draw_ornament(node_data, svg_mid_angle, svg_mid_x_pos,
 				svg_mid_y_pos);
 	}
 	printf("</g>");
