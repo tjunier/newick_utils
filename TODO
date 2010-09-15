@@ -487,3 +487,4 @@ In radial trees, there are two variables that govern radial nudging of labels:
 one for leaf labels, and one for inner node labels. Is this really necessary?
 If not, make everything governable by -n.
 
+rotate all ornaments (not just text) in radial trees.
