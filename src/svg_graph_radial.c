@@ -45,7 +45,8 @@ extern enum inner_lbl_pos inner_label_pos;
 
 const double PI = 3.14159;
 const int Scale_bar_left_space = 10;
-const int NUDGE_DISTANCE = 3;	/* px */
+//const int NUDGE_DISTANCE = 3;	/* px */
+const int NUDGE_DISTANCE = 0;	/* px */
 
 // TODO: the svg_ prefix that many variables have is probably not really
 // necessary. Also, replace logical ints by booleans.
@@ -99,6 +100,9 @@ static void draw_inner_node_arc(double svg_top_angle,
 		svg_bot_x_pos, svg_bot_y_pos);
 }
 
+// TODO: should we really pass the node? Why can't we just pass the parent
+// data,or actually, the parent's depth since this is the only use of 'node' ? 
+
 static void draw_radial_line(struct rnode *node, const double r_scale,
 		double svg_mid_angle, double svg_mid_x_pos,
 		double svg_mid_y_pos, int group_nb)
@@ -122,45 +126,37 @@ static void draw_ornament (struct svg_data *node_data,
 		double svg_mid_angle, double svg_mid_x_pos,
 		double svg_mid_y_pos)
 {
-	/* ornament is considered text IFF it starts
-	 * with "<text" */
-	if (strstr(node_data->ornament, "<text") == 
-			node_data->ornament) {
-		printf("<g style='stroke:none;fill:black'>");
-		if (cos(svg_mid_angle) >= 0) {
-			svg_mid_x_pos -= (NUDGE_DISTANCE *
-				cos(svg_mid_angle + PI / 2));
-			svg_mid_y_pos -= (NUDGE_DISTANCE *
-				sin(svg_mid_angle + PI / 2));
-			printf ("<g style='text-anchor:end'"
-				" transform='rotate(%g,%g,%g)"
-				" translate(%.4f,%.4f)'>%s</g>",
-				svg_mid_angle / (2*PI) * 360,
-				svg_mid_x_pos, svg_mid_y_pos,
-				svg_mid_x_pos, svg_mid_y_pos,
-				node_data->ornament);
-		} else {
-			svg_mid_x_pos += (NUDGE_DISTANCE *
-				cos(svg_mid_angle + PI / 2));
-			svg_mid_y_pos += (NUDGE_DISTANCE *
-				sin(svg_mid_angle + PI / 2));
-			printf ("<g transform='"
-				"rotate(180,%g,%g) "
-				"rotate(%g,%g,%g) "
-				"translate(%.4f,%.4f)'>%s</g>",
-				svg_mid_x_pos, svg_mid_y_pos,
-				svg_mid_angle / (2*PI) * 360,
-				svg_mid_x_pos, svg_mid_y_pos,
-				svg_mid_x_pos, svg_mid_y_pos,
-				node_data->ornament);
-		}
-		printf("</g>");
+	/* this styling is for text, so that users can omit styles in the map
+	 * file and still see the text. */
+	printf("<g style='stroke:none;fill:black'>");
+	if (cos(svg_mid_angle) >= 0) {
+		svg_mid_x_pos -= (NUDGE_DISTANCE *
+			cos(svg_mid_angle + PI / 2));
+		svg_mid_y_pos -= (NUDGE_DISTANCE *
+			sin(svg_mid_angle + PI / 2));
+		printf ("<g style='text-anchor:end;vertical-align:super'"
+			" transform='rotate(%g,%g,%g)"
+			" translate(%.4f,%.4f)'>%s</g>",
+			svg_mid_angle / (2*PI) * 360,
+			svg_mid_x_pos, svg_mid_y_pos,
+			svg_mid_x_pos, svg_mid_y_pos,
+			node_data->ornament);
 	} else {
+		svg_mid_x_pos += (NUDGE_DISTANCE *
+			cos(svg_mid_angle + PI / 2));
+		svg_mid_y_pos += (NUDGE_DISTANCE *
+			sin(svg_mid_angle + PI / 2));
 		printf ("<g transform='"
+			"rotate(180,%g,%g) "
+			"rotate(%g,%g,%g) "
 			"translate(%.4f,%.4f)'>%s</g>",
+			svg_mid_x_pos, svg_mid_y_pos,
+			svg_mid_angle / (2*PI) * 360,
+			svg_mid_x_pos, svg_mid_y_pos,
 			svg_mid_x_pos, svg_mid_y_pos,
 			node_data->ornament);
 	}
+	printf("</g>");
 }
 
 static void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
