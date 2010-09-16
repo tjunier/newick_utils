@@ -20,7 +20,7 @@ cssquot: -sr -w 450 -c quotcss.map catarrhini.nw
 sS: -sS catarrhini.nw
 srS: -srS catarrhini.nw
 orn: -s -b 'visibility:hidden' -o ornament.map catarrhini.nw
-orn_r: -sr -w 500 -o ornament.map catarrhini.nw
+orn_r: -sr -w 500 -o ornament_r.map catarrhini.nw
 Il: -s -Il -b 'visibility:hidden' simiiformes.nw
 Im: -s -Im -b 'visibility:hidden' simiiformes.nw
 Ir: -s -Ir -b 'visibility:hidden' simiiformes.nw
