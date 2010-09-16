@@ -80,8 +80,6 @@ void set_svg_root_length(int length)
 /* Outputs an SVG <g> element with all the tree branches, radial. In this
  * context, a node's 'top' and 'bottom' are angles, not vertical positions */
 
-/* TODO: all functions should be declared static unless used outside this module */
-
 /* Draws the arc for inner nodes, including root */
 
 static void draw_inner_node_arc(double svg_top_angle,
@@ -165,7 +163,7 @@ static void draw_ornament (struct svg_data *node_data,
 	}
 }
 
-void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
+static void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 		const double a_scale, int align_leaves, double dmax)
 {
 	printf( "<g"
@@ -220,7 +218,7 @@ void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
 
 /* lower-level label drawing */
 
-void place_label(const char *label, const double radius, double mid_angle,
+static void place_label(const char *label, const double radius, double mid_angle,
 		 const bool nudge, const char *class)
 {
 	double x_pos;
@@ -305,7 +303,7 @@ static void draw_label(struct rnode *node, double radius,
 
 /* Prints the node text (labels and lengths) in a <g> element, radial */
 
-void draw_text_radial (struct rooted_tree *tree, const double r_scale,
+static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		const double a_scale, int align_leaves, double dmax)
 {
 	printf( "<g style='stroke:none'>");
@@ -371,7 +369,7 @@ void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 
 /* Prints an SVG comment block with some run parameters. Useful for debugging */
 
-void params_as_svg_comment (struct h_data hd, double node_area_width,
+static void params_as_svg_comment (struct h_data hd, double node_area_width,
 		double r_scale)
 {
 	printf ("<!-- SVG parameters:\n"
