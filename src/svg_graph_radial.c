@@ -45,8 +45,7 @@ extern enum inner_lbl_pos inner_label_pos;
 
 const double PI = 3.14159;
 const int Scale_bar_left_space = 10;
-//const int NUDGE_DISTANCE = 3;	/* px */
-const int NUDGE_DISTANCE = 0;	/* px */
+const int NUDGE_DISTANCE = 3;	/* px */
 
 // TODO: the svg_ prefix that many variables have is probably not really
 // necessary. Also, replace logical ints by booleans.
@@ -130,10 +129,6 @@ static void draw_ornament (struct svg_data *node_data,
 	 * file and still see the text. */
 	printf("<g style='stroke:none;fill:black'>");
 	if (cos(svg_mid_angle) >= 0) {
-		svg_mid_x_pos -= (NUDGE_DISTANCE *
-			cos(svg_mid_angle + PI / 2));
-		svg_mid_y_pos -= (NUDGE_DISTANCE *
-			sin(svg_mid_angle + PI / 2));
 		printf ("<g style='text-anchor:end;vertical-align:super'"
 			" transform='rotate(%g,%g,%g)"
 			" translate(%.4f,%.4f)'>%s</g>",
@@ -142,10 +137,6 @@ static void draw_ornament (struct svg_data *node_data,
 			svg_mid_x_pos, svg_mid_y_pos,
 			node_data->ornament);
 	} else {
-		svg_mid_x_pos += (NUDGE_DISTANCE *
-			cos(svg_mid_angle + PI / 2));
-		svg_mid_y_pos += (NUDGE_DISTANCE *
-			sin(svg_mid_angle + PI / 2));
 		printf ("<g transform='"
 			"rotate(180,%g,%g) "
 			"rotate(%g,%g,%g) "
