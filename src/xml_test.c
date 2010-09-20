@@ -51,12 +51,9 @@ int main(int argc, char *argv[])
 	} else {
 		xmlNodeSetPtr nodeset = result->nodesetval;
 		int i;
-		xmlChar *keyword;
 		for (i=0; i < nodeset->nodeNr; i++) {
-			keyword = xmlNodeListGetString(doc,
-				nodeset->nodeTab[i]->xmlChildrenNode, 1);
-			printf("keyword: %s\n", keyword);
-			xmlFree(keyword);
+			xmlNodePtr node = nodeset->nodeTab[i];
+			printf("node name: %s\n", (char *) node->name);
 		}
 		xmlXPathFreeObject (result);
 	}
