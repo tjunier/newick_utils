@@ -4,6 +4,8 @@
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 
+#include "masprintf.h"
+
 int main(int argc, char *argv[])
 {
 	const char * dummy_doc_start = "<dummy>";
@@ -56,12 +58,22 @@ int main(int argc, char *argv[])
 			printf("node name: %s\n", (char *) node->name);
 			printf("node type: %d\n", node->type);
 			xmlChar *value = xmlGetProp(node, (xmlChar *) "x");
-			if (NULL != value)
+			if (NULL != value) {
 				printf("x-value: %s\n", (char *) value);
+				double x_val = atof((char *) value);
+				x_val += 1.0;
+				char *new_value = masprintf("%g", x_val);
+				xmlSetProp(node, (xmlChar *) "x", (xmlChar *) new_value);
+			}	
 			xmlFree(value);
 		}
 		xmlXPathFreeObject (result);
 	}
+
+	xmlChar *xml_buf;
+	int buf_length;
+	xmlDocDumpFormatMemory(doc, &xml_buf, &buf_length, 1);
+	printf("%s", (char *) xml_buf);
 
 	xmlFreeDoc(doc);
 	xmlXPathFreeContext(context);
