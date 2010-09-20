@@ -75,16 +75,15 @@ int main(int argc, char *argv[])
 	xmlNodePtr cur = xmlDocGetRootElement(doc);
 	cur = cur->xmlChildrenNode;
 	while (NULL != cur) {
-		// 
-		printf ("%s\n", (char *) cur->name);
+		xmlBufferPtr buf = xmlBufferCreate ();
+		xmlNodeDump (buf, doc, cur, 0, 0 );
+		const xmlChar * contents = xmlBufferContent(buf);
+		printf ("%s\n", (char *) contents);
+		xmlBufferFree(buf);
 		cur = cur->next;	/* sibling */
 	}
 	
 
-/*
-	buf = xmlBufferCreate ();
-	xmlNodeDump (buf, newDoc, xmlDocGetRootElement (newDoc), 0, 0 );
-*/
 	xmlFreeDoc(doc);
 	xmlXPathFreeContext(context);
 
