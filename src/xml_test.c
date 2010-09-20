@@ -69,12 +69,22 @@ int main(int argc, char *argv[])
 		}
 		xmlXPathFreeObject (result);
 	}
+	
+	/* now print out each node in the <dummy> doc, whether changed or not
+*/
+	xmlNodePtr cur = xmlDocGetRootElement(doc);
+	cur = cur->xmlChildrenNode;
+	while (NULL != cur) {
+		// 
+		printf ("%s\n", (char *) cur->name);
+		cur = cur->next;	/* sibling */
+	}
+	
 
-	xmlChar *xml_buf;
-	int buf_length;
-	xmlDocDumpFormatMemory(doc, &xml_buf, &buf_length, 1);
-	printf("%s", (char *) xml_buf);
-
+/*
+	buf = xmlBufferCreate ();
+	xmlNodeDump (buf, newDoc, xmlDocGetRootElement (newDoc), 0, 0 );
+*/
 	xmlFreeDoc(doc);
 	xmlXPathFreeContext(context);
 
