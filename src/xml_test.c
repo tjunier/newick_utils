@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	int doc_length;
 	char *doc_str;
 
-	printf ("snippet: %s\n", svg_snippet);
+	//printf ("snippet: %s\n", svg_snippet);
 
 	/* wrap snippet into dummy document */
 	int start_length = strlen(dummy_doc_start);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	strcpy(doc_str + start_length, svg_snippet);
 	strcpy(doc_str + start_length + snippet_length, dummy_doc_stop);
 
-	printf ("dummy doc: %s\n", doc_str);
+	// printf ("dummy doc: %s\n", doc_str);
 
 	/* parse SVG from string */
 	doc = xmlParseMemory(doc_str, doc_length);
@@ -55,11 +55,11 @@ int main(int argc, char *argv[])
 		int i;
 		for (i=0; i < nodeset->nodeNr; i++) {
 			xmlNodePtr node = nodeset->nodeTab[i];
-			printf("node name: %s\n", (char *) node->name);
-			printf("node type: %d\n", node->type);
+			// printf("node name: %s\n", (char *) node->name);
+			// printf("node type: %d\n", node->type);
 			xmlChar *value = xmlGetProp(node, (xmlChar *) "x");
 			if (NULL != value) {
-				printf("x-value: %s\n", (char *) value);
+				// printf("x-value: %s\n", (char *) value);
 				double x_val = atof((char *) value);
 				x_val += 1.0;
 				char *new_value = masprintf("%g", x_val);
@@ -72,18 +72,33 @@ int main(int argc, char *argv[])
 	
 	/* now print out each node in the <dummy> doc, whether changed or not
 */
+	
+	/* this will give a size that is certain to be enough */
+	xmlChar *xml_buf;
+	int buf_length;
+	xmlDocDumpFormatMemory(doc, &xml_buf, &buf_length, 1);
+
+
+	/* so, allocate that much */
+	char *tweaked_svg = calloc(buf_length, sizeof(char));
+	if (NULL == tweaked_svg) { perror(NULL); exit(EXIT_FAILURE); }
+
 	xmlNodePtr cur = xmlDocGetRootElement(doc);
 	cur = cur->xmlChildrenNode;
 	while (NULL != cur) {
 		xmlBufferPtr buf = xmlBufferCreate ();
 		xmlNodeDump (buf, doc, cur, 0, 0 );
 		const xmlChar * contents = xmlBufferContent(buf);
-		printf ("%s\n", (char *) contents);
+		int cur_len = strlen(tweaked_svg);
+		/* appends to tweaked_svg */
+		strcpy(tweaked_svg + cur_len, (char *) contents);
 		xmlBufferFree(buf);
 		cur = cur->next;	/* sibling */
 	}
-	
 
+	printf("%s\n", tweaked_svg);
+
+	free(tweaked_svg);
 	xmlFreeDoc(doc);
 	xmlXPathFreeContext(context);
 
