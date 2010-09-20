@@ -54,6 +54,11 @@ int main(int argc, char *argv[])
 		for (i=0; i < nodeset->nodeNr; i++) {
 			xmlNodePtr node = nodeset->nodeTab[i];
 			printf("node name: %s\n", (char *) node->name);
+			printf("node type: %d\n", node->type);
+			xmlChar *value = xmlGetProp(node, (xmlChar *) "x");
+			if (NULL != value)
+				printf("x-value: %s\n", (char *) value);
+			xmlFree(value);
 		}
 		xmlXPathFreeObject (result);
 	}
