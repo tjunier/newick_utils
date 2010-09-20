@@ -22,6 +22,7 @@ AC_CHECK_LIB([m], [main])
 # Checks for header files.
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
+AC_CHECK_HEADER(libxml/parser.h)
 AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.

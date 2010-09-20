@@ -10961,6 +10961,12 @@ $as_echo "#define STDC_HEADERS 1" >>confdefs.h
 
 fi
 
+ac_fn_c_check_header_mongrel "$LINENO" "libxml/parser.h" "ac_cv_header_libxml_parser_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml_parser_h" = x""yes; then :
+
+fi
+
+
 for ac_header in inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
