@@ -61,6 +61,32 @@ static void alter_x_attr(xmlDocPtr doc, char *attr)
 	xmlXPathFreeContext(context);
 }	
 
+static char *unwrap_snippet(xmlDocPtr doc)
+{
+	/* this will give a size that is certain to be enough */
+	xmlChar *xml_buf;
+	int buf_length;
+	xmlDocDumpFormatMemory(doc, &xml_buf, &buf_length, 0); 
+	/* so, allocate that much (cleared) */
+	char *tweaked_svg = calloc(buf_length, sizeof(char));
+	if (NULL == tweaked_svg) return NULL;
+	// TODO: the following 2 lines can be merged
+	xmlNodePtr cur = xmlDocGetRootElement(doc);
+	cur = cur->xmlChildrenNode;
+	while (NULL != cur) {
+		xmlBufferPtr buf = xmlBufferCreate ();
+		xmlNodeDump (buf, doc, cur, 0, 0);
+		const xmlChar * contents = xmlBufferContent(buf);
+		int cur_len = strlen(tweaked_svg);
+		/* appends to tweaked_svg - cur_len must initially be 0, which
+		 * is why we use calloc() */
+		strcpy(tweaked_svg + cur_len, (char *) contents);
+		xmlBufferFree(buf);
+		cur = cur->next;	/* sibling */
+	}
+	return tweaked_svg;
+}
+
 int main(int argc, char *argv[])
 {
 	char *svg_snippet = argv[1];
@@ -78,35 +104,13 @@ int main(int argc, char *argv[])
 	free(wrapped_snippet);
 
 	alter_x_attr(doc, "x");
-	/* now print out each node in the <dummy> doc, whether changed or not
-*/
-	
-	/* this will give a size that is certain to be enough */
-	xmlChar *xml_buf;
-	int buf_length;
-	xmlDocDumpFormatMemory(doc, &xml_buf, &buf_length, 1);
 
-
-	/* so, allocate that much */
-	char *tweaked_svg = calloc(buf_length, sizeof(char));
-	if (NULL == tweaked_svg) { perror(NULL); exit(EXIT_FAILURE); }
-
-	xmlNodePtr cur = xmlDocGetRootElement(doc);
-	cur = cur->xmlChildrenNode;
-	while (NULL != cur) {
-		xmlBufferPtr buf = xmlBufferCreate ();
-		xmlNodeDump (buf, doc, cur, 0, 0 );
-		const xmlChar * contents = xmlBufferContent(buf);
-		int cur_len = strlen(tweaked_svg);
-		/* appends to tweaked_svg */
-		strcpy(tweaked_svg + cur_len, (char *) contents);
-		xmlBufferFree(buf);
-		cur = cur->next;	/* sibling */
-	}
-
+	/* now print out the altered snipped, unwrapped.  */
+	char *tweaked_svg = unwrap_snippet(doc);
+	if (NULL == tweaked_svg) { perror(NULL), exit(EXIT_FAILURE); }
 	printf("%s\n", tweaked_svg);
-
 	free(tweaked_svg);
+
 	xmlFreeDoc(doc);
 
 	return EXIT_SUCCESS;
