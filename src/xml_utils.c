@@ -92,3 +92,7 @@ char *escape_predefined_character_entities(const char *string)
 #endif
 	return result;
 }
+
+string *change_svg_x_attr_sign(const char *svg_snippet)
+{
+}
