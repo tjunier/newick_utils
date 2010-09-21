@@ -20,10 +20,27 @@ LT_INIT#([disable-fast-install)]
 AC_CHECK_LIB([m], [main])
 
 # Checks for header files.
+
+# try to get info about the location of libxml files using xml2-config
+if xml2-config --version > /dev/null; then
+	CPPFLAGS="$CPPFLAGS $(xml2-config --cflags)"
+else
+	CPPFLAGS="$CPPFLAGS -I/usr/include/libxml2"
+fi
+echo "CPPFLAGS: $CPPFLAGS"
+
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
+AC_CHECK_HEADER(libxml/tree.h)
 AC_CHECK_HEADER(libxml/parser.h)
-AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADER(libxml/xpath.h)
+AC_CHECK_HEADER(inttypes.h)
+AC_CHECK_HEADER(libintl.h)
+AC_CHECK_HEADER(malloc.h)
+AC_CHECK_HEADER(stddef.h)
+AC_CHECK_HEADER(stdlib.h)
+AC_CHECK_HEADER(string.h)
+AC_CHECK_HEADER(unistd.h)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

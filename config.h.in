@@ -21,18 +21,12 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the <libintl.h> header file. */
-#undef HAVE_LIBINTL_H
-
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
 /* Define to 1 if your system has a GNU libc compatible `malloc' function, and
    to 0 otherwise. */
 #undef HAVE_MALLOC
-
-/* Define to 1 if you have the <malloc.h> header file. */
-#undef HAVE_MALLOC_H
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -46,9 +40,6 @@
 
 /* Define to 1 if you have the `rint' function. */
 #undef HAVE_RINT
-
-/* Define to 1 if you have the <stddef.h> header file. */
-#undef HAVE_STDDEF_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H

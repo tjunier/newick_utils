@@ -10659,6 +10659,15 @@ fi
 
 
 # Checks for header files.
+
+# try to get info about the location of libxml files using xml2-config
+if xml2-config --version > /dev/null; then
+	CPPFLAGS="$CPPFLAGS $(xml2-config --cflags)"
+else
+	CPPFLAGS="$CPPFLAGS -I/usr/include/libxml2"
+fi
+echo "CPPFLAGS: $CPPFLAGS"
+
 # The Ultrix 4.2 mips builtin alloca declared by alloca.h only works
 # for constant arguments.  Useless!
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for working alloca.h" >&5
@@ -10961,25 +10970,65 @@ $as_echo "#define STDC_HEADERS 1" >>confdefs.h
 
 fi
 
+ac_fn_c_check_header_mongrel "$LINENO" "libxml/tree.h" "ac_cv_header_libxml_tree_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml_tree_h" = x""yes; then :
+
+fi
+
+
 ac_fn_c_check_header_mongrel "$LINENO" "libxml/parser.h" "ac_cv_header_libxml_parser_h" "$ac_includes_default"
 if test "x$ac_cv_header_libxml_parser_h" = x""yes; then :
 
 fi
 
 
-for ac_header in inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h
-do :
-  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
-ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
-eval as_val=\$$as_ac_Header
-   if test "x$as_val" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
-_ACEOF
+ac_fn_c_check_header_mongrel "$LINENO" "libxml/xpath.h" "ac_cv_header_libxml_xpath_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml_xpath_h" = x""yes; then :
 
 fi
 
-done
+
+ac_fn_c_check_header_mongrel "$LINENO" "inttypes.h" "ac_cv_header_inttypes_h" "$ac_includes_default"
+if test "x$ac_cv_header_inttypes_h" = x""yes; then :
+
+fi
+
+
+ac_fn_c_check_header_mongrel "$LINENO" "libintl.h" "ac_cv_header_libintl_h" "$ac_includes_default"
+if test "x$ac_cv_header_libintl_h" = x""yes; then :
+
+fi
+
+
+ac_fn_c_check_header_mongrel "$LINENO" "malloc.h" "ac_cv_header_malloc_h" "$ac_includes_default"
+if test "x$ac_cv_header_malloc_h" = x""yes; then :
+
+fi
+
+
+ac_fn_c_check_header_mongrel "$LINENO" "stddef.h" "ac_cv_header_stddef_h" "$ac_includes_default"
+if test "x$ac_cv_header_stddef_h" = x""yes; then :
+
+fi
+
+
+ac_fn_c_check_header_mongrel "$LINENO" "stdlib.h" "ac_cv_header_stdlib_h" "$ac_includes_default"
+if test "x$ac_cv_header_stdlib_h" = x""yes; then :
+
+fi
+
+
+ac_fn_c_check_header_mongrel "$LINENO" "string.h" "ac_cv_header_string_h" "$ac_includes_default"
+if test "x$ac_cv_header_string_h" = x""yes; then :
+
+fi
+
+
+ac_fn_c_check_header_mongrel "$LINENO" "unistd.h" "ac_cv_header_unistd_h" "$ac_includes_default"
+if test "x$ac_cv_header_unistd_h" = x""yes; then :
+
+fi
+
 
 
 # Checks for typedefs, structures, and compiler characteristics.
