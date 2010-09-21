@@ -31,16 +31,16 @@ echo "CPPFLAGS: $CPPFLAGS"
 
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
-AC_CHECK_HEADER(libxml/tree.h)
-AC_CHECK_HEADER(libxml/parser.h)
-AC_CHECK_HEADER(libxml/xpath.h)
-AC_CHECK_HEADER(inttypes.h)
-AC_CHECK_HEADER(libintl.h)
-AC_CHECK_HEADER(malloc.h)
-AC_CHECK_HEADER(stddef.h)
-AC_CHECK_HEADER(stdlib.h)
-AC_CHECK_HEADER(string.h)
-AC_CHECK_HEADER(unistd.h)
+AC_CHECK_HEADERS(libxml/tree.h)
+AC_CHECK_HEADERS(libxml/parser.h)
+AC_CHECK_HEADERS(libxml/xpath.h)
+AC_CHECK_HEADERS(inttypes.h)
+AC_CHECK_HEADERS(libintl.h)
+AC_CHECK_HEADERS(malloc.h)
+AC_CHECK_HEADERS(stddef.h)
+AC_CHECK_HEADERS(stdlib.h)
+AC_CHECK_HEADERS(string.h)
+AC_CHECK_HEADERS(unistd.h)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
