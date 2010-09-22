@@ -42,6 +42,8 @@ AC_CHECK_HEADERS(stdlib.h)
 AC_CHECK_HEADERS(string.h)
 AC_CHECK_HEADERS(unistd.h)
 
+AC_CHECK_LIB(xml2, xmlParseMemory)
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
