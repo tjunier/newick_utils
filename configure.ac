@@ -27,7 +27,6 @@ if xml2-config --version > /dev/null; then
 else
 	CPPFLAGS="$CPPFLAGS -I/usr/include/libxml2"
 fi
-echo "CPPFLAGS: $CPPFLAGS"
 
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
