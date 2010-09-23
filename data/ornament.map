@@ -1,4 +1,5 @@
 "<circle style='fill:red;stroke:black' r='5'/>" I Homo Pan
 "<circle style='fill:cyan;stroke:blue' r='5'/>" C Homo Hylobates
-"<text y='-3'>plains</text>"				I Gorilla
-"<text style='font-style:italic' y='-3' x='20'>Borneo</text><circle style='fill:blue;stroke:orange' r='5'/><circle style='fill:yellow;stroke:purple' r='5' cx='10'/>" I Pongo
+"<text x='-5' y='-3'>plains</text>"				I Gorilla
+"<text x='-5' y='-3'>plains</text>"				I Macaca
+"<text style='font-style:italic' y='-3' x='-5'>Borneo</text>" I Pongo
