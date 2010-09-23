@@ -2,4 +2,5 @@
 "<circle style='fill:cyan;stroke:blue' r='5'/>" C Homo Hylobates
 "<text x='-5' y='-3'>plains</text>"				I Gorilla
 "<text x='-5' y='-3'>plains</text>"				I Macaca
-"<text style='font-style:italic' y='-3' x='-5'>Borneo</text>" I Pongo
+"<text style='font-style:italic' y='-3' x='-25'>Borneo</text><circle r='4' style='fill:blue;stroke:cyan'/><circle cx='-10' r='4' fill='green' stroke='lime'/><rect x='-15' y='-3' width='8' height='6' stroke='orange' fill='blue'/>" I Pongo
+"<text style='font-face:italic' y='-3' x='-12'>Africa</text><circle r='4' style='stroke:grey;fill:white'/><ellipse cx='-8' rx='4' ry='2' style='fill:magenta;stroke:purple'/>" I Homininae
