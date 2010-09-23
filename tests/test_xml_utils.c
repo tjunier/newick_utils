@@ -93,6 +93,16 @@ int test_change_svg_x_attr_sign()
 		return 1;
 	}
 
+	const char *case_6 = "<image x='10' y='-50' width='100' height='100' xlink:href='100px-square-Giraffe.png'/>";
+	const char *exp_6 = "<image x=\"-10\" y=\"-50\" width=\"100\" height=\"100\" xlink:href=\"100px-square-Giraffe.png\"/>";
+	const char *out_6 = change_svg_x_attr_sign(case_6);
+
+	if (strcmp(out_6, exp_6) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp_6,
+				out_6);
+		return 1;
+	}
+
 	printf("%s ok.\n", test_name);
 	return 0;
 }

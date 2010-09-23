@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static char * wrap_in_dummy_doc(const char *svg_snippet)
 {
-	const char * dummy_doc_start = "<dummy>";
+	const char * dummy_doc_start = "<dummy xmlns:xlink=\"http://www.w3.org/1999/xlink\">";
 	const char * dummy_doc_stop = "</dummy>";
 	char *doc_str;
 
