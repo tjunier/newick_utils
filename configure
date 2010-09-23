@@ -10680,7 +10680,6 @@ if xml2-config --version > /dev/null; then
 else
 	CPPFLAGS="$CPPFLAGS -I/usr/include/libxml2"
 fi
-echo "CPPFLAGS: $CPPFLAGS"
 
 # The Ultrix 4.2 mips builtin alloca declared by alloca.h only works
 # for constant arguments.  Useless!

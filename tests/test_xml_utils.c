@@ -39,11 +39,40 @@ int test_escape_predefined_character_entities()
 	return 0;
 }
 
+int test_change_svg_x_attr_sign()
+{
+	const char *test_name = __func__;
+
+	const char *case_1 = "<text>a text</text>";
+	const char *exp_1 = "<text>a text</text>";
+	const char *out_1 = change_svg_x_attr_sign(case_1);
+
+	if (strcmp(out_1, exp_1) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp_1,
+				out_1);
+		return 1;
+	}
+
+	const char *case_2 = "<text x='10'>a text with an x-attribute</text>";
+	const char *exp_2 = "<text x=\"-10\">a text with an x-attribute</text>";
+	const char *out_2 = change_svg_x_attr_sign(case_2);
+
+	if (strcmp(out_2, exp_2) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp_2,
+				out_2);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
 	printf("Starting XML utilities test...\n");
 	failures += test_escape_predefined_character_entities();
+	failures += test_change_svg_x_attr_sign();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
