@@ -63,6 +63,36 @@ int test_change_svg_x_attr_sign()
 		return 1;
 	}
 
+	const char *case_3 = "<text x='-10'>a text with an x-attribute</text>";
+	const char *exp_3 = "<text x=\"10\">a text with an x-attribute</text>";
+	const char *out_3 = change_svg_x_attr_sign(case_3);
+
+	if (strcmp(out_3, exp_3) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp_3,
+				out_3);
+		return 1;
+	}
+
+	const char *case_4 = "<text x='-10.23'>a text with an x-attribute</text>";
+	const char *exp_4 = "<text x=\"10.23\">a text with an x-attribute</text>";
+	const char *out_4 = change_svg_x_attr_sign(case_4);
+
+	if (strcmp(out_4, exp_4) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp_4,
+				out_4);
+		return 1;
+	}
+
+	const char *case_5 = "<circle cx='-10.23' cy='0.12' r='6'/>";
+	const char *exp_5 = "<circle cx=\"10.23\" cy=\"0.12\" r=\"6\"/>";
+	const char *out_5 = change_svg_x_attr_sign(case_5);
+
+	if (strcmp(out_5, exp_5) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp_5,
+				out_5);
+		return 1;
+	}
+
 	printf("%s ok.\n", test_name);
 	return 0;
 }
