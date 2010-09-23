@@ -90,7 +90,8 @@ test_tree_models_SOURCES = test_tree_models.c $(SRC)/tree_models.c \
 	$(SRC)/concat.c $(SRC)/rnode_iterator.c \
 	$(SRC)/hash.c $(SRC)/masprintf.c
 
-test_xml_utils_SOURCES = test_xml_utils.c $(SRC)/xml_utils.c
+test_xml_utils_SOURCES = test_xml_utils.c $(SRC)/xml_utils.c \
+	$(SRC)/masprintf.c
 
 test_masprintf_SOURCES = test_masprintf.c $(SRC)/masprintf.c
 

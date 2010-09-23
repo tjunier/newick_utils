@@ -8,3 +8,4 @@ stamp-h1
 tags
 .*.sw?
 *.tar.gz
+Session.vim

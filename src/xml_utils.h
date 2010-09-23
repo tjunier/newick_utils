@@ -35,3 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 char *escape_predefined_character_entities(const char*);
 
+/* Changes the sign of x-attributes of SVG elements. This is used to correct
+ * the effects of rotations and tranformations on the left side of radial
+ * graphs. */
+
+char *change_svg_x_attr_sign(const char *svg_snippet);

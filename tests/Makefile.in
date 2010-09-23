@@ -182,7 +182,7 @@ am_test_tree_models_OBJECTS = test_tree_models.$(OBJEXT) \
 test_tree_models_OBJECTS = $(am_test_tree_models_OBJECTS)
 test_tree_models_LDADD = $(LDADD)
 am_test_xml_utils_OBJECTS = test_xml_utils.$(OBJEXT) \
-	xml_utils.$(OBJEXT)
+	xml_utils.$(OBJEXT) masprintf.$(OBJEXT)
 test_xml_utils_OBJECTS = $(am_test_xml_utils_OBJECTS)
 test_xml_utils_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -405,7 +405,9 @@ test_tree_models_SOURCES = test_tree_models.c $(SRC)/tree_models.c \
 	$(SRC)/concat.c $(SRC)/rnode_iterator.c \
 	$(SRC)/hash.c $(SRC)/masprintf.c
 
-test_xml_utils_SOURCES = test_xml_utils.c $(SRC)/xml_utils.c
+test_xml_utils_SOURCES = test_xml_utils.c $(SRC)/xml_utils.c \
+	$(SRC)/masprintf.c
+
 test_masprintf_SOURCES = test_masprintf.c $(SRC)/masprintf.c
 test_error_SOURCES = test_error.c $(SRC)/error.c
 test_order_tree_SOURCES = test_order_tree.c $(SRC)/order_tree.c tree_stubs.c \
