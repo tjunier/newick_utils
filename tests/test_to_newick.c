@@ -33,7 +33,11 @@ int dump_newick_to_file(struct rnode *node, char *outname)
 	*/
 
 	/* This also works, and may be more portable, but involves fork()ing a
-	 * child process: overkill? */
+	 * child process: overkill? Moreover, DON'T redirect output (as in make
+	 * check), as it will interfere with the test. TODO: try to fix this
+	 * problem. Reproduce by doing i) ./test_to_newick, and ii)
+	 * ./test_to_newick | grep -i fail -- in the second case there will be
+	 * (false-positive) failures due to redirection */
 	int fd = open(outname, O_CREAT | O_TRUNC | O_RDWR, S_IWUSR | S_IRUSR);
 	if (-1 == fd) return -1;
 	pid_t pid = fork();
