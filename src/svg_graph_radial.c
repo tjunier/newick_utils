@@ -130,6 +130,8 @@ static void draw_ornament (struct svg_data *node_data,
 	printf("<g style='stroke:none;fill:black'>");
 	if (cos(svg_mid_angle) >= 0) {
 		/* right side of circle */
+		/* left side of circle */
+		// TODO: apply transform
 		printf ("<g style='text-anchor:end;vertical-align:super'"
 			" transform='rotate(%g,%g,%g)"
 			" translate(%.4f,%.4f)'>%s</g>",
@@ -139,7 +141,8 @@ static void draw_ornament (struct svg_data *node_data,
 			node_data->ornament);
 	} else {
 		/* left side of circle */
-		char *orn_chs_x = change_svg_x_attr_sign(node_data->ornament);
+		// TODO: apply transform
+		// char *orn_chs_x = change_svg_x_attr_sign(node_data->ornament);
 		printf ("<g transform='"
 			"rotate(180,%g,%g) "
 			"rotate(%g,%g,%g) "
@@ -148,8 +151,7 @@ static void draw_ornament (struct svg_data *node_data,
 			svg_mid_angle / (2*PI) * 360,
 			svg_mid_x_pos, svg_mid_y_pos,
 			svg_mid_x_pos, svg_mid_y_pos,
-			orn_chs_x);
-		free(orn_chs_x);
+			node_data->ornament);
 	}
 	printf("</g>");
 }

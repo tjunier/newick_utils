@@ -64,7 +64,7 @@ static char * wrap_in_dummy_doc(const char *svg_snippet)
 }
 
 /* changes the x-attribute's sign */
-
+// TODO: these will be superseded by f()s in svg_graph_radial.c
 static void chs_x_attr(xmlDocPtr doc, char *attr)
 {
 	/* look for xpath attributes in elements */
