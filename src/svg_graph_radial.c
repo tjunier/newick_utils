@@ -31,6 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
+#include <libxml/tree.h>
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
 
 #include "list.h"
 #include "rnode.h"
@@ -40,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "graph_common.h"
 #include "svg_graph_common.h"
 #include "math.h"
+#include "masprintf.h"
 
 extern enum inner_lbl_pos inner_label_pos;
 
@@ -77,8 +83,191 @@ void set_svg_root_length(int length)
 	svg_root_length = length;
 }
 
+static char * wrap_in_dummy_doc(const char *svg_snippet)
+{
+	const char * dummy_doc_start = "<dummy xmlns:xlink=\"http://www.w3.org/1999/xlink\">";
+	const char * dummy_doc_stop = "</dummy>";
+	char *doc_str;
+
+
+	/* wrap snippet into dummy document */
+	size_t start_length = strlen(dummy_doc_start);
+	size_t snippet_length = strlen(svg_snippet);
+	size_t stop_length = strlen(dummy_doc_stop);
+	size_t doc_length = start_length + snippet_length + stop_length;
+	/* + 1 for trailing '\0' */
+	doc_str = malloc((doc_length + 1) * sizeof(char));
+	if (NULL == doc_str) return NULL;
+
+	strcpy(doc_str, dummy_doc_start);
+	strcpy(doc_str + start_length, svg_snippet);
+	strcpy(doc_str + start_length + snippet_length, dummy_doc_stop);
+
+	return doc_str;
+}
+
+/* changes the x-attribute's sign */
+static void chs_x_attr(xmlDocPtr doc, char *attr)
+{
+	/* look for xpath attributes in elements */
+	xmlChar *xpath = (xmlChar *) masprintf("//*[@%s]", attr);
+	xmlXPathContextPtr context = xmlXPathNewContext(doc);
+	xmlXPathObjectPtr result = xmlXPathEvalExpression(xpath, context);
+	if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
+		xmlXPathFreeObject(result);
+		xmlXPathFreeContext(context);
+		free(xpath);
+		return;
+	} else {
+		xmlNodeSetPtr nodeset = result->nodesetval;
+		int i;
+		for (i=0; i < nodeset->nodeNr; i++) {
+			xmlNodePtr node = nodeset->nodeTab[i];
+			xmlChar *value = xmlGetProp(node, (xmlChar *) attr);
+			if (NULL != value) {
+				double x_val = atof((char *) value);
+				x_val *= -1.0;
+				char *new_value = masprintf("%g", x_val);
+				xmlSetProp(node, (xmlChar *) attr,
+						(xmlChar *) new_value);
+				free(new_value);
+			}	
+			xmlFree(value);
+		}
+		xmlXPathFreeObject (result);
+	}
+	free(xpath);
+	xmlXPathFreeContext(context);
+}	
+
+/* appends a transform to the transform attribute of the element */
+
+static void append_transform(xmlNodePtr node, char *transform)
+{
+	const xmlChar *attr = (xmlChar *) "transform";
+	xmlChar *value = xmlGetProp(node, attr);
+	if (NULL != value) {
+		/* append translate to existing transform(s) */
+		// printf ("Transform: %s\n", value);
+		char * new_value = masprintf("%s, %s",
+			(char *) value, transform);
+		xmlSetProp(node, attr, (xmlChar *) new_value);
+		free(value);
+		free(new_value);
+	}	
+	else {
+		/* set transform to translate */
+		// printf ("No transform yet.\n");
+		xmlSetProp(node, attr, (xmlChar *) transform); 
+	}
+}
+
+/* adds a translation(x,y) to the element */
+
+static void translate(xmlNodePtr node, double x, double y)
+{
+	char *translation = masprintf("translate(%g,%g)", x, y);
+	append_transform(node, translation);
+	free(translation);
+}
+
+/* adds a rotation(angle_deg) to the element */
+
+static void rotate(xmlNodePtr node, double angle_deg)
+{
+	char *rotation = masprintf("rotate(%g)", angle_deg);
+	append_transform(node, rotation);
+	free(rotation);
+}
+
+void apply_transforms(xmlDocPtr doc, double angle_deg, double x, double y)
+{
+	xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
+	while (NULL != cur) {
+		if (strcmp("circle", (char *) cur->name) == 0)
+			/* circles don't need rotation */
+			translate(cur, x, y);
+		else {
+			/* default: rotate then translate */
+			rotate(cur, angle_deg);
+			translate(cur, x, y);
+		}
+		cur = cur->next;	/* sibling */
+	}
+}
+
+static char *unwrap_snippet(xmlDocPtr doc)
+{
+	/* this will give a size that is certain to be enough */
+	xmlChar *xml_buf;
+	int buf_length;
+	xmlDocDumpFormatMemory(doc, &xml_buf, &buf_length, 0); 
+	xmlFree(xml_buf);	/* only need buf_length */
+	/* so, allocate that much (cleared) */
+	char *tweaked_svg = calloc(buf_length, sizeof(char));
+	if (NULL == tweaked_svg) return NULL;
+	// TODO: the following 2 lines can be merged
+	xmlNodePtr cur = xmlDocGetRootElement(doc);
+	cur = cur->xmlChildrenNode;
+	while (NULL != cur) {
+		xmlBufferPtr buf = xmlBufferCreate ();
+		xmlNodeDump (buf, doc, cur, 0, 0);
+		const xmlChar * contents = xmlBufferContent(buf);
+		int cur_len = strlen(tweaked_svg);
+		/* appends to tweaked_svg - cur_len must initially be 0, which
+		 * is why we use calloc() */
+		strcpy(tweaked_svg + cur_len, (char *) contents);
+		xmlBufferFree(buf);
+		cur = cur->next;	/* sibling */
+	}
+	return tweaked_svg;
+}
+
 /* Outputs an SVG <g> element with all the tree branches, radial. In this
  * context, a node's 'top' and 'bottom' are angles, not vertical positions */
+
+/* Transforms SVG elements. Argument is the ornaments string as in the ornament
+ * file (i.e., an SVG snippet). Returns (and allocates - you must free it)
+ * another SVG snippet in which the elements have been transformed.
+ * Transformations * include:
+ *	o translation to node position (all elements)
+ *	o rotation (the same as node edge and node labels) (all but circle)
+ *	o 180° rotation and/or alignment (text - so that it always reads
+ *	  left-to-right)
+ *	o further rotation and translation (images - so that they are oriented
+ *	  right)
+ *
+ * This f() is not static because it needs to be tested directly (in
+ * test_svg_graph_radial); but it is not in any header file either, because it
+ * is not meant to be used outside this module.
+ * Returns NULL in case of failure. */
+
+char *transform_ornaments(const char *ornaments, double angle_deg, double x,
+		double y)
+{
+
+	xmlDocPtr doc;
+
+	char *wrapped_orn = wrap_in_dummy_doc(ornaments);
+	if (NULL == wrapped_orn) return NULL;
+
+	/* parse SVG from string */
+	doc = xmlParseMemory(wrapped_orn, strlen(wrapped_orn));
+	if (NULL == doc) {
+		fprintf(stderr, "Failed to parse document\n");
+		return NULL;
+	}
+	free(wrapped_orn);
+
+	/* tweak according to element type */
+	apply_transforms(doc, angle_deg, x, y);
+
+	/* now print out the altered snipped, unwrapped.  */
+	char *tweaked_svg = unwrap_snippet(doc);
+	xmlFreeDoc(doc);
+
+	return tweaked_svg;
+}
 
 /* Draws the arc for inner nodes, including root */
 

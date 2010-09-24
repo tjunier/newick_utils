@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "svg_graph_radial.h"
+char *transform_ornaments(const char *, double, double, double);
 
 unsigned int test_transform_ornaments()
 {
 	const char *test_name = __func__;
 
-	const char *case_1 = "<text>a text</text>";
-	const char *exp_1 = "<text>a text</text>";
-	const char *out_1 = transform_ornaments(case_1);
+	const char *case_1 = "<circle r='2'/>";
+	const char *exp_1 = "<circle r=\"2\" transform=\"translate(10,10)\"/>";
+	const char *out_1 = transform_ornaments(case_1, 45.0, 10.0, 10.0);
 
 	if (strcmp(out_1, exp_1) != 0) {
 		printf ("%s: expected '%s', got '%s'\n", test_name, exp_1,
@@ -17,9 +17,9 @@ unsigned int test_transform_ornaments()
 		return 1;
 	}
 
-	const char *case_2 = "<text x='10'>a text with an x-attribute</text>";
-	const char *exp_2 = "<text x=\"-10\">a text with an x-attribute</text>";
-	const char *out_2 = transform_ornaments(case_2);
+	const char *case_2 = "<circle r='3' transform='scale(2.1)'/>";
+	const char *exp_2 = "<circle r=\"3\" transform=\"scale(2.1), translate(10,10)\"/>";
+	const char *out_2 = transform_ornaments(case_2, 45.0, 10.0, 10.0);
 
 	if (strcmp(out_2, exp_2) != 0) {
 		printf ("%s: expected '%s', got '%s'\n", test_name, exp_2,
@@ -27,9 +27,9 @@ unsigned int test_transform_ornaments()
 		return 1;
 	}
 
-	const char *case_3 = "<text x='-10'>a text with an x-attribute</text>";
-	const char *exp_3 = "<text x=\"10\">a text with an x-attribute</text>";
-	const char *out_3 = transform_ornaments(case_3);
+	const char *case_3 = "<rect y='-3' height='6' width='9'/>";
+	const char *exp_3 = "<rect y=\"-3\" height=\"6\" width=\"9\" transform=\"rotate(45), translate(10,10)\"/>";
+	const char *out_3 = transform_ornaments(case_3, 45.0, 10.0, 10.0);
 
 	if (strcmp(out_3, exp_3) != 0) {
 		printf ("%s: expected '%s', got '%s'\n", test_name, exp_3,
@@ -37,6 +37,7 @@ unsigned int test_transform_ornaments()
 		return 1;
 	}
 
+	/*
 	const char *case_4 = "<text x='-10.23'>a text with an x-attribute</text>";
 	const char *exp_4 = "<text x=\"10.23\">a text with an x-attribute</text>";
 	const char *out_4 = transform_ornaments(case_4);
@@ -66,6 +67,7 @@ unsigned int test_transform_ornaments()
 				out_6);
 		return 1;
 	}
+	*/
 
 	printf("%s ok.\n", test_name);
 
@@ -75,7 +77,7 @@ unsigned int test_transform_ornaments()
 int main()
 {
 	int failures = 0;
-	printf("Starting canvas test...\n");
+	printf("Starting svg_graph_radial test...\n");
 	failures += test_transform_ornaments();
 	if (0 == failures) {
 		printf("All tests ok.\n");
