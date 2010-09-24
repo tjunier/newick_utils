@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
@@ -13,6 +14,8 @@
 #include "concat.h"
 #include "parser.h"
 #include "tree.h"
+
+void newick_scanner_set_string_input(char *);
 
 /* dump_newick() writes to standard output. If we want to check what it wrote,
  * we have to redirect its output to a file. This can be done easily with dup()

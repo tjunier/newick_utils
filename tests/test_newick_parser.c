@@ -12,6 +12,7 @@ int nwslex (void);
 struct rnode *root;
 struct llist *nodes_in_order;
 enum parser_status_type newick_parser_status;
+void newick_scanner_set_string_input(char *);
 
 /* NOTE: we can use to_newick() to check the parser's output because this
  * function is independently tested on trees constructed without the parser
