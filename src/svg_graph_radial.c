@@ -184,9 +184,13 @@ void apply_transforms(xmlDocPtr doc, double angle_deg, double x, double y)
 {
 	xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
 	while (NULL != cur) {
-		rotate(cur, angle_deg);
-		fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, x, y);
+		/* transforms are now appended, which means that they appear in
+		 * reverse order (i.e., the following causes the rotation to
+		 * occur _first_. TODO: change append_transform() to
+		 * prepend_transform() */
+		// TODO: special handling of trees and images 
 		translate(cur, x, y);
+		rotate(cur, angle_deg);
 		cur = cur->next;	/* sibling */
 	}
 }
@@ -255,7 +259,7 @@ char *transform_ornaments(const char *ornaments, double angle_deg, double x,
 	free(wrapped_orn);
 
 	/* tweak according to element type */
-	fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, x, y);
+	//fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, x, y);
 	apply_transforms(doc, angle_deg, x, y);
 
 	/* now print out the altered snipped, unwrapped.  */
@@ -296,7 +300,7 @@ static void draw_radial_line(struct rnode *node, const double r_scale,
 		r_scale * parent_data->depth);
 	double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
 	double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
-	fprintf(stderr, "node pos: (%g,%g)\n", svg_mid_x_pos, svg_mid_y_pos);
+	//fprintf(stderr, "node pos: (%g,%g)\n", svg_mid_x_pos, svg_mid_y_pos);
 	printf ("<line class='clade_%d' "
 		"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 		group_nb,
@@ -313,7 +317,7 @@ static void draw_ornament (struct svg_data *node_data,
 {
 	/* this styling is for text, so that users can omit styles in the map
 	 * file and still see the text. */
-	fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, svg_mid_x_pos, svg_mid_y_pos);
+	//fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, svg_mid_x_pos, svg_mid_y_pos);
 	printf("<g style='stroke:none;fill:black'>");
 	char *transformed_ornaments = transform_ornaments(
 			node_data->ornament,
