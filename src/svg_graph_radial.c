@@ -148,8 +148,8 @@ static void append_transform(xmlNodePtr node, char *transform)
 	xmlChar *value = xmlGetProp(node, attr);
 	if (NULL != value) {
 		/* append translate to existing transform(s) */
-		// printf ("Transform: %s\n", value);
-		char * new_value = masprintf("%s, %s",
+		// fprintf (stderr, "Transform: %s, applying %s\n", value, transform);
+		char * new_value = masprintf("%s %s",
 			(char *) value, transform);
 		xmlSetProp(node, attr, (xmlChar *) new_value);
 		free(value);
@@ -157,7 +157,7 @@ static void append_transform(xmlNodePtr node, char *transform)
 	}	
 	else {
 		/* set transform to translate */
-		// printf ("No transform yet.\n");
+		// fprintf (stderr, "No transform yet. Applying %s\n", transform);
 		xmlSetProp(node, attr, (xmlChar *) transform); 
 	}
 }
@@ -184,14 +184,9 @@ void apply_transforms(xmlDocPtr doc, double angle_deg, double x, double y)
 {
 	xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
 	while (NULL != cur) {
-		if (strcmp("circle", (char *) cur->name) == 0)
-			/* circles don't need rotation */
-			translate(cur, x, y);
-		else {
-			/* default: rotate then translate */
-			rotate(cur, angle_deg);
-			translate(cur, x, y);
-		}
+		rotate(cur, angle_deg);
+		fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, x, y);
+		translate(cur, x, y);
 		cur = cur->next;	/* sibling */
 	}
 }
@@ -231,7 +226,7 @@ static char *unwrap_snippet(xmlDocPtr doc)
  * another SVG snippet in which the elements have been transformed.
  * Transformations * include:
  *	o translation to node position (all elements)
- *	o rotation (the same as node edge and node labels) (all but circle)
+ *	o rotation (the same as node edge and node labels) (all elements)
  *	o 180° rotation and/or alignment (text - so that it always reads
  *	  left-to-right)
  *	o further rotation and translation (images - so that they are oriented
@@ -260,6 +255,7 @@ char *transform_ornaments(const char *ornaments, double angle_deg, double x,
 	free(wrapped_orn);
 
 	/* tweak according to element type */
+	fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, x, y);
 	apply_transforms(doc, angle_deg, x, y);
 
 	/* now print out the altered snipped, unwrapped.  */
@@ -300,6 +296,7 @@ static void draw_radial_line(struct rnode *node, const double r_scale,
 		r_scale * parent_data->depth);
 	double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
 	double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
+	fprintf(stderr, "node pos: (%g,%g)\n", svg_mid_x_pos, svg_mid_y_pos);
 	printf ("<line class='clade_%d' "
 		"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 		group_nb,
@@ -316,10 +313,19 @@ static void draw_ornament (struct svg_data *node_data,
 {
 	/* this styling is for text, so that users can omit styles in the map
 	 * file and still see the text. */
+	fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, svg_mid_x_pos, svg_mid_y_pos);
 	printf("<g style='stroke:none;fill:black'>");
+	char *transformed_ornaments = transform_ornaments(
+			node_data->ornament,
+			svg_mid_angle / (2*PI) * 360,
+			svg_mid_x_pos, svg_mid_y_pos);
+	printf("%s", transformed_ornaments);
+	// fprintf(stderr, "%s\n", transformed_ornaments);
+	free(transformed_ornaments);
+	printf("</g>");
+	/*
 	if (cos(svg_mid_angle) >= 0) {
-		/* right side of circle */
-		/* left side of circle */
+		// right side
 		// TODO: apply transform
 		printf ("<g style='text-anchor:end;vertical-align:super'"
 			" transform='rotate(%g,%g,%g)"
@@ -329,7 +335,7 @@ static void draw_ornament (struct svg_data *node_data,
 			svg_mid_x_pos, svg_mid_y_pos,
 			node_data->ornament);
 	} else {
-		/* left side of circle */
+		// left side
 		// TODO: apply transform
 		// char *orn_chs_x = change_svg_x_attr_sign(node_data->ornament);
 		printf ("<g transform='"
@@ -341,8 +347,7 @@ static void draw_ornament (struct svg_data *node_data,
 			svg_mid_x_pos, svg_mid_y_pos,
 			svg_mid_x_pos, svg_mid_y_pos,
 			node_data->ornament);
-	}
-	printf("</g>");
+	} */
 }
 
 static void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
