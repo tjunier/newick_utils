@@ -39,7 +39,7 @@ unsigned int test_transform_ornaments()
 
 	const char *case_4 = "<text>a text</text>";
 	const char *exp_4 = "<text transform=\"translate(10,10) rotate(45)\""
-				" style=\"text-anchor:end\">"
+				" y=\"-3\" style=\"text-anchor:end\">"
 				"a text</text>";
 	const char *out_4 = transform_ornaments(case_4, 45.0, 10.0, 10.0);
 
@@ -49,27 +49,16 @@ unsigned int test_transform_ornaments()
 		return 1;
 	}
 
-	/*
-	const char *case_5 = "<circle cx='-10.23' cy='0.12' r='6'/>";
-	const char *exp_5 = "<circle cx=\"10.23\" cy=\"0.12\" r=\"6\"/>";
-	const char *out_5 = transform_ornaments(case_5);
+	const char *case_5 = "<text>a text</text>";
+	const char *exp_5 = "<text transform=\"rotate(180,-10,-10) "
+		"translate(-10,-10) rotate(135)\" y=\"-3\">a text</text>";
+	const char *out_5 = transform_ornaments(case_5, 135.0, -10.0, -10.0);
 
 	if (strcmp(out_5, exp_5) != 0) {
 		printf ("%s: expected '%s', got '%s'\n", test_name, exp_5,
 				out_5);
 		return 1;
 	}
-
-	const char *case_6 = "<image x='10' y='-50' width='100' height='100' xlink:href='100px-square-Giraffe.png'/>";
-	const char *exp_6 = "<image x=\"-10\" y=\"-50\" width=\"100\" height=\"100\" xlink:href=\"100px-square-Giraffe.png\"/>";
-	const char *out_6 = transform_ornaments(case_6);
-
-	if (strcmp(out_6, exp_6) != 0) {
-		printf ("%s: expected '%s', got '%s'\n", test_name, exp_6,
-				out_6);
-		return 1;
-	}
-	*/
 
 	printf("%s ok.\n", test_name);
 
