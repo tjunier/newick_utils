@@ -8,7 +8,7 @@ unsigned int test_transform_ornaments()
 	const char *test_name = __func__;
 
 	const char *case_1 = "<circle r='2'/>";
-	const char *exp_1 = "<circle r=\"2\" transform=\"translate(10,10)\"/>";
+	const char *exp_1 = "<circle r=\"2\" transform=\"translate(10,10) rotate(45)\"/>";
 	const char *out_1 = transform_ornaments(case_1, 45.0, 10.0, 10.0);
 
 	if (strcmp(out_1, exp_1) != 0) {
