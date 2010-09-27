@@ -140,17 +140,19 @@ static void chs_x_attr(xmlDocPtr doc, char *attr)
 	xmlXPathFreeContext(context);
 }	
 
-/* appends a transform to the transform attribute of the element */
+/* prepends a transform to the transform attribute of the element - the effect
+ * is to do compose the new tranform to the existing ones (think matrix
+ * multiplication) */
 
-static void append_transform(xmlNodePtr node, char *transform)
+static void prepend_transform(xmlNodePtr node, char *transform)
 {
 	const xmlChar *attr = (xmlChar *) "transform";
 	xmlChar *value = xmlGetProp(node, attr);
 	if (NULL != value) {
-		/* append translate to existing transform(s) */
+		/* prepend translate to existing transform(s) */
 		// fprintf (stderr, "Transform: %s, applying %s\n", value, transform);
 		char * new_value = masprintf("%s %s",
-			(char *) value, transform);
+			transform, (char *) value);
 		xmlSetProp(node, attr, (xmlChar *) new_value);
 		free(value);
 		free(new_value);
@@ -167,7 +169,7 @@ static void append_transform(xmlNodePtr node, char *transform)
 static void translate(xmlNodePtr node, double x, double y)
 {
 	char *translation = masprintf("translate(%g,%g)", x, y);
-	append_transform(node, translation);
+	prepend_transform(node, translation);
 	free(translation);
 }
 
@@ -176,7 +178,7 @@ static void translate(xmlNodePtr node, double x, double y)
 static void rotate(xmlNodePtr node, double angle_deg)
 {
 	char *rotation = masprintf("rotate(%g)", angle_deg);
-	append_transform(node, rotation);
+	prepend_transform(node, rotation);
 	free(rotation);
 }
 
@@ -184,13 +186,10 @@ void apply_transforms(xmlDocPtr doc, double angle_deg, double x, double y)
 {
 	xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
 	while (NULL != cur) {
-		/* transforms are now appended, which means that they appear in
-		 * reverse order (i.e., the following causes the rotation to
-		 * occur _first_. TODO: change append_transform() to
-		 * prepend_transform() */
+		/* apply the transforms, in this order */
 		// TODO: special handling of trees and images 
-		translate(cur, x, y);
 		rotate(cur, angle_deg);
+		translate(cur, x, y);
 		cur = cur->next;	/* sibling */
 	}
 }

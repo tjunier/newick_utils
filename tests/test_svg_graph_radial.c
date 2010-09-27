@@ -18,7 +18,7 @@ unsigned int test_transform_ornaments()
 	}
 
 	const char *case_2 = "<circle r='3' transform='scale(2.1)'/>";
-	const char *exp_2 = "<circle r=\"3\" transform=\"scale(2.1), translate(10,10)\"/>";
+	const char *exp_2 = "<circle r=\"3\" transform=\"translate(10,10) rotate(45) scale(2.1)\"/>";
 	const char *out_2 = transform_ornaments(case_2, 45.0, 10.0, 10.0);
 
 	if (strcmp(out_2, exp_2) != 0) {
@@ -28,7 +28,7 @@ unsigned int test_transform_ornaments()
 	}
 
 	const char *case_3 = "<rect y='-3' height='6' width='9'/>";
-	const char *exp_3 = "<rect y=\"-3\" height=\"6\" width=\"9\" transform=\"rotate(45), translate(10,10)\"/>";
+	const char *exp_3 = "<rect y=\"-3\" height=\"6\" width=\"9\" transform=\"translate(10,10) rotate(45)\"/>";
 	const char *out_3 = transform_ornaments(case_3, 45.0, 10.0, 10.0);
 
 	if (strcmp(out_3, exp_3) != 0) {
