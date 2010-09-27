@@ -52,6 +52,7 @@ extern enum inner_lbl_pos inner_label_pos;
 const double PI = 3.14159;
 const int Scale_bar_left_space = 10;
 const int NUDGE_DISTANCE = 3;	/* px */
+const int TEXT_ORNAMENTS_BASELINE_NUDGE = 3; /* px */
 
 // TODO: the svg_ prefix that many variables have is probably not really
 // necessary. Also, replace logical ints by booleans.
@@ -140,6 +141,23 @@ static void chs_x_attr(xmlDocPtr doc, char *attr)
 	xmlXPathFreeContext(context);
 }	
 
+/* nudges y-attribute above the baseline (for text) */
+
+static void nudge_baseline(xmlNodePtr node)
+{
+	xmlChar *y_attr = (xmlChar*) "y";
+	xmlChar *y = xmlGetProp(node, y_attr);
+	double y_value; /* initialized below */
+	if (NULL != y) 
+		y_value = atof((char *) y);
+	 else 
+		y_value = 0 ;
+	y_value -= TEXT_ORNAMENTS_BASELINE_NUDGE;
+	char *new_y_val = masprintf("%g", y_value);
+	xmlSetProp(node, y_attr, (xmlChar *) new_y_val);
+	free(new_y_val);
+}
+
 /* prepends a transform to the transform attribute of the element - the effect
  * is to do compose the new tranform to the existing ones (think matrix
  * multiplication) */
@@ -182,14 +200,45 @@ static void rotate(xmlNodePtr node, double angle_deg)
 	free(rotation);
 }
 
+/* special transforms for <text> elements */
+
+static void text_transforms(xmlNodePtr node, double angle_deg,
+		double x, double y)
+{
+	nudge_baseline(node); /* so text can be read */
+	if (angle_deg <= 90 || angle_deg >= 270) {
+		// right side (cos >= 0) 
+		/* ensure end-anchoring */
+		xmlChar *style_attr = (xmlChar*) "style";
+		xmlChar *style = xmlGetProp(node, style_attr);
+		if (NULL != style) {
+			char * new_style = masprintf("%s;%s",
+					(char *) style, "text-anchor:end");
+			xmlSetProp(node, style_attr, (xmlChar *) new_style);
+			free(style);
+			free(new_style);
+		}
+		else {
+			xmlSetProp(node, style_attr,
+					(xmlChar*) "text-anchor:end");
+		}
+	} else {
+		// left side (cos < 0)
+		char * half_turn = masprintf("rotate(180,%g,%g)", x, y);
+		prepend_transform(node, half_turn);
+		free(half_turn);
+	}
+}
+
 void apply_transforms(xmlDocPtr doc, double angle_deg, double x, double y)
 {
 	xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
 	while (NULL != cur) {
 		/* apply the transforms, in this order */
-		// TODO: special handling of trees and images 
 		rotate(cur, angle_deg);
 		translate(cur, x, y);
+		if (strcmp("text", (char *) cur->name) == 0)
+			text_transforms(cur, angle_deg, x, y);
 		cur = cur->next;	/* sibling */
 	}
 }

@@ -9,3 +9,4 @@ tags
 .*.sw?
 *.tar.gz
 Session.vim
+*~

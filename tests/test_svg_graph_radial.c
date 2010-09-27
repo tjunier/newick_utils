@@ -37,10 +37,11 @@ unsigned int test_transform_ornaments()
 		return 1;
 	}
 
-	/*
-	const char *case_4 = "<text x='-10.23'>a text with an x-attribute</text>";
-	const char *exp_4 = "<text x=\"10.23\">a text with an x-attribute</text>";
-	const char *out_4 = transform_ornaments(case_4);
+	const char *case_4 = "<text>a text</text>";
+	const char *exp_4 = "<text transform=\"translate(10,10) rotate(45)\""
+				" style=\"text-anchor:end\">"
+				"a text</text>";
+	const char *out_4 = transform_ornaments(case_4, 45.0, 10.0, 10.0);
 
 	if (strcmp(out_4, exp_4) != 0) {
 		printf ("%s: expected '%s', got '%s'\n", test_name, exp_4,
@@ -48,6 +49,7 @@ unsigned int test_transform_ornaments()
 		return 1;
 	}
 
+	/*
 	const char *case_5 = "<circle cx='-10.23' cy='0.12' r='6'/>";
 	const char *exp_5 = "<circle cx=\"10.23\" cy=\"0.12\" r=\"6\"/>";
 	const char *out_5 = transform_ornaments(case_5);
