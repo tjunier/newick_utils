@@ -228,9 +228,17 @@ static void center_vertically(xmlNodePtr node)
 		return;
 	}
 	double height = atof((char *) height_value);
-	xmlChar * y_attr = (); // TODO: here
-
-
+	xmlChar * y_attr = (xmlChar *) "y";
+	xmlChar * y_value = xmlGetProp(node, y_attr);
+	double y;
+	if (NULL != y_value)
+		y = atof((char *) y_value);
+	else
+		y = 0;
+	y -= height / 2;
+	char *new_y_value = masprintf("%g", y);
+	xmlSetProp(node, y_attr, (xmlChar *) new_y_value);
+	free(new_y_value);
 }
 
 static void image_transforms(xmlNodePtr node, double angle_deg,
