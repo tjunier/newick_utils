@@ -214,6 +214,37 @@ static void text_transforms(xmlNodePtr node, double angle_deg,
 	}
 }
 
+/* special transforms for <image> elements */
+
+/* centers an image vertically around the node position ("vertically" is to be
+ * understood _before_ rotation (i.e., as for a rotation of 0) */
+
+static void center_vertically(xmlNodePtr node)
+{
+	xmlChar * height_attr = (xmlChar *) "height";
+	xmlChar * height_value = xmlGetProp(node, height_attr);
+	if (NULL == height_value) {
+		fprintf (stderr, "WARNING: <image> has no height.\n");
+		return;
+	}
+	double height = atof((char *) height_value);
+	xmlChar * y_attr = (); // TODO: here
+
+
+}
+
+static void image_transforms(xmlNodePtr node, double angle_deg,
+		double x, double y)
+{
+	center_vertically(node);
+	if (angle_deg > 90 && angle_deg < 270) {
+		// left side (cos < 0)
+		char * half_turn = masprintf("rotate(180,%g,%g)", x, y);
+		prepend_transform(node, half_turn);
+		free(half_turn);
+	}
+}
+
 void apply_transforms(xmlDocPtr doc, double angle_deg, double x, double y)
 {
 	xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
@@ -223,6 +254,9 @@ void apply_transforms(xmlDocPtr doc, double angle_deg, double x, double y)
 		translate(cur, x, y);
 		if (strcmp("text", (char *) cur->name) == 0)
 			text_transforms(cur, angle_deg, x, y);
+		else if (strcmp("image", (char *) cur->name) == 0)
+			image_transforms(cur, angle_deg, x, y);
+
 		cur = cur->next;	/* sibling */
 	}
 }
