@@ -60,6 +60,17 @@ unsigned int test_transform_ornaments()
 		return 1;
 	}
 
+	const char *case_6 = "<text x='-5'>a text</text>";
+	const char *exp_6 = "<text x=\"5\" transform=\"rotate(180,-10,-10) "
+		"translate(-10,-10) rotate(135)\" y=\"-3\">a text</text>";
+	const char *out_6 = transform_ornaments(case_6, 135.0, -10.0, -10.0);
+
+	if (strcmp(out_6, exp_6) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp_6,
+				out_6);
+		return 1;
+	}
+
 	printf("%s ok.\n", test_name);
 
 	return 0;

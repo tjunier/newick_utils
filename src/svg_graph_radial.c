@@ -108,37 +108,19 @@ static char * wrap_in_dummy_doc(const char *svg_snippet)
 }
 
 /* changes the x-attribute's sign */
-static void chs_x_attr(xmlDocPtr doc, char *attr)
+
+static void change_x_sign(xmlNodePtr node)
 {
-	/* look for xpath attributes in elements */
-	xmlChar *xpath = (xmlChar *) masprintf("//*[@%s]", attr);
-	xmlXPathContextPtr context = xmlXPathNewContext(doc);
-	xmlXPathObjectPtr result = xmlXPathEvalExpression(xpath, context);
-	if (xmlXPathNodeSetIsEmpty(result->nodesetval)) {
-		xmlXPathFreeObject(result);
-		xmlXPathFreeContext(context);
-		free(xpath);
-		return;
-	} else {
-		xmlNodeSetPtr nodeset = result->nodesetval;
-		int i;
-		for (i=0; i < nodeset->nodeNr; i++) {
-			xmlNodePtr node = nodeset->nodeTab[i];
-			xmlChar *value = xmlGetProp(node, (xmlChar *) attr);
-			if (NULL != value) {
-				double x_val = atof((char *) value);
-				x_val *= -1.0;
-				char *new_value = masprintf("%g", x_val);
-				xmlSetProp(node, (xmlChar *) attr,
-						(xmlChar *) new_value);
-				free(new_value);
-			}	
-			xmlFree(value);
-		}
-		xmlXPathFreeObject (result);
-	}
-	free(xpath);
-	xmlXPathFreeContext(context);
+	xmlChar *x = (xmlChar *) "x";
+	xmlChar *x_value = xmlGetProp(node, x);
+	if (NULL != x_value) {
+		double x_val = atof((char *) x_value);
+		x_val *= -1.0;
+		char *new_value = masprintf("%g", x_val);
+		xmlSetProp(node, x, (xmlChar *) new_value);
+		free(new_value);
+	}	
+	xmlFree(x_value);
 }	
 
 /* nudges y-attribute above the baseline (for text) */
@@ -227,6 +209,8 @@ static void text_transforms(xmlNodePtr node, double angle_deg,
 		char * half_turn = masprintf("rotate(180,%g,%g)", x, y);
 		prepend_transform(node, half_turn);
 		free(half_turn);
+		/* the rotation causes any x value to have wrong sign, so: */
+		change_x_sign(node); 
 	}
 }
 
