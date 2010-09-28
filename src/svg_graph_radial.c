@@ -241,15 +241,47 @@ static void center_vertically(xmlNodePtr node)
 	free(new_y_value);
 }
 
+/* shifts an image one image width leafwards */
+
+static void shift_one_width_leafwards(xmlNodePtr node)
+{
+	xmlChar *width_attr = (xmlChar *) "width";
+	xmlChar *width_value = xmlGetProp(node, width_attr);
+	if (NULL == width_value) {
+		fprintf (stderr, "WARNING: <image> has no width.\n");
+		return;
+	}
+	double width = atof((char *) width_value);
+
+	/* could also use a translate() transform, but this would have to be
+	prepended _before_ the other transforms. */
+	double x = 0.0;
+	xmlChar *x_attr = (xmlChar *) "x";
+	xmlChar *x_value = xmlGetProp(node, x_attr);
+	if (NULL != x_value) 
+		x = atof((char *) x_value);
+	x -= width;
+	char *new_value = masprintf("%g", x);
+	xmlSetProp(node, x_attr, (xmlChar *) new_value);
+	free(new_value);
+	xmlFree(x_value);
+	xmlFree(width_value);
+}	
+
 static void image_transforms(xmlNodePtr node, double angle_deg,
 		double x, double y)
 {
 	center_vertically(node);
+	/* if the image is on the left side, we i) rotate it 180° around the
+	 * node (tip of the parent edge)(so that it is not upside-down), and
+	 * ii) shift it one image length leafwards (to correct for the
+	 * rootwards shift caused by rotation) */
 	if (angle_deg > 90 && angle_deg < 270) {
 		// left side (cos < 0)
 		char * half_turn = masprintf("rotate(180,%g,%g)", x, y);
 		prepend_transform(node, half_turn);
 		free(half_turn);
+		shift_one_width_leafwards(node);
 	}
 }
 

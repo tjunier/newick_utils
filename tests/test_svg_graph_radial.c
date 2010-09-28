@@ -71,6 +71,29 @@ unsigned int test_transform_ornaments()
 		return 1;
 	}
 
+	const char *case_7 = "<image width='22.5' height='15'/>";
+	const char *exp_7 = "<image width=\"22.5\" height=\"15\" "
+		"transform=\"translate(10,10) rotate(45)\" y=\"-7.5\"/>";
+	const char *out_7 = transform_ornaments(case_7, 45.0, 10.0, 10.0);
+
+	if (strcmp(out_7, exp_7) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp_7,
+				out_7);
+		return 1;
+	}
+
+	const char *case_8 = "<image width='22.5' height='15'/>";
+	const char *exp_8 = "<image width=\"22.5\" height=\"15\" "
+		"transform=\"rotate(180,-10,-10) translate(-10,-10) "
+		"rotate(135)\" y=\"-7.5\" x=\"-22.5\"/>";
+	const char *out_8 = transform_ornaments(case_8, 135.0, -10.0, -10.0);
+
+	if (strcmp(out_8, exp_8) != 0) {
+		printf ("%s: expected '%s', got '%s'\n", test_name, exp_8,
+				out_8);
+		return 1;
+	}
+
 	printf("%s ok.\n", test_name);
 
 	return 0;
