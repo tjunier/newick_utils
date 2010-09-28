@@ -31,6 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
+#include <libxml/tree.h>
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
 
 #include "list.h"
 #include "rnode.h"
@@ -40,12 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "graph_common.h"
 #include "svg_graph_common.h"
 #include "math.h"
+#include "masprintf.h"
 
 extern enum inner_lbl_pos inner_label_pos;
 
 const double PI = 3.14159;
 const int Scale_bar_left_space = 10;
 const int NUDGE_DISTANCE = 3;	/* px */
+const int TEXT_ORNAMENTS_BASELINE_NUDGE = 3; /* px */
 
 // TODO: the svg_ prefix that many variables have is probably not really
 // necessary. Also, replace logical ints by booleans.
@@ -77,8 +84,296 @@ void set_svg_root_length(int length)
 	svg_root_length = length;
 }
 
+static char * wrap_in_dummy_doc(const char *svg_snippet)
+{
+	const char * dummy_doc_start = "<dummy xmlns:xlink=\"http://www.w3.org/1999/xlink\">";
+	const char * dummy_doc_stop = "</dummy>";
+	char *doc_str;
+
+
+	/* wrap snippet into dummy document */
+	size_t start_length = strlen(dummy_doc_start);
+	size_t snippet_length = strlen(svg_snippet);
+	size_t stop_length = strlen(dummy_doc_stop);
+	size_t doc_length = start_length + snippet_length + stop_length;
+	/* + 1 for trailing '\0' */
+	doc_str = malloc((doc_length + 1) * sizeof(char));
+	if (NULL == doc_str) return NULL;
+
+	strcpy(doc_str, dummy_doc_start);
+	strcpy(doc_str + start_length, svg_snippet);
+	strcpy(doc_str + start_length + snippet_length, dummy_doc_stop);
+
+	return doc_str;
+}
+
+/* changes the x-attribute's sign */
+
+static void change_x_sign(xmlNodePtr node)
+{
+	xmlChar *x = (xmlChar *) "x";
+	xmlChar *x_value = xmlGetProp(node, x);
+	if (NULL != x_value) {
+		double x_val = atof((char *) x_value);
+		x_val *= -1.0;
+		char *new_value = masprintf("%g", x_val);
+		xmlSetProp(node, x, (xmlChar *) new_value);
+		free(new_value);
+	}	
+	xmlFree(x_value);
+}	
+
+/* nudges y-attribute above the baseline (for text) */
+
+static void nudge_baseline(xmlNodePtr node)
+{
+	xmlChar *y_attr = (xmlChar*) "y";
+	xmlChar *y = xmlGetProp(node, y_attr);
+	double y_value; /* initialized below */
+	if (NULL != y) 
+		y_value = atof((char *) y);
+	 else 
+		y_value = 0 ;
+	y_value -= TEXT_ORNAMENTS_BASELINE_NUDGE;
+	char *new_y_val = masprintf("%g", y_value);
+	xmlSetProp(node, y_attr, (xmlChar *) new_y_val);
+	free(new_y_val);
+}
+
+/* prepends a transform to the transform attribute of the element - the effect
+ * is to do compose the new tranform to the existing ones (think matrix
+ * multiplication) */
+
+static void prepend_transform(xmlNodePtr node, char *transform)
+{
+	const xmlChar *attr = (xmlChar *) "transform";
+	xmlChar *value = xmlGetProp(node, attr);
+	if (NULL != value) {
+		/* prepend translate to existing transform(s) */
+		// fprintf (stderr, "Transform: %s, applying %s\n", value, transform);
+		char * new_value = masprintf("%s %s",
+			transform, (char *) value);
+		xmlSetProp(node, attr, (xmlChar *) new_value);
+		free(value);
+		free(new_value);
+	}	
+	else {
+		/* set transform to translate */
+		// fprintf (stderr, "No transform yet. Applying %s\n", transform);
+		xmlSetProp(node, attr, (xmlChar *) transform); 
+	}
+}
+
+/* adds a translation(x,y) to the element */
+
+static void translate(xmlNodePtr node, double x, double y)
+{
+	char *translation = masprintf("translate(%g,%g)", x, y);
+	prepend_transform(node, translation);
+	free(translation);
+}
+
+/* adds a rotation(angle_deg) to the element */
+
+static void rotate(xmlNodePtr node, double angle_deg)
+{
+	char *rotation = masprintf("rotate(%g)", angle_deg);
+	prepend_transform(node, rotation);
+	free(rotation);
+}
+
+/* special transforms for <text> elements */
+
+static void text_transforms(xmlNodePtr node, double angle_deg,
+		double x, double y)
+{
+	nudge_baseline(node); /* so text can be read */
+	if (angle_deg <= 90 || angle_deg >= 270) {
+		// right side (cos >= 0) 
+		/* ensure end-anchoring */
+		xmlChar *style_attr = (xmlChar*) "style";
+		xmlChar *style = xmlGetProp(node, style_attr);
+		if (NULL != style) {
+			char * new_style = masprintf("%s;%s",
+					(char *) style, "text-anchor:end");
+			xmlSetProp(node, style_attr, (xmlChar *) new_style);
+			free(style);
+			free(new_style);
+		}
+		else {
+			xmlSetProp(node, style_attr,
+					(xmlChar*) "text-anchor:end");
+		}
+	} else {
+		// left side (cos < 0)
+		char * half_turn = masprintf("rotate(180,%g,%g)", x, y);
+		prepend_transform(node, half_turn);
+		free(half_turn);
+		/* the rotation causes any x value to have wrong sign, so: */
+		change_x_sign(node); 
+	}
+}
+
+/* special transforms for <image> elements */
+
+/* centers an image vertically around the node position ("vertically" is to be
+ * understood _before_ rotation (i.e., as for a rotation of 0) */
+
+static void center_vertically(xmlNodePtr node)
+{
+	xmlChar * height_attr = (xmlChar *) "height";
+	xmlChar * height_value = xmlGetProp(node, height_attr);
+	if (NULL == height_value) {
+		fprintf (stderr, "WARNING: <image> has no height.\n");
+		return;
+	}
+	double height = atof((char *) height_value);
+	xmlChar * y_attr = (xmlChar *) "y";
+	xmlChar * y_value = xmlGetProp(node, y_attr);
+	double y;
+	if (NULL != y_value)
+		y = atof((char *) y_value);
+	else
+		y = 0;
+	y -= height / 2;
+	char *new_y_value = masprintf("%g", y);
+	xmlSetProp(node, y_attr, (xmlChar *) new_y_value);
+	free(new_y_value);
+}
+
+/* shifts an image one image width leafwards */
+
+static void shift_one_width_leafwards(xmlNodePtr node)
+{
+	xmlChar *width_attr = (xmlChar *) "width";
+	xmlChar *width_value = xmlGetProp(node, width_attr);
+	if (NULL == width_value) {
+		fprintf (stderr, "WARNING: <image> has no width.\n");
+		return;
+	}
+	double width = atof((char *) width_value);
+
+	/* could also use a translate() transform, but this would have to be
+	prepended _before_ the other transforms. */
+	double x = 0.0;
+	xmlChar *x_attr = (xmlChar *) "x";
+	xmlChar *x_value = xmlGetProp(node, x_attr);
+	if (NULL != x_value) 
+		x = atof((char *) x_value);
+	x -= width;
+	char *new_value = masprintf("%g", x);
+	xmlSetProp(node, x_attr, (xmlChar *) new_value);
+	free(new_value);
+	xmlFree(x_value);
+	xmlFree(width_value);
+}	
+
+static void image_transforms(xmlNodePtr node, double angle_deg,
+		double x, double y)
+{
+	center_vertically(node);
+	/* if the image is on the left side, we i) rotate it 180° around the
+	 * node (tip of the parent edge)(so that it is not upside-down), and
+	 * ii) shift it one image length leafwards (to correct for the
+	 * rootwards shift caused by rotation) */
+	if (angle_deg > 90 && angle_deg < 270) {
+		// left side (cos < 0)
+		char * half_turn = masprintf("rotate(180,%g,%g)", x, y);
+		prepend_transform(node, half_turn);
+		free(half_turn);
+		shift_one_width_leafwards(node);
+	}
+}
+
+void apply_transforms(xmlDocPtr doc, double angle_deg, double x, double y)
+{
+	xmlNodePtr cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
+	while (NULL != cur) {
+		/* apply the transforms, in this order */
+		rotate(cur, angle_deg);
+		translate(cur, x, y);
+		if (strcmp("text", (char *) cur->name) == 0)
+			text_transforms(cur, angle_deg, x, y);
+		else if (strcmp("image", (char *) cur->name) == 0)
+			image_transforms(cur, angle_deg, x, y);
+
+		cur = cur->next;	/* sibling */
+	}
+}
+
+static char *unwrap_snippet(xmlDocPtr doc)
+{
+	/* this will give a size that is certain to be enough */
+	xmlChar *xml_buf;
+	int buf_length;
+	xmlDocDumpFormatMemory(doc, &xml_buf, &buf_length, 0); 
+	xmlFree(xml_buf);	/* only need buf_length */
+	/* so, allocate that much (cleared) */
+	char *tweaked_svg = calloc(buf_length, sizeof(char));
+	if (NULL == tweaked_svg) return NULL;
+	// TODO: the following 2 lines can be merged
+	xmlNodePtr cur = xmlDocGetRootElement(doc);
+	cur = cur->xmlChildrenNode;
+	while (NULL != cur) {
+		xmlBufferPtr buf = xmlBufferCreate ();
+		xmlNodeDump (buf, doc, cur, 0, 0);
+		const xmlChar * contents = xmlBufferContent(buf);
+		int cur_len = strlen(tweaked_svg);
+		/* appends to tweaked_svg - cur_len must initially be 0, which
+		 * is why we use calloc() */
+		strcpy(tweaked_svg + cur_len, (char *) contents);
+		xmlBufferFree(buf);
+		cur = cur->next;	/* sibling */
+	}
+	return tweaked_svg;
+}
+
 /* Outputs an SVG <g> element with all the tree branches, radial. In this
  * context, a node's 'top' and 'bottom' are angles, not vertical positions */
+
+/* Transforms SVG elements. Argument is the ornaments string as in the ornament
+ * file (i.e., an SVG snippet). Returns (and allocates - you must free it)
+ * another SVG snippet in which the elements have been transformed.
+ * Transformations * include:
+ *	o translation to node position (all elements)
+ *	o rotation (the same as node edge and node labels) (all elements)
+ *	o 180° rotation and/or alignment (text - so that it always reads
+ *	  left-to-right)
+ *	o further rotation and translation (images - so that they are oriented
+ *	  right)
+ *
+ * This f() is not static because it needs to be tested directly (in
+ * test_svg_graph_radial); but it is not in any header file either, because it
+ * is not meant to be used outside this module.
+ * Returns NULL in case of failure. */
+
+char *transform_ornaments(const char *ornaments, double angle_deg, double x,
+		double y)
+{
+
+	xmlDocPtr doc;
+
+	char *wrapped_orn = wrap_in_dummy_doc(ornaments);
+	if (NULL == wrapped_orn) return NULL;
+
+	/* parse SVG from string */
+	doc = xmlParseMemory(wrapped_orn, strlen(wrapped_orn));
+	if (NULL == doc) {
+		fprintf(stderr, "Failed to parse document\n");
+		return NULL;
+	}
+	free(wrapped_orn);
+
+	/* tweak according to element type */
+	//fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, x, y);
+	apply_transforms(doc, angle_deg, x, y);
+
+	/* now print out the altered snipped, unwrapped.  */
+	char *tweaked_svg = unwrap_snippet(doc);
+	xmlFreeDoc(doc);
+
+	return tweaked_svg;
+}
 
 /* Draws the arc for inner nodes, including root */
 
@@ -111,6 +406,7 @@ static void draw_radial_line(struct rnode *node, const double r_scale,
 		r_scale * parent_data->depth);
 	double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
 	double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
+	//fprintf(stderr, "node pos: (%g,%g)\n", svg_mid_x_pos, svg_mid_y_pos);
 	printf ("<line class='clade_%d' "
 		"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 		group_nb,
@@ -127,9 +423,20 @@ static void draw_ornament (struct svg_data *node_data,
 {
 	/* this styling is for text, so that users can omit styles in the map
 	 * file and still see the text. */
+	//fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, svg_mid_x_pos, svg_mid_y_pos);
 	printf("<g style='stroke:none;fill:black'>");
+	char *transformed_ornaments = transform_ornaments(
+			node_data->ornament,
+			svg_mid_angle / (2*PI) * 360,
+			svg_mid_x_pos, svg_mid_y_pos);
+	printf("%s", transformed_ornaments);
+	// fprintf(stderr, "%s\n", transformed_ornaments);
+	free(transformed_ornaments);
+	printf("</g>");
+	/*
 	if (cos(svg_mid_angle) >= 0) {
-		/* right side of circle */
+		// right side
+		// TODO: apply transform
 		printf ("<g style='text-anchor:end;vertical-align:super'"
 			" transform='rotate(%g,%g,%g)"
 			" translate(%.4f,%.4f)'>%s</g>",
@@ -138,8 +445,9 @@ static void draw_ornament (struct svg_data *node_data,
 			svg_mid_x_pos, svg_mid_y_pos,
 			node_data->ornament);
 	} else {
-		/* left side of circle */
-		char *orn_chs_x = change_svg_x_attr_sign(node_data->ornament);
+		// left side
+		// TODO: apply transform
+		// char *orn_chs_x = change_svg_x_attr_sign(node_data->ornament);
 		printf ("<g transform='"
 			"rotate(180,%g,%g) "
 			"rotate(%g,%g,%g) "
@@ -148,10 +456,8 @@ static void draw_ornament (struct svg_data *node_data,
 			svg_mid_angle / (2*PI) * 360,
 			svg_mid_x_pos, svg_mid_y_pos,
 			svg_mid_x_pos, svg_mid_y_pos,
-			orn_chs_x);
-		free(orn_chs_x);
-	}
-	printf("</g>");
+			node_data->ornament);
+	} */
 }
 
 static void draw_branches_radial (struct rooted_tree *tree, const double r_scale,

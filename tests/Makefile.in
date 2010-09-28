@@ -35,9 +35,9 @@ build_triplet = @build@
 host_triplet = @host@
 TESTS = test_newick_scanner$(EXEEXT) test_newick_parser$(EXEEXT) \
 	test_rnode$(EXEEXT) test_list$(EXEEXT) test_link$(EXEEXT) \
-	test_masprintf$(EXEEXT) test_canvas$(EXEEXT) \
-	test_concat$(EXEEXT) test_hash$(EXEEXT) test_lca$(EXEEXT) \
-	test_enode$(EXEEXT) test_nodemap$(EXEEXT) \
+	test_masprintf$(EXEEXT) test_svg_graph_radial$(EXEEXT) \
+	test_canvas$(EXEEXT) test_concat$(EXEEXT) test_hash$(EXEEXT) \
+	test_lca$(EXEEXT) test_enode$(EXEEXT) test_nodemap$(EXEEXT) \
 	test_to_newick$(EXEEXT) test_tree$(EXEEXT) \
 	test_node_set$(EXEEXT) test_rnode_iterator$(EXEEXT) \
 	test_tree_models$(EXEEXT) test_xml_utils$(EXEEXT) \
@@ -59,7 +59,7 @@ check_PROGRAMS = test_rnode$(EXEEXT) test_list$(EXEEXT) \
 	test_tree_models$(EXEEXT) test_xml_utils$(EXEEXT) \
 	test_masprintf$(EXEEXT) test_error$(EXEEXT) \
 	test_order_tree$(EXEEXT) test_graph_common$(EXEEXT) \
-	test_newick_parser$(EXEEXT)
+	test_newick_parser$(EXEEXT) test_svg_graph_radial$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(check_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -161,6 +161,16 @@ am_test_rnode_iterator_OBJECTS = test_rnode_iterator.$(OBJEXT) \
 	tree_stubs.$(OBJEXT) masprintf.$(OBJEXT)
 test_rnode_iterator_OBJECTS = $(am_test_rnode_iterator_OBJECTS)
 test_rnode_iterator_LDADD = $(LDADD)
+am_test_svg_graph_radial_OBJECTS = test_svg_graph_radial.$(OBJEXT) \
+	svg_graph_radial.$(OBJEXT) tree.$(OBJEXT) svg_graph.$(OBJEXT) \
+	rnode.$(OBJEXT) hash.$(OBJEXT) list.$(OBJEXT) \
+	masprintf.$(OBJEXT) rnode_iterator.$(OBJEXT) \
+	svg_graph_ortho.$(OBJEXT) error.$(OBJEXT) readline.$(OBJEXT) \
+	xml_utils.$(OBJEXT) graph_common.$(OBJEXT) \
+	node_pos_alloc.$(OBJEXT) nodemap.$(OBJEXT) lca.$(OBJEXT) \
+	link.$(OBJEXT)
+test_svg_graph_radial_OBJECTS = $(am_test_svg_graph_radial_OBJECTS)
+test_svg_graph_radial_LDADD = $(LDADD)
 am_test_to_newick_OBJECTS = test_to_newick.$(OBJEXT) \
 	to_newick.$(OBJEXT) rnode.$(OBJEXT) link.$(OBJEXT) \
 	concat.$(OBJEXT) list.$(OBJEXT) rnode_iterator.$(OBJEXT) \
@@ -206,7 +216,8 @@ SOURCES = $(test_canvas_SOURCES) $(test_concat_SOURCES) \
 	$(test_newick_scanner_SOURCES) $(test_node_set_SOURCES) \
 	$(test_nodemap_SOURCES) $(test_order_tree_SOURCES) \
 	$(test_readline_SOURCES) $(test_rnode_SOURCES) \
-	$(test_rnode_iterator_SOURCES) $(test_to_newick_SOURCES) \
+	$(test_rnode_iterator_SOURCES) \
+	$(test_svg_graph_radial_SOURCES) $(test_to_newick_SOURCES) \
 	$(test_tree_SOURCES) $(test_tree_models_SOURCES) \
 	$(test_xml_utils_SOURCES)
 DIST_SOURCES = $(test_canvas_SOURCES) $(test_concat_SOURCES) \
@@ -217,7 +228,8 @@ DIST_SOURCES = $(test_canvas_SOURCES) $(test_concat_SOURCES) \
 	$(test_newick_scanner_SOURCES) $(test_node_set_SOURCES) \
 	$(test_nodemap_SOURCES) $(test_order_tree_SOURCES) \
 	$(test_readline_SOURCES) $(test_rnode_SOURCES) \
-	$(test_rnode_iterator_SOURCES) $(test_to_newick_SOURCES) \
+	$(test_rnode_iterator_SOURCES) \
+	$(test_svg_graph_radial_SOURCES) $(test_to_newick_SOURCES) \
 	$(test_tree_SOURCES) $(test_tree_models_SOURCES) \
 	$(test_xml_utils_SOURCES)
 ETAGS = etags
@@ -411,15 +423,21 @@ test_xml_utils_SOURCES = test_xml_utils.c $(SRC)/xml_utils.c \
 test_masprintf_SOURCES = test_masprintf.c $(SRC)/masprintf.c
 test_error_SOURCES = test_error.c $(SRC)/error.c
 test_order_tree_SOURCES = test_order_tree.c $(SRC)/order_tree.c tree_stubs.c \
-			  $(SRC)/link.c $(SRC)/to_newick.c $(SRC)/rnode.c \
-			  $(SRC)/list.c $(SRC)/masprintf.c $(SRC)/concat.c \
-			  $(SRC)/hash.c $(SRC)/rnode_iterator.c
+	$(SRC)/link.c $(SRC)/to_newick.c $(SRC)/rnode.c $(SRC)/list.c \
+	$(SRC)/masprintf.c $(SRC)/concat.c $(SRC)/hash.c \
+	$(SRC)/rnode_iterator.c
 
 test_graph_common_SOURCES = test_graph_common.c $(SRC)/graph_common.c \
-			    tree_stubs.c $(SRC)/link.c $(SRC)/list.c \
-			    $(SRC)/tree.c $(SRC)/rnode_iterator.c \
-			    $(SRC)/hash.c $(SRC)/masprintf.c $(SRC)/rnode.c \
-			    $(SRC)/nodemap.c
+	tree_stubs.c $(SRC)/link.c $(SRC)/list.c $(SRC)/tree.c \
+	$(SRC)/rnode_iterator.c $(SRC)/hash.c $(SRC)/masprintf.c \
+	$(SRC)/rnode.c $(SRC)/nodemap.c
+
+test_svg_graph_radial_SOURCES = test_svg_graph_radial.c \
+	$(SRC)/svg_graph_radial.c $(SRC)/tree.c $(SRC)/svg_graph.c \
+	$(SRC)/rnode.c $(SRC)/hash.c $(SRC)/list.c $(SRC)/masprintf.c \
+	$(SRC)/rnode_iterator.c $(SRC)/svg_graph_ortho.c $(SRC)/error.c \
+	$(SRC)/readline.c $(SRC)/xml_utils.c $(SRC)/graph_common.c \
+	$(SRC)/node_pos_alloc.c $(SRC)/nodemap.c $(SRC)/lca.c $(SRC)/link.c
 
 all: all-am
 
@@ -518,6 +536,9 @@ test_rnode$(EXEEXT): $(test_rnode_OBJECTS) $(test_rnode_DEPENDENCIES)
 test_rnode_iterator$(EXEEXT): $(test_rnode_iterator_OBJECTS) $(test_rnode_iterator_DEPENDENCIES) 
 	@rm -f test_rnode_iterator$(EXEEXT)
 	$(LINK) $(test_rnode_iterator_OBJECTS) $(test_rnode_iterator_LDADD) $(LIBS)
+test_svg_graph_radial$(EXEEXT): $(test_svg_graph_radial_OBJECTS) $(test_svg_graph_radial_DEPENDENCIES) 
+	@rm -f test_svg_graph_radial$(EXEEXT)
+	$(LINK) $(test_svg_graph_radial_OBJECTS) $(test_svg_graph_radial_LDADD) $(LIBS)
 test_to_newick$(EXEEXT): $(test_to_newick_OBJECTS) $(test_to_newick_DEPENDENCIES) 
 	@rm -f test_to_newick$(EXEEXT)
 	$(LINK) $(test_to_newick_OBJECTS) $(test_to_newick_LDADD) $(LIBS)
@@ -549,6 +570,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/masprintf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newick_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newick_scanner.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/node_pos_alloc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/node_set.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nodemap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/order_tree.Po@am__quote@
@@ -556,6 +578,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rnode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rnode_iterator.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg_graph.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg_graph_ortho.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg_graph_radial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_canvas.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_concat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_enode.Po@am__quote@
@@ -574,6 +599,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_readline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rnode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rnode_iterator.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_svg_graph_radial.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_to_newick.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_tree.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_tree_models.Po@am__quote@
@@ -899,19 +925,47 @@ readline.obj: $(SRC)/readline.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o readline.obj `if test -f '$(SRC)/readline.c'; then $(CYGPATH_W) '$(SRC)/readline.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/readline.c'; fi`
 
-tree_models.o: $(SRC)/tree_models.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tree_models.o -MD -MP -MF $(DEPDIR)/tree_models.Tpo -c -o tree_models.o `test -f '$(SRC)/tree_models.c' || echo '$(srcdir)/'`$(SRC)/tree_models.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/tree_models.Tpo $(DEPDIR)/tree_models.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/tree_models.c' object='tree_models.o' libtool=no @AMDEPBACKSLASH@
+svg_graph_radial.o: $(SRC)/svg_graph_radial.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT svg_graph_radial.o -MD -MP -MF $(DEPDIR)/svg_graph_radial.Tpo -c -o svg_graph_radial.o `test -f '$(SRC)/svg_graph_radial.c' || echo '$(srcdir)/'`$(SRC)/svg_graph_radial.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/svg_graph_radial.Tpo $(DEPDIR)/svg_graph_radial.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/svg_graph_radial.c' object='svg_graph_radial.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tree_models.o `test -f '$(SRC)/tree_models.c' || echo '$(srcdir)/'`$(SRC)/tree_models.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o svg_graph_radial.o `test -f '$(SRC)/svg_graph_radial.c' || echo '$(srcdir)/'`$(SRC)/svg_graph_radial.c
 
-tree_models.obj: $(SRC)/tree_models.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tree_models.obj -MD -MP -MF $(DEPDIR)/tree_models.Tpo -c -o tree_models.obj `if test -f '$(SRC)/tree_models.c'; then $(CYGPATH_W) '$(SRC)/tree_models.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/tree_models.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/tree_models.Tpo $(DEPDIR)/tree_models.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/tree_models.c' object='tree_models.obj' libtool=no @AMDEPBACKSLASH@
+svg_graph_radial.obj: $(SRC)/svg_graph_radial.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT svg_graph_radial.obj -MD -MP -MF $(DEPDIR)/svg_graph_radial.Tpo -c -o svg_graph_radial.obj `if test -f '$(SRC)/svg_graph_radial.c'; then $(CYGPATH_W) '$(SRC)/svg_graph_radial.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/svg_graph_radial.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/svg_graph_radial.Tpo $(DEPDIR)/svg_graph_radial.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/svg_graph_radial.c' object='svg_graph_radial.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tree_models.obj `if test -f '$(SRC)/tree_models.c'; then $(CYGPATH_W) '$(SRC)/tree_models.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/tree_models.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o svg_graph_radial.obj `if test -f '$(SRC)/svg_graph_radial.c'; then $(CYGPATH_W) '$(SRC)/svg_graph_radial.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/svg_graph_radial.c'; fi`
+
+svg_graph.o: $(SRC)/svg_graph.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT svg_graph.o -MD -MP -MF $(DEPDIR)/svg_graph.Tpo -c -o svg_graph.o `test -f '$(SRC)/svg_graph.c' || echo '$(srcdir)/'`$(SRC)/svg_graph.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/svg_graph.Tpo $(DEPDIR)/svg_graph.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/svg_graph.c' object='svg_graph.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o svg_graph.o `test -f '$(SRC)/svg_graph.c' || echo '$(srcdir)/'`$(SRC)/svg_graph.c
+
+svg_graph.obj: $(SRC)/svg_graph.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT svg_graph.obj -MD -MP -MF $(DEPDIR)/svg_graph.Tpo -c -o svg_graph.obj `if test -f '$(SRC)/svg_graph.c'; then $(CYGPATH_W) '$(SRC)/svg_graph.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/svg_graph.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/svg_graph.Tpo $(DEPDIR)/svg_graph.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/svg_graph.c' object='svg_graph.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o svg_graph.obj `if test -f '$(SRC)/svg_graph.c'; then $(CYGPATH_W) '$(SRC)/svg_graph.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/svg_graph.c'; fi`
+
+svg_graph_ortho.o: $(SRC)/svg_graph_ortho.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT svg_graph_ortho.o -MD -MP -MF $(DEPDIR)/svg_graph_ortho.Tpo -c -o svg_graph_ortho.o `test -f '$(SRC)/svg_graph_ortho.c' || echo '$(srcdir)/'`$(SRC)/svg_graph_ortho.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/svg_graph_ortho.Tpo $(DEPDIR)/svg_graph_ortho.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/svg_graph_ortho.c' object='svg_graph_ortho.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o svg_graph_ortho.o `test -f '$(SRC)/svg_graph_ortho.c' || echo '$(srcdir)/'`$(SRC)/svg_graph_ortho.c
+
+svg_graph_ortho.obj: $(SRC)/svg_graph_ortho.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT svg_graph_ortho.obj -MD -MP -MF $(DEPDIR)/svg_graph_ortho.Tpo -c -o svg_graph_ortho.obj `if test -f '$(SRC)/svg_graph_ortho.c'; then $(CYGPATH_W) '$(SRC)/svg_graph_ortho.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/svg_graph_ortho.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/svg_graph_ortho.Tpo $(DEPDIR)/svg_graph_ortho.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/svg_graph_ortho.c' object='svg_graph_ortho.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o svg_graph_ortho.obj `if test -f '$(SRC)/svg_graph_ortho.c'; then $(CYGPATH_W) '$(SRC)/svg_graph_ortho.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/svg_graph_ortho.c'; fi`
 
 xml_utils.o: $(SRC)/xml_utils.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT xml_utils.o -MD -MP -MF $(DEPDIR)/xml_utils.Tpo -c -o xml_utils.o `test -f '$(SRC)/xml_utils.c' || echo '$(srcdir)/'`$(SRC)/xml_utils.c
@@ -926,6 +980,34 @@ xml_utils.obj: $(SRC)/xml_utils.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/xml_utils.c' object='xml_utils.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o xml_utils.obj `if test -f '$(SRC)/xml_utils.c'; then $(CYGPATH_W) '$(SRC)/xml_utils.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/xml_utils.c'; fi`
+
+node_pos_alloc.o: $(SRC)/node_pos_alloc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT node_pos_alloc.o -MD -MP -MF $(DEPDIR)/node_pos_alloc.Tpo -c -o node_pos_alloc.o `test -f '$(SRC)/node_pos_alloc.c' || echo '$(srcdir)/'`$(SRC)/node_pos_alloc.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/node_pos_alloc.Tpo $(DEPDIR)/node_pos_alloc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/node_pos_alloc.c' object='node_pos_alloc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o node_pos_alloc.o `test -f '$(SRC)/node_pos_alloc.c' || echo '$(srcdir)/'`$(SRC)/node_pos_alloc.c
+
+node_pos_alloc.obj: $(SRC)/node_pos_alloc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT node_pos_alloc.obj -MD -MP -MF $(DEPDIR)/node_pos_alloc.Tpo -c -o node_pos_alloc.obj `if test -f '$(SRC)/node_pos_alloc.c'; then $(CYGPATH_W) '$(SRC)/node_pos_alloc.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/node_pos_alloc.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/node_pos_alloc.Tpo $(DEPDIR)/node_pos_alloc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/node_pos_alloc.c' object='node_pos_alloc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o node_pos_alloc.obj `if test -f '$(SRC)/node_pos_alloc.c'; then $(CYGPATH_W) '$(SRC)/node_pos_alloc.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/node_pos_alloc.c'; fi`
+
+tree_models.o: $(SRC)/tree_models.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tree_models.o -MD -MP -MF $(DEPDIR)/tree_models.Tpo -c -o tree_models.o `test -f '$(SRC)/tree_models.c' || echo '$(srcdir)/'`$(SRC)/tree_models.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/tree_models.Tpo $(DEPDIR)/tree_models.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/tree_models.c' object='tree_models.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tree_models.o `test -f '$(SRC)/tree_models.c' || echo '$(srcdir)/'`$(SRC)/tree_models.c
+
+tree_models.obj: $(SRC)/tree_models.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tree_models.obj -MD -MP -MF $(DEPDIR)/tree_models.Tpo -c -o tree_models.obj `if test -f '$(SRC)/tree_models.c'; then $(CYGPATH_W) '$(SRC)/tree_models.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/tree_models.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/tree_models.Tpo $(DEPDIR)/tree_models.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/tree_models.c' object='tree_models.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tree_models.obj `if test -f '$(SRC)/tree_models.c'; then $(CYGPATH_W) '$(SRC)/tree_models.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/tree_models.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1224,6 +1306,7 @@ uninstall-am:
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am
+
 
 clean-local:
 	$(RM) *.out

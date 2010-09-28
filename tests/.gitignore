@@ -24,3 +24,4 @@ test_to_newick
 test_tree
 test_tree_models
 test_xml_utils
+test_svg_graph_radial

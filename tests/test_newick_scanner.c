@@ -22,6 +22,7 @@ struct rnode *root;
 struct llist *nodes_in_order;
 enum parser_status_type newick_parser_status;
 void newick_scanner_set_string_input(char *);
+void newick_scanner_set_file_input(FILE *);
 
 int test_simple()
 {
@@ -534,7 +535,7 @@ int test_comments()
 	token_type = nwslex();	/* EOF */
 	if (token_type > 0) {
 		printf ("%s: expected EOF, got %d\n",
-				test_name, EOF, token_type);
+				test_name, EOF);
 		return 1;
 	}
 
