@@ -1,3 +1,5 @@
+# source this file in an R shell
+
 # I want to determine the number of decimal points I should reasonably use for
 # angles (in degrees). This is because using "%g" gives me a slightly different
 # result (3rd decimal place off by 1) on Ubuntu and Fedora, and this causes the

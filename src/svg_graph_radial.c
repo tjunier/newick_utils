@@ -177,7 +177,16 @@ static void translate(xmlNodePtr node, double x, double y)
 
 static void rotate(xmlNodePtr node, double angle_deg)
 {
-	char *rotation = masprintf("rotate(%g)", angle_deg);
+	/* We normally use %g as a number format, because it allows both
+	 * maximum precision when possible, yet doesn't add meaningless decimal
+	 * places if it can be avoided. The problem here is that in the "orn_r"
+	 * test case of test_nw_display.sh, the third decimal is slightly
+	 * different on different machines. I therefore round to two decimal
+	 * places so the tests pass. I have checked (see src/chord.R) that this
+	 * rounding off of 1/1000 degree should not affect trees unless their
+	 * radius is over 5'000 pixels long. */
+	/* char *rotation = masprintf("rotate(%g)", angle_deg); */
+	char *rotation = masprintf("rotate(%.2f)", angle_deg);
 	prepend_transform(node, rotation);
 	free(rotation);
 }
@@ -424,6 +433,7 @@ static void draw_ornament (struct svg_data *node_data,
 	/* this styling is for text, so that users can omit styles in the map
 	 * file and still see the text. */
 	//fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, svg_mid_x_pos, svg_mid_y_pos);
+	fprintf(stderr, "angle = %g°\n", svg_mid_angle / (2*PI) * 360);
 	printf("<g style='stroke:none;fill:black'>");
 	char *transformed_ornaments = transform_ornaments(
 			node_data->ornament,
