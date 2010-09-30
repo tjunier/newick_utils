@@ -526,8 +526,8 @@ static void draw_branches_radial (struct rooted_tree *tree, const double r_scale
 
 /* lower-level label drawing */
 
-static void place_label(const char *label, const double radius, double mid_angle,
-		 const bool nudge, const char *class)
+static void place_label(const char *label, const double radius, double
+		mid_angle, const bool nudge, const char *class)
 {
 	double x_pos;
 	double y_pos;
@@ -555,6 +555,8 @@ static void place_label(const char *label, const double radius, double mid_angle
 			x_pos += (NUDGE_DISTANCE * cos(mid_angle + PI / 2));
 			y_pos += (NUDGE_DISTANCE * sin(mid_angle + PI / 2));
 		}
+		fprintf(stderr, "angle = %g (%g°), Pi = %g\n",
+				mid_angle, mid_angle / (2*PI) * 360, PI);
 		printf(	"<text class='%s' "
 			"style='text-anchor:end;' "
 			"transform='rotate(%g,%g,%g) rotate(180,%g,%g)' "
