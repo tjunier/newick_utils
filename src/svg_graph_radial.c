@@ -555,7 +555,7 @@ static void place_label(const char *label, const double radius, double
 			x_pos += (NUDGE_DISTANCE * cos(mid_angle + PI / 2));
 			y_pos += (NUDGE_DISTANCE * sin(mid_angle + PI / 2));
 		}
-		fprintf(stderr, "angle = %g (%g°), Pi = %g\n",
+		fprintf(stderr, "angle = %f (%f°), Pi = %f\n",
 				mid_angle, mid_angle / (2*PI) * 360, PI);
 		printf(	"<text class='%s' "
 			"style='text-anchor:end;' "
