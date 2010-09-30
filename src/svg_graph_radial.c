@@ -177,16 +177,10 @@ static void translate(xmlNodePtr node, double x, double y)
 
 static void rotate(xmlNodePtr node, double angle_deg)
 {
-	/* We normally use %g as a number format, because it allows both
-	 * maximum precision when possible, yet doesn't add meaningless decimal
-	 * places if it can be avoided. The problem here is that in the "orn_r"
-	 * test case of test_nw_display.sh, the third decimal is slightly
-	 * different on different machines. I therefore round to two decimal
-	 * places so the tests pass. I have checked (see src/chord.R) that this
-	 * rounding off of 1/1000 degree should not affect trees unless their
-	 * radius is over 5'000 pixels long. */
-	char *rotation = masprintf("rotate(%g)", angle_deg);
+	// NOTE: if tests fail due to rounding errors in rotation angles,
+	// change the %g below into %f.
 	// char *rotation = masprintf("rotate(%.2f)", angle_deg);
+	char *rotation = masprintf("rotate(%g)", angle_deg);
 	prepend_transform(node, rotation);
 	free(rotation);
 }
