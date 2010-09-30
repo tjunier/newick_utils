@@ -433,6 +433,7 @@ static void draw_ornament (struct svg_data *node_data,
 	/* this styling is for text, so that users can omit styles in the map
 	 * file and still see the text. */
 	//fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, svg_mid_x_pos, svg_mid_y_pos);
+	fprintf(stderr, "angle = %g, Pi = %g\n", svg_mid_angle, PI);
 	fprintf(stderr, "angle = %g°\n", svg_mid_angle / (2*PI) * 360);
 	printf("<g style='stroke:none;fill:black'>");
 	char *transformed_ornaments = transform_ornaments(
