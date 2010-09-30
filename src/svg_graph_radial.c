@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extern enum inner_lbl_pos inner_label_pos;
 
-const double PI = 3.14159;
+const double PI = 3.1415926535;
 const int Scale_bar_left_space = 10;
 const int NUDGE_DISTANCE = 3;	/* px */
 const int TEXT_ORNAMENTS_BASELINE_NUDGE = 3; /* px */
