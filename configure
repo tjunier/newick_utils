@@ -862,6 +862,8 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_libxml
+with_libxml_headers
 enable_dependency_tracking
 enable_shared
 enable_static
@@ -1511,6 +1513,13 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+
+	 	  --with-libxml           use libxml2 to handle ornaments [default=yes]
+
+
+	 	  --with-libxml-headers   specify alternative include directory for libxml
+                          headers [default=/usr/include]
+
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
@@ -2821,6 +2830,30 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 ac_config_headers="$ac_config_headers config.h"
 
 
+
+# Check whether --with-libxml was given.
+if test "${with_libxml+set}" = set; then :
+  withval=$with_libxml;
+else
+  # do nothing special if passed (but see below in lib section)
+	with_libxml=yes	# if not passed, set to 'yes' (default)
+
+fi
+
+
+
+# Check whether --with-libxml-headers was given.
+if test "${with_libxml_headers+set}" = set; then :
+  withval=$with_libxml_headers;
+	 	{ $as_echo "$as_me:${as_lineno-$LINENO}: Note: --with-libxml set to 'yes' as libxml include dirs were provided" >&5
+$as_echo "$as_me: Note: --with-libxml set to 'yes' as libxml include dirs were provided" >&6;}
+		with_libxml=yes
+
+
+fi
+
+
+
 # Checks for programs.
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -4006,6 +4039,8 @@ fi
 if test "$LEX" = :; then
   LEX=${am_missing_run}flex
 fi
+# TODO: mb check for LaTeX for doc...
+
 case `pwd` in
   *\ * | *\	*)
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Libtool does not cope well with whitespace in \`pwd\`" >&5
@@ -4686,13 +4721,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:4689: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:4724: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4692: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:4727: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4695: output\"" >&5)
+  (eval echo "\"\$as_me:4730: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -5158,11 +5193,11 @@ irix5* | irix6* | nonstopux*)
   ;;
 
 # This must be Linux ELF.
-linux* | k*bsd*-gnu)
+linux* | k*bsd*-gnu | kopensolaris*-gnu)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-netbsd*)
+netbsd* | netbsdelf*-gnu)
   if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
     lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
   else
@@ -5897,7 +5932,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5900 "configure"' > conftest.$ac_ext
+  echo '#line 5935 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7423,11 +7458,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7426: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7461: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7430: \$? = $ac_status" >&5
+   echo "$as_me:7465: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7592,7 +7627,7 @@ $as_echo_n "checking for $compiler option to produce PIC... " >&6; }
       lt_prog_compiler_static='-non_shared'
       ;;
 
-    linux* | k*bsd*-gnu)
+    linux* | k*bsd*-gnu | kopensolaris*-gnu)
       case $cc_basename in
       # old Intel for x86_64 which still supported -KPIC.
       ecc*)
@@ -7762,11 +7797,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7765: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7800: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7769: \$? = $ac_status" >&5
+   echo "$as_me:7804: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7867,11 +7902,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7870: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7905: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7874: \$? = $ac_status" >&5
+   echo "$as_me:7909: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -7922,11 +7957,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7925: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7960: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7929: \$? = $ac_status" >&5
+   echo "$as_me:7964: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8041,6 +8076,9 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
   openbsd*)
     with_gnu_ld=no
     ;;
+  linux* | k*bsd*-gnu)
+    link_all_deplibs=no
+    ;;
   esac
 
   ld_shlibs=yes
@@ -8062,6 +8100,7 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
     fi
     supports_anon_versioning=no
     case `$LD -v 2>&1` in
+      *GNU\ gold*) supports_anon_versioning=yes ;;
       *\ [01].* | *\ 2.[0-9].* | *\ 2.10.*) ;; # catch versions < 2.11
       *\ 2.11.93.0.2\ *) supports_anon_versioning=yes ;; # RH7.3 ...
       *\ 2.11.92.0.12\ *) supports_anon_versioning=yes ;; # Mandrake 8.2 ...
@@ -8153,7 +8192,7 @@ _LT_EOF
       archive_expsym_cmds='sed "s,^,_," $export_symbols >$output_objdir/$soname.expsym~$CC -shared $pic_flag $libobjs $deplibs $compiler_flags ${wl}-h,$soname ${wl}--retain-symbols-file,$output_objdir/$soname.expsym ${wl}--image-base,`expr ${RANDOM-$$} % 4096 / 2 \* 262144 + 1342177280` -o $lib'
       ;;
 
-    gnu* | linux* | tpf* | k*bsd*-gnu)
+    gnu* | linux* | tpf* | k*bsd*-gnu | kopensolaris*-gnu)
       tmp_diet=no
       if test "$host_os" = linux-dietlibc; then
 	case $cc_basename in
@@ -8223,7 +8262,7 @@ _LT_EOF
       fi
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -8398,6 +8437,7 @@ _LT_EOF
 	if test "$aix_use_runtimelinking" = yes; then
 	  shared_flag="$shared_flag "'${wl}-G'
 	fi
+	link_all_deplibs=no
       else
 	# not using gcc
 	if test "$host_cpu" = ia64; then
@@ -8724,7 +8764,7 @@ rm -f core conftest.err conftest.$ac_objext \
       link_all_deplibs=yes
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -9614,7 +9654,7 @@ linux*oldld* | linux*aout* | linux*coff*)
   ;;
 
 # This must be Linux ELF.
-linux* | k*bsd*-gnu)
+linux* | k*bsd*-gnu | kopensolaris*-gnu)
   version_type=linux
   need_lib_prefix=no
   need_version=no
@@ -9654,13 +9694,10 @@ rm -f core conftest.err conftest.$ac_objext \
   # before this can be enabled.
   hardcode_into_libs=yes
 
-  # Add ABI-specific directories to the system library path.
-  sys_lib_dlsearch_path_spec="/lib64 /usr/lib64 /lib /usr/lib"
-
   # Append ld.so.conf contents to the search path
   if test -f /etc/ld.so.conf; then
     lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s 2>/dev/null", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;/^[	 ]*hwcap[	 ]/d;s/[:,	]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
-    sys_lib_dlsearch_path_spec="$sys_lib_dlsearch_path_spec $lt_ld_extra"
+    sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
   fi
 
   # We used to test for /lib/ld.so.1 and disable shared libraries on
@@ -9670,6 +9707,18 @@ rm -f core conftest.err conftest.$ac_objext \
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
+  ;;
+
+netbsdelf*-gnu)
+  version_type=linux
+  need_lib_prefix=no
+  need_version=no
+  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+  soname_spec='${libname}${release}${shared_ext}$major'
+  shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
+  hardcode_into_libs=yes
+  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -10292,7 +10341,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 10295 "configure"
+#line 10344 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10388,7 +10437,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 10391 "configure"
+#line 10440 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10617,10 +10666,9 @@ CC="$lt_save_CC"
 #([disable-fast-install)]
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lm':
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lm" >&5
-$as_echo_n "checking for main in -lm... " >&6; }
-if test "${ac_cv_lib_m_main+set}" = set; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for log in -lm" >&5
+$as_echo_n "checking for log in -lm... " >&6; }
+if test "${ac_cv_lib_m_log+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -10628,27 +10676,33 @@ LIBS="-lm  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char log ();
 int
 main ()
 {
-return main ();
+return log ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_m_main=yes
+  ac_cv_lib_m_log=yes
 else
-  ac_cv_lib_m_main=no
+  ac_cv_lib_m_log=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_main" >&5
-$as_echo "$ac_cv_lib_m_main" >&6; }
-if test "x$ac_cv_lib_m_main" = x""yes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_log" >&5
+$as_echo "$ac_cv_lib_m_log" >&6; }
+if test "x$ac_cv_lib_m_log" = x""yes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_LIBM 1
 _ACEOF
@@ -10657,15 +10711,75 @@ _ACEOF
 
 fi
 
+if test "x$with_libxml" != xno; then :
+
+	 	# use libxml.
+	 	if test "x$with_libxml" != xyes; then :
+
+			 	# look for libxml where user said: in $with_libxml
+				LDFLAGS="-L$with_libxml $LDFLAGS"
+
+else
+
+			 	# try to have xml2-config tell us where libxml is
+				if xml2-config --version > /dev/null; then
+					LDFLAGS="-L$(xml2-config --prefix) $LDFLAGS"
+				fi
+				# otherwise just use defaults
+
+
+fi
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for xmlParseMemory in -lxml2" >&5
+$as_echo_n "checking for xmlParseMemory in -lxml2... " >&6; }
+if test "${ac_cv_lib_xml2_xmlParseMemory+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lxml2  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char xmlParseMemory ();
+int
+main ()
+{
+return xmlParseMemory ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_xml2_xmlParseMemory=yes
+else
+  ac_cv_lib_xml2_xmlParseMemory=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_xml2_xmlParseMemory" >&5
+$as_echo "$ac_cv_lib_xml2_xmlParseMemory" >&6; }
+if test "x$ac_cv_lib_xml2_xmlParseMemory" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBXML2 1
+_ACEOF
+
+  LIBS="-lxml2 $LIBS"
+
+fi
+
+
+
+fi
 
 # Checks for header files.
 
-# try to get info about the location of libxml files using xml2-config
-if xml2-config --version > /dev/null; then
-	CPPFLAGS="$CPPFLAGS $(xml2-config --cflags)"
-else
-	CPPFLAGS="$CPPFLAGS -I/usr/include/libxml2"
-fi
 
 # The Ultrix 4.2 mips builtin alloca declared by alloca.h only works
 # for constant arguments.  Useless!
@@ -10969,42 +11083,6 @@ $as_echo "#define STDC_HEADERS 1" >>confdefs.h
 
 fi
 
-for ac_header in libxml/tree.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "libxml/tree.h" "ac_cv_header_libxml_tree_h" "$ac_includes_default"
-if test "x$ac_cv_header_libxml_tree_h" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBXML_TREE_H 1
-_ACEOF
-
-fi
-
-done
-
-for ac_header in libxml/parser.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "libxml/parser.h" "ac_cv_header_libxml_parser_h" "$ac_includes_default"
-if test "x$ac_cv_header_libxml_parser_h" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBXML_PARSER_H 1
-_ACEOF
-
-fi
-
-done
-
-for ac_header in libxml/xpath.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "libxml/xpath.h" "ac_cv_header_libxml_xpath_h" "$ac_includes_default"
-if test "x$ac_cv_header_libxml_xpath_h" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBXML_XPATH_H 1
-_ACEOF
-
-fi
-
-done
-
 for ac_header in inttypes.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "inttypes.h" "ac_cv_header_inttypes_h" "$ac_includes_default"
@@ -11089,49 +11167,64 @@ fi
 
 done
 
+if test "$with_libxml_headers" != ""; then :
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for xmlParseMemory in -lxml2" >&5
-$as_echo_n "checking for xmlParseMemory in -lxml2... " >&6; }
-if test "${ac_cv_lib_xml2_xmlParseMemory+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lxml2  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
+	 	# look for headers where user said: in $with_libxml_headers
+	 	CPPFLAGS="-I$with_libxml_headers $CPPFLAGS"
 
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char xmlParseMemory ();
-int
-main ()
-{
-return xmlParseMemory ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_xml2_xmlParseMemory=yes
 else
-  ac_cv_lib_xml2_xmlParseMemory=no
+
+		# try to have xml2-config tell us where the libxml headers are
+		if xml2-config --version > /dev/null; then
+			CPPFLAGS="$(xml2-config --cflags) $CPPFLAGS "
+		else
+			# a reasonable default
+			CPPFLAGS="-I/usr/include/libxml2 $CPPFLAGS"
+		fi
+
+
 fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_xml2_xmlParseMemory" >&5
-$as_echo "$ac_cv_lib_xml2_xmlParseMemory" >&6; }
-if test "x$ac_cv_lib_xml2_xmlParseMemory" = x""yes; then :
+if test "x$with_libxml" != xno; then :
+
+		# look for libxml headers IFF with-libxml is not 'no'. Where to look for
+		# them is governed by CPPFLAGS (see above).
+		for ac_header in libxml/tree.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "libxml/tree.h" "ac_cv_header_libxml_tree_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml_tree_h" = x""yes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBXML2 1
+#define HAVE_LIBXML_TREE_H 1
 _ACEOF
 
-  LIBS="-lxml2 $LIBS"
+fi
+
+done
+
+		for ac_header in libxml/parser.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "libxml/parser.h" "ac_cv_header_libxml_parser_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml_parser_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBXML_PARSER_H 1
+_ACEOF
+
+fi
+
+done
+
+		for ac_header in libxml/xpath.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "libxml/xpath.h" "ac_cv_header_libxml_xpath_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml_xpath_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBXML_XPATH_H 1
+_ACEOF
+
+fi
+
+done
+
+
 
 fi
 
