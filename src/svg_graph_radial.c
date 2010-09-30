@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 
+#include "config.h"
+
 #include "list.h"
 #include "rnode.h"
 #include "tree.h"
@@ -150,7 +152,6 @@ static void prepend_transform(xmlNodePtr node, char *transform)
 	xmlChar *value = xmlGetProp(node, attr);
 	if (NULL != value) {
 		/* prepend translate to existing transform(s) */
-		// fprintf (stderr, "Transform: %s, applying %s\n", value, transform);
 		char * new_value = masprintf("%s %s",
 			transform, (char *) value);
 		xmlSetProp(node, attr, (xmlChar *) new_value);
@@ -159,7 +160,6 @@ static void prepend_transform(xmlNodePtr node, char *transform)
 	}	
 	else {
 		/* set transform to translate */
-		// fprintf (stderr, "No transform yet. Applying %s\n", transform);
 		xmlSetProp(node, attr, (xmlChar *) transform); 
 	}
 }
@@ -331,12 +331,10 @@ static char *unwrap_snippet(xmlDocPtr doc)
 	return tweaked_svg;
 }
 
-/* Outputs an SVG <g> element with all the tree branches, radial. In this
- * context, a node's 'top' and 'bottom' are angles, not vertical positions */
-
-/* Transforms SVG elements. Argument is the ornaments string as in the ornament
- * file (i.e., an SVG snippet). Returns (and allocates - you must free it)
- * another SVG snippet in which the elements have been transformed.
+/* Transforms SVG elements by parsing XML. Argument is the ornaments string as
+ * in the ornament file (i.e., an SVG snippet). Returns (and allocates - you
+ * must free it) another SVG snippet in which the elements have been
+ * transformed.
  * Transformations * include:
  *	o translation to node position (all elements)
  *	o rotation (the same as node edge and node labels) (all elements)
@@ -350,7 +348,7 @@ static char *unwrap_snippet(xmlDocPtr doc)
  * is not meant to be used outside this module.
  * Returns NULL in case of failure. */
 
-char *transform_ornaments(const char *ornaments, double angle_deg, double x,
+char *xml_transform_ornaments(const char *ornaments, double angle_deg, double x,
 		double y)
 {
 
@@ -368,7 +366,6 @@ char *transform_ornaments(const char *ornaments, double angle_deg, double x,
 	free(wrapped_orn);
 
 	/* tweak according to element type */
-	//fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, x, y);
 	apply_transforms(doc, angle_deg, x, y);
 
 	/* now print out the altered snipped, unwrapped.  */
@@ -376,6 +373,42 @@ char *transform_ornaments(const char *ornaments, double angle_deg, double x,
 	xmlFreeDoc(doc);
 
 	return tweaked_svg;
+}
+
+static char *embed_transform_ornaments(const char *ornaments, double angle_deg,
+		double x, double y)
+{
+	char *result;
+	if (angle_deg <= 90 || angle_deg >= 270) {
+		// right side
+		result = masprintf (
+			"<g style='text-anchor:end;vertical-align:super'"
+			" transform='rotate(%g,%g,%g)"
+			" translate(%.4f,%.4f)'>%s</g>",
+			angle_deg, x, y, x, y, ornaments);
+	} else {
+		// left side
+		result = masprintf ("<g transform='rotate(180,%g,%g) "
+			"rotate(%g,%g,%g) "
+			"translate(%.4f,%.4f)'>%s</g>",
+			x, y, angle_deg, x, y, x, y, ornaments);
+	}
+
+	return result;
+}
+
+/* A dispatcher function, will call the XML-parsing transform function if
+ * libXml is available, or the simpler string-embedding function if not. */
+
+static char *transform_ornaments(const char *ornaments, double angle_deg,
+		double x, double y)
+{
+	if (HAVE_LIBXML2) {
+		return xml_transform_ornaments(ornaments, angle_deg, x, y);
+	}
+	else {
+		return embed_transform_ornaments(ornaments, angle_deg, x, y);
+	}
 }
 
 /* Draws the arc for inner nodes, including root */
@@ -409,7 +442,6 @@ static void draw_radial_line(struct rnode *node, const double r_scale,
 		r_scale * parent_data->depth);
 	double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
 	double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
-	//fprintf(stderr, "node pos: (%g,%g)\n", svg_mid_x_pos, svg_mid_y_pos);
 	printf ("<line class='clade_%d' "
 		"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 		group_nb,
@@ -426,43 +458,17 @@ static void draw_ornament (struct svg_data *node_data,
 {
 	/* this styling is for text, so that users can omit styles in the map
 	 * file and still see the text. */
-	//fprintf(stderr, "%s: translating to (%g,%g)\n", __func__, svg_mid_x_pos, svg_mid_y_pos);
-	// fprintf(stderr, "angle = %g, Pi = %g\n", svg_mid_angle, PI);
-	// fprintf(stderr, "angle = %g°\n", svg_mid_angle / (2*PI) * 360);
 	printf("<g style='stroke:none;fill:black'>");
+
 	char *transformed_ornaments = transform_ornaments(
 			node_data->ornament,
 			svg_mid_angle / (2*PI) * 360,
 			svg_mid_x_pos, svg_mid_y_pos);
+	// TODO: check for NULL!
 	printf("%s", transformed_ornaments);
-	// fprintf(stderr, "%s\n", transformed_ornaments);
 	free(transformed_ornaments);
+
 	printf("</g>");
-	/*
-	if (cos(svg_mid_angle) >= 0) {
-		// right side
-		// TODO: apply transform
-		printf ("<g style='text-anchor:end;vertical-align:super'"
-			" transform='rotate(%g,%g,%g)"
-			" translate(%.4f,%.4f)'>%s</g>",
-			svg_mid_angle / (2*PI) * 360,
-			svg_mid_x_pos, svg_mid_y_pos,
-			svg_mid_x_pos, svg_mid_y_pos,
-			node_data->ornament);
-	} else {
-		// left side
-		// TODO: apply transform
-		// char *orn_chs_x = change_svg_x_attr_sign(node_data->ornament);
-		printf ("<g transform='"
-			"rotate(180,%g,%g) "
-			"rotate(%g,%g,%g) "
-			"translate(%.4f,%.4f)'>%s</g>",
-			svg_mid_x_pos, svg_mid_y_pos,
-			svg_mid_angle / (2*PI) * 360,
-			svg_mid_x_pos, svg_mid_y_pos,
-			svg_mid_x_pos, svg_mid_y_pos,
-			node_data->ornament);
-	} */
 }
 
 static void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
