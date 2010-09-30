@@ -49,6 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math.h"
 #include "masprintf.h"
 
+#ifndef HAVE_LIBXML2
+#define HAVE_LIBXML2 0
+#endif
+
 extern enum inner_lbl_pos inner_label_pos;
 
 const double PI = 3.1415926535;
@@ -85,6 +89,15 @@ void set_svg_root_length(int length)
 {
 	svg_root_length = length;
 }
+
+/****************************************************************
+
+  LibXML functions - only compiled if libxml was requested and found. Some do
+  not actually use libxml, but none are called if libxml is not used.
+
+****************************************************************/
+
+#if HAVE_LIBXML2
 
 static char * wrap_in_dummy_doc(const char *svg_snippet)
 {
@@ -375,6 +388,8 @@ char *xml_transform_ornaments(const char *ornaments, double angle_deg, double x,
 	return tweaked_svg;
 }
 
+#endif	/* HAVE_LIBXML2 */
+
 static char *embed_transform_ornaments(const char *ornaments, double angle_deg,
 		double x, double y)
 {
@@ -403,12 +418,11 @@ static char *embed_transform_ornaments(const char *ornaments, double angle_deg,
 static char *transform_ornaments(const char *ornaments, double angle_deg,
 		double x, double y)
 {
-	if (HAVE_LIBXML2) {
-		return xml_transform_ornaments(ornaments, angle_deg, x, y);
-	}
-	else {
-		return embed_transform_ornaments(ornaments, angle_deg, x, y);
-	}
+#if HAVE_LIBXML2
+	return xml_transform_ornaments(ornaments, angle_deg, x, y);
+#else
+	return embed_transform_ornaments(ornaments, angle_deg, x, y);
+#endif
 }
 
 /* Draws the arc for inner nodes, including root */

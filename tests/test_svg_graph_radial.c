@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "config.h"
+
+#ifdef HAVE_LIBXML2
+
 char *xml_transform_ornaments(const char *, double, double, double);
 
 unsigned int test_transform_ornaments()
@@ -99,8 +103,11 @@ unsigned int test_transform_ornaments()
 	return 0;
 }
 
+#endif	/* HAVE_LIBXML2 */
+
 int main()
 {
+#ifdef HAVE_LIBXML2
 	int failures = 0;
 	printf("Starting svg_graph_radial test...\n");
 	failures += test_transform_ornaments();
@@ -110,6 +117,8 @@ int main()
 		printf("%d test(s) FAILED.\n", failures);
 		return 1;
 	}
-
+#else
+	printf("svg_graph_radial skipped (libXML not used)\n");
+#endif
 	return 0;
 }
