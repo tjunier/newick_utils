@@ -253,6 +253,15 @@ specified with option \texttt{-o}:
  \includegraphics{display_8_svg.pdf}
 \end{center}
 
+\noindent{}Ornaments and \css{} can be combined:
+
+\verbatiminput{display_9_svg.cmd}
+\begin{center}
+ \includegraphics{display_9_svg.pdf}
+\end{center}
+
+\subsubsection{\libxml}
+
 If \libxml{} is being used (see Appendix \ref{app:installing}), the handling of ornaments is more elaborate, in that some kinds of elements undergo special treatment. Besides positioning the ornament at the node's location and orienting it along the parent edge, which occur for all elements, the following occurs:
 \begin{itemize}
 	\item \texttt{<text>} elements are nudged a few pixels from the parent edge,
@@ -282,12 +291,17 @@ This gives the following:
 \includegraphics{display_18_svg.pdf}
 \end{center}
 
-Ornaments and \css{} can be combined:
+As hinted above, \libxml{} also allows handling of images:
 
-\verbatiminput{display_9_svg.cmd}
+\verbatiminput{img_r.map}
+
+This gives the following:
+
+\verbatiminput{display_19_svg.cmd}
 \begin{center}
- \includegraphics{display_9_svg.pdf}
+\includegraphics{display_19_svg.pdf}
 \end{center}
+(credits: all images are from Wkipedia)
 
 \subsubsection{Example: Mapping GC Content}
 \label{sct_display_ornament_xpl_gc}

@@ -1,0 +1,20 @@
+(
+  (
+    Antilocapridae,
+    Moschidae,
+    (
+      Giraffidae,
+      (
+        Cervidae,
+        (
+          (
+            Antilopinae,
+            Caprinae
+          ),
+          Bovinae
+        )Bovidae
+      )
+    )
+  )Pecora,
+  Tragulidae
+)Ruminantia;
