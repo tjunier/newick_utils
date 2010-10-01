@@ -149,6 +149,7 @@ static void nudge_baseline(xmlNodePtr node)
 		y_value = atof((char *) y);
 	 else 
 		y_value = 0 ;
+	xmlFree(y);
 	y_value -= TEXT_ORNAMENTS_BASELINE_NUDGE;
 	char *new_y_val = masprintf("%g", y_value);
 	xmlSetProp(node, y_attr, (xmlChar *) new_y_val);
@@ -244,6 +245,7 @@ static void center_vertically(xmlNodePtr node)
 		return;
 	}
 	double height = atof((char *) height_value);
+	free(height_value);
 	xmlChar * y_attr = (xmlChar *) "y";
 	xmlChar * y_value = xmlGetProp(node, y_attr);
 	double y;
