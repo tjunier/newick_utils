@@ -46,7 +46,7 @@ all: nwutils_tutorial.pdf
 # by make install). By putting ../src *before* the PATH, we ensure that the
 # version of newick utils used is the latest compiled one.
 
-PATH := ../src/:$(PATH)	
+export PATH := ../src/:$(PATH)	
 
 regular_svg_commands = $(wildcard *_svg)
 regular_svg_command_strings = $(addsuffix .cmd, $(regular_svg_commands))

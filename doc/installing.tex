@@ -1,4 +1,5 @@
 \chapter{Installing the \nutils}
+\label{app:installing}
 
 \section{From source}
 
@@ -46,10 +47,10 @@ The \texttt{make check} is optional, but you should try it anyway. Note that
 the \gen{} test may fail - this is due to differences in pseudo-random number
 generators, as far as I can tell.
 
-To prevent the use of \libxml, pass \texttt{--without-libxml} to
-\texttt{./configure}. If want to use \libxml{} but your \texttt{.so} files are
-in a nonstandard location, use \texttt{--with-libxml=<lib directory>}. Likewise,
-if the \libxml{} header files are in a nonstandard location, use
+\noindent{}To prevent the use of \libxml, pass \texttt{--without-libxml} to
+\texttt{./configure}. If you want to use \libxml{} but your \texttt{.so} files
+are in a nonstandard location, use \texttt{--with-libxml=<lib directory>}.
+Likewise, if the \libxml{} header files are in a nonstandard location, use
 \texttt{--with-libxml-headers=<include dir>}.
 
 \section{As binaries}

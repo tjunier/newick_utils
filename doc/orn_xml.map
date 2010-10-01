@@ -1,0 +1,6 @@
+"<circle style='fill:red;stroke:black' r='5'/>" I Homo Pan
+"<circle style='fill:cyan;stroke:blue' r='5'/>" C Homo Hylobates
+"<text>plains</text>"				I Gorilla
+"<text>plains</text>"				I Macaca
+"<text style='font-style:italic' x='-25'>Borneo</text><circle r='4' style='fill:blue;stroke:cyan'/><circle cx='-10' r='4' fill='green' stroke='lime'/><rect x='-25' y='-3' width='8' height='6' stroke='orange' fill='blue'/>" I Pongo
+"<text style='font-face:italic' x='-12'>Africa</text><circle r='4' style='stroke:grey;fill:white'/><ellipse cx='-8' rx='4' ry='2' style='fill:magenta;stroke:purple'/>" I Homininae

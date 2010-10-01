@@ -253,11 +253,7 @@ specified with option \texttt{-o}:
  \includegraphics{display_8_svg.pdf}
 \end{center}
 
-\noindent{}Text ornaments are special: they follow the node's parent edge, and are aligned
-with the edge's tip. In radial trees, this means that they are rotated like
-regular node labels.
-
-If \libxml{} is available (see \ref{install:libxml}), the handling of ornaments is more elaborate, in that some kinds of elements undergo special treatment. Besides positioning the ornament at the node's location and orienting it along the parent edge, which occur for all elements, the following occurs:
+If \libxml{} is being used (see Appendix \ref{app:installing}), the handling of ornaments is more elaborate, in that some kinds of elements undergo special treatment. Besides positioning the ornament at the node's location and orienting it along the parent edge, which occur for all elements, the following occurs:
 \begin{itemize}
 	\item \texttt{<text>} elements are nudged a few pixels from the parent edge,
 	to make the text more readable. They are also transformed so that the text is
@@ -269,6 +265,23 @@ If \libxml{} is available (see \ref{install:libxml}), the handling of ornaments 
 	side of the tree, they are also rotated and shifted so that they don't show
 	upside-down.
 \end{itemize}
+
+In the following file, the orang-utan (\texttt{Pongo}) and hominines have
+several ornaments, which are spaced out along the radial axis so that they don't
+overlap. This is done simply by using the \texttt{x} attribute of texts and
+rectangles, as well as the \texttt{cx} attribute of circles and ellipses. Again,
+the node to be adorned lies at (0,0), x values lie on the radial axis, and y
+values are perpendicular to the x axis.
+
+\verbatiminput{display_17_txt.out}
+
+This gives the following:
+
+\verbatiminput{display_18_svg.cmd}
+\begin{center}
+\includegraphics{display_18_svg.pdf}
+\end{center}
+
 Ornaments and \css{} can be combined:
 
 \verbatiminput{display_9_svg.cmd}
