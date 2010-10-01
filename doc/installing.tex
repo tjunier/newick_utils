@@ -25,6 +25,13 @@ Make			& GNU Make 								& 3.81
 \end{tabular}
 \medskip
 
+\noindent{}If \libxml{} is present on your system, the \nutils{} can use it to
+produce better \svg{} graphics. This is the default behaviour, but it is
+optional: if the library is not present (or not found), or if you specify not to
+use it (see below), the build process will work all the same, and most programs
+will not be affected in any way (currently this only affects ornaments to \svg{}
+trees).
+
 \noindent{}The package uses the \textsc{gnu} autotools, like many other open source
 software packages. So all you need to do is the usual
 \begin{verbatim}
@@ -39,6 +46,11 @@ The \texttt{make check} is optional, but you should try it anyway. Note that
 the \gen{} test may fail - this is due to differences in pseudo-random number
 generators, as far as I can tell.
 
+To prevent the use of \libxml, pass \texttt{--without-libxml} to
+\texttt{./configure}. If want to use \libxml{} but your \texttt{.so} files are
+in a nonstandard location, use \texttt{--with-libxml=<lib directory>}. Likewise,
+if the \libxml{} header files are in a nonstandard location, use
+\texttt{--with-libxml-headers=<include dir>}.
 
 \section{As binaries}
 

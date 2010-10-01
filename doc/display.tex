@@ -255,7 +255,21 @@ specified with option \texttt{-o}:
 
 \noindent{}Text ornaments are special: they follow the node's parent edge, and are aligned
 with the edge's tip. In radial trees, this means that they are rotated like
-regular node labels.  Ornaments and \css{} can be combined:
+regular node labels.
+
+If \libxml{} is available (see \ref{install:libxml}), the handling of ornaments is more elaborate, in that some kinds of elements undergo special treatment. Besides positioning the ornament at the node's location and orienting it along the parent edge, which occur for all elements, the following occurs:
+\begin{itemize}
+	\item \texttt{<text>} elements are nudged a few pixels from the parent edge,
+	to make the text more readable. They are also transformed so that the text is
+	aligned with the node's position, on both sides of the tree (this involved an
+	additional 180° rotation on the left side).
+	\item \texttt{<image>} elements are centered so that instead of having their
+	top left corner at the node's position, they have the middle of the left side
+	(this corresponds to verical centering on an orthogonal tree). On the left
+	side of the tree, they are also rotated and shifted so that they don't show
+	upside-down.
+\end{itemize}
+Ornaments and \css{} can be combined:
 
 \verbatiminput{display_9_svg.cmd}
 \begin{center}
