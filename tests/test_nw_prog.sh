@@ -26,10 +26,11 @@ if [ ! -r $args_file ] ; then
 fi
 
 # Define variables that can be used for conditional running of test cases
-if grep "^#define HAVE_LIBXML2 1" ../config.h ; then
-	xml=1
+
+if grep "^#define HAVE_LIBXML2 1" ../config.h > /dev/null ; then
+	xml='on'
 else
-	xml=0
+	xml='off'
 fi
 
 # Each test case on one line. Line structure is
@@ -40,13 +41,23 @@ fi
 
 pass=TRUE
 while IFS=':' read name args condition ; do
-	[ '' = "$condition" ] && condition=1	# no condition => true
-	if [ $condition = 1 ] ; then
-		echo evaluating test $name
-	else
-		echo skipping
-		continue
-	fi
+	do_test=TRUE
+	condition=`echo $condition | tr -d ' '`
+	case "$condition" in
+		"noxml" )
+			[ $xml != 'off' ] && do_test=FALSE
+			;;
+		"xml" )
+			[ $xml != 'on' ] && do_test=FALSE
+			;;
+		"" )
+			;;	# do nothing - already TRUE
+		*)
+			echo "ERROR condition $condition is invalid" >& 2
+			continue
+			;;
+	esac
+	[ do_test = TRUE ] && continue
 	# setting IFS to '' preserves whitespace through shell word splitting
 	IFS='' cmd="../src/$prog $args"
 	echo -n "test '$name': '$cmd' - "
