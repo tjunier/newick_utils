@@ -25,28 +25,12 @@ if [ ! -r $args_file ] ; then
 	exit 1
 fi
 
-# Define variables that can be used for conditional running of test cases
-if grep "^#define HAVE_LIBXML2 1" ../config.h ; then
-	xml=1
-else
-	xml=0
-fi
-
-# Each test case on one line. Line structure is
-# <case name>:<program arguments>[:<condition>].
-# The program will run if <condition> is met (or if there is no <condition>),
-# and if run will be passed <program arguments>. The expected result is in a
-# file named "test_<prog name>_<case name>.exp" .
+# Each test case in on one line. Line structure is <case name>:<prog
+# arguments>. The expected result is in a file named test_<prog name>_<case
+# name>.exp .
 
 pass=TRUE
-while IFS=':' read name args condition ; do
-	[ '' = "$condition" ] && condition=1	# no condition => true
-	if [ $condition = 1 ] ; then
-		echo evaluating test $name
-	else
-		echo skipping
-		continue
-	fi
+while IFS=':' read name args ; do
 	# setting IFS to '' preserves whitespace through shell word splitting
 	IFS='' cmd="../src/$prog $args"
 	echo -n "test '$name': '$cmd' - "
