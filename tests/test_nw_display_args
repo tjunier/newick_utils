@@ -23,7 +23,7 @@ orn_withxml: -s -b 'visibility:hidden' -o ornament.map catarrhini.nw
 orn_r_withxml: -sr -w 500 -o ornament_r.map catarrhini.nw
 orn_r_img_withxml: -sr -w 500 -o img_r.map pecora.nw
 orn_noxml: -s -b 'visibility:hidden' -o ornament.map catarrhini.nw
-orn_r_noxml: -sr -w 500 -o ornament_r.map catarrhini.nw
+orn_r_noxml: -sr -w 500 -o orn_r_noxml.map catarrhini.nw
 Il: -s -Il -b 'visibility:hidden' simiiformes.nw
 Im: -s -Im -b 'visibility:hidden' simiiformes.nw
 Ir: -s -Ir -b 'visibility:hidden' simiiformes.nw
