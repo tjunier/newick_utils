@@ -295,13 +295,18 @@ As hinted above, \libxml{} also allows handling of images:
 
 \verbatiminput{img_r.map}
 
-This gives the following:
+This gives the following (credits: all images are from Wkipedia):
 
 \verbatiminput{display_19_svg.cmd}
 \begin{center}
 \includegraphics{display_19_svg.pdf}
 \end{center}
-(credits: all images are from Wkipedia)
+
+\noindent{}The advantage of using \libxml{} is greatest with radial trees. This
+is because some elements, as said above, need special transforms, which means
+that each element must be handled separately. This in turn means that the \svg{}
+snipped must be parsed (instead of just wrapped in a \texttt{<g>} element, as is
+the case when \libxml{} is not used).
 
 \subsubsection{Example: Mapping GC Content}
 \label{sct_display_ornament_xpl_gc}
