@@ -1,0 +1,12 @@
+b_s:-n HRV.bs.nw 'b == 13' s
+b_d:HRV.bs.nw 'b == 13' d
+ib_o:HRV.bs.nw 'i & b < 11' o
+top:top.nw i o
+nr_1s:-n -r catarrhini.nw '1 == 1' s
+no:-no catarrhini.nw 'd > 10' s
+n_l:-n catarrhini.nw '1 == 1' l
+multi: -no forest_ind.nw 'a >= 4' s
+d_s:-n catarrhini.nw 'D == 2' s
+c_s:-n falc_families.nw 'c > 2' s
+const_1: -n catarrhini.nw 1 s 
+const_0: -n catarrhini.nw 0 s 
