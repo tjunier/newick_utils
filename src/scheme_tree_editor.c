@@ -1,6 +1,6 @@
 /* 
 
-Copyright (c) 2009 Thomas Junier and Evgeny Zdobnov, University of Geneva
+Copyright (c) 2010 Thomas Junier and Evgeny Zdobnov, University of Geneva
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
+#include <libguile.h>
 
 #include "rnode.h"
 #include "link.h"
@@ -50,8 +52,7 @@ enum order { POST_ORDER, PRE_ORDER };
 struct enode *expression_root;
 
 struct parameters {
-	char * address;
-	int action;
+	char *scheme_expr;	// a (test action) pair
 	int show_tree;
 	int order;
 	int stop_clade_at_first_match;
@@ -209,9 +210,9 @@ struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
-	params.show_tree = TRUE;
+	params.show_tree = true;
 	params.order = POST_ORDER;
-	params.stop_clade_at_first_match = FALSE;
+	params.stop_clade_at_first_match = false;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "hnor")) != -1) {
@@ -220,10 +221,10 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'n':
-			params.show_tree = FALSE;
+			params.show_tree = false;
 			break;
 		case 'o':
-			params.stop_clade_at_first_match = TRUE;
+			params.stop_clade_at_first_match = true;
 			params.order = PRE_ORDER;
 			break;
 		case 'r':
@@ -236,7 +237,7 @@ struct parameters get_params(int argc, char *argv[])
 	}
 
 	/* check arguments */
-	if (3 == (argc - optind))	{
+	if (2 == (argc - optind))	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
 			extern FILE *nwsin;
@@ -246,21 +247,7 @@ struct parameters get_params(int argc, char *argv[])
 			}
 			nwsin = fin;
 		}
-		params.address = argv[optind+1];
-		char action = argv[optind+2][0];
-		switch (action) {
-		case 's': params.action = ACTION_SUBTREE;
-			break;
-		case 'o': params.action = ACTION_SPLICE_OUT;
-			break;
-		case 'd': params.action = ACTION_DELETE;
-		  	break;
-		case 'l': params.action = ACTION_PRINT_LABEL;
-		 	break;
-		default: fprintf(stderr, 
-			"Action '%c' is unknown.\n", action);
-			 exit(EXIT_FAILURE);
-		}
+		params.scheme_expr = argv[optind+1];
 	} else {
 		fprintf(stderr, "Usage: %s [-hnro] <filename|-> <address> <operation>\n",
 				argv[0]);
@@ -313,7 +300,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 	if (NULL == rndata) { perror(NULL); exit (EXIT_FAILURE); }
 	rndata->nb_ancestors = 0;
 	rndata->depth = 0;
-	rndata->stop_mark = FALSE;
+	rndata->stop_mark = false;
 	node->data = rndata;
 
 	/* WARNING: don't forget to set values for the root's data, above. The
@@ -328,7 +315,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 		rndata->depth = parent_data->depth +
 			atof(node->edge_length_as_string);
 
-		rndata->stop_mark = FALSE;
+		rndata->stop_mark = false;
 		node->data = rndata;
 	}
 
@@ -357,8 +344,6 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct llist *nodes;
 	struct list_elem *el;
-	enum unlink_rnode_status result;
-	char *newick;
 
 	/* these two traversals fill the node data. */
 	reverse_parse_order_traversal(tree);
@@ -383,7 +368,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			if (((struct rnode_data *) current->parent->data)->stop_mark) {
 				/* Stop-mark the current node and continue */ 
 				((struct rnode_data *)
-				current->data)->stop_mark = TRUE;
+				current->data)->stop_mark = true;
 				continue;
 			}
 		} 
@@ -401,10 +386,19 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		destroy_llist(nodes);
 }
 
-int main(int argc, char* argv[])
+static void inner_main(void *closure, int argc, char* argv[])
 {
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
+
+	SCM expr_scm = scm_from_locale_string(params.scheme_expr);
+	SCM in_port = scm_open_input_string(expr_scm);
+	SCM expr = scm_read(in_port);
+	SCM addr = scm_car(expr);
+	SCM action = scm_cdr(expr);
+	SCM is_match = scm_primitive_eval(addr);
+	if (! scm_is_false(is_match))
+		scm_primitive_eval(action);
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, params);
@@ -413,6 +407,10 @@ int main(int argc, char* argv[])
 		}
 		destroy_tree(tree, FREE_NODE_DATA);
 	}
+}
 
-	return 0;
+int main(int argc, char* argv[])
+{
+       scm_boot_guile (argc, argv, inner_main, 0);
+       return 0; /* never reached */
 }

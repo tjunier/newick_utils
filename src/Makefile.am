@@ -95,7 +95,7 @@ nw_stats_SOURCES = stats.c
 nw_stats_LDADD = @LEXLIB@ libnw.la
 
 nw_sched_SOURCES = scheme_tree_editor.c
-nw_sched_LDADD = @LEXLIB@  libnw.la
+nw_sched_LDADD = @LEXLIB@  libnw.la -lguile
 
 # disabled for release
 #nw_toy_SOURCES = toy.c
