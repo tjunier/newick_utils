@@ -44,12 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree_editor_rnode_data.h"
 #include "common.h"
 
-enum action { ACTION_DELETE, ACTION_SUBTREE, ACTION_SPLICE_OUT,
-	ACTION_PRINT_LABEL };
+struct rnode *current_node;
 
 enum order { POST_ORDER, PRE_ORDER };
-
-struct enode *expression_root;
 
 struct parameters {
 	char *scheme_expr;	// a (test action) pair
@@ -340,12 +337,50 @@ void parse_order_traversal(struct rooted_tree *tree)
 	}
 }
 
-void process_tree(struct rooted_tree *tree, struct parameters params)
+/* Sets the value of the predefined variables (i, l, a, etc), according to the
+ * node passed as argument. This is normally the current node, while visiting
+ * the tree. Using variables rather than functions makes for shorter Scheme
+ * expression can be shorter, because function calls can be replaced by
+ * variables, e.g. (< 2 a) instead of (< 2 (a)) to check that the current node
+ * has fewer than two ancestors. On the command line, this is handy. */
+
+void set_predefined_variables(struct rnode *node)
+{
+	/* b: returns node label, as a bootstrap support value */
+	if (is_leaf(node))
+		scm_c_define("b", SCM_BOOL_F);
+	else {
+		SCM label = scm_from_locale_string(node->label);
+		SCM support_value = scm_string_to_number(label, SCM_UNDEFINED);
+		scm_c_define("b", support_value);
+	}
+
+	/* i: true IFF node is inner (not leaf, not root) */
+	if (is_inner_node(node))
+		scm_c_define("i", SCM_BOOL_T);
+	else
+		scm_c_define("i", SCM_BOOL_F);
+
+	/* l: true IFF node is a leaf */
+	if (is_leaf(node))
+		scm_c_define("l", SCM_BOOL_T);
+	else
+		scm_c_define("l", SCM_BOOL_F);
+}
+
+/* 'address' and 'action' are Scheme expressions. The tree is visited, and
+ * 'address' is evaluated at each node (though some may be skipped). If
+ * 'address' is true, 'action' is perfomed. */
+
+void process_tree(struct rooted_tree *tree, SCM address,
+		SCM action, struct parameters params)
 {
 	struct llist *nodes;
 	struct list_elem *el;
 
 	/* these two traversals fill the node data. */
+	// TODO: would gain time by only performing those traversals that are
+	// needed
 	reverse_parse_order_traversal(tree);
 	parse_order_traversal(tree);
 
@@ -361,23 +396,23 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 
 	/* Main loop: Iterate over all nodes */
 	for (el = nodes->head; NULL != el; el = el -> next) {
-		struct rnode *current = (struct rnode *) el->data;
+		current_node = (struct rnode *) el->data;
 
 		/* Check for stop mark in parent (see option -o) */
-		if (! is_root(current)) { 	/* root has no parent... */
-			if (((struct rnode_data *) current->parent->data)->stop_mark) {
+		if (! is_root(current_node)) { 	/* root has no parent... */
+			if (((struct rnode_data *)
+				current_node->parent->data)->stop_mark) {
 				/* Stop-mark the current node and continue */ 
 				((struct rnode_data *)
-				current->data)->stop_mark = true;
+					current_node->data)->stop_mark = true;
 				continue;
 			}
 		} 
 
-		/* Set the current node for evaluation, and evaluate the
-		 * expression - if the current node matches, then perform the
-		 * specified action */
-		// TODO: set current node
-		// TODO: eval Scheme address
+		set_predefined_variables(current_node);
+		SCM is_match = scm_primitive_eval(address);
+		if (! scm_is_false(is_match))
+			scm_primitive_eval(action);
 	}
 
 	/* If order is PRE_ORDER, the list of nodes is an inverted copy, so we
@@ -386,22 +421,38 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		destroy_llist(nodes);
 }
 
+/* Makes C functions available to Scheme */
+
+SCM scm_dump_subclade()
+{
+	dump_newick(current_node);
+}
+
+static void register_C_functions()
+{
+	// TODO: later
+	// scm_c_define_gsubr("l?", 0, 0, 0, scm_is_leaf);
+	scm_c_define_gsubr("s", 0, 0, 0, scm_dump_subclade);
+	scm_c_define_gsubr("dump-subclade", 0, 0, 0, scm_dump_subclade);
+}
+
 static void inner_main(void *closure, int argc, char* argv[])
 {
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
 
+	scm_c_eval_string("(define & and)");	/* short alias */
+
 	SCM expr_scm = scm_from_locale_string(params.scheme_expr);
 	SCM in_port = scm_open_input_string(expr_scm);
 	SCM expr = scm_read(in_port);
-	SCM addr = scm_car(expr);
-	SCM action = scm_cdr(expr);
-	SCM is_match = scm_primitive_eval(addr);
-	if (! scm_is_false(is_match))
-		scm_primitive_eval(action);
+	SCM address = scm_car(expr);
+	SCM action = scm_cadr(expr);
+
+	register_C_functions();
 
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, params);
+		process_tree(tree, address, action, params);
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
