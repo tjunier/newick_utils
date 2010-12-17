@@ -48,7 +48,7 @@ TESTS = test_newick_scanner$(EXEEXT) test_newick_parser$(EXEEXT) \
 	test_nw_clade.sh test_nw_distance.sh test_nw_labels.sh \
 	test_nw_prune.sh test_nw_order.sh test_nw_match.sh \
 	test_nw_trim.sh test_nw_gen.sh test_nw_duration.sh \
-	test_nw_stats.sh test_summary.sh
+	test_nw_stats.sh test_nw_sched.sh test_summary.sh
 check_PROGRAMS = test_rnode$(EXEEXT) test_list$(EXEEXT) \
 	test_link$(EXEEXT) test_newick_scanner$(EXEEXT) \
 	test_canvas$(EXEEXT) test_concat$(EXEEXT) test_hash$(EXEEXT) \

@@ -5,7 +5,7 @@ BUILT_SOURCES = newick_parser.h newick_scanner.c newick_parser.c \
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 	       nw_condense nw_support nw_ed nw_topology nw_distance \
 	       nw_labels nw_prune nw_order nw_match nw_gen nw_trim \
-	       nw_duration nw_stats #nw_toy disabled for release
+	       nw_duration nw_stats nw_sched #nw_toy disabled for release
 
 # I mention all headers here, so they're included in the distro (otherwise this
 # is not necessary, it builds just fine)
@@ -93,6 +93,9 @@ nw_duration_LDADD = @LEXLIB@ libnw.la
 
 nw_stats_SOURCES = stats.c
 nw_stats_LDADD = @LEXLIB@ libnw.la
+
+nw_sched_SOURCES = scheme_tree_editor.c
+nw_sched_LDADD = @LEXLIB@  libnw.la -lguile
 
 # disabled for release
 #nw_toy_SOURCES = toy.c

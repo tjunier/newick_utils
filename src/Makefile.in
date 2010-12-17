@@ -41,7 +41,7 @@ bin_PROGRAMS = nw_indent$(EXEEXT) nw_display$(EXEEXT) \
 	nw_topology$(EXEEXT) nw_distance$(EXEEXT) nw_labels$(EXEEXT) \
 	nw_prune$(EXEEXT) nw_order$(EXEEXT) nw_match$(EXEEXT) \
 	nw_gen$(EXEEXT) nw_trim$(EXEEXT) nw_duration$(EXEEXT) \
-	nw_stats$(EXEEXT)
+	nw_stats$(EXEEXT) nw_sched$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	address_parser.c address_parser.h address_scanner.c \
@@ -135,6 +135,9 @@ nw_rename_DEPENDENCIES = libnw.la
 am_nw_reroot_OBJECTS = reroot.$(OBJEXT)
 nw_reroot_OBJECTS = $(am_nw_reroot_OBJECTS)
 nw_reroot_DEPENDENCIES = libnw.la
+am_nw_sched_OBJECTS = scheme_tree_editor.$(OBJEXT)
+nw_sched_OBJECTS = $(am_nw_sched_OBJECTS)
+nw_sched_DEPENDENCIES = libnw.la
 am_nw_stats_OBJECTS = stats.$(OBJEXT)
 nw_stats_OBJECTS = $(am_nw_stats_OBJECTS)
 nw_stats_DEPENDENCIES = libnw.la
@@ -172,17 +175,17 @@ SOURCES = $(libnw_la_SOURCES) $(nw_clade_SOURCES) \
 	$(nw_distance_SOURCES) $(nw_duration_SOURCES) $(nw_ed_SOURCES) \
 	$(nw_gen_SOURCES) $(nw_indent_SOURCES) $(nw_labels_SOURCES) \
 	$(nw_match_SOURCES) $(nw_order_SOURCES) $(nw_prune_SOURCES) \
-	$(nw_rename_SOURCES) $(nw_reroot_SOURCES) $(nw_stats_SOURCES) \
-	$(nw_support_SOURCES) $(nw_topology_SOURCES) \
-	$(nw_trim_SOURCES)
+	$(nw_rename_SOURCES) $(nw_reroot_SOURCES) $(nw_sched_SOURCES) \
+	$(nw_stats_SOURCES) $(nw_support_SOURCES) \
+	$(nw_topology_SOURCES) $(nw_trim_SOURCES)
 DIST_SOURCES = $(libnw_la_SOURCES) $(nw_clade_SOURCES) \
 	$(nw_condense_SOURCES) $(nw_display_SOURCES) \
 	$(nw_distance_SOURCES) $(nw_duration_SOURCES) $(nw_ed_SOURCES) \
 	$(nw_gen_SOURCES) $(nw_indent_SOURCES) $(nw_labels_SOURCES) \
 	$(nw_match_SOURCES) $(nw_order_SOURCES) $(nw_prune_SOURCES) \
-	$(nw_rename_SOURCES) $(nw_reroot_SOURCES) $(nw_stats_SOURCES) \
-	$(nw_support_SOURCES) $(nw_topology_SOURCES) \
-	$(nw_trim_SOURCES)
+	$(nw_rename_SOURCES) $(nw_reroot_SOURCES) $(nw_sched_SOURCES) \
+	$(nw_stats_SOURCES) $(nw_support_SOURCES) \
+	$(nw_topology_SOURCES) $(nw_trim_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -373,6 +376,8 @@ nw_duration_SOURCES = duration.c
 nw_duration_LDADD = @LEXLIB@ libnw.la
 nw_stats_SOURCES = stats.c
 nw_stats_LDADD = @LEXLIB@ libnw.la
+nw_sched_SOURCES = scheme_tree_editor.c
+nw_sched_LDADD = @LEXLIB@  libnw.la -lguile
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -536,6 +541,9 @@ nw_rename$(EXEEXT): $(nw_rename_OBJECTS) $(nw_rename_DEPENDENCIES)
 nw_reroot$(EXEEXT): $(nw_reroot_OBJECTS) $(nw_reroot_DEPENDENCIES) 
 	@rm -f nw_reroot$(EXEEXT)
 	$(LINK) $(nw_reroot_OBJECTS) $(nw_reroot_LDADD) $(LIBS)
+nw_sched$(EXEEXT): $(nw_sched_OBJECTS) $(nw_sched_DEPENDENCIES) 
+	@rm -f nw_sched$(EXEEXT)
+	$(LINK) $(nw_sched_OBJECTS) $(nw_sched_LDADD) $(LIBS)
 nw_stats$(EXEEXT): $(nw_stats_OBJECTS) $(nw_stats_DEPENDENCIES) 
 	@rm -f nw_stats$(EXEEXT)
 	$(LINK) $(nw_stats_OBJECTS) $(nw_stats_LDADD) $(LIBS)
@@ -590,6 +598,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reroot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rnode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rnode_iterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scheme_tree_editor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple_node_pos.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stats.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/subtree.Po@am__quote@
