@@ -219,6 +219,7 @@ int test_bug2()
 	return 0;
 }
 
+/* (a:12); */
 int test_to_newick_i_simple()
 {
 	const char *test_name = __func__;
