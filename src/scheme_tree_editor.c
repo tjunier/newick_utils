@@ -346,11 +346,13 @@ void parse_order_traversal(struct rooted_tree *tree)
 
 void set_predefined_variables(struct rnode *node)
 {
+	SCM label = scm_from_locale_string(node->label);
+	scm_c_define("lbl", label);
+
 	/* b: returns node label, as a bootstrap support value */
 	if (is_leaf(node))
 		scm_c_define("b", SCM_BOOL_F);
 	else {
-		SCM label = scm_from_locale_string(node->label);
 		SCM support_value = scm_string_to_number(label, SCM_UNDEFINED);
 		scm_c_define("b", support_value);
 	}
