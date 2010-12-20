@@ -112,23 +112,36 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 		return iter->current;
 	}
 
+	/* Case 1: we're on a leaf, but not the root (see Case 0). We return
+	 * the parent node. */
 	// TODO: this case may in fact be handled by the next one.
 	if (is_leaf(iter->current)) {
 		iter->current = iter->current->parent;
 		return iter->current;
 	}
 
+	/* Case 2: we're on an inner node, possibly the root. In any case, the
+	 * node has children. We see if we visited them all (in which case we
+	 * go to the parent) or not (in which case we go to the first unvisited
+	 * child).
+	 * Variable current_child_elem points to a node's currently visited
+	 * child.*/
 	if (iter->current->current_child_elem
-	    == iter->current->children->tail) {
+	    == iter->current->children->tail) {	/* seen all children */
+		iter->current->current_child_elem = NULL; /* reset */
 		if (iter->root == iter->current) {
-			return NULL;
+			// TODO: should we not set a value to indicate the
+			// reason for NULL (as NULL can also signal an error)?
+			return NULL;	/* done iterating */
 		} else {
 			iter->current = iter->current->parent;
 			return iter->current;
 		}
 	}
 
+	/* More children to visit... */
 	if (NULL == iter->current->current_child_elem) 
+		// first time on this node
 		iter->current->current_child_elem =
 			iter->current->children->head;
 	else
