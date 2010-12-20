@@ -96,5 +96,7 @@ struct llist *get_nodes_in_order(struct rnode *);
 struct hash *get_leaf_label_map_from_node(struct rnode *root);
 
 /* Resets all 'current_child_elem' pointers in 'tree's nodes to NULL. */
+// TODO: now that rnode_iterator_next() resets the nodes' current_child_elem
+// after exiting to the parent, we probably don't need this f() anymore. Check.
 
 void reset_current_child_elem (struct rooted_tree *tree);
