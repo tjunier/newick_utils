@@ -43,7 +43,7 @@ char *to_newick(struct rnode* root);
  * does not do this, because it would involve repeated calls to concat(), which
  * are costly and not necessarily needed (e.g., if you just want to print the
  * Newick, which is usually the case, you can just print the strings in list
- * order, and dump_newick() does this for you, using buffered output. Also,
+ * order -- and dump_newick() does this for you, using buffered output) Also,
  * this function is iterative rather than recursive. */
 
 struct llist *to_newick_i(struct rnode *root);
