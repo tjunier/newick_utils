@@ -250,7 +250,11 @@ void prune_empty_labels(struct rooted_tree *target_tree)
 	for (el=target_tree->nodes_in_order->head; NULL != el; el=el->next) {
 		struct rnode *current = el->data;
 		char *label = current->label;
-		if (is_leaf(current)) {
+		/* If none of the labels in the target tree are found in the
+		 * pattern, we end up with a null tree consisting of nothing
+		 * but an unlabeled root. We can't unlink it, hence the test.
+		 * */
+		if (is_leaf(current) && ! is_root(current)) {
 			if (0 == strcmp("", label)) {
 				enum unlink_rnode_status result =
 					unlink_rnode(current);

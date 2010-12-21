@@ -123,7 +123,7 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 
 	/* Case 0: we're on a leaf, but not the root (see Case 0). We return
 	 * the parent node. */
-	if (is_leaf(iter->current) && ! is_root(iter->current)) {
+	if (is_leaf(iter->current)) {
 		if (iter->current == iter->root) {
 			struct list_elem dummy;
 			/* we use current_child_elem in a different
@@ -149,14 +149,17 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 		}
 	}
 
+	
 	/* Case 1: on a leaf which is also the root */
 	// TODO: this case may in fact be handled by the next one. Check tests
 	// with this if clause commented out.
+	 /*
 	if (is_leaf(iter->current)) {
 		iter->current = iter->current->parent;
 		SHOW;
 		return iter->current;
 	}
+	*/
 
 	/* Case 2: we're on an inner node, possibly the root. In any case, the
 	 * node has children. We see if we visited them all (in which case we
