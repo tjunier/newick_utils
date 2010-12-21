@@ -130,7 +130,8 @@ struct llist *to_newick_i(struct rnode *node)
 	
 	it->root->seen = 1;
 
-	append_element(result, strdup("("));
+	if (! is_leaf(it->root))
+		append_element(result, strdup("("));
 
 	while ((current = rnode_iterator_next(it)) != NULL) {
 		if (is_leaf(current)) {
