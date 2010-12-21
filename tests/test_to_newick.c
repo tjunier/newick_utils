@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include "rnode.h"
 #include "to_newick.h"
@@ -219,6 +220,64 @@ int test_bug2()
 	return 0;
 }
 
+/* a:12; */
+int test_to_newick_i_leaf()
+{
+	const char *test_name = __func__;
+	struct llist *result;
+	struct rnode *node_a;
+	struct list_elem *e;
+
+	/* (a:12); */
+	node_a = create_rnode("a", "12");
+
+	result = to_newick_i(node_a);
+	e = result->head;
+	if (NULL == e) {
+		printf ("%s: list head is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp("a", (char *)(e->data)) != 0) {
+		printf ("%s: expected 'a', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL == e) {
+		printf ("%s: list element is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp(":", (char *)(e->data)) != 0) {
+		printf ("%s: expected ':', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL == e) {
+		printf ("%s: list element is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp("12", (char *)(e->data)) != 0) {
+		printf ("%s: expected '12', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL == e) {
+		printf ("%s: list element is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp(";", (char *)(e->data)) != 0) {
+		printf ("%s: expected ';', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL != e) {
+		printf ("%s: list element should be NULL\n", test_name);
+		return 1;
+	}
+
+	printf("%s: ok.\n", test_name);
+	return 0;
+}
+
 /* (a:12); */
 int test_to_newick_i_simple()
 {
@@ -309,6 +368,7 @@ int main()
 	failures += test_nested_2();
 	failures += test_bug1();
 	failures += test_bug2();
+	failures += test_to_newick_i_leaf();
 	failures += test_to_newick_i_simple();
 	if (0 == failures) {
 		printf("All tests ok.\n");
