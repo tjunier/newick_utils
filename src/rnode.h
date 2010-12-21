@@ -72,7 +72,7 @@ struct rnode {
 
 	/* enables traversing by rnode_iterator_next() */
 	struct list_elem *current_child_elem;
-	int seen;	// TODO: check that it is used.
+	int seen;	// TODO: check if we could use a boolean.
 };
 
 /* allocates a rnode and returns a pointer to it, or exits. If 'label' is NULL
