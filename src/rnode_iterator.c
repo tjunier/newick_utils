@@ -91,6 +91,7 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
 }
 
 /* Returns true IFF there are more children to visit on the current node. */
+// TODO: is this f() ever used?
 
 bool more_children_to_visit (struct rnode_iterator *iter)
 {
@@ -109,6 +110,9 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	 * children) and the root (no parent). Hence the double test below. */
 	if (is_leaf(iter->current) && ! is_root(iter->current)) {
 		iter->current = iter->current->parent;
+#ifdef DEBUG_ITERATOR		
+		printf ("-> %p\t%s\n", iter->current, iter->current->label);
+#endif
 		return iter->current;
 	}
 
@@ -117,6 +121,9 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	// TODO: this case may in fact be handled by the next one.
 	if (is_leaf(iter->current)) {
 		iter->current = iter->current->parent;
+#ifdef DEBUG_ITERATOR		
+		printf ("-> %p\t%s\n", iter->current, iter->current->label);
+#endif
 		return iter->current;
 	}
 
@@ -132,9 +139,15 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 		if (iter->root == iter->current) {
 			// TODO: should we not set a value to indicate the
 			// reason for NULL (as NULL can also signal an error)?
+#ifdef DEBUG_ITERATOR		
+			printf ("-> END\n");
+#endif
 			return NULL;	/* done iterating */
 		} else {
 			iter->current = iter->current->parent;
+#ifdef DEBUG_ITERATOR		
+			printf ("-> %p\t%s\n", iter->current, iter->current->label);
+#endif
 			return iter->current;
 		}
 	}
@@ -150,7 +163,10 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 
 	struct rnode *next = iter->current->current_child_elem->data;
 	iter->current = next;
-	return next;
+#ifdef DEBUG_ITERATOR		
+	printf ("-> %p\t%s\n", iter->current, iter->current->label);
+#endif
+	return next;	// TODO: change to iter->current, as everywhere else.
 }
 
 /* Computes the list by doing a tree traversal, then reversing it, printing out
