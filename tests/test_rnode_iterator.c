@@ -9,6 +9,11 @@
 #include "hash.h"
 #include "rnode.h"
 #include "list.h"
+#include "parser.h"
+#include "newick_parser.h"
+#include "to_newick.h"
+
+void newick_scanner_set_string_input(char *);
 
 int test_iterator()
 {
@@ -348,6 +353,33 @@ int test_iterator_repeat()
 	return 0;
 }
 
+int test_iterator_repeat_inside()
+{
+	const char *test_name = __func__;
+	char * catarrhini = "((((Gorilla:16,(Pan:10,Homo:10)Hominini:10)Homininae:15,Pongo:30)Hominidae:15,Hylobates:20):10,(((Macaca:10,Papio:10):20,Cercopithecus:10)Cercopithecinae:25,(Simias:10,Colobus:7)Colobinae:5)Cercopithecidae:10);";
+	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
+
+	newick_scanner_set_string_input(catarrhini);
+	struct rooted_tree *tree = parse_tree();
+	struct hash *nodemap = create_label2node_map(tree->nodes_in_order);
+	struct rnode *node_Hominidae = hash_get(nodemap, "Hominidae");
+	struct rnode *node_Hominini = hash_get(nodemap, "Hominini");
+	struct rnode *node_Cercopithecidae = hash_get(nodemap, "Cercopithecidae");
+	struct rnode *node_Cercopithecinae = hash_get(nodemap, "Cercopithecinae");
+	struct rnode *node_Colobinae = hash_get(nodemap, "Colobinae");
+
+	/* This time we start in the middle of the tree, at node h. */
+	//struct rnode_iterator *it = create_rnode_iterator(node_Hominidae);
+	dump_newick(node_Hominini);
+	dump_newick(node_Hominidae);
+	dump_newick(node_Cercopithecidae);
+	dump_newick(node_Colobinae);
+	dump_newick(node_Cercopithecinae);
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int test_get_nodes_in_order()
 {
 	const char *test_name = "test_get_nodes_in_order";
@@ -661,6 +693,7 @@ int main()
 	failures += test_iterator();
 	failures += test_iterator_midtree();
 	failures += test_iterator_repeat();
+	failures += test_iterator_repeat_inside();
 	failures += test_get_leaf_label_map_from_node();
 	failures += test_get_nodes_in_order();
 	failures += test_get_nodes_in_order_linear();

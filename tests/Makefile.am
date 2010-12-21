@@ -80,8 +80,10 @@ test_enode_SOURCES = test_enode.c $(SRC)/enode.c $(SRC)/rnode.c \
 	$(SRC)/hash.c $(SRC)/masprintf.c
 
 test_rnode_iterator_SOURCES = test_rnode_iterator.c $(SRC)/rnode_iterator.c \
-  	$(SRC)/list.c $(SRC)/link.c $(SRC)/rnode.c \
-       	$(SRC)/hash.c $(SRC)/nodemap.c tree_stubs.c $(SRC)/masprintf.c
+  	$(SRC)/list.c $(SRC)/link.c $(SRC)/rnode.c $(SRC)/to_newick.c \
+       	$(SRC)/hash.c $(SRC)/nodemap.c tree_stubs.c $(SRC)/masprintf.c \
+	$(SRC)/parser.c $(SRC)/newick_scanner.c $(SRC)/newick_parser.c \
+	$(SRC)/concat.c
 
 test_readline_SOURCES = test_readline.c $(SRC)/readline.c
 

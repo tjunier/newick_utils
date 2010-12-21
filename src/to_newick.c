@@ -167,6 +167,7 @@ struct llist *to_newick_i(struct rnode *node)
 						append_element(result,
 								strdup(current->edge_length_as_string));
 					}
+					current->seen = 0;	/* reset */
 				}
 			}
 		}
