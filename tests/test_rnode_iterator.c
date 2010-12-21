@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "tree.h"
 #include "tree_stubs.h"
@@ -211,6 +212,40 @@ int test_iterator_midtree()
 	if (next != NULL) {
 		printf ("%s: expected NULL, got %p.\n",
 				test_name, next);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_iterator_leaf()
+{
+	const char *test_name = __func__;
+
+	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
+	struct rooted_tree tree = tree_3();
+	struct hash *nodemap = create_label2node_map(tree.nodes_in_order);
+	struct rnode *node_C = hash_get(nodemap, "C");
+	struct rnode *node_A = hash_get(nodemap, "A");
+
+	/* This time we start at a leaf (C) */
+	struct rnode_iterator *it = create_rnode_iterator(node_C);
+	struct rnode *next;
+
+	next = rnode_iterator_next(it);
+	if (node_C != next) {
+		printf ("%s: expected node C (%p), got %s (%p).\n",
+				test_name, node_C, next->label, next);
+		return 1;
+	}
+
+	/* For good measure, we start again at another leaf */
+	it = create_rnode_iterator(node_A);
+	next = rnode_iterator_next(it);
+	if (node_A != next) {
+		printf ("%s: expected node A (%p), got %s (%p).\n",
+				test_name, node_A, next->label, next);
 		return 1;
 	}
 
@@ -665,6 +700,7 @@ int main()
 	printf("Starting rnode iterator test...\n");
 	failures += test_iterator();
 	failures += test_iterator_midtree();
+	failures += test_iterator_leaf();
 	failures += test_iterator_repeat();
 	failures += test_get_leaf_label_map_from_node();
 	failures += test_get_nodes_in_order();
