@@ -157,8 +157,10 @@ test_rnode_OBJECTS = $(am_test_rnode_OBJECTS)
 test_rnode_LDADD = $(LDADD)
 am_test_rnode_iterator_OBJECTS = test_rnode_iterator.$(OBJEXT) \
 	rnode_iterator.$(OBJEXT) list.$(OBJEXT) link.$(OBJEXT) \
-	rnode.$(OBJEXT) hash.$(OBJEXT) nodemap.$(OBJEXT) \
-	tree_stubs.$(OBJEXT) masprintf.$(OBJEXT)
+	rnode.$(OBJEXT) to_newick.$(OBJEXT) hash.$(OBJEXT) \
+	nodemap.$(OBJEXT) tree_stubs.$(OBJEXT) masprintf.$(OBJEXT) \
+	parser.$(OBJEXT) newick_scanner.$(OBJEXT) \
+	newick_parser.$(OBJEXT) concat.$(OBJEXT)
 test_rnode_iterator_OBJECTS = $(am_test_rnode_iterator_OBJECTS)
 test_rnode_iterator_LDADD = $(LDADD)
 am_test_svg_graph_radial_OBJECTS = test_svg_graph_radial.$(OBJEXT) \
@@ -408,8 +410,10 @@ test_enode_SOURCES = test_enode.c $(SRC)/enode.c $(SRC)/rnode.c \
 	$(SRC)/hash.c $(SRC)/masprintf.c
 
 test_rnode_iterator_SOURCES = test_rnode_iterator.c $(SRC)/rnode_iterator.c \
-  	$(SRC)/list.c $(SRC)/link.c $(SRC)/rnode.c \
-       	$(SRC)/hash.c $(SRC)/nodemap.c tree_stubs.c $(SRC)/masprintf.c
+  	$(SRC)/list.c $(SRC)/link.c $(SRC)/rnode.c $(SRC)/to_newick.c \
+       	$(SRC)/hash.c $(SRC)/nodemap.c tree_stubs.c $(SRC)/masprintf.c \
+	$(SRC)/parser.c $(SRC)/newick_scanner.c $(SRC)/newick_parser.c \
+	$(SRC)/concat.c
 
 test_readline_SOURCES = test_readline.c $(SRC)/readline.c
 test_tree_models_SOURCES = test_tree_models.c $(SRC)/tree_models.c \
