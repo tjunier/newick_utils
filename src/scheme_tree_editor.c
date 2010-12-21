@@ -368,6 +368,19 @@ void set_predefined_variables(struct rnode *node)
 		scm_c_define("l", SCM_BOOL_T);
 	else
 		scm_c_define("l", SCM_BOOL_F);
+
+	/* d: depth */
+	struct rnode_data *data = current_node->data;
+	scm_c_define("d", scm_from_int(data->depth));
+
+	/* a: number of ancestors */
+	scm_c_define("a", scm_from_int(data->nb_ancestors));
+
+	/* c: number of children */
+	scm_c_define("c", scm_from_int(current_node->children->count));
+
+	/* D: number of descendants */
+	scm_c_define("D", scm_from_int(data->nb_descendants));
 }
 
 /* 'address' and 'action' are Scheme expressions. The tree is visited, and
@@ -413,9 +426,16 @@ void process_tree(struct rooted_tree *tree, SCM address,
 
 		set_predefined_variables(current_node);
 		SCM is_match = scm_primitive_eval(address);
-		if (! scm_is_false(is_match))
+
+		if (! scm_is_false(is_match)) {
 			scm_primitive_eval(action);
-	}
+			/* see -o switch */
+			if (params.stop_clade_at_first_match)
+				((struct rnode_data *)
+				 current_node->data)->stop_mark = TRUE;
+		}
+
+	} /* loop over all nodes */
 
 	/* If order is PRE_ORDER, the list of nodes is an inverted copy, so we
 	 * need to free it. */
@@ -472,7 +492,7 @@ static void register_C_functions()
 	// scm_c_define_gsubr("l?", 0, 0, 0, scm_is_leaf);
 	scm_c_define_gsubr("s", 0, 0, 0, scm_dump_subclade);
 	scm_c_define_gsubr("dump-subclade", 0, 0, 0, scm_dump_subclade);
-	scm_c_define_gsubr("d", 0, 0, 0, scm_unlink_node);
+	scm_c_define_gsubr("u", 0, 0, 0, scm_unlink_node);
 	scm_c_define_gsubr("unlink-node", 0, 0, 0, scm_unlink_node);
 	scm_c_define_gsubr("o", 0, 0, 0, scm_splice_out_node);
 	scm_c_define_gsubr("splice-out-node", 0, 0, 0, scm_splice_out_node);
@@ -483,7 +503,9 @@ static void inner_main(void *closure, int argc, char* argv[])
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
 
-	scm_c_eval_string("(define & and)");	/* short alias */
+	/* Aliases and simple functions */
+	scm_c_eval_string("(define & and)");	
+	scm_c_eval_string("(define (p obj) (display obj) (newline))");
 
 	SCM expr_scm = scm_from_locale_string(params.scheme_expr);
 	SCM in_port = scm_open_input_string(expr_scm);
