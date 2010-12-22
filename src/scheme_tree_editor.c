@@ -346,11 +346,13 @@ void parse_order_traversal(struct rooted_tree *tree)
 
 void set_predefined_variables(struct rnode *node)
 {
+	SCM label = scm_from_locale_string(node->label);
+	scm_c_define("lbl", label);
+
 	/* b: returns node label, as a bootstrap support value */
 	if (is_leaf(node))
 		scm_c_define("b", SCM_BOOL_F);
 	else {
-		SCM label = scm_from_locale_string(node->label);
 		SCM support_value = scm_string_to_number(label, SCM_UNDEFINED);
 		scm_c_define("b", support_value);
 	}
@@ -426,7 +428,42 @@ void process_tree(struct rooted_tree *tree, SCM address,
 SCM scm_dump_subclade()
 {
 	dump_newick(current_node);
-	return SCM_BOOL_F;	// TODO: fix
+	return SCM_UNDEFINED;
+}
+
+SCM scm_unlink_node()
+{
+	if (is_root(current_node)) {
+		fprintf (stderr, "Warning: tried to delete root\n");
+		return SCM_UNDEFINED;
+
+	}
+	enum unlink_rnode_status result = unlink_rnode(current_node);
+	switch(result) {
+	case UNLINK_RNODE_DONE:
+	case UNLINK_RNODE_ROOT_CHILD:
+		break;
+	case UNLINK_RNODE_ERROR:
+		fprintf (stderr, "Memory error - unlink aborted.\n");
+		break;
+	default:
+		assert(0); /* programmer error */
+	}
+
+	return SCM_UNDEFINED;
+}
+
+SCM scm_splice_out_node() 	/* "open" */
+{
+	if (is_inner_node(current_node)) {
+		if (! splice_out_rnode(current_node)) {
+			perror("Memory error - node not spliced out.");
+		}
+	} else {
+		fprintf (stderr, "Warning: tried to splice out non-inner node ('%s')\n", current_node->label);
+	}
+
+	return SCM_UNDEFINED;
 }
 
 static void register_C_functions()
@@ -435,6 +472,10 @@ static void register_C_functions()
 	// scm_c_define_gsubr("l?", 0, 0, 0, scm_is_leaf);
 	scm_c_define_gsubr("s", 0, 0, 0, scm_dump_subclade);
 	scm_c_define_gsubr("dump-subclade", 0, 0, 0, scm_dump_subclade);
+	scm_c_define_gsubr("d", 0, 0, 0, scm_unlink_node);
+	scm_c_define_gsubr("unlink-node", 0, 0, 0, scm_unlink_node);
+	scm_c_define_gsubr("o", 0, 0, 0, scm_splice_out_node);
+	scm_c_define_gsubr("splice-out-node", 0, 0, 0, scm_splice_out_node);
 }
 
 static void inner_main(void *closure, int argc, char* argv[])
