@@ -38,6 +38,16 @@ struct rnode;
 
 char *to_newick(struct rnode* root);
 
-/* Dumps the newick rooted at 'root' to stdout. */
+/* Like to_newick, but returns a list of strings. Concatenating the strings in
+ * list order results in the Newick representation of the tree. The function
+ * does not do this, because it would involve repeated calls to concat(), which
+ * are costly and not necessarily needed (e.g., if you just want to print the
+ * Newick, which is usually the case, you can just print the strings in list
+ * order -- and dump_newick() does this for you, using buffered output) Also,
+ * this function is iterative rather than recursive. */
+
+struct llist *to_newick_i(struct rnode *root);
+
+/* Dumps the newick rooted at 'root' to stdout, using to_newick_i() */
 
 void dump_newick(struct rnode* root);

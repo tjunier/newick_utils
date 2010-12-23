@@ -38,6 +38,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "tree.h"
 
+/* Some debugging macros. Compile with -DDEBUG_ITERATOR and the addresses and
+ * labels of the next nodes (as returned by rnode_iterator_next()) will be
+ * printed. */
+
+#ifdef DEBUG_ITERATOR
+#define SHOW printf ("-> %p\t%s\n", iter->current, iter->current->label)
+#define SHOW_END printf ("-> END\n")
+#else
+#define SHOW ;
+#define SHOW_END ;
+#endif
+
 /* The functions in this module provide an iterator interface on a node and its
  * descendents, allowing traversal. The low-level rnode_iterator and functions
  * that call it directly (such as rnode_iterator_next()) visit the tree by
@@ -91,6 +103,7 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
 }
 
 /* Returns true IFF there are more children to visit on the current node. */
+// TODO: is this f() ever used?
 
 bool more_children_to_visit (struct rnode_iterator *iter)
 {
@@ -107,28 +120,68 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	 * e.g. in nw_match if none of the labels in the pattern tree is found
 	 * in the target tree). The single node is in this case both a leaf (no
 	 * children) and the root (no parent). Hence the double test below. */
+
+	/* Case 0: we're on a leaf, but not the root (see Case 0). We return
+	 * the parent node. */
 	if (is_leaf(iter->current) && ! is_root(iter->current)) {
-		iter->current = iter->current->parent;
-		return iter->current;
-	}
-
-	// TODO: this case may in fact be handled by the next one.
-	if (is_leaf(iter->current)) {
-		iter->current = iter->current->parent;
-		return iter->current;
-	}
-
-	if (iter->current->current_child_elem
-	    == iter->current->children->tail) {
-		if (iter->root == iter->current) {
-			return NULL;
+		if (iter->current == iter->root) {
+			struct list_elem dummy;
+			/* we use current_child_elem in a different
+			 * way here - this is a leaf, so it obviously has no
+			 * children. current_child_elem is set to the current
+			 * node the first time, and reset to NULL the second
+			 * time. This allows the iterator to return a leaf when
+			 * and only when it starts on a leaf. */
+			if (NULL == iter->current->current_child_elem) {
+				iter->current->current_child_elem =
+					&dummy;
+					SHOW;
+				return iter->current;
+			} else {
+				iter->current->current_child_elem = NULL;
+				SHOW_END;
+				return NULL;
+			}
 		} else {
 			iter->current = iter->current->parent;
+			SHOW;
 			return iter->current;
 		}
 	}
 
+	/* Case 1: on a leaf which is also the root */
+	// TODO: this case may in fact be handled by the next one. Check tests
+	// with this if clause commented out.
+	if (is_leaf(iter->current)) {
+		iter->current = iter->current->parent;
+		SHOW;
+		return iter->current;
+	}
+
+	/* Case 2: we're on an inner node, possibly the root. In any case, the
+	 * node has children. We see if we visited them all (in which case we
+	 * go to the parent) or not (in which case we go to the first unvisited
+	 * child).
+	 * Variable current_child_elem points to a node's currently visited
+	 * child.*/
+	if (iter->current->current_child_elem
+	    == iter->current->children->tail) {	/* seen all children */
+		iter->current->current_child_elem = NULL; /* reset */
+		if (iter->root == iter->current) {
+			// TODO: should we not set a value to indicate the
+			// reason for NULL (as NULL can also signal an error)?
+			SHOW_END;
+			return NULL;	/* done iterating */
+		} else {
+			iter->current = iter->current->parent;
+			SHOW;
+			return iter->current;
+		}
+	}
+
+	/* More children to visit... */
 	if (NULL == iter->current->current_child_elem) 
+		// first time on this node
 		iter->current->current_child_elem =
 			iter->current->children->head;
 	else
@@ -137,7 +190,8 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 
 	struct rnode *next = iter->current->current_child_elem->data;
 	iter->current = next;
-	return next;
+	SHOW;
+	return next;	// TODO: change to iter->current, as everywhere else.
 }
 
 /* Computes the list by doing a tree traversal, then reversing it, printing out

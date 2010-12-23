@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode_iterator.h"
 #include "hash.h"
 
+// TODO: make all functions static unless needed otherwise
+
 /* returns the length part of a node, e.g. ":12.345" */
 
 char *length(struct rnode *node)
@@ -114,27 +116,31 @@ char *to_newick(struct rnode *node)
 	return result;
 }
 
-int dump_newick(struct rnode *node)
+struct llist *to_newick_i(struct rnode *node)
 {
 	struct rnode_iterator *it;
 	struct rnode *current;
+	struct llist *result = create_llist();
 
 	it = create_rnode_iterator(node);
 	if (NULL == it) {
-		perror(NULL);
-		return FAILURE;
+		// TODO: set error msg, or sthg
+		return NULL;
 	}
 	
 	it->root->seen = 1;
 
-	printf("(");
+	append_element(result, strdup("("));
+
 	while ((current = rnode_iterator_next(it)) != NULL) {
-		 // fprintf (stderr, "%s (%s): seen: %d\n", current->label, current->edge_length_as_string, current->seen);
 		if (is_leaf(current)) {
 			/* leaf: just print label */
-			printf("%s", current->label);
-			if (strcmp("", current->edge_length_as_string) != 0)
-					printf(":%s", current->edge_length_as_string);
+			append_element(result, strdup(current->label));
+			if (strcmp("", current->edge_length_as_string) != 0) {
+				append_element(result, strdup(":"));
+				append_element(result,
+					strdup(current->edge_length_as_string));
+			}
 		}
 		else {
 			/* inner node: behaviour depends on whether we've
@@ -142,22 +148,48 @@ int dump_newick(struct rnode *node)
 			if (0 == current->seen) {
 				/* not seen: print '(' */
 				current->seen = 1;
-				printf("(");
+				append_element(result, strdup("("));
 			} else {
 				if (more_children_to_visit(it)) {
-					printf(",");
+					append_element(result, strdup(","));
 				}
 				else {
-					printf(")%s", current->label);
+					//printf(")%s", current->label);
+					append_element(result, strdup(")"));
+					if (strcmp("", current->label) != 0)
+						append_element(result,
+							strdup(current->label));
 					if (strcmp("",
-					current->edge_length_as_string) != 0)
-						printf(":%s", current->edge_length_as_string);
+						current->edge_length_as_string) != 0) {
+						//printf(":%s", current->edge_length_as_string);
+						append_element(result,
+								strdup(":"));
+						append_element(result,
+								strdup(current->edge_length_as_string));
+					}
+					current->seen = 0;	/* reset */
 				}
 			}
 		}
 	}
-	printf(";\n");
+	//printf(";\n");
+	append_element(result, strdup(";"));
 
 	destroy_rnode_iterator(it);
+
+	return result;
+}
+
+int dump_newick(struct rnode *node)
+{
+	struct llist *nw_strings = to_newick_i(node);
+	if (NULL == nw_strings) return FAILURE;
+
+	struct list_elem *e;
+
+	for (e = nw_strings->head; NULL != e; e = e->next) 
+		printf("%s", (char *) e->data);
+	printf("\n");
+
 	return SUCCESS;
 }

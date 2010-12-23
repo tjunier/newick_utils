@@ -14,64 +14,9 @@
 #include "concat.h"
 #include "parser.h"
 #include "tree.h"
+#include "list.h"
 
 void newick_scanner_set_string_input(char *);
-
-/* dump_newick() writes to standard output. If we want to check what it wrote,
- * we have to redirect its output to a file. This can be done easily with dup()
- * or dup2(). But this is not the end of the story, because we want to resume
- * writing to the old stdout after dump_newick() has done its job -- we have to
- * print a summary of how the test went, and of course there are other tests
- * down the line. I found two ways of doing this: */
-
-int dump_newick_to_file(struct rnode *node, char *outname)
-{
-
-	/* This works, and conforms to C99, but what if the terminal isn't
-	 * /dev/tty? */
-	/*
-	FILE *out = freopen("test.out", "w", stdout);
-	dump_newick(node_b);
-	freopen("/dev/tty", "w", out);
-	*/
-
-	/* This also works, and may be more portable, but involves fork()ing a
-	 * child process: overkill? Moreover, DON'T redirect output (as in make
-	 * check), as it will interfere with the test. TODO: try to fix this
-	 * problem. Reproduce by doing i) ./test_to_newick, and ii)
-	 * ./test_to_newick | grep -i fail -- in the second case there will be
-	 * (false-positive) failures due to redirection */
-	int fd = open(outname, O_CREAT | O_TRUNC | O_RDWR, S_IWUSR | S_IRUSR);
-	if (-1 == fd) return -1;
-	pid_t pid = fork();
-	if (-1 == pid) return -1; 
-	if (0 == pid) {
-		/* child */
-		close(STDOUT_FILENO);
-		if (-1 == dup(fd)) {
-			perror("dup");
-			close(fd);
-			exit(EXIT_FAILURE);
-		}
-		dump_newick(node);
-		close(fd);
-		exit(EXIT_SUCCESS);
-	} else {
-		/* parent */
-		wait(NULL);
-		return fd;
-	}
-}
-
-char *mmap_output(int fd)
-{
-	struct stat buf;
-	if (-1 == fstat(fd, &buf)) return NULL;
-	char *output = mmap(NULL, buf.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	if (NULL == output) return NULL;
-
-	return output;
-}
 
 int test_trivial()
 {
@@ -244,81 +189,6 @@ int test_bug1()
 	return 0;
 }
 
-int test_dump_simple()
-{
-	char *test_name = "test_dump_simple";
-	char *result;
-	struct rnode *node_a;
-	struct rnode *node_b;
-	char *exp = "(a:12);\n";
-
-	node_a = create_rnode("a", "12");
-	node_b = create_rnode("", "");
-	add_child(node_b, node_a);
-
-	char *outname = concat(test_name, ".out");
-	if (NULL == outname) { perror(NULL); return 1; }
-
-	/* dump the newick into a file (by redirecting stdout) */
-	int fd = dump_newick_to_file(node_b, outname);
-	if (-1 == fd) { perror(NULL); return 1; }
-
-	/* read the output into a string */
-	char *obt = mmap_output(fd);
-	if (NULL == obt) { perror(NULL); return 1; }
-
-	if (strcmp(exp, obt) != 0) {
-		printf("%s: expected '%s', got '%s'.\n", test_name, exp, obt);
-		return 1;
-	}
-
-	printf("%s: ok.\n", test_name);
-	unlink(outname);
-	return 0;
-}
-
-/* (a:12,(b:5,c:7)d:3)e; */
-int test_dump_nested_2()
-{
-	char *test_name = "test_dump_nested_2";
-	char *result;
-	struct rnode *node_a;
-	struct rnode *node_b;
-	struct rnode *node_c;
-	struct rnode *node_d;
-	struct rnode *node_e;
-	char *exp = "(a:12,(b:5,c:7)d:3)e:4;\n";
-
-	node_a = create_rnode("a", "12");
-	node_b = create_rnode("b", "5");
-	node_c = create_rnode("c", "7");
-	node_d = create_rnode("d", "3");
-	node_e = create_rnode("e", "4");
-	add_child(node_d, node_b);
-	add_child(node_d, node_c);
-	add_child(node_e, node_a);
-	add_child(node_e, node_d);
-
-	char *outname = concat(test_name, ".out");
-	if (NULL == outname) { perror(NULL); return 1; }
-
-	int fd = dump_newick_to_file(node_e, outname);
-	if (-1 == fd) { perror(NULL); return 1; }
-
-	char *obt = mmap_output(fd);
-	if (NULL == obt) { perror(NULL); return 1; }
-
-	if (strcmp(exp, obt) != 0) {
-		printf("%s: expected '%s', got '%s'.\n",
-				test_name, exp, obt);
-		return 1;
-	}
-
-	printf("%s: ok.\n", test_name);
-	unlink(outname);
-	return 0;
-}
-
 int test_bug2()
 {
 	char *test_name = "test_bug2";
@@ -349,6 +219,85 @@ int test_bug2()
 	return 0;
 }
 
+/* (a:12); */
+int test_to_newick_i_simple()
+{
+	const char *test_name = __func__;
+	struct llist *result;
+	struct rnode *node_a;
+	struct rnode *node_b;
+	struct list_elem *e;
+
+	/* (a:12); */
+	node_a = create_rnode("a", "12");
+	node_b = create_rnode("", "");
+	add_child(node_b, node_a);
+
+	result = to_newick_i(node_b);
+	e = result->head;
+	if (NULL == e) {
+		printf ("%s: list head is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp("(", (char *)(e->data)) != 0) {
+		printf ("%s: expected '(', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL == e) {
+		printf ("%s: list element is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp("a", (char *)(e->data)) != 0) {
+		printf ("%s: expected 'a', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL == e) {
+		printf ("%s: list element is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp(":", (char *)(e->data)) != 0) {
+		printf ("%s: expected ':', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL == e) {
+		printf ("%s: list element is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp("12", (char *)(e->data)) != 0) {
+		printf ("%s: expected '12', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL == e) {
+		printf ("%s: list element is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp(")", (char *)(e->data)) != 0) {
+		printf ("%s: expected ')', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL == e) {
+		printf ("%s: list element is NULL\n", test_name);
+		return 1;
+	}
+	if (strcmp(";", (char *)(e->data)) != 0) {
+		printf ("%s: expected ';', got '%s'\n", test_name, (char*)(e->data));
+		return 1;
+	}
+	e = e->next;
+	if (NULL != e) {
+		printf ("%s: list element should be NULL\n", test_name);
+		return 1;
+	}
+
+	printf("%s: ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -360,8 +309,7 @@ int main()
 	failures += test_nested_2();
 	failures += test_bug1();
 	failures += test_bug2();
-	failures += test_dump_simple();
-	failures += test_dump_nested_2();
+	failures += test_to_newick_i_simple();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
