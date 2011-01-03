@@ -106,6 +106,7 @@ void help(char *argv[])
 "internal, while 'boostrap' is set to the current node's bootstrap support\n"
 "value (assuming the the node has a label and that it is numeric).\n"
 "All of Scheme's logical and relational operators are available, so\n"
+
 "\n"
 "		 (and is-internal (> boostrap 75))\n"
 "\n"
