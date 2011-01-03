@@ -251,7 +251,8 @@ struct parameters get_params(int argc, char *argv[])
 		}
 		params.scheme_expr = argv[optind+1];
 	} else {
-		fprintf(stderr, "Usage: %s [-hnro] <filename|-> <address> <operation>\n",
+		fprintf(stderr, "Usage: %s [-hnro] <filename|-> "
+				"<Scheme expression>\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}
