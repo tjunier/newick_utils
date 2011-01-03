@@ -419,16 +419,22 @@ void process_tree(struct rooted_tree *tree, SCM address,
 
 		set_predefined_variables(current_node);
 		SCM is_match = scm_primitive_eval(address);
-		if (! scm_is_false(is_match))
+
+		if (! scm_is_false(is_match)) {
 			scm_primitive_eval(action);
-	}
+			/* see -o switch */
+			if (params.stop_clade_at_first_match)
+				((struct rnode_data *)
+				 current_node->data)->stop_mark = TRUE;
+		}
+
+	} /* loop over all nodes */
 
 	/* If order is PRE_ORDER, the list of nodes is an inverted copy, so we
 	 * need to free it. */
 	if (PRE_ORDER == params.order)
 		destroy_llist(nodes);
 }
-
 /* Makes C functions available to Scheme */
 
 SCM scm_dump_subclade()
