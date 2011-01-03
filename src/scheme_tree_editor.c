@@ -128,38 +128,63 @@ void help(char *argv[])
 "\n"
 "The predefined varables are:\n"
 "\n"
-"    a	integer		number of ancestors\n"
-"    b	rational	support value (or #f)\n"
-"    d	rational	depth (distance to root), or #f\n"
-"    c	integer		number of children\n"
-"    D	integer		number of descendants\n"
-"    i	boolean    	true iff node is strictly internal (i.e., not root!)\n"
-"    l	boolean    	true iff node is a leaf\n"
-"    r	boolean    	true iff node is the root\n"
+"	Name	Type		Meaning\n"
+"	---------------------------------------------------------\n"
+"    	a	integer		number of ancestors\n"
+"    	b	rational	support value (or #f)\n"
+"    	c	integer		number of children\n"
+"    	d	rational	depth (distance to root), or #f\n"
+"    	D	integer		number of descendants\n"
+"    	i	boolean    	true iff node is strictly internal\n"
+"    	L	rational    	parent edge's length\n"
+"    	l	boolean    	true iff node is a leaf\n"
+"    	lbl	string    	label\n"
+"    	r	boolean    	true iff node is the root\n"
 "\n"
-" The following Scheme forms also have shorter names:\n"
-"    and	&   logical and\n"
-"    or		|   logical or\n"
+"Exactly one of i, l, and r is true for every node. The difference between b\n"
+"and lbl is that b interprets the label as a number (if possible), while lbl\n"
+"returns the label as a string.\n"
+"\n"
+" The following Scheme forms also have shorter names predefined:\n"
+
+"    	and	&   logical and\n"
+"    	or	|   logical or\n"
 "\n"
 "Actions\n"
 "-------\n"
 "\n"
 "The action can be any valid Scheme expression. The program defines the\n"
 "following functions that work with nodes. They all take the current node\n"
-"as an implicit argument. Like variables, they have short names to allow\n"
-"for concise expressions on the command line.\n"
+"as an implicit argument, and have undefined return type. Like variables,\n"
+"they have short names to allow for concise expressions on the command line.\n"
 "\n"
-"    o undefined	'opens' a node - unlinks the node, and \n"
+"	Name	Meaning\n"
+"	---------------------------------------------------------\n"
+"    	o 	'opens' a node - unlinks the node, and \n"
 "			attaches children to the unliked node's parent\n"
-"    s undefined	prints the subtree rooted ad the current node\n"
-"    u undefined	unlinks the current node\n"
+"    	s 	prints the subtree rooted ad the current node\n"
+"    	u 	unlinks the current node\n"
 "\n"
 "Function 'o' ('open') is useful for discarding poorly-supported nodes (see\n"
 "Examples below).\n"
 "\n"
+"Setters\n"
+".......\n"
+"Label and length also have setter functions. They are named like the\n"
+"corresponding variable, with a trailing '!' (to remind that they change\n"
+"some data). They also have undefined return type.\n"
+"\n"
+"	Name	Arg type	Meaning\n"
+"	---------------------------------------------------------\n"
+"    	L!	rational	set the parent edge's length\n"
+"    	lbl!	string		set the label\n"
+"\n"
 "In addition, the following general functions are defined\n"
 "\n"
-"    p <arg>	undefined	displays arg, then newline\n"
+"	Name	Arg type	Meaning\n"
+"	---------------------------------------------------------\n"
+"    	p 	any		displays arg, then newline\n"
+"				returns undefined.\n"
 "\n"
 "Options\n"
 "-------\n"
@@ -353,6 +378,8 @@ void parse_order_traversal(struct rooted_tree *tree)
 void set_predefined_variables(struct rnode *node)
 {
 	SCM label = scm_from_locale_string(node->label);
+	SCM edge_length_as_scm_string  = scm_from_locale_string(
+			node->edge_length_as_string);
 	scm_c_define("lbl", label);
 
 	/* b: returns node label, as a bootstrap support value */
@@ -375,6 +402,13 @@ void set_predefined_variables(struct rnode *node)
 	else
 		scm_c_define("l", SCM_BOOL_F);
 
+	/* L: parent edge's length */
+	if (strcmp ("", node->edge_length_as_string) == 0) 
+		scm_c_define("L", SCM_UNDEFINED);
+	else	
+		scm_c_define("L", scm_string_to_number(
+				edge_length_as_scm_string, SCM_UNDEFINED));
+	
 	/* d: depth */
 	struct rnode_data *data = current_node->data;
 	scm_c_define("d", scm_from_int(data->depth));
@@ -490,6 +524,28 @@ SCM scm_splice_out_node() 	/* "open" */
 	return SCM_UNDEFINED;
 }
 
+SCM scm_set_length(SCM edge_length)
+{
+	char *length_as_string;
+	size_t buffer_length;	/* storage for length as string */
+
+	/* Put length as string into a buffer */
+
+	SCM edge_length_as_scm_string = scm_number_to_string(edge_length,
+			SCM_UNDEFINED);
+	buffer_length = scm_c_string_length(edge_length_as_scm_string);
+	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
+	size_t copied = scm_to_locale_stringbuf(
+			edge_length_as_scm_string, buffer, buffer_length);
+	buffer[buffer_length] = '\0';
+
+	/* Set the allocated buffer as the current node's length-as-string */
+	free(current_node->edge_length_as_string);
+	current_node->edge_length_as_string = buffer;
+
+	return SCM_UNDEFINED;
+}
+
 static void register_C_functions()
 {
 	scm_c_define_gsubr("s", 0, 0, 0, scm_dump_subclade);
@@ -498,6 +554,8 @@ static void register_C_functions()
 	scm_c_define_gsubr("unlink-node", 0, 0, 0, scm_unlink_node);
 	scm_c_define_gsubr("o", 0, 0, 0, scm_splice_out_node);
 	scm_c_define_gsubr("splice-out-node", 0, 0, 0, scm_splice_out_node);
+	scm_c_define_gsubr("L!", 1, 0, 0, scm_set_length);
+	scm_c_define_gsubr("set-length!", 1, 0, 0, scm_set_length);
 }
 
 static void inner_main(void *closure, int argc, char* argv[])
@@ -528,6 +586,6 @@ static void inner_main(void *closure, int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-       scm_boot_guile (argc, argv, inner_main, 0);
-       return 0; /* never reached */
+       	scm_boot_guile (argc, argv, inner_main, 0);
+       	return 0; /* never reached */
 }
