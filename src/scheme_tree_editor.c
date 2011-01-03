@@ -27,6 +27,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+/* NOTE: This program uses libguile. When checking for memory leaks with
+ * Valgrind, I get error messages that seem to point to problems in libguile
+ * rather than my own code. To see this, do e.g.:
+ *
+ * valgrind --leak-check=full \
+ * ./src/nw_sched -n data/catarrhini '((= D 2) (s))' 2>&1 \
+ * | grep -A 1 '^==[0-9]\+== [A-Z]' | grep -o '(in .*)' \
+ * | tr -d '()' | awk '{print $2}' | sort -u
+ *
+ */
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
