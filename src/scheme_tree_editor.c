@@ -131,9 +131,9 @@ void help(char *argv[])
 "	Name	Type		Meaning\n"
 "	---------------------------------------------------------\n"
 "    	a	integer		number of ancestors\n"
-"    	b	rational	support value (or #f)\n"
+"    	b	rational	support value\n"
 "    	c	integer		number of children\n"
-"    	d	rational	depth (distance to root), or #f\n"
+"    	d	rational	depth (distance to root)\n"
 "    	D	integer		number of descendants\n"
 "    	i	boolean    	true iff node is strictly internal\n"
 "    	L	rational    	parent edge's length\n"
@@ -141,9 +141,11 @@ void help(char *argv[])
 "    	lbl	string    	label\n"
 "    	r	boolean    	true iff node is the root\n"
 "\n"
-"Exactly one of i, l, and r is true for every node. The difference between b\n"
-"and lbl is that b interprets the label as a number (if possible), while lbl\n"
-"returns the label as a string.\n"
+"Notes:\n"
+"    o Exactly one of i, l, and r is true for every node.\n"
+"    o The difference between b and lbl is that b interprets the label as a\n"
+"      number (if possible), while lbl returns the label as a string.\n"
+"    o Variables b, d, L and lbl may be undefined.\n"
 "\n"
 " The following Scheme forms also have shorter names predefined:\n"
 
@@ -421,6 +423,12 @@ void set_predefined_variables(struct rnode *node)
 
 	/* D: number of descendants */
 	scm_c_define("D", scm_from_int(data->nb_descendants));
+
+	/* r: true iff node is root */
+	if (is_root(node))
+		scm_c_define("r", SCM_BOOL_T);
+	else
+		scm_c_define("r", SCM_BOOL_F);
 }
 
 /* 'address' and 'action' are Scheme expressions. The tree is visited, and
@@ -565,6 +573,8 @@ static void inner_main(void *closure, int argc, char* argv[])
 
 	/* Aliases and simple functions */
 	scm_c_eval_string("(define & and)");	
+	scm_c_eval_string("(define | or)");	
+	scm_c_eval_string("(define def? defined?)");	
 	scm_c_eval_string("(define (p obj) (display obj) (newline))");
 
 	SCM expr_scm = scm_from_locale_string(params.scheme_expr);
