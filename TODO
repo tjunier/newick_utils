@@ -1,3 +1,5 @@
+nw_match: try to implement the whole thing using iterators rather than comparing Newick strings.
+
 nw_stats: should say if root is labeled or not.
 
 nw_label: add option for printing out only the root's label (handy when
@@ -487,4 +489,11 @@ In radial trees, there are two variables that govern radial nudging of labels:
 one for leaf labels, and one for inner node labels. Is this really necessary?
 If not, make everything governable by -n.
 
-rotate all ornaments (not just text) in radial trees -- this is better than the conditional rotation based on whether the first element is a <text> or anything else. But the problem is that left-side texts are anchored at the left, while right-side texts are anchored at the right, so giving (say) x=10 will shift some rootward and the others leafward. One needs, I'm afraid, to tweak the <text> elements themselves and change the sign of x='...' attributes for one side of the tree.
+[done] rotate all ornaments (not just text) in radial trees -- this is better
+than the conditional rotation based on whether the first element is a <text> or
+anything else. But the problem is that left-side texts are anchored at the
+left, while right-side texts are anchored at the right, so giving (say) x=10
+will shift some rootward and the others leafward. One needs, I'm afraid, to
+tweak the <text> elements themselves and change the sign of x='...' attributes
+for one side of the tree.
+

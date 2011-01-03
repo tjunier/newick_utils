@@ -58,12 +58,13 @@ struct parameters {
 void help(char *argv[])
 {
 	printf (
-"Performs actions on nodes that match some condition\n"
+"Performs actions on nodes that match some condition, using an\n"
+"embedded Scheme interpreter (GNU Guile)\n"
 "\n"
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hnor] <newick trees filename|-> <address> <action>\n"
+"%s [-hnor] <newick trees filename|-> <Scheme expression>\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -71,90 +72,98 @@ void help(char *argv[])
 "First argument is the name of a file that contains Newick trees, or '-' (in\n"
 "which case trees are read from standard input).\n"
 "\n"
-"Second argument is a node address, in the form of a logical expression (see\n"
-"Addresses below).\n"
+"Second argument is a Scheme S-expression with two parts. The first part is\n"
+"evaluated on each node in turn. If it evaluates to #t, then (and only then)\n"
+"the second part is evaluated. The first part is typically used to select\n"
+"nodes and is called the Selector, and the second part is used to perform\n"
+"arbitrary actions and is called the Action. For example, the following\n"
+"expression\n"
 "\n"
-"Third argument is a code that specifies an action to perform on nodes\n"
-"which match the address (see Actions).\n" 
+"                                (#t (s))\n"
+"\n"
+"has '#t' as a selector and '(s)' as action. This selector is always true, so\n"
+"the action (s) (print out the subtree rooted at the current node) is\n"
+"performed for every node.\n"
+"The program provides specalized Scheme functions and variables for working\n"
+"with nodes (see below)\n"
+"This program is analogous to pattern-oriented, stream processing UNIX\n"
+"utilities like sed(1) and awk(1), but instead of working on lines (like\n"
+"sed) or records (like awk), %s works on tree nodes.\n"
 "\n"
 "Output\n"
 "------\n"
 "\n"
 "By default, prints the input tree, which may have been modified. However,\n"
-"the 's' action (see Actions, below) causes matching subtrees to be\n"
-"printed out.\n"
+"the action can cause arbitrary material to be printed out.\n"
 "\n"
-"This program is analogous to pattern-oriented, stream processing UNIX\n"
-"utilities like sed(1) and awk(1), but instead of working on lines (like\n"
-"sed) or records (like awk), %s works on tree nodes.\n"
-"\n"
-"The program traverses the tree in Newick order, evaluating the address\n"
-"expression for each node in turn. If (and only if) the address matches, the\n"
-"action is performed.\n"
-"\n"
-"Addresses\n"
+"Selector\n"
 "---------\n"
 "\n"
-"The address expression involves node properties such as depth, bootstrap\n"
+"The selector expression involves node properties such as depth, bootstrap\n"
 "support, whether or not a node is a leaf, etc. These are represented by\n"
-"single-letter codes, to make expressions short. For example:\n"
+"top-level variables which are predefined for the current node. For example,\n"
+"the predefined variable 'is-internal' is true iff the current node is\n"
+"internal, while 'boostrap' is set to the current node's bootstrap support\n"
+"value (assuming the the node has a label and that it is numeric).\n"
+"All of Scheme's logical and relational operators are available, so\n"
 "\n"
-"				       i\n"
-"\n"
-"matches internal nodes, while\n"
-"\n"
-"				     b > 75\n"
-"\n"
-"matches nodes whose label has a numerical value of 75 or more (if the label\n"
-"is numeric). The usual logical and relational operators are available, so\n"
-"\n"
-"				   i & b > 75\n"
+"		 (and is-internal (> boostrap 75))\n"
 "\n"
 "could be used to match internal nodes with a bootstrap support value\n"
 "greater than 75.\n"
 "\n"
-"The functions are:\n"
-"    a numeric    number of ancestors of node	\n"
-"    b numeric    node's support value (or zero)\n"
-"    d numeric    node's depth (distance to root)\n"
-"    c numeric    node's number of children\n"
-"    D numeric    node's number of descendants\n"
-"    i boolean    true iff node is strictly internal (i.e., not root!)\n"
-"    l boolean    true iff node is a leaf\n"
-"    r boolean    true iff node is the root\n"
+"To allow for compact expressions on the command line, the variables\n"
+"(and some logical operators) have short forms. The above expression can\n"
+"thus be written\n"
 "\n"
-"The operators are:\n"
-"    ==  equality\n"
-"    !=  inequality\n"
-"    <   greater than\n"
-"    >   lesser than\n"
-"    >=  greater than or equal to\n"
-"    <=  lesser than or equal to\n"
-"    !   logical negation\n"
-"    &   logical and\n"
-"    |   logical or\n"
+"			(& i (> b 75))\n"
 "\n"
-"The operator precedence is: negation, relationals, and, or; i.e. \n"
+"The predefined variables are:\n"
 "\n"
-"				 1 == d & !i | l\n"
+"    long form      short     type      meaning\n"
+"    ------------------------------------------------------------------\n"
+"    bootstrap		b	R	support value (or #f)\n"
+"    depth		d	R	depth (distance to root)\n"
+"    is-internal	i	B    	true iff node is strictly internal\n"
+"    is-leaf		l	B	true iff node is a leaf\n"
+"    is-root		r	B    	true iff node is the root\n"
+"    nb-ancestors	a	I	number of ancestors\n"
+"    nb-children	c	I	number of children (i.e., direct)\n"
+"    nb-descendants	D	I	number of descendants\n"
 "\n"
-"is equivalent to\n"
+"where I: integer, R: rational, B: boolean.\n"
 "\n"
-"			       ((1 == d) & (!i)) | l\n"
+" The following Scheme forms also have shorter names:\n"
 "\n"
-"Parentheses can be used for overriding precedence, or for clarity.\n"
+"    long form      short     type      meaning\n"
+"    ------------------------------------------------------------------\n"
+"    and		&   	B	logical and\n"
+"    or			|   	B	logical or\n"
 "\n"
 "Actions\n"
 "-------\n"
 "\n"
-"Actions are performed on nodes that match the address. They are:\n"
-"    s   (Subtree) print subtree rooted at matching node\n"
-"    o   (splice Out) splice out node, and attach children to parent, \n"
-"	   preserving branch lengths. This is useful for \"opening\" poorly\n"
-"          supported nodes.\n"
-"    d   Delete node\n"
-"    l   Print node's label\n"   
+"Actions are performed on nodes that match the address. Any valid Scheme\n"
+"expression can be used; in addition to the above variables, the following\n"
+"functions are defined. They all have an implicit argument, which is the\n"
+"current node.\n"
 "\n"
+"    long form      short     type      meaning\n"
+"    ------------------------------------------------------------------\n"
+"    dump-subclade  	s	?	print subtree rooted at node\n"
+"    splice-out   	o	?	splice out node, and attach\n"
+"					children to parent, preserving\n"
+"					branchlengths.\n"
+"    unlink		u	?	delete from tree\n"
+"\n"
+"Function splice-out is useful for \"opening\" poorly-supported nodes.\n"
+"\n"
+"In addition, the following definitions are available (short forms have\n"
+"the same arguments as long forms, of course):"
+"\n"
+"    long form      short     type      meaning\n"
+"    ------------------------------------------------------------------\n"
+"    print <obj> 	p	?	display obj, then newline\n"
 "\n"
 "Options\n"
 "-------\n"
@@ -164,7 +173,7 @@ void help(char *argv[])
 "        (modeled after sed -n)\n"
 "    -r: visit tree in preorder (starting at root, and visiting a node\n"
 "        before any of its descendants). Default is post-order (ends at root\n"
-"        and visits a node after all its descendats).\n"
+"        and visits a node after all its descendants).\n"
 "    -o: stop processing a clade after the first match - that is, if a node\n"
 "        matches, its descendants are not processed.\n"
 "        Note: this option will automatically set -r, as it makes no\n"
@@ -182,18 +191,19 @@ void help(char *argv[])
 "# \"open\" all nodes with bootstrap support <= 10 (assuming support is coded\n"
 "# in internal node labels)\n"
 "\n"
-"$ %s data/HRV.bs.nw 'i & b <= 10' o \n"
+"$ %s data/HRV.bs.nw '((& i (<= b 10)) (o)) \n"
 "\n"
 "# \"open\" all nodes with bootstrap support < 750, then discard leaves that\n"
 "# are directly attached to the ingroup's root. This effectively keeps only\n"
 "# leaves that are part of well-supported clades.\n"
 "\n"
-"$ %s data/big.rn.nw 'i & b < 750' o | %s - 'l & a == 2' d\n"
+"$ %s data/big.rn.nw '((& i (< b 750)) (o))' | %s - '((& l (= a 2)) (u))'\n"
 "\n"
 "# get all clades with at least one ancestor, 980 or better support. Do not\n"
 "# print subtrees of matching clades, even if they match (option -o)\n"
 "\n"
 "$ %s data/big.rn.nw -n -o 'a >= 1 & b >= 980' s\n",
+"$ %s data/big.rn.nw -n -o '((& (>= a 1) (>= b 980)) (s))'\n",
 	argv[0],
 	argv[0],
 	argv[0],
@@ -346,13 +356,11 @@ void parse_order_traversal(struct rooted_tree *tree)
 
 void set_predefined_variables(struct rnode *node)
 {
-	SCM label = scm_from_locale_string(node->label);
-	scm_c_define("lbl", label);
-
 	/* b: returns node label, as a bootstrap support value */
 	if (is_leaf(node))
 		scm_c_define("b", SCM_BOOL_F);
 	else {
+		SCM label = scm_from_locale_string(node->label);
 		SCM support_value = scm_string_to_number(label, SCM_UNDEFINED);
 		scm_c_define("b", support_value);
 	}
@@ -448,42 +456,6 @@ void process_tree(struct rooted_tree *tree, SCM address,
 SCM scm_dump_subclade()
 {
 	dump_newick(current_node);
-	return SCM_UNDEFINED;
-}
-
-SCM scm_unlink_node()
-{
-	if (is_root(current_node)) {
-		fprintf (stderr, "Warning: tried to delete root\n");
-		return SCM_UNDEFINED;
-
-	}
-	enum unlink_rnode_status result = unlink_rnode(current_node);
-	switch(result) {
-	case UNLINK_RNODE_DONE:
-	case UNLINK_RNODE_ROOT_CHILD:
-		break;
-	case UNLINK_RNODE_ERROR:
-		fprintf (stderr, "Memory error - unlink aborted.\n");
-		break;
-	default:
-		assert(0); /* programmer error */
-	}
-
-	return SCM_UNDEFINED;
-}
-
-SCM scm_splice_out_node() 	/* "open" */
-{
-	if (is_inner_node(current_node)) {
-		if (! splice_out_rnode(current_node)) {
-			perror("Memory error - node not spliced out.");
-		}
-	} else {
-		fprintf (stderr, "Warning: tried to splice out non-inner node ('%s')\n", current_node->label);
-	}
-
-	return SCM_UNDEFINED;
 }
 
 static void register_C_functions()
@@ -506,6 +478,7 @@ static void inner_main(void *closure, int argc, char* argv[])
 	/* Aliases and simple functions */
 	scm_c_eval_string("(define & and)");	
 	scm_c_eval_string("(define (p obj) (display obj) (newline))");
+	scm_c_eval_string("(define nb-ancestors a)");
 
 	SCM expr_scm = scm_from_locale_string(params.scheme_expr);
 	SCM in_port = scm_open_input_string(expr_scm);
