@@ -1,9 +1,35 @@
 \section{Stream editing}
 \label{sct_ed}
 
-\ed{} is one of the more experimental programs in the \nutils{} package. It was
-inpired by \unix{} utilities like \texttt{sed} and \texttt{awk}, which perform
-an action on the parts of input (usually lines) that meet some condition.
+\subsection{Background}
+
+The programs we have seen so far are all specialized for a given task,
+hopefully one of the more frequent ones. It is, of course, impossible to
+foresee every way in which one may need to process a tree, and with this we hit
+a limit to specialization. In some cases, a more general-purpose program may
+offer a solution.
+
+The programs described in this section fall into that category: they are less
+specialized, usually less efficient, but more flexible than the ones shown up
+to now. They were inpired by \unix{} utilities like \texttt{sed} and
+\texttt{awk}, which perform an action on the parts of input (usually lines)
+that meet some condition. Rather than lines in a file, they work with nodes in
+a tree: each node is visited in turn, and if it meets a user-specified
+condition, a user-specified action is performed.
+
+As a word of warning, I should say that these programs are among the more
+experimental in the \nutils{} package. This is why there are two or more
+programs that do basically the same thing, although differently and with
+different capabilities: \ed{} is the simplest (and first), it is written
+entirely in C and it is fairly limited. \sched{} was developed to address
+\ed{}'s limitations: by embedding a Scheme interpreter (\gnu{} Guile), its
+flexibility is, for practical purposes, limitless. Of course, this comes at the
+price of linking to an external library, which may not be available. Therefore
+\ed{}, for all its limitations, will stay in the package as it does not depend
+on Guile. Finally, I understand that Scheme is not the only solution as an
+embedded language, and my intention is to try the same approach with Lua.
+
+\subsection{\ed}
 
 \ed{} iterates over the nodes in a specific order, and for each node it
 evaluates a logical expression provided by the user. If the expression is true,
