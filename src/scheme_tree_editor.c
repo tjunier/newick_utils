@@ -501,7 +501,7 @@ SCM scm_unlink_node()
 {
 	if (is_root(current_node)) {
 		fprintf (stderr, "Warning: tried to delete root\n");
-		return SCM_UNDEFINED;
+		return SCM_UNSPECIFIED;
 
 	}
 	enum unlink_rnode_status result = unlink_rnode(current_node);
@@ -516,7 +516,7 @@ SCM scm_unlink_node()
 		assert(0); /* programmer error */
 	}
 
-	return SCM_UNDEFINED;
+	return SCM_UNSPECIFIED;
 }
 
 SCM scm_splice_out_node() 	/* "open" */
@@ -529,15 +529,40 @@ SCM scm_splice_out_node() 	/* "open" */
 		fprintf (stderr, "Warning: tried to splice out non-inner node ('%s')\n", current_node->label);
 	}
 
-	return SCM_UNDEFINED;
+	return SCM_UNSPECIFIED;
 }
+
+/* Sets the current node's parent edge length. Argument must be a number or a
+ * string. */
 
 SCM scm_set_length(SCM edge_length)
 {
 	char *length_as_string;
 	size_t buffer_length;	/* storage for length as string */
 
-	/* Put length as string into a buffer */
+	/* If edge_length is a string, we first try to convert it to a number.
+	 * If this fails, the edge length is undefined. */
+	if (scm_is_string(edge_length)) {
+		edge_length = scm_string_to_number(edge_length, SCM_UNDEFINED);
+		if (scm_is_false(edge_length))
+			edge_length = SCM_UNDEFINED;
+	} else if (! scm_is_number(edge_length)) {
+		/* edge_length should be a number. If not, edge length is
+		 * undefined */
+		edge_length = SCM_UNDEFINED;
+	}
+		
+	/* edge_length is now a number, or undefined. In the latter case, we
+	 * set the node's edge length to "" (i.e., unspecified) */
+
+	if (SCM_UNDEFINED == edge_length) {
+		free(current_node->edge_length_as_string);
+		current_node->edge_length_as_string = strdup("");
+		return SCM_UNSPECIFIED;
+	}
+
+	/* edge_length is a number. We convert it to a string, and set the edge
+	 * length to this value. */
 
 	SCM edge_length_as_scm_string = scm_number_to_string(edge_length,
 			SCM_UNDEFINED);
@@ -551,7 +576,7 @@ SCM scm_set_length(SCM edge_length)
 	free(current_node->edge_length_as_string);
 	current_node->edge_length_as_string = buffer;
 
-	return SCM_UNDEFINED;
+	return SCM_UNSPECIFIED;
 }
 
 static void register_C_functions()
@@ -576,6 +601,7 @@ static void inner_main(void *closure, int argc, char* argv[])
 	scm_c_eval_string("(define | or)");	
 	scm_c_eval_string("(define def? defined?)");	
 	scm_c_eval_string("(define (p obj) (display obj) (newline))");
+	scm_c_eval_string("(use-modules (ice-9 format))");
 
 	SCM expr_scm = scm_from_locale_string(params.scheme_expr);
 	SCM in_port = scm_open_input_string(expr_scm);
