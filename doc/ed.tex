@@ -1,9 +1,35 @@
 \section{Stream editing}
 \label{sct_ed}
 
-\ed{} is one of the more experimental programs in the \nutils{} package. It was
-inpired by \unix{} utilities like \texttt{sed} and \texttt{awk}, which perform
-an action on the parts of input (usually lines) that meet some condition.
+\subsection{Background}
+
+The programs we have seen so far are all specialized for a given task,
+hopefully one of the more frequent ones. It is, of course, impossible to
+foresee every way in which one may need to process a tree, and with this we hit
+a limit to specialization. In some cases, a more general-purpose program may
+offer a solution.
+
+The programs described in this section fall into that category: they are less
+specialized, usually less efficient, but more flexible than the ones shown up
+to now. They were inpired by \unix{} utilities like \texttt{sed} and
+\texttt{awk}, which perform an action on the parts of input (usually lines)
+that meet some condition. Rather than lines in a file, they work with nodes in
+a tree: each node is visited in turn, and if it meets a user-specified
+condition, a user-specified action is performed.
+
+As a word of warning, I should say that these programs are among the more
+experimental in the \nutils{} package. This is why there are two or more
+programs that do basically the same thing, although differently and with
+different capabilities: \ed{} is the simplest (and first), it is written
+entirely in C and it is fairly limited. \sched{} was developed to address
+\ed{}'s limitations: by embedding a Scheme interpreter (\gnu{} Guile), its
+flexibility is, for practical purposes, limitless. Of course, this comes at the
+price of linking to an external library, which may not be available. Therefore
+\ed{}, for all its limitations, will stay in the package as it does not depend
+on Guile. Finally, I understand that Scheme is not the only solution as an
+embedded language, and my intention is to try the same approach with Lua.
+
+\subsection{\ed}
 
 \ed{} iterates over the nodes in a specific order, and for each node it
 evaluates a logical expression provided by the user. If the expression is true,
@@ -22,6 +48,142 @@ Let's look at an example before we jump into the details. Here is a tree of vert
 \verbatiminput{ed_2_txt.cmd}
 \begin{samepage}
 \verbatiminput{ed_2_txt.out}
+\end{samepage}
+
+\noindent{}This instructs \ed{} to iterate over the nodes, in \no{}, and to
+print the subtree (action \texttt{s}) for all nodes that match the expression
+\texttt{b >= 95}, which means "intepret the node label as a (bootstrap) support
+value, and evaluate to true if that value is greater than 95". As we can see,
+\ed{} reports the three well-supported clades (primates, tetrapods, and
+ray-finned fishes), in \no. We also remark that one of the clades (primates) is
+contained in another (tetrapods). Finally, option \texttt{-n} suppresses
+the printing of the whole tree at the end of the run, which isn't useful here.
+
+The two parameters of \ed{} (besides the input file) are an \emph{address} and
+an \emph{action}. Addresses specify sets of nodes, and actions are performed on
+them. 
+
+\subsubsection{Addresses}
+
+Currently, addresses are logical expressions involving node properties, and the
+action is performed on the nodes for which the expression is true. They are
+composed of numbers, logical operators, and node functions.
+
+The functions have one-letter names, to keep expressions short (after all, they are passed on the command line). There are two types, numeric and boolean.
+
+\begin{center}
+\begin{tabular}{cll}
+name & type & meaning \\
+\hline
+\texttt{a} & numeric & number of ancestors of node	 \\
+\texttt{b} & numeric & node's support value (or zero) \\
+\texttt{c} & numeric & node's number of children (direct) \\
+\texttt{D} & numeric & node's number of descendants (includes children) \\
+\texttt{d} & numeric & node's depth (distance to root) \\
+\texttt{i} & boolean & true iff node is strictly internal (i.e., not root!) \\
+\texttt{l} (ell) & boolean & true iff node is a leaf \\
+\texttt{r} & boolean & true iff node is the root
+\end{tabular}
+\end{center}
+
+The logical and relational operators work as expected, here is the list, in
+order of precedence, from tightest to loosest-binding.  Anyway, you can use
+parentheses to override precedence, so don't worry.
+
+\begin{center}
+\begin{tabular}{cl}
+symbol & operator \\
+\hline
+\texttt{!} & logical negation \\
+\hline
+\texttt{==} & equality \\
+\texttt{!=} & inequality \\
+\texttt{<} & greater than \\
+\texttt{>} & lesser than \\
+\texttt{>=} & greater than or equal to \\
+\texttt{<=} & lesser than or equal to \\
+\hline
+\texttt{\&} & logical and \\
+\hline
+\texttt{|} & logical or
+\end{tabular}
+\end{center}
+
+\noindent{}Here are a few examples:
+
+\begin{center}
+\begin{tabular}{cl}
+expression & selects: \\
+\hline
+\texttt{l} & all leaves \\
+\texttt{l \& a <= 3} & leaves with 3 ancestors or less \\
+\texttt{i \& (b >= 95)} & internal nodes with support greater than 95\% \\ 
+\texttt{i \& (b < 50)} & unsupported nodes (less than 50\%) \\
+\texttt{!r} & all nodes except the root \\
+\texttt{c > 2} & multifurcating nodes
+\end{tabular}
+\end{center}
+
+\subsubsection{Actions}
+
+The actions are also coded by a single letter, for the same reason. For now,
+the following are implemented:
+
+\begin{center}
+\begin{tabular}{clc}
+code & effect & modifies tree?\\
+\hline
+\texttt{d} & delete the node (and all descendants) & yes \\
+\texttt{l} & print the node's label & no \\
+\texttt{o} & splice out the node & yes \\
+\texttt{s} & print the subtree rooted at the node & no \\
+\end{tabular}
+\end{center}
+
+\ed{} is somewhat experimental; it is also the only program that is not
+deliberately "orthogonal" to the rest, that is, it can emulate some of the
+functionality of other utilities.
+
+\subsection{Opening Poorly-supported Nodes}
+
+When a node has low support, it may be better to splice it out from the tree,
+reflecting uncertainty about the true topology. Consider the following tree, 
+\texttt{HRV\_cg.nw}:
+
+\begin{center}
+\includegraphics{ed_3_svg.pdf}
+\end{center}
+
+\noindent{}The inner node labels represent bootstrap support, as a percentage
+of replicates. As we can see, some nodes are much better supported than others.
+For example, the \texttt{(COXB2,ECHO6)} node (top of the figure) has a support
+of only 35\%, and in the lower right of the graph there are many nodes with
+even poorer support. Let's "open" the nodes with less than 50\% support. This means that those nodes will be spliced out, and their children attached to their "grandparent":
+
+\verbatiminput{ed_4_svg.cmd}
+\begin{center}
+\includegraphics{ed_4_svg.pdf}
+\end{center}
+
+\noindent{}Now \texttt{COXB2} and \texttt{ECHO6} are siblings of
+\texttt{ECHO1}, forming a node with 90\% support. What this means is that the
+original tree strongly supports that these three species form a clade, but is
+much less clear about the relationships \emph{within} the clade. Opening the
+nodes makes this fact clear by creating multifurcations. Likewise, the lower
+right of the figure is now occupied by a highly multifurcating (8 children) but
+perfectly supported (100\%) node, none of whose descendants has less than 80\%
+support.
+
+\subsection{\sched}
+
+\sched{} works in much the same way as \ed{} does, but its address (also called
+{\it selector} and action are passed together as a Scheme expression.
+
+\noindent{}As a first example, let's again extract all well-supported clades from the tree of vertebrate genera, as we did with \ed.
+
+\verbatiminput{ed_5_txt.cmd}
+\begin{samepage}
+\verbatiminput{ed_5_txt.out}
 \end{samepage}
 
 \noindent{}This instructs \ed{} to iterate over the nodes, in \no{}, and to

@@ -11,3 +11,5 @@ c_s:-n falc_families.nw '((> c 2) (s))'
 const_1: -n catarrhini.nw '(#t (s))'
 const_0: -n catarrhini.nw '(#f (s))'
 set_len: catarrhini.nw "((def? 'L) (L! (* 2 L)))"
+to_cg: catarrhini.nw '(#t (L! ""))'
+fmt: HRV.nw "((def? 'L) (L! (format #f \\"~,2f\\" L)))"
