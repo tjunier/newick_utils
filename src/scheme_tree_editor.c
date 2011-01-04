@@ -384,12 +384,16 @@ void set_predefined_variables(struct rnode *node)
 			node->edge_length_as_string);
 	scm_c_define("lbl", label);
 
-	/* b: returns node label, as a bootstrap support value */
+	/* b: returns node label, as a bootstrap support value (or undefined if
+	this can't be done) */
 	if (is_leaf(node))
-		scm_c_define("b", SCM_BOOL_F);
+		scm_c_define("b", SCM_UNDEFINED);
 	else {
 		SCM support_value = scm_string_to_number(label, SCM_UNDEFINED);
-		scm_c_define("b", support_value);
+		if (SCM_BOOL_F == support_value)
+			scm_c_define("b", SCM_UNDEFINED);
+		else
+			scm_c_define("b", support_value);
 	}
 
 	/* i: true IFF node is inner (not leaf, not root) */
