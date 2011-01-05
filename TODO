@@ -497,3 +497,6 @@ will shift some rootward and the others leafward. One needs, I'm afraid, to
 tweak the <text> elements themselves and change the sign of x='...' attributes
 for one side of the tree.
 
+tests for nw_sched: test undefinedness of b, d, etc. -- all variables that may
+be undefined.
+

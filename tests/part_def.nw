@@ -1,0 +1,23 @@
+[a tree with some lengths defined, and others not]
+(
+	(
+		(
+			A:2,
+			B
+		)i:2,
+		(
+			C:2,
+			D
+		)j
+	)m:2,
+	(
+		(
+			E:2,
+			F
+		)k:2,
+		(
+			G:2,
+			H
+		)l
+	)n
+)o;

@@ -331,6 +331,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 	rndata = malloc(sizeof(struct rnode_data));
 	if (NULL == rndata) { perror(NULL); exit (EXIT_FAILURE); }
 	rndata->nb_ancestors = 0;
+	rndata->is_depth_defined = true;
 	rndata->depth = 0;
 	rndata->stop_mark = false;
 	node->data = rndata;
@@ -344,8 +345,24 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 		rndata = malloc(sizeof(struct rnode_data));
 		if (NULL == rndata) { perror(NULL); exit (EXIT_FAILURE); }
 		rndata->nb_ancestors = parent_data->nb_ancestors + 1;
-		rndata->depth = parent_data->depth +
-			atof(node->edge_length_as_string);
+
+		if (parent_data->is_depth_defined) {
+			double edge_length;
+			char *endptr;
+			edge_length = strtod(node->edge_length_as_string,
+					&endptr);
+			if (endptr == node->edge_length_as_string) {
+				/* no conversion: depth is undefined */
+				rndata->is_depth_defined = false;
+			} else {
+				rndata->is_depth_defined = true; 
+				rndata->depth = parent_data->depth
+					+ edge_length;
+			}
+		} else {
+			/* We don't even set the value: it must not be used. */
+			rndata->is_depth_defined = false;
+		}
 
 		rndata->stop_mark = false;
 		node->data = rndata;
@@ -416,16 +433,20 @@ void set_predefined_variables(struct rnode *node)
 	else	
 		scm_c_define("L", scm_string_to_number(
 				edge_length_as_scm_string, SCM_UNDEFINED));
-	
-	/* d: depth */
-	struct rnode_data *data = current_node->data;
-	scm_c_define("d", scm_from_int(data->depth));
-
-	/* a: number of ancestors */
-	scm_c_define("a", scm_from_int(data->nb_ancestors));
 
 	/* c: number of children */
 	scm_c_define("c", scm_from_int(current_node->children->count));
+	
+	struct rnode_data *data = current_node->data;
+
+	/* d: depth */
+	if (data->is_depth_defined)
+		scm_c_define("d", scm_from_double(data->depth));
+	else
+		scm_c_define("d", SCM_UNDEFINED);
+
+	/* a: number of ancestors */
+	scm_c_define("a", scm_from_int(data->nb_ancestors));
 
 	/* D: number of descendants */
 	scm_c_define("D", scm_from_int(data->nb_descendants));
@@ -603,8 +624,11 @@ static void inner_main(void *closure, int argc, char* argv[])
 	struct rooted_tree *tree;
 
 	/* Aliases and simple functions */
+	// TODO: put in a separate f(); and call scm_c_eval_string() once on all
+	// the Scheme functions.
 	scm_c_eval_string("(define & and)");	
 	scm_c_eval_string("(define | or)");	
+	scm_c_eval_string("(define ! not)");	
 	scm_c_eval_string("(define def? defined?)");	
 	scm_c_eval_string("(define (p obj) (display obj) (newline))");
 	scm_c_eval_string("(use-modules (ice-9 format))");
