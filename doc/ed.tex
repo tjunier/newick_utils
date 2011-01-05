@@ -146,6 +146,7 @@ deliberately "orthogonal" to the rest, that is, it can emulate some of the
 functionality of other utilities.
 
 \subsection{Opening Poorly-supported Nodes}
+\label{sct:ed_ed}
 
 When a node has low support, it may be better to splice it out from the tree,
 reflecting uncertainty about the true topology. Consider the following tree, 
@@ -155,11 +156,13 @@ reflecting uncertainty about the true topology. Consider the following tree,
 \includegraphics{ed_3_svg.pdf}
 \end{center}
 
-\noindent{}The inner node labels represent bootstrap support, as a percentage
-of replicates. As we can see, some nodes are much better supported than others.
+\noindent{}The inner node labels represent bootstrap support, as a percentage of
+replicates. As we can see, some nodes are much better supported than others.
 For example, the \texttt{(COXB2,ECHO6)} node (top of the figure) has a support
-of only 35\%, and in the lower right of the graph there are many nodes with
-even poorer support. Let's "open" the nodes with less than 50\% support. This means that those nodes will be spliced out, and their children attached to their "grandparent":
+of only 35\%, and in the lower right of the graph there are many nodes with even
+poorer support. Let's "open" the nodes with less than 50\% support. This means
+that those nodes will be spliced out, and their children attached to their
+"grandparent":
 
 \verbatiminput{ed_4_svg.cmd}
 \begin{center}
@@ -234,7 +237,7 @@ conversion to a number fails, or if the node is a leaf. Edge length and depth
 Newick tree, as in cladograms.
 
 Whereas \ed{} defines logical and relational opertaors, \sched{} just uses those
-of the Scheme language. It just defines a few shorter names so help keep command
+of the Scheme language. It just defines a few shorter names to help keep command
 lines compact:
 
 \begin{center}
@@ -268,50 +271,54 @@ value, one can leave out the \texttt{(def? 'b)} clause.
 
 \subsubsection{Actions}
 
-The actions are also coded by a single letter, for the same reason. For now,
-the following are implemented:
+Actions are arbitrary Scheme expressions, so they are much more flexible than
+the fixed actions defined by \ed. \sched{} defines most of them, as well as a
+few new ones, as Scheme functions\footnote{Note that you must use Scheme's function call syntax to call the function, \ie, \texttt{(function [args...])}.}:
 
 \begin{center}
 \begin{tabular}{clc}
 code & effect & modifies tree?\\
 \hline
-\texttt{d} & delete the node (and all descendants) & yes \\
-\texttt{l} & print the node's label & no \\
-\texttt{o} & splice out the node & yes \\
-\texttt{s} & print the subtree rooted at the node & no \\
+\texttt{L! <len>}	& sets the node's parent-edge length to \texttt{len}	& yes \\
+\texttt{lbl! <lbl>}	& sets the node's label to \texttt{lbl}	& yes \\
+\texttt{o} 				& splice out the node 									& yes \\
+\texttt{p <arg>} 	& print \texttt{arg}, then a newline 		& no \\
+\texttt{s} 				& print the subtree rooted at the node 	& no \\
+\texttt{u} 				& delete ("unlink") the node (and all descendants) & yes \\
 \end{tabular}
 \end{center}
 
-\ed{} is somewhat experimental; it is also the only program that is not
-deliberately "orthogonal" to the rest, that is, it can emulate some of the
-functionality of other utilities.
+\noindent{}The \texttt{l} action of \ed{}, which prints the current node's
+label, can be achieved in \sched{} with the more general \texttt{p} function:
+\texttt{(p lbl)}.
 
-\subsection{Opening Poorly-supported Nodes}
+The \texttt{L!} function sets the current node's parent-edge length. It accepts
+a string or a number. If the argument is a string, it attempts to convert it to
+a number. If this fails, the edge length is undefined. The \texttt{lbl!}
+function sets the current node's label. Its argument is a string.
 
-When a node has low support, it may be better to splice it out from the tree,
-reflecting uncertainty about the true topology. Consider the following tree, 
-\texttt{HRV\_cg.nw}:
+The delete action was renamed to \texttt{u} because the \texttt{d} symbol stands
+for the node's depth.
 
-\begin{center}
-\includegraphics{ed_3_svg.pdf}
-\end{center}
+\subsubsection{Examples}
 
-\noindent{}The inner node labels represent bootstrap support, as a percentage
-of replicates. As we can see, some nodes are much better supported than others.
-For example, the \texttt{(COXB2,ECHO6)} node (top of the figure) has a support
-of only 35\%, and in the lower right of the graph there are many nodes with
-even poorer support. Let's "open" the nodes with less than 50\% support. This means that those nodes will be spliced out, and their children attached to their "grandparent":
+{\it Formatting Lengths} 
 
-\verbatiminput{ed_4_svg.cmd}
-\begin{center}
-\includegraphics{ed_4_svg.pdf}
-\end{center}
+\noindent{}Some phylogeny programs return \nw{} trees with an unrealistic number
+of decimal places. For example, the \texttt{HRV.nw} tree has six:
 
-\noindent{}Now \texttt{COXB2} and \texttt{ECHO6} are siblings of
-\texttt{ECHO1}, forming a node with 90\% support. What this means is that the
-original tree strongly supports that these three species form a clade, but is
-much less clear about the relationships \emph{within} the clade. Opening the
-nodes makes this fact clear by creating multifurcations. Likewise, the lower
-right of the figure is now occupied by a highly multifurcating (8 children) but
-perfectly supported (100\%) node, none of whose descendants has less than 80\%
-support.
+\verbatiminput{ed_6_txt.cmd}
+\begin{samepage}
+\verbatiminput{ed_6_txt.out}
+\end{samepage}
+
+\noindent{}I use \nwindent{} to show each node on a line for clarity, and show
+only the last ten.\footnote{the \emph{first} ten lines contain only opening
+parentheses} To format the lengths to two decimal places, do the following:
+
+\verbatiminput{ed_7_txt.cmd}
+\begin{samepage}
+\verbatiminput{ed_7_txt.out}
+\end{samepage}
+
+
