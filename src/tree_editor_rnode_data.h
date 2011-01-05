@@ -31,11 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * the tree editor, when the properties that will actually be used are not
  * known in advance: the nodes are first traversed to fill this structure.
  * Contrast this with e.g. displaying: the node properties that we need are
- * their horizontal and vertical positions, and only those */
+ * their horizontal and vertical positions, and only those. The 'is_depth_valid'
+ * field can be used to mark invalid depths. This is because the depth is a
+ * double and is computed from edge lengths (length_as_string member of struct
+ * rnode) with atof(3), which returns zero when conversion fails (i.e. "0" and
+ * "" are not distinguished), and using only 'depth' we could not know if a
+ * depth is zero or undefined. */
 
 struct rnode_data {
 	float support;	/* normally derived from label */
 	float depth;	/* from root; normally root's depth == 0 */
+	bool  is_depth_valid;	/* false if depth is undefined */
 	int nb_ancestors;	/* root has 0 */
 	int nb_descendants;	/* direct (children) and indirect */
 	int stop_mark;	/* to stop processing of a clade, see option -o */
