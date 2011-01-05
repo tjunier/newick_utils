@@ -500,3 +500,6 @@ for one side of the tree.
 tests for nw_sched: test undefinedness of b, d, etc. -- all variables that may
 be undefined.
 
+nw_sched: implement lbl!
+
+nw_shed: check help page, and sync w/ tutorial; add examples incl. implementation of other nutils (nw_topology, nw_label, nw_trim?)
