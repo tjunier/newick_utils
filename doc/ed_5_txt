@@ -1,1 +1,2 @@
-nw_sched -n vrt2cg.nw '((& i (>= b 95)) (s))' | nw_display -w 65 -
+nw_sched -n vrt2cg.nw "((& (def? 'b) (>= b 95)) (s))" \
+	| nw_display -w 65 -

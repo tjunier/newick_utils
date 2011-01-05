@@ -22,11 +22,12 @@ experimental in the \nutils{} package. This is why there are two or more
 programs that do basically the same thing, although differently and with
 different capabilities: \ed{} is the simplest (and first), it is written
 entirely in C and it is fairly limited. \sched{} was developed to address
-\ed{}'s limitations: by embedding a Scheme interpreter (\gnu{} Guile), its
-flexibility is, for practical purposes, limitless. Of course, this comes at the
-price of linking to an external library, which may not be available. Therefore
-\ed{}, for all its limitations, will stay in the package as it does not depend
-on Guile. Finally, I understand that Scheme is not the only solution as an
+\ed{}'s limitations: by embedding a Scheme (see \eg{}
+\url{http://www.schemers.org}) interpreter (\gnu{} Guile), its flexibility is,
+for practical purposes, limitless. Of course, this comes at the price of
+linking to an external library, which may not be available. Therefore \ed{},
+for all its limitations, will stay in the package as it does not depend on
+Guile. Finally, I understand that Scheme is not the only solution as an
 embedded language, and my intention is to try the same approach with Lua.
 
 \subsection{\ed}
@@ -176,9 +177,6 @@ support.
 
 \subsection{\sched}
 
-\sched{} works in much the same way as \ed{} does, but its address (also called
-{\it selector} and action are passed together as a Scheme expression.
-
 \noindent{}As a first example, let's again extract all well-supported clades from the tree of vertebrate genera, as we did with \ed.
 
 \verbatiminput{ed_5_txt.cmd}
@@ -186,41 +184,53 @@ support.
 \verbatiminput{ed_5_txt.out}
 \end{samepage}
 
-\noindent{}This instructs \ed{} to iterate over the nodes, in \no{}, and to
-print the subtree (action \texttt{s}) for all nodes that match the expression
-\texttt{b >= 95}, which means "intepret the node label as a (bootstrap) support
-value, and evaluate to true if that value is greater than 95". As we can see,
-\ed{} reports the three well-supported clades (primates, tetrapods, and
-ray-finned fishes), in \no. We also remark that one of the clades (primates) is
-contained in another (tetrapods). Finally, option \texttt{-n} suppresses
-the printing of the whole tree at the end of the run, which isn't useful here.
+\sched{} works in much the same way as \ed{} does, but its address (also called
+{\it selector}) and action are passed together as a Scheme expression. The
+expression \texttt{((\& (def? 'b) (>= 95 b)) (s))} parses as follows:
+\begin{itemize}
+	\item the first element, \texttt{(\& (def? 'b) (>= 95 b))}, is the selector.
+	It is a boolean expression, namely a conjunction
+	(\texttt{\&})\footnote{\texttt{\&} is a short name for the Scheme form
+	\texttt{and}.} of the expressions \texttt{(def? 'b)} and \texttt{(>= 95 b)}.
+	The former verifies that variable \texttt{b} is defined\footnote{In \ed,
+	\texttt{b} was zero if the support was not defined. \sched{} distinguishes
+	between undefined and zero, which is why one has to check that \texttt{b} is
+	defined before using it. \texttt{def?} is just a shorter name for
+	\texttt{defined?}.}, and the latter is true iff \texttt{b} is not smaller than
+	95.
+	\item the second element, \texttt{(s)}, is the action -- in this case, a call
+	to function \texttt{s}, which has the same meaning as action \texttt{s} in
+	\ed, namely to print out the subclade rooted at the current node.
+\end{itemize}
 
-The two parameters of \ed{} (besides the input file) are an \emph{address} and
-an \emph{action}. Addresses specify sets of nodes, and actions are performed on
-them. 
+\subsubsection{Selectors}
 
-\subsubsection{Addresses}
-
-Currently, addresses are logical expressions involving node properties, and the
-action is performed on the nodes for which the expression is true. They are
-composed of numbers, logical operators, and node functions.
-
-The functions have one-letter names, to keep expressions short (after all, they are passed on the command line). There are two types, numeric and boolean.
+Like \ed{} addresses, \sched{} selectors are boolean Scheme expressions normally
+involving node properties which are available as predefined variables.  As in
+\ed{}, the variables have short names, to keep expressions short.
 
 \begin{center}
 \begin{tabular}{cll}
 name & type & meaning \\
 \hline
-\texttt{a} & numeric & number of ancestors of node	 \\
-\texttt{b} & numeric & node's support value (or zero) \\
-\texttt{c} & numeric & node's number of children (direct) \\
-\texttt{D} & numeric & node's number of descendants (includes children) \\
+\texttt{a} & integer & number of ancestors of node	 \\
+\texttt{b} & rational & node's support value \\
+\texttt{c} & integer & node's number of children (direct descendants) \\
+\texttt{D} & integer & node's total number of descendants (includes children) \\
 \texttt{d} & numeric & node's depth (distance to root) \\
 \texttt{i} & boolean & true iff node is strictly internal (i.e., not root!) \\
+\texttt{lbl} & string & node's label \\
 \texttt{l} (ell) & boolean & true iff node is a leaf \\
+\texttt{L} & rational & node's parent edge length \\
 \texttt{r} & boolean & true iff node is the root
 \end{tabular}
 \end{center}
+
+Variables \texttt{b} and \texttt{lbl} are both derived from the label, but
+\texttt{b} is interpreted as a number, and is undefined if the conversion to a
+number fails, or if the node is a leaf. Edge length and depth (\texttt{L} and
+\texttt{d}) are undefined (not zero!) if not specified in the Newick tree, as in
+cladograms.
 
 The logical and relational operators work as expected, here is the list, in
 order of precedence, from tightest to loosest-binding.  Anyway, you can use
