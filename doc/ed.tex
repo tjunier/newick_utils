@@ -227,49 +227,44 @@ name & type & meaning \\
 \end{tabular}
 \end{center}
 
-Variables \texttt{b} and \texttt{lbl} are both derived from the label, but
-\texttt{b} is interpreted as a number, and is undefined if the conversion to a
-number fails, or if the node is a leaf. Edge length and depth (\texttt{L} and
-\texttt{d}) are undefined (not zero!) if not specified in the Newick tree, as in
-cladograms.
+\noindent{}Variables \texttt{b} and \texttt{lbl} are both derived from the
+label, but \texttt{b} is interpreted as a number, and is undefined if the
+conversion to a number fails, or if the node is a leaf. Edge length and depth
+(\texttt{L} and \texttt{d}) are undefined (not zero!) if not specified in the
+Newick tree, as in cladograms.
 
-The logical and relational operators work as expected, here is the list, in
-order of precedence, from tightest to loosest-binding.  Anyway, you can use
-parentheses to override precedence, so don't worry.
+Whereas \ed{} defines logical and relational opertaors, \sched{} just uses those
+of the Scheme language. It just defines a few shorter names so help keep command
+lines compact:
 
 \begin{center}
-\begin{tabular}{cl}
-symbol & operator \\
+\begin{tabular}{lcl}
+Scheme & \sched{} short form & meaning \\
 \hline
-\texttt{!} & logical negation \\
-\hline
-\texttt{==} & equality \\
-\texttt{!=} & inequality \\
-\texttt{<} & greater than \\
-\texttt{>} & lesser than \\
-\texttt{>=} & greater than or equal to \\
-\texttt{<=} & lesser than or equal to \\
-\hline
-\texttt{\&} & logical and \\
-\hline
-\texttt{|} & logical or
+\texttt{not} 	& \texttt{!} 				& logical negation \\
+\texttt{and} 	& \texttt{\&} 			& logical and \\
+\texttt{or}  	& \texttt{|} 				& logical or \\
+\texttt{defined?}	& \texttt{def?}	& checks if arg is defined
 \end{tabular}
 \end{center}
 
-\noindent{}Here are a few examples:
+\noindent{}Here are a the same examples as above, but for \sched:
 
 \begin{center}
 \begin{tabular}{cl}
 expression & selects: \\
 \hline
 \texttt{l} & all leaves \\
-\texttt{l \& a <= 3} & leaves with 3 ancestors or less \\
-\texttt{i \& (b >= 95)} & internal nodes with support greater than 95\% \\ 
-\texttt{i \& (b < 50)} & unsupported nodes (less than 50\%) \\
-\texttt{!r} & all nodes except the root \\
-\texttt{c > 2} & multifurcating nodes
+\texttt{(\& l (<= a 3))} & leaves with 3 ancestors or less \\
+\texttt{(\& i (def? 'b) (>= b 95))} & internal nodes with support greater than 95\% \\ 
+\texttt{(\& i (def? 'b) (b < 50)} & unsupported nodes (less than 50\%) \\
+\texttt{(! r)} & all nodes except the root \\
+\texttt{(> c 2)} & multifurcating nodes
 \end{tabular}
 \end{center}
+
+\noindent{}When it is clear that all inner nodes will have a defined support
+value, one can leave out the \texttt{(def? 'b)} clause.
 
 \subsubsection{Actions}
 
