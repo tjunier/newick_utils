@@ -11,7 +11,7 @@ offer a solution.
 
 The programs described in this section fall into that category: they are less
 specialized, usually less efficient, but more flexible than the ones shown up
-to now. They were inpired by \unix{} utilities like \texttt{sed} and
+to now. They were inspired by \unix{} utilities like \texttt{sed} and
 \texttt{awk}, which perform an action on the parts of input (usually lines)
 that meet some condition. Rather than lines in a file, they work with nodes in
 a tree: each node is visited in turn, and if it meets a user-specified
@@ -53,7 +53,7 @@ Let's look at an example before we jump into the details. Here is a tree of vert
 
 \noindent{}This instructs \ed{} to iterate over the nodes, in \no{}, and to
 print the subtree (action \texttt{s}) for all nodes that match the expression
-\texttt{b >= 95}, which means "intepret the node label as a (bootstrap) support
+\texttt{b >= 95}, which means "interpret the node label as a (bootstrap) support
 value, and evaluate to true if that value is greater than 95". As we can see,
 \ed{} reports the three well-supported clades (primates, tetrapods, and
 ray-finned fishes), in \no. We also remark that one of the clades (primates) is
@@ -70,7 +70,7 @@ Currently, addresses are logical expressions involving node properties, and the
 action is performed on the nodes for which the expression is true. They are
 composed of numbers, logical operators, and node functions.
 
-The functions have one-letter names, to keep expressions short (after all, they are passed on the command line). There are two types, numeric and boolean.
+The functions have one-letter names, to keep expressions short (after all, they are passed on the command line). There are two types, numeric and Boolean.
 
 \begin{center}
 \begin{tabular}{cll}
@@ -81,9 +81,9 @@ name & type & meaning \\
 \texttt{c} & numeric & node's number of children (direct) \\
 \texttt{D} & numeric & node's number of descendants (includes children) \\
 \texttt{d} & numeric & node's depth (distance to root) \\
-\texttt{i} & boolean & true iff node is strictly internal (i.e., not root!) \\
-\texttt{l} (ell) & boolean & true iff node is a leaf \\
-\texttt{r} & boolean & true iff node is the root
+\texttt{i} & Boolean & true iff node is strictly internal (i.e., not root!) \\
+\texttt{l} (ell) & Boolean & true iff node is a leaf \\
+\texttt{r} & Boolean & true iff node is the root
 \end{tabular}
 \end{center}
 
@@ -180,6 +180,9 @@ support.
 
 \subsection{\sched}
 
+As mentioned above, \sched{} works like \ed{}, but embeds a Scheme interpreter
+so that the address (also called the {\tt selector}) and action are passed as a
+Scheme expression.
 \noindent{}As a first example, let's again extract all well-supported clades from the tree of vertebrate genera, as we did with \ed.
 
 \verbatiminput{ed_5_txt.cmd}
@@ -187,12 +190,10 @@ support.
 \verbatiminput{ed_5_txt.out}
 \end{samepage}
 
-\sched{} works in much the same way as \ed{} does, but its address (also called
-{\it selector}) and action are passed together as a Scheme expression. The
-expression \texttt{((\& (def? 'b) (>= 95 b)) (s))} parses as follows:
+The expression \texttt{((\& (def? 'b) (>= 95 b)) (s))} parses as follows:
 \begin{itemize}
 	\item the first element, \texttt{(\& (def? 'b) (>= 95 b))}, is the selector.
-	It is a boolean expression, namely a conjunction
+	It is a Boolean expression, namely a conjunction
 	(\texttt{\&})\footnote{\texttt{\&} is a short name for the Scheme form
 	\texttt{and}.} of the expressions \texttt{(def? 'b)} and \texttt{(>= 95 b)}.
 	The former verifies that variable \texttt{b} is defined\footnote{In \ed,
@@ -208,25 +209,26 @@ expression \texttt{((\& (def? 'b) (>= 95 b)) (s))} parses as follows:
 
 \subsubsection{Selectors}
 
-Like \ed{} addresses, \sched{} selectors are boolean expressions normally
-involving node properties which are available as predefined variables.  As in
-\ed{}, the variables have short names, to keep expressions short. The predefined
-variables are shown in the table below.
+Like \ed{} addresses, \sched{} selectors are Boolean expressions normally
+involving node properties which are available as predefined variables. As the
+program "visits" each node in turn, the variables are set to reflect the current
+node's properties. As in \ed{}, the variables have short names, to keep
+expressions concise. The predefined variables are shown in the table below.
 
 \begin{center}
 \begin{tabular}{cll}
 name & type & meaning \\
 \hline
-\texttt{a} & integer & number of ancestors of node	 \\
-\texttt{b} & rational & node's support value \\
-\texttt{c} & integer & node's number of children (direct descendants) \\
-\texttt{D} & integer & node's total number of descendants (includes children) \\
-\texttt{d} & numeric & node's depth (distance to root) \\
-\texttt{i} & boolean & true iff node is strictly internal (i.e., not root!) \\
-\texttt{lbl} & string & node's label \\
-\texttt{l} (ell) & boolean & true iff node is a leaf \\
-\texttt{L} & rational & node's parent edge length \\
-\texttt{r} & boolean & true iff node is the root
+\texttt{a} & integer & number of ancestors  \\
+\texttt{b} & rational & support value \\
+\texttt{c} & integer & number of children (direct descendants) \\
+\texttt{D} & integer & total number of descendants (includes children) \\
+\texttt{d} & numeric & depth (distance to root) \\
+\texttt{i} & Boolean & true iff node is strictly internal (i.e., not root!) \\
+\texttt{lbl} & string & label \\
+\texttt{l} (ell) & Boolean & true iff node is a leaf \\
+\texttt{L} & rational & parent edge length \\
+\texttt{r} & Boolean & true iff node is the root
 \end{tabular}
 \end{center}
 
@@ -236,7 +238,7 @@ conversion to a number fails, or if the node is a leaf. Edge length and depth
 (\texttt{L} and \texttt{d}) are undefined (not zero!) if not specified in the
 Newick tree, as in cladograms.
 
-Whereas \ed{} defines logical and relational opertaors, \sched{} just uses those
+Whereas \ed{} defines logical and relational operators, \sched{} just uses those
 of the Scheme language. It just defines a few shorter names to help keep command
 lines compact:
 
@@ -314,11 +316,43 @@ of decimal places. For example, the \texttt{HRV.nw} tree has six:
 
 \noindent{}I use \nwindent{} to show each node on a line for clarity, and show
 only the last ten.\footnote{the \emph{first} ten lines contain only opening
-parentheses} To format the lengths to two decimal places, do the following:
+parentheses.} To format\footnote{\sched{} automatically loads the {\tt format}
+module so that the full-fledged {\tt format} function is available.} the lengths
+to two decimal places, do the following:
 
 \verbatiminput{ed_7_txt.cmd}
 \begin{samepage}
 \verbatiminput{ed_7_txt.out}
 \end{samepage}
 
+\begin{samepage}
+\noindent{}{\it Implementing other \nutils}
 
+\noindent{}\sched{} can emulate other programs in the package, when these
+iterate on every node and perform some action. There is no real reason to use
+\sched{} rather than the original, since \sched{} will be slower (after all, it
+has to start the Scheme interpreter, parse the Scheme expressions, etc.). But it
+can serve as illustration.
+\end{samepage}
+
+\begin{center}
+\begin{tabular}{ll}
+program & \sched{} equivalent \\
+\hline
+\labels{} 						& {\tt '((! (string-null? lbl)) (p lbl))'}  \\
+\labels{} {\tt -I} 		& {\tt '((! (| i (string-null? lbl))) (p lbl))'} \\
+\topology{}						& {\tt '(\#t (L! ""))'} \\
+\topology{} {\tt -I} 	& {\tt '(\#t (if l (L! "") (begin (L! "") (lbl!  ""))))'}
+\end{tabular}
+\end{center}
+
+The {\tt string-null?} predicate in the \labels{} replacements is checked
+because the original \labels{} does not print empty labels. The {\tt begin} form
+in the \topology{} replacement is used to perform two actions: setting the
+length and setting the label. Note also that the check for node type is done in
+the action rather than the selector. The {\tt if} on the selector is implicit.
+Future versions will allow more than one (selector, action) pair (just as Awk
+does) and allow the {\tt nw\_topology -I} equivalent to be written {\tt '((\#t
+(L! "")) ((! l) (lbl! "")))} -- set length to undefined for every node, and set
+label to empty for all non-leaf nodes. I also intend to put an implicit {\tt
+begin} around the action.
