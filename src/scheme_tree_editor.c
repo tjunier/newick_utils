@@ -577,7 +577,8 @@ static SCM scm_get_current_node()
 
 static SCM scm_get_node_label(SCM node)
 {
-	/* WTF? no idea how to to this... */
+	// TODO: probably need to define a SMOB for this (and if so,
+	// scm_get_current_node() will need to be modified, too.
 }
 
 /* Sets the current node's parent edge length. Argument must be a number or a
