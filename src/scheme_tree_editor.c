@@ -606,6 +606,29 @@ SCM scm_set_length(SCM edge_length)
 	return SCM_UNSPECIFIED;
 }
 
+/* Sets the current node's label. Argument must be a string or a number (to be
+ * able to set support values), if numeric it will be converted to a string
+ * using format. */
+
+SCM scm_set_label(SCM label)
+{
+	size_t buffer_length;	/* storage for label */
+
+	if (scm_is_number (label))
+		label = scm_number_to_string(label, SCM_UNDEFINED);	
+
+	buffer_length = scm_c_string_length(label);
+	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
+	size_t copied = scm_to_locale_stringbuf(label, buffer, buffer_length);
+	buffer[buffer_length] = '\0';
+
+	/* Set the allocated buffer as the current node's length-as-string */
+	free(current_node->label);
+	current_node->label = buffer;
+
+	return SCM_UNSPECIFIED;
+}
+
 static void register_C_functions()
 {
 	scm_c_define_gsubr("s", 0, 0, 0, scm_dump_subclade);
@@ -616,6 +639,8 @@ static void register_C_functions()
 	scm_c_define_gsubr("splice-out-node", 0, 0, 0, scm_splice_out_node);
 	scm_c_define_gsubr("L!", 1, 0, 0, scm_set_length);
 	scm_c_define_gsubr("set-length!", 1, 0, 0, scm_set_length);
+	scm_c_define_gsubr("lbl!", 1, 0, 0, scm_set_label);
+	scm_c_define_gsubr("set-label!", 1, 0, 0, scm_set_label);
 }
 
 static void inner_main(void *closure, int argc, char* argv[])

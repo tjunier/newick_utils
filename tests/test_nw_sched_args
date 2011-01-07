@@ -15,3 +15,4 @@ to_cg: catarrhini.nw '(#t (L! ""))'
 fmt: HRV.nw "((def? 'L) (L! (format #f \\"~,2f\\" L)))"
 def_d: -n part_def.nw "((def? 'd) (p lbl))" 
 undef_d: -n part_def.nw "((! (def? 'd)) (p lbl))"
+set_lbl: catarrhini.nw '(#t (lbl! ""))'
