@@ -33,17 +33,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 
 #include "rnode.h"
-#include "list.h"
 #include "rnode_iterator.h"
 #include "hash.h"
 #include "common.h"
+#include "list.h"
 
 struct rnode *create_rnode(char *label, char *length_as_string)
 {
-	struct rnode *node_p;
+	struct rnode *node;
 
-	node_p = malloc(sizeof(struct rnode));
-	if (NULL == node_p) return NULL;
+	node = malloc(sizeof(struct rnode));
+	if (NULL == node) return NULL;
 
 	if (NULL == label) {
 		label = "";
@@ -51,26 +51,26 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	if (NULL == length_as_string) {
 		length_as_string = "";
 	}
-	node_p->label = strdup(label);
-	node_p->edge_length_as_string = strdup(length_as_string);
-	node_p->children = create_llist();	
-	if (NULL == node_p->children) return NULL;
-	node_p->parent = NULL;
-	node_p->data = NULL;
+	node->label = strdup(label);
+	node->edge_length_as_string = strdup(length_as_string);
+	node->parent = NULL;
+	node->next_sibling = NULL;
+	node->first_child = NULL;
+	node->data = NULL;
 	/* We must initialize to some numeric value, so we use -1 to mean
 	 * unknown/undetermined. Note that negative branch lengths can occur,
 	 * e.g. with neighbor-joining. The reference variable here is
 	 * length_as_string, which will be an empty string ("") if the length
 	 * is not defined (as in cladograms). */
-	node_p->edge_length = -1;
-	node_p->current_child_elem = NULL;
-	node_p->seen = 0;
+	node->edge_length = -1;	// TODO: check that this is used.
+	node->current_child = NULL;
+	node->seen = 0;
 
 #ifdef SHOW_RNODE_CREATE
-	fprintf(stderr, "creating rnode %p '%s'\n", node_p, node_p->label);
+	fprintf(stderr, "creating rnode %p '%s'\n", node, node->label);
 #endif
 
-	return node_p;
+	return node;
 }
 
 void destroy_rnode(struct rnode *node, void (*free_data)(void *))
@@ -78,7 +78,6 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void *))
 #ifdef SHOW_RNODE_DESTROY
 	fprintf (stderr, " freeing rnode %p '%s'\n", node, node->label);
 #endif
-	destroy_llist(node->children);
 	free(node->label);
 	free(node->edge_length_as_string);
 	/* if free_data is not NULL, we call it to free the node data (use this
@@ -91,14 +90,14 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void *))
 	free(node);
 }
 
-int children_count(struct rnode *node)
+inline int children_count(struct rnode *node)
 {
-	return node->children->count;
+	return node->child_count;
 }
 
 int is_leaf(struct rnode *node)
 {
-	return 0 == node->children->count;
+	return 0 == node->child_count;
 }
 
 int is_root(struct rnode *node)
@@ -119,7 +118,7 @@ void dump_rnode(void *arg)
 	printf ("  label at %p = '%s'\n", node->label, node->label);
 	printf ("  edge length = '%s'\n", node->edge_length_as_string);
 	printf ("              = %f\n", node->edge_length);
-	printf ("  children    = %p\n", node->children);
+	printf ("  1st child   = %p\n", node->first_child);
 	printf ("  data    = %p\n", node->data);
 }
 

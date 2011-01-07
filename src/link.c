@@ -45,16 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode *unlink_rnode_root_child;
 
-int add_child(struct rnode *parent, struct rnode *child)
+void add_child(struct rnode *parent, struct rnode *child)
 {
-	struct llist *children_list;
 	child->parent = parent;
 
-	children_list = parent->children;
-	if (! append_element(children_list, child))
-		return FAILURE;
-
-	return SUCCESS;
+	parent->last_child->next_sibling = child;
+	parent->last_child = child;
 }
 
 /* Returns half the length passed as a parameter (as char *), or "". */
@@ -92,7 +88,7 @@ int insert_node_above(struct rnode *this, char *label)
 	new = create_rnode(label, new_edge_length);
 	if (NULL == new) return FAILURE;
 	/* link new node to this node */
-	if (! add_child(new, this)) return FAILURE;
+	add_child(new, this);
 	free(this->edge_length_as_string);
 	this->edge_length_as_string = strdup(new_edge_length);
 	replace_child(parent, this, new);
@@ -104,10 +100,10 @@ int insert_node_above(struct rnode *this, char *label)
 	
 void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
 {
-	struct list_elem *el;
+	struct rnode *current = node->first_child;
 
-	for (el = node->children->head; NULL != el; el = el->next) { 
-		if (el->data == old) {
+	for (; current; current = current->next_sibling) { 
+		if (current == old) {
 			el->data = new;
 			new->parent = node; /* only if old was found... */
 			return;

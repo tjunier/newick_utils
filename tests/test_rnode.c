@@ -6,36 +6,44 @@
 int test_create_rnode()
 {
 	const char *test_name = "test_create_rnode";
-	struct rnode *nodep;
+	struct rnode *node;
 	char *label = "test";
 	char *length = "2.0456";
-	nodep = create_rnode(label,length);
-	if (0 != strcmp(nodep->label, label)) {
+	node = create_rnode(label,length);
+	if (0 != strcmp(node->label, label)) {
 		printf("%s: expected label '%s' (got '%s')\n",
-				test_name, label, nodep->label);
+				test_name, label, node->label);
 		return 1;
 	}
-	if (0 != strcmp(nodep->edge_length_as_string, length)) {
+	if (0 != strcmp(node->edge_length_as_string, length)) {
 		printf("%s: expected length '%s', got '%s'\n",
-			test_name, length, nodep->edge_length_as_string);
+			test_name, length, node->edge_length_as_string);
 		return 1;
 	}
-	if (NULL == nodep->children) {
-		printf("%s: children list should not be NULL.\n", test_name);
-		return 1;
-	}
-	if (NULL != nodep->parent) {
+	if (NULL != node->parent) {
 		printf ("%s: parent should be NULL.\n", test_name);
 		return 1;
 	}
-	if (0 != nodep->seen) {
-		printf("%s: 'seen' should be 0 (got %d)\n", test_name,
-				nodep->seen);
+	if (NULL != node->next_sibling) {
+		printf ("%s: next_sibling should be NULL.\n", test_name);
 		return 1;
 	}
-	if (NULL != nodep->current_child_elem) {
+	if (NULL != node->first_child) {
+		printf ("%s: first_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->last_child) {
+		printf ("%s: last_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (0 != node->seen) {
+		printf("%s: 'seen' should be 0 (got %d)\n", test_name,
+				node->seen);
+		return 1;
+	}
+	if (NULL != node->current_child_elem) {
 		printf("%s: 'current_child_elem' should be NULL (got %p)\n", test_name,
-				nodep->current_child_elem);
+				node->current_child_elem);
 		return 1;
 	}
 	printf("%s ok.\n", test_name);
@@ -45,23 +53,23 @@ int test_create_rnode()
 int test_create_rnode_nulllabel()
 {
 	const char *test_name = "test_create_rnode_nulllabel";
-	struct rnode *nodep;
-	nodep = create_rnode(NULL,"");
-	if (0 != strcmp(nodep->label, "")) {
+	struct rnode *node;
+	node = create_rnode(NULL,"");
+	if (0 != strcmp(node->label, "")) {
 		printf("%s: expected empty label (""), got '%s'\n",
-				test_name, nodep->label);
+				test_name, node->label);
 		return 1;
 	}
-	if (0 != strcmp(nodep->edge_length_as_string, "")) {
+	if (0 != strcmp(node->edge_length_as_string, "")) {
 		printf("%s: expected empty length, got '%s'\n",
-			test_name, nodep->edge_length_as_string);
+			test_name, node->edge_length_as_string);
 		return 1;
 	}
-	if (NULL == nodep->children) {
+	if (NULL == node->children) {
 		printf("%s: children list should not be NULL.\n", test_name);
 		return 1;
 	}
-	if (NULL != nodep->parent) {
+	if (NULL != node->parent) {
 		printf ("%s: parent node should be NULL.\n", test_name);
 		return 1;
 	}
@@ -72,23 +80,23 @@ int test_create_rnode_nulllabel()
 int test_create_rnode_emptylabel()
 {
 	const char *test_name = "test_create_rnode_emptylabel";
-	struct rnode *nodep;
-	nodep = create_rnode("","");
-	if (0 != strcmp(nodep->label, "")) {
+	struct rnode *node;
+	node = create_rnode("","");
+	if (0 != strcmp(node->label, "")) {
 		printf("%s: expected empty label (""), got '%s'\n",
-				test_name, nodep->label);
+				test_name, node->label);
 		return 1;
 	}
-	if (0 != strcmp(nodep->edge_length_as_string, "")) {
+	if (0 != strcmp(node->edge_length_as_string, "")) {
 		printf("%s: expected empty length, got '%s'\n",
-			test_name, nodep->edge_length_as_string);
+			test_name, node->edge_length_as_string);
 		return 1;
 	}
-	if (NULL == nodep->children) {
+	if (NULL == node->children) {
 		printf("%s: children list should not be NULL.\n", test_name);
 		return 1;
 	}
-	if (NULL != nodep->parent) {
+	if (NULL != node->parent) {
 		printf ("%s: parent node should be NULL.\n", test_name);
 		return 1;
 	}
@@ -99,24 +107,24 @@ int test_create_rnode_emptylabel()
 int test_create_rnode_nulllength()
 {
 	const char *test_name = "test_create_rnode_nulllength";
-	struct rnode *nodep;
+	struct rnode *node;
 	char *label = "test";
-	nodep = create_rnode(label,NULL);
-	if (0 != strcmp(nodep->label, label)) {
+	node = create_rnode(label,NULL);
+	if (0 != strcmp(node->label, label)) {
 		printf("%s: expected label '%s' (got '%s')\n",
-				test_name, label, nodep->label);
+				test_name, label, node->label);
 		return 1;
 	}
-	if (0 != strcmp(nodep->edge_length_as_string, "")) {
+	if (0 != strcmp(node->edge_length_as_string, "")) {
 		printf("%s: expected empty length, got '%s'\n",
-			test_name, nodep->edge_length_as_string);
+			test_name, node->edge_length_as_string);
 		return 1;
 	}
-	if (NULL == nodep->children) {
+	if (NULL == node->children) {
 		printf("%s: children list should not be NULL.\n", test_name);
 		return 1;
 	}
-	if (NULL != nodep->parent) {
+	if (NULL != node->parent) {
 		printf ("%s: parent should be NULL.\n", test_name);
 		return 1;
 	}
@@ -127,24 +135,24 @@ int test_create_rnode_nulllength()
 int test_create_rnode_emptylength()
 {
 	const char *test_name = "test_create_rnode_emptylength";
-	struct rnode *nodep;
+	struct rnode *node;
 	char *label = "test";
-	nodep = create_rnode(label,"");
-	if (0 != strcmp(nodep->label, label)) {
+	node = create_rnode(label,"");
+	if (0 != strcmp(node->label, label)) {
 		printf("%s: expected label '%s' (got '%s')\n",
-				test_name, label, nodep->label);
+				test_name, label, node->label);
 		return 1;
 	}
-	if (0 != strcmp(nodep->edge_length_as_string, "")) {
+	if (0 != strcmp(node->edge_length_as_string, "")) {
 		printf("%s: expected empty length, got '%s'\n",
-			test_name, nodep->edge_length_as_string);
+			test_name, node->edge_length_as_string);
 		return 1;
 	}
-	if (NULL == nodep->children) {
+	if (NULL == node->children) {
 		printf("%s: children list should not be NULL.\n", test_name);
 		return 1;
 	}
-	if (NULL != nodep->parent) {
+	if (NULL != node->parent) {
 		printf ("%s: parent should be NULL.\n", test_name);
 		return 1;
 	}
@@ -157,8 +165,8 @@ int test_create_many()
 	int i;
 	int num = 100000;
 	for (i = 0; i < num; i++) {
-		struct rnode *nodep;
-		nodep = create_rnode("test", "2.34");
+		struct rnode *node;
+		node = create_rnode("test", "2.34");
 	}
 	printf ("test_create_many Ok (created %d).\n", num);
 	return 0; 	/* crashes on failure */

@@ -45,7 +45,8 @@ struct rnode {
 	struct rnode *parent;		/* NULL iff root */
 	struct rnode *next_sibling;
 	int child_count;		/* 0 iff leaf */
-	struct rnode *first_chlid;	/* NULL iff leaf */
+	struct rnode *first_child;	/* NULL iff leaf */
+	struct rnode *last_child;	/* NULL iff leaf */
 
 	/* enables traversing by rnode_iterator_next() */
 	struct rnode *current_child;
