@@ -9,26 +9,48 @@ foresee every way in which one may need to process a tree, and with this we hit
 a limit to specialization. In some cases, a more general-purpose program may
 offer a solution.
 
-The programs described in this section fall into that category: they are less
-specialized, usually less efficient, but more flexible than the ones shown up
-to now. They were inspired by \unix{} utilities like \texttt{sed} and
-\texttt{awk}, which perform an action on the parts of input (usually lines)
-that meet some condition. Rather than lines in a file, they work with nodes in
-a tree: each node is visited in turn, and if it meets a user-specified
-condition, a user-specified action is performed.
+As an analogy, consider the task of finding lines in a text file that match a
+given pattern. This can be done, for example, in the following ways, from the
+general to the specific:
+\begin{itemize}
+	\item a Perl program
+	\item a {\tt sed} one-liner
+	\item a {\tt grep} command
+\end{itemize}
+Perl is a general-purpose language, it just happens to be rather good at
+processing text. Sed is specialized for editing text streams, and {\tt grep} is
+designed for precisely the line-finding task in question\footnote{The name
+"grep" comes from the {\tt sed} expression {\tt g/re/p}, where "re" stands for
+"regular expression"}. We should expect {\tt grep} to be the most efficient, but
+we should not expect it to be able to perform any significantly different task.
+By contrast, Perl may be (I haven't checked!) less efficient than {\tt grep},
+but it can handle pretty much any task. Sed will lie in between. The programs we
+have seen so far are {\tt grep}-like: they are specialized for one task (and
+hopefully, they are efficient).
+
+The programs described in this section are more {\tt sed}-like: they are less
+specialized, usually less efficient, but more flexible than the ones shown up to
+now. They were in fact inspired by \texttt{sed} and \texttt{awk}, which perform
+an action on the parts of input (usually lines) that meet some condition. Rather
+than lines in a file, the programs presented here work with nodes in a tree:
+each node is visited in turn, and if it meets a user-specified condition, a
+user-specified action is performed. In other word, they are node-oriented stream
+editors for trees.
 
 As a word of warning, I should say that these programs are among the more
-experimental in the \nutils{} package. This is why there are two or more
-programs that do basically the same thing, although differently and with
-different capabilities: \ed{} is the simplest (and first), it is written
-entirely in C and it is fairly limited. \sched{} was developed to address
-\ed{}'s limitations: by embedding a Scheme (see \eg{}
-\url{http://www.schemers.org}) interpreter (\gnu{} Guile), its flexibility is,
-for practical purposes, limitless. Of course, this comes at the price of
-linking to an external library, which may not be available. Therefore \ed{},
-for all its limitations, will stay in the package as it does not depend on
-Guile. Finally, I understand that Scheme is not the only solution as an
-embedded language, and my intention is to try the same approach with Lua.
+experimental in the \nutils{} package. This is why there are two (at least one
+more is on the way) programs that do basically the same thing, although
+differently and with different capabilities: \ed{} is the simplest (and first),
+it is written entirely in C and it is fairly limited. \sched{} was developed to
+address \ed{}'s limitations: by embedding a Scheme (\url{www.schemers.org})
+interpreter (\gnu{} Guile), its flexibility is, for practical purposes,
+limitless. Of course, this comes at the price of linking to an external library,
+which may not be available. Therefore \ed{}, for all its limitations, will stay
+in the package as it does not depend on Guile. Finally, I understand that Scheme
+is not the only solution as an embedded language, and that many people (myself
+included) find learning it a challenge. Therefore, my intention is to try the
+same approach with Lua (\url{www.lua.org}, which is designed as an embeddable
+language.
 
 \subsection{\ed}
 
