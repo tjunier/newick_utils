@@ -100,17 +100,28 @@ int insert_node_above(struct rnode *this, char *label)
 	
 void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
 {
-	struct rnode *current = node->first_child;
+	/* To replace the old node by the new one, we need a pointer to the
+	 * node _before_ the old node (so as to be able to change its
+	 * next_sibling member). We therefore start "ahead" of the list, using
+	 * a dummy first child. */
 
-	for (; current; current = current->next_sibling) { 
-		if (current == old) {
-			el->data = new;
-			new->parent = node; /* only if old was found... */
-			return;
+	struct rnode dummy_first;	/* NOT a pointer! */
+	struct rnode *current;
+
+	dummy_first.next_sibling = node->first_child;
+
+	for (current = &dummy_first; NULL != current->next_sibling;
+			current = current->next_sibling) {
+		if (current->next_sibling == old) {
+			current->next_sibling = new;
+			new->next_sibling = old->next_sibling; 
+			if (node->first_child == old) 
+				node->first_child = new;
+			if (node->last_child == old)
+				node->last_child = new;
 		}
 	}
 
-	/* not found - do nothing */
 }
 
 char *add_len_strings(char *ls1, char *ls2)
