@@ -149,36 +149,34 @@ char *add_len_strings(char *ls1, char *ls2)
 
 int splice_out_rnode(struct rnode *this)
 {
+	struct rnode dummy_head;	/* see [where?] */
 	struct rnode *parent = this->parent;
-	struct list_elem *elem;
+	struct rnode *current_child, *current_sibling;
 
 	/* change the children's parent edges: they must now point to their
 	 * 'grandparent', and the length from their parent to their grandparent
 	 * must be added. */
-	for (elem = this->children->head; NULL != elem; elem = elem->next) {
-		struct rnode *child = elem->data;
+	for (current_child = this->first_child; NULL != current_child;
+			current_child = current_child->next_sibling) {
 		char *new_edge_len_s = add_len_strings(
 			this->edge_length_as_string,
-			child->edge_length_as_string);
+			current_child->edge_length_as_string);
 		if (NULL == new_edge_len_s) return FAILURE;
-		free(child->edge_length_as_string);
-		child->edge_length_as_string = new_edge_len_s;
-		child->parent = parent;  /* instead of this node */
+		free(current_child->edge_length_as_string);
+		current_child->edge_length_as_string = new_edge_len_s;
+		current_child->parent = parent;  /* instead of this node */
 	}
-	struct llist *kids_copy = shallow_copy(this->children);
-	if (NULL == kids_copy) return FAILURE;
 
-	/* find where this node's parent edge is in parent */
-	int i = llist_index_of(parent->children, this);
+	/* Insert this node's children in place of itself among its parent's
+	 * children */
+	dummy_head.next_sibling = parent->first_child;
+	for (current_sibling = &dummy_head;
+			NULL != current_sibling->next_sibling;
+			current_sibling = current_sibling->next_sibling) {
 
-	/* delete old edge from parent's children list */
-	struct llist *del = delete_after(parent->children, i-1, 1);
-	if (NULL == del) return FAILURE;
-	destroy_llist(del);
-
-	/* insert list of modified edges in parent's children list */
-	insert_after(parent->children, i-1, kids_copy);
-	free(kids_copy);
+		if (current_sibling->next == this) {
+		}
+	}
 
 	return SUCCESS;
 }

@@ -41,9 +41,9 @@ int test_create_rnode()
 				node->seen);
 		return 1;
 	}
-	if (NULL != node->current_child_elem) {
+	if (NULL != node->current_child) {
 		printf("%s: 'current_child_elem' should be NULL (got %p)\n", test_name,
-				node->current_child_elem);
+				node->current_child);
 		return 1;
 	}
 	printf("%s ok.\n", test_name);
@@ -65,12 +65,29 @@ int test_create_rnode_nulllabel()
 			test_name, node->edge_length_as_string);
 		return 1;
 	}
-	if (NULL == node->children) {
-		printf("%s: children list should not be NULL.\n", test_name);
-		return 1;
-	}
 	if (NULL != node->parent) {
 		printf ("%s: parent node should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->next_sibling) {
+		printf ("%s: next_sibling should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->first_child) {
+		printf ("%s: first_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->last_child) {
+		printf ("%s: last_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (0 != node->seen) {
+		printf("%s: 'seen' should be 0 (got %d)\n", test_name,
+				node->seen);
+		return 1;
+	}
+	if (NULL != node->current_child) {
+		printf("%s: 'current_child_elem' should be NULL (got %p)\n", test_name, node->current_child);
 		return 1;
 	}
 	printf("%s ok.\n", test_name);
@@ -92,12 +109,30 @@ int test_create_rnode_emptylabel()
 			test_name, node->edge_length_as_string);
 		return 1;
 	}
-	if (NULL == node->children) {
-		printf("%s: children list should not be NULL.\n", test_name);
-		return 1;
-	}
 	if (NULL != node->parent) {
 		printf ("%s: parent node should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->next_sibling) {
+		printf ("%s: next_sibling should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->first_child) {
+		printf ("%s: first_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->last_child) {
+		printf ("%s: last_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (0 != node->seen) {
+		printf("%s: 'seen' should be 0 (got %d)\n", test_name,
+				node->seen);
+		return 1;
+	}
+	if (NULL != node->current_child) {
+		printf("%s: 'current_child_elem' should be NULL (got %p)\n", test_name,
+				node->current_child);
 		return 1;
 	}
 	printf("%s ok.\n", test_name);
@@ -120,12 +155,30 @@ int test_create_rnode_nulllength()
 			test_name, node->edge_length_as_string);
 		return 1;
 	}
-	if (NULL == node->children) {
-		printf("%s: children list should not be NULL.\n", test_name);
-		return 1;
-	}
 	if (NULL != node->parent) {
 		printf ("%s: parent should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->next_sibling) {
+		printf ("%s: next_sibling should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->first_child) {
+		printf ("%s: first_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->last_child) {
+		printf ("%s: last_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (0 != node->seen) {
+		printf("%s: 'seen' should be 0 (got %d)\n", test_name,
+				node->seen);
+		return 1;
+	}
+	if (NULL != node->current_child) {
+		printf("%s: 'current_child_elem' should be NULL (got %p)\n", test_name,
+				node->current_child);
 		return 1;
 	}
 	printf("%s ok.\n", test_name);
@@ -148,12 +201,30 @@ int test_create_rnode_emptylength()
 			test_name, node->edge_length_as_string);
 		return 1;
 	}
-	if (NULL == node->children) {
-		printf("%s: children list should not be NULL.\n", test_name);
-		return 1;
-	}
 	if (NULL != node->parent) {
 		printf ("%s: parent should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->next_sibling) {
+		printf ("%s: next_sibling should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->first_child) {
+		printf ("%s: first_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != node->last_child) {
+		printf ("%s: last_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (0 != node->seen) {
+		printf("%s: 'seen' should be 0 (got %d)\n", test_name,
+				node->seen);
+		return 1;
+	}
+	if (NULL != node->current_child) {
+		printf("%s: 'current_child_elem' should be NULL (got %p)\n", test_name,
+				node->current_child);
 		return 1;
 	}
 	printf("%s ok.\n", test_name);
