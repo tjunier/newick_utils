@@ -174,9 +174,20 @@ int splice_out_rnode(struct rnode *this)
 			NULL != current_sibling->next_sibling;
 			current_sibling = current_sibling->next_sibling) {
 
-		if (current_sibling->next == this) {
+		if (current_sibling->next_sibling == this) {
+			current_sibling->next_sibling = this->first_child;
+			this->last_child->next_sibling = this->next_sibling;
 		}
 	}
+
+	/* Update prent's first_child and last_child pointers, if needed */
+	if (parent->first_child == this)
+		parent->first_child = this->first_child;
+	if (parent->last_child == this)
+		parent->last_child = this->last_child;
+
+	/* Update parent's children count */
+	parent->child_count += this->child_count - 1;
 
 	return SUCCESS;
 }
@@ -186,29 +197,50 @@ int remove_child(struct rnode *child)
 	if (is_root(child)) return RM_CHILD_IS_ROOT;;
 
 	struct rnode *parent = child->parent;
-	struct llist *kids = parent->children;
-	int n = llist_index_of(kids, child);
-	assert(n >= 0);
-	struct llist *deleted = delete_after(kids, n-1, 1);
-	if (NULL == deleted) return RM_CHILD_MEM_ERROR;
-	child->parent = NULL;
-	destroy_llist(deleted);
+	struct rnode dummy_head;
+	struct rnode *previous;
+	int n;
 
-	return n;
+	child->parent = NULL;	// TODO: Is this a good idea?
+	parent->child_count --;
+
+	/* Easy special case: parent has exactly one child. */
+	if (1 == parent->child_count) {
+		parent->first_child = NULL;
+		parent->last_child = NULL;
+		return 0;
+	}
+
+	/* Find node previous to child */
+	for (n = 0, previous = &dummy_head;
+		NULL != previous->next_sibling;
+		n++, previous = previous->next_sibling) 
+		if (previous->next_sibling == child) 
+			break;
+		
+	
+	/* Update parent's first_child and last_child, if needed. */
+	if (parent->first_child == child)
+		parent->first_child = child->next_sibling;
+	if (parent->last_child == previous->next_sibling)
+			parent->last_child = previous;
+
+	/* Skip 'child', effectively removing if from children list */
+	previous->next_sibling = previous->next_sibling->next_sibling;
+
+	return n;	// TODO: is this ever used?
 }
 
-// TODO: is this f() ever used?
+// This function is apparently never used
+/*
 int insert_child(struct rnode *parent, struct rnode *child, int index)
 {
-	struct llist *kids = parent->children;
-	struct llist *insert = create_llist();
-	if (NULL == insert) return FAILURE;
-	if (! append_element(insert, child)) return FAILURE;
-	insert_after(kids, index-1, insert);
+
 	child->parent = parent;
 
 	return SUCCESS;
 }
+*/
 
 // TODO: return value should differentiate between mem error and child-is-root
 int swap_nodes(struct rnode *node)
@@ -219,7 +251,7 @@ int swap_nodes(struct rnode *node)
 	struct rnode *parent = node->parent;
 	char *length = strdup(node->edge_length_as_string);
 	if(remove_child(node) < 0) return FAILURE;
-	if (! add_child(node, parent)) return FAILURE;
+	add_child(node, parent);
 
 	free(node->edge_length_as_string);
 	node->edge_length_as_string = strdup("");
@@ -232,7 +264,6 @@ int swap_nodes(struct rnode *node)
 int unlink_rnode(struct rnode *node)
 {
 	struct rnode *parent = node->parent;
-	struct llist *siblings = parent->children; 	/* includes 'node'! */
 	int index = llist_index_of(siblings, node);
 	/* This removes this node from its parent's list of children.  We get
 	 * the resulting list only so we can free it. */

@@ -18,7 +18,7 @@
 
 int test_children_count()
 {
-	const char *test_name = "test_children_count";
+	const char *test_name = __func__;
 
 	char *length1 = "12.34";
 	char *length2 = "2.345";
@@ -46,21 +46,21 @@ int test_children_count()
 
 int test_is_leaf()
 {
-	const char *test_name = "test_is_leaf";
+	const char *test_name = __func__;
 
 	struct rnode *root;
-	struct rnode *left;
+	struct rnode *leaf;
 
 	root = create_rnode("root", "");
-	left = create_rnode("left", "12.34");
+	leaf = create_rnode("leaf", "12.34");
 
-	add_child(root, left);
+	add_child(root, leaf);
 
 	if (is_leaf(root)) {
 		printf("%s: root should not be leaf.\n", test_name);
 		return 1;
 	}
-	if (! is_leaf(left)) {
+	if (! is_leaf(leaf)) {
 		printf("%s: leaf should be leaf.\n", test_name);
 		return 1;
 	}
@@ -71,13 +71,12 @@ int test_is_leaf()
 
 int test_add_3_children()
 {
-	const char *test_name = "test_add_3_children";
+	const char *test_name = __func__;
 
 	char *length1 = "12.34";
 	char *length2 = "2.345";
 	char *length3 = "456.7";
 	struct rnode *parent, *kid1, *kid2, *kid3, *node;
-	struct list_elem *elem;
 
 	parent = create_rnode("parent", "");
 	kid1 = create_rnode("kid1", length1);	
@@ -87,30 +86,31 @@ int test_add_3_children()
 	add_child(parent, kid2);
 	add_child(parent, kid3);
 
-	if (NULL == parent->children) {
-		printf("%s: children ptr should not be NULL.", test_name);
+	if (NULL == parent->first_child) {
+		printf("%s: parent->first_child should not be NULL.", test_name);
+		return 1;
+	}
+	if (NULL == parent->last_child) {
+		printf("%s: parent->last_child should not be NULL.", test_name);
 		return 1;
 	}
 
-	if (parent->children->count != 3) {
+	if (parent->child_count != 3) {
 		printf("%s: children count should be 3 instead of %d.\n",
-				test_name, children_count(parent));
+				test_name, parent->child_count);
 		return 1;
 	}
-	elem = parent->children->head;
-	node = elem->data;
+	node = parent->first_child;
 	if (strcmp(node->edge_length_as_string, length1) != 0) {
 		printf("%s: length should be %s.\n", test_name, length1);
 		return 1;
 	}
-	elem = elem->next;
-	node = elem->data;
+	node = node->next_sibling;
 	if (strcmp(node->edge_length_as_string, length2) != 0) {
 		printf("%s: length should be %s.\n", test_name, length2);
 		return 1;
 	}
-	elem = elem->next;
-	node = elem->data;
+	node = node->next_sibling;
 	if (strcmp(node->edge_length_as_string, length3) != 0) {
 		printf("%s: length should be %s.\n", test_name, length3);
 		return 1;
@@ -122,7 +122,7 @@ int test_add_3_children()
 
 int test_simple_tree()
 {
-	const char *test_name = "test_simple_tree";
+	const char *test_name = __func__;
 
 	struct rnode *root;
 	struct rnode *left;
@@ -144,7 +144,7 @@ int test_simple_tree()
 		return 1;
 	}
 
-	node = root->children->head->data;
+	node = root->first_child;
 	label = node->label;
 	if (strcmp("left", label) != 0) {
 		printf ("%s: wrong label '%s' (expected 'left')\n",
@@ -152,7 +152,7 @@ int test_simple_tree()
 		return 1;
 	}
 
-	node = root->children->head->next->data;
+	node = node->next_sibling;
 	label = node->label;
 	if (strcmp("right", label) != 0) {
 		printf ("%s: wrong label '%s' (expected 'right')\n",
@@ -196,9 +196,27 @@ int test_is_root()
 	return 0;
 }
 
+int test_singleton()
+{
+	const char *test_name = __func__;
+
+	struct rnode *singleton = create_rnode("single", "");
+
+	if (! is_root(singleton)) {
+		printf ("%s: expected singleton to be root.\n", test_name);
+		return 1;
+	}
+	if (! is_leaf(singleton)) {
+		printf ("%s: expected singleton to be leaf.\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+}
+
 int test_insert_node_above()
 {
-	const char *test_name = "test_insert_node_above";
+	const char *test_name = __func__;
 
 	struct rooted_tree tree;
 	struct rnode *node_f, *root;
@@ -239,7 +257,7 @@ int test_insert_node_above()
 
 int test_insert_node_above_wlen()
 {
-	const char *test_name = "test_insert_node_above_wlen";
+	const char *test_name = __func__;
 
 	struct rooted_tree tree;
 	struct rnode *node_f, *root;
@@ -282,7 +300,7 @@ int test_insert_node_above_wlen()
 
 int test_replace_child()
 {
-	const char *test_name = "test_replace_child";
+	const char *test_name = __func__;
 
 	struct rnode *parent;
 	struct rnode *child_1;
@@ -318,7 +336,7 @@ int test_replace_child()
 
 int test_replace_child_wlen()
 {
-	const char *test_name = "test_replace_child_wlen";
+	const char *test_name = __func__;
 
 	struct rnode *parent;
 	struct rnode *child_1;
@@ -354,7 +372,7 @@ int test_replace_child_wlen()
 
 int test_splice_out()
 {
-	const char *test_name = "test_splice_out";
+	const char *test_name = __func__;
 
 	struct rooted_tree tree;
 	struct rnode *node_h, *root;
@@ -381,7 +399,7 @@ int test_splice_out()
 
 int test_splice_out_wlen()
 {
-	const char *test_name = "test_splice_out_wlen";
+	const char *test_name = __func__;
 
 	struct rooted_tree tree;
 	struct rnode *node_h, *root;
@@ -524,15 +542,6 @@ int test_unlink_rnode_3sibs()
 	return 0;
 
 }
-
-/* I had second thoughts about condensing stair nodes, as this is a bit a form
- * of cheating. */
-/*
-int test_is_stair()
-{
-	return 1;
-}
-*/
 
 int test_siblings()
 {
@@ -678,7 +687,8 @@ int test_insert_remove_child()
 	add_child(mum, kid2);
 	add_child(mum, kid3);
 
-	/* Removal and insertion in the middle of the list, checking parent links */
+	/* Removal and insertion in the middle of the list, checking parent
+	 * links */
 	index = remove_child(kid2);
 	if (index != 1) {
 		printf("%s: expected index 1, got %d\n", test_name, index);
@@ -695,7 +705,7 @@ int test_insert_remove_child()
 		return 1;
 	}
 	insert_child(mum, kid4, 1);
-	node = mum->children->head->next->data;	
+	node = mum->first_child->next_sibling;
 	if (node != kid4) {
 		printf("%s: expected node %p, got %p.\n", test_name, kid4, node);
 		return 1;
@@ -712,7 +722,7 @@ int test_insert_remove_child()
 		return 1;
 	}
 	insert_child(mum, kid5, 0);
-	node = mum->children->head->data;	
+	node = mum->first_child;
 	if (node != kid5) {
 		printf("%s: expected node %p, got %p.\n", test_name, kid5, node);
 		return 1;
@@ -724,7 +734,7 @@ int test_insert_remove_child()
 		return 1;
 	}
 	insert_child(mum, kid6, 2);
-	node = mum->children->tail->data;	
+	node = mum->last_child;
 	if (node != kid6) {
 		printf("%s: expected node %p, got %p.\n", test_name, kid6, node);
 		return 1;
@@ -787,6 +797,7 @@ int main()
 	failures += test_simple_tree();
 	failures += test_is_leaf();
 	failures += test_is_root();
+	failures += test_singleton();
 	failures += test_insert_node_above_wlen();
 	failures += test_insert_node_above();
 	failures += test_splice_out();
