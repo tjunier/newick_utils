@@ -104,6 +104,7 @@ int insert_node_above(struct rnode *this, char *label)
 	free(this->edge_length_as_string);
 	this->edge_length_as_string = strdup(new_edge_length);
 	replace_child(parent, this, new);
+	this->next_sibling = NULL;
 
 	free(new_edge_length);
 

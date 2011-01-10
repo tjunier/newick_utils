@@ -221,14 +221,16 @@ int test_insert_node_above()
 	const char *test_name = __func__;
 
 	struct rooted_tree tree;
-	struct rnode *node_f, *root;
+	struct rnode *node_f, *node_h, *root;
 	struct hash *map;
 	char *exp = "(((A,B)f)k,(C,(D,E)g)h)i;";
 
 	tree = tree_2();	/* ((A,B)f,(C,(D,E)g)h)i; - see tree_stubs.h */
 	map = create_label2node_map(tree.nodes_in_order);
 	node_f = hash_get(map, "f");
+	node_h = hash_get(map, "h");
 	root = hash_get(map, "i");
+
 	insert_node_above(node_f, "k");
 
 	struct rnode *node_k = node_f->parent;
@@ -246,10 +248,39 @@ int test_insert_node_above()
 				test_name, node_k->parent, root);
 		return 1;
 	}
+	if (1 != node_k->child_count) {
+		printf ("%s: node k should have 1 child, but has %d\n", test_name, node_k->child_count);
+		return 1;
+	}
+	if (node_k->first_child != node_f) {
+		printf ("%s: node k's first child should be f, but is %s\n",
+				test_name, node_k->first_child->label);
+		return 1;
+	}
+	if (node_k->last_child != node_f) {
+		printf ("%s: node k's last child should be f, but is %s\n",
+				test_name, node_k->last_child->label);
+		return 1;
+	}
+	if (root->first_child != node_k) {
+		printf ("%s: root's first child is %s, should be k\n",
+				test_name, root->first_child->label);
+		return 1;
+	}
+	if (root->last_child != node_h) {
+		printf ("%s: root's last child is %s, should be h\n",
+				test_name, root->last_child->label);
+		return 1;
+	}
+	if (NULL != node_f->next_sibling) {
+		printf ("%s: node f should not have a next sib\n",
+				test_name);
+		return 1;
+	}
 	char *obt = to_newick(root);
 	if (0 != strcmp(exp, obt)) {
 		printf ("%s: expected tree '%s', got '%s'.\n",
-				test_name, exp, to_newick(root));
+				test_name, exp, obt);
 		return 1;
 	}
 
