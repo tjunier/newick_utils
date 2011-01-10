@@ -80,8 +80,7 @@ char *subtree(struct rnode *node)
 		result = append_to(result, "(");
 
 		/* first child */
-		elem = node->children->head;
-		child = elem->data;
+		child = node->first_child;
 		child_node_s = subtree(child);
 		if (NULL == child_node_s) return NULL;
 		result = append_to(result, child_node_s);
