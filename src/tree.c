@@ -98,36 +98,37 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 
 /* Returns true IFF all children are leaves. Assumes n is not a leaf. */
 
-int all_children_are_leaves(struct rnode *n)
+// TODO: return bool instead of int
+int all_children_are_leaves(struct rnode *node)
 {
-	struct list_elem *el;
-	for (el = n->children->head; NULL != el; el = el->next) {
-		struct rnode *child = el->data;
-		if (! is_leaf(child)) return 0;
-	}
+	struct rnode *curr;
+	for (curr=node->first_child; NULL != curr; curr=curr->next_sibling)
+		if (! is_leaf(curr)) return 0;
 
 	return 1;
 }
 
 /* Returns true IFF all children have the same label. If true, sets 'label' to
- * the shared label. Assumes n is inner node, and all its children are leaves. */
+ * the shared label. Assumes n is inner node, and all its children are leaves.
+ * */
 
-int all_children_have_same_label(struct rnode *n, char **label)
+// TODO: return boolean 
+
+int all_children_have_same_label(struct rnode *node, char **label)
 {
 
 	/* get first child's label */
 
-	struct list_elem *el = n->children->head;
-	struct rnode *child = el->data;
-	char *ref_label = child->label;
+	struct rnode *curr = node->first_child;
+	char *ref_label = curr->label;
 
-	/* iterate over other children, and compare their label to the first's */
+	/* iterate over other children, and compare their label to the first's
+	 * */
 
-	for (el = el->next; NULL != el; el = el->next) {
-		child = el->data;
-		if (0 != strcmp(ref_label, child->label))
+	*label = NULL;
+	for (curr = curr->next_sibling; NULL != curr; curr = curr->next_sibling)
+		if (0 != strcmp(ref_label, curr->label))
 			return 0; /* found a different label */
-	}
 
 	*label = ref_label;
 	return 1;
@@ -150,7 +151,6 @@ void collapse_pure_clades(struct rooted_tree *tree)
 			free(current->label);
 			current->label = strdup(label);
 			/* remove children */
-			clear_llist(current->children);
 		}
 	}
 }
@@ -163,7 +163,6 @@ void destroy_tree(struct rooted_tree *tree, int free_node_data)
 	 * already empty when we destroy the list */
 	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
 		struct rnode *current = e->data;
-		destroy_llist(current->children);
 		free(current->label);
 		free(current->edge_length_as_string);
 		/* only works if data can be free()d, i.e. has no pointer to
@@ -196,7 +195,6 @@ void destroy_tree_cb(struct rooted_tree *tree,
 	 * children edges) */
 	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
 		struct rnode *current = e->data;
-		destroy_llist(current->children);
 		free(current->label);
 		free(current->edge_length_as_string);
 		if (NULL != node_data_destroyer)
@@ -413,12 +411,11 @@ static struct rnode *clone_clade(struct rnode *root)
 	struct rnode *root_clone = create_rnode(root->label,
 			root->edge_length_as_string);
 	if (NULL == root_clone) return NULL;
-	struct list_elem *el;
-	for (el = root->children->head; NULL != el; el = el->next) {
-		struct rnode *kid = el->data;
-		struct rnode *kid_clone = clone_clade(kid);
+	struct rnode *curr;
+	for (curr=root->first_child; NULL != curr; curr=curr->next_sibling) {
+		struct rnode *kid_clone = clone_clade(curr);
 		if (NULL == kid_clone) return NULL;
-		if (! add_child(root_clone, kid_clone)) return NULL;
+		add_child(root_clone, kid_clone);
 	}
 
 	return root_clone;
