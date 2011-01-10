@@ -250,26 +250,27 @@ int remove_child(struct rnode *child)
 int insert_child(struct rnode *parent, struct rnode *insert, int index)
 {
 	struct rnode dummy_head, *current;
+	int n;
 
 	if (index < 0 || index > parent->child_count)
 		return FAILURE;	/* invalid index */
+
+	/* Find node just before insertion point */
+	dummy_head.next_sibling = parent->first_child;
+	for (	current = &dummy_head, n = index; 
+		n > 0;
+		current = current->next_sibling, n--);
+
+	/* current is now the node before the insertion point */
+	insert->next_sibling = current->next_sibling;
+	current->next_sibling = insert;
+	insert->parent = parent;
 
 	/* Update parent's child pointers */
 	if (0 == index)
 		parent->first_child = insert;
 	if (parent->child_count == index)
 		parent->last_child = insert;
-
-	/* Find node just before insertion point */
-	dummy_head.next_sibling = parent->first_child;
-	for (	current = &dummy_head; 
-		index > 0;
-		current = current->next_sibling, index--);
-
-	/* current is now the node before the insertion point */
-	insert->next_sibling = current->next_sibling;
-	current->next_sibling = insert;
-	insert->parent = parent;
 
 	return SUCCESS;
 }
