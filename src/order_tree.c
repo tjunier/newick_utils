@@ -55,6 +55,44 @@ int lbl_comparator(const void *a, const void *b)
 	return cmp;
 }
 
+int order_tree(struct rooted_tree *tree, int (*comparator)(void*,void*))
+{
+	struct list_elem *elem;
+
+	/* the rnode->data member is used to store the sort field. For leaves,
+	 * this is just the label; for inner nodes it is the sort field of the
+	 * first child (after sorting). */
+
+	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
+		struct rnode *current = elem->data;
+		if (is_leaf(current)) {
+			current->data = strdup(current->label);
+		} else {
+			/* Since all children have been visited (because we're
+			 * traversing the tree in parse order), we can just
+			 * order the children on their sort field. */
+
+			struct rnode ** kids_array;
+			int count = current->child_count;
+			kids_array = (struct rnode **)
+				children_array(current);
+			if (NULL == kids_array) return FAILURE;
+			qsort(kids_array, count, sizeof(struct rnode *),
+					comparator);
+			remove_children(current);
+			int i;
+			for (i = 0; i < count; i++)
+				add_child(current, kids_array[i]);
+
+			// Get sort field from first child ("back-inherit") [?]
+			current->data = strdup(kids_array[0]->data);
+			free(kids_array);
+		}
+	}
+
+	return SUCCESS;
+}
+
 int order_tree_lbl(struct rooted_tree *tree)
 {
 	struct list_elem *elem;

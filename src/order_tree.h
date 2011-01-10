@@ -31,15 +31,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rooted_tree;
 
-/* A helper function, to pass as parameter to qsort(). This compares node labels. */
+/* A general-purpose sort function. Any of the comparators below can be passed
+ * to it. */
+
+int order_tree(struct rooted_tree *tree, int (*comparator)(void*,void*));
+
+/* This compares node labels. */
 
 int lbl_comparator(const void *, const void *);
 
-/* Idem, but for ordering children by increasing number of descendants */
+/* Idem, but for ordering children by increasing number of descendants. Node
+ * data must point to the number of descendants. */
 
 int num_desc_comparator(const void *a, const void *b);
 
-/* reverse of num_desc_comparator() */
+/* Reverse of num_desc_comparator(). Also relies on node->data pointing to the
+ * count of descendants. */
 
 int reverse_num_desc_comparator(const void *a, const void *b);
 
