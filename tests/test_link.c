@@ -435,6 +435,9 @@ int test_unlink_rnode()
 	map = create_label2node_map(t.nodes_in_order);
 	node_A = hash_get(map, "A");
 
+	// TODO: test value of unlink_rnode_root_child, use a getter! Do this
+	// for all functions that test unlink_rnode()
+
 	enum unlink_rnode_status result = unlink_rnode(node_A);
 	switch(result) {
 	case UNLINK_RNODE_DONE:
@@ -467,6 +470,7 @@ int test_unlink_rnode_rad_leaf()
 	const char *test_name = "test_unlink_rnode_rad_leaf()";
 	struct hash *map;
 	struct rnode *node_D;
+	struct rnode *root_child;
 	/*  ((A:1,B:1,C:1)e:1,D:2)f */
 	struct rooted_tree t = tree_6();
 
@@ -481,8 +485,9 @@ int test_unlink_rnode_rad_leaf()
 		printf ("%s: unlink_rnode() should have returned UNLINK_RNODE_ROOT_CHILD, but returned UNLINK_RNODE_DONE.\n", test_name);
 		return 1;
 	case UNLINK_RNODE_ROOT_CHILD:
-		unlink_rnode_root_child->parent = NULL;
-		t.root = unlink_rnode_root_child;
+		root_child = get_unlink_rnode_root_child();
+		root_child->parent = NULL;
+		t.root = root_child;
 		break;
 	case UNLINK_RNODE_ERROR:
 		fprintf (stderr, "Memory error -\n");

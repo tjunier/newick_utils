@@ -43,7 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "masprintf.h"
 #include "common.h"
 
-struct rnode *unlink_rnode_root_child;
+/* Avoid global variables by making external vars static and using a getter. */
+
+static struct rnode *unlink_rnode_root_child;
+
+struct rnode *get_unlink_rnode_root_child()
+{
+	return unlink_rnode_root_child;
+}
 
 void add_child(struct rnode *parent, struct rnode *child)
 {
@@ -231,16 +238,14 @@ int remove_child(struct rnode *child)
 	return n;	// TODO: is this ever used?
 }
 
-// This function is apparently never used
-/*
 int insert_child(struct rnode *parent, struct rnode *child, int index)
 {
 
+	// TODO: fetch back from master branch
 	child->parent = parent;
 
 	return SUCCESS;
 }
-*/
 
 // TODO: return value should differentiate between mem error and child-is-root
 int swap_nodes(struct rnode *node)
@@ -264,20 +269,16 @@ int swap_nodes(struct rnode *node)
 int unlink_rnode(struct rnode *node)
 {
 	struct rnode *parent = node->parent;
-	int index = llist_index_of(siblings, node);
-	/* This removes this node from its parent's list of children.  We get
-	 * the resulting list only so we can free it. */
-	struct llist *del = delete_after(siblings, index-1, 1);
-	if (NULL == del) return UNLINK_RNODE_ERROR;
-	destroy_llist(del);	
+	/* Remove this node from its parent's list of children.  */
+	remove_child(node);
 
 	/* If deleting this node results in the parent having only one child,
 	 * we splice the parent out (unless it's the root, in which case we
 	 * return its first child) */
-	if (1 == siblings->count) {
+	unlink_rnode_root_child = NULL;
+	if (1 == parent->child_count) {
 		if (is_root(parent)) {
-			unlink_rnode_root_child = 
-				(struct rnode *) siblings->head->data;
+			unlink_rnode_root_child = parent->first_child;
 			return UNLINK_RNODE_ROOT_CHILD;
 		}
 		else {
@@ -290,6 +291,8 @@ int unlink_rnode(struct rnode *node)
 	return UNLINK_RNODE_DONE;
 }
 
+/* TODO: Obsolete - remove when all tests pass. */
+/*
 struct llist *siblings(struct rnode *node)
 {
 	struct rnode *sib;
@@ -308,3 +311,4 @@ struct llist *siblings(struct rnode *node)
 
 	return result;
 }
+*/
