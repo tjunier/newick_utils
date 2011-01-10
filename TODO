@@ -503,3 +503,5 @@ be undefined.
 nw_sched: implement lbl!
 
 nw_shed: check help page, and sync w/ tutorial; add examples incl. implementation of other nutils (nw_topology, nw_label, nw_trim?)
+
+new rnode: some TODO items list tests to write. Write them. Now.

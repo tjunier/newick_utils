@@ -99,3 +99,7 @@ int is_stair_node(struct rnode *node);
 /* Like all free()ing functions, does not return error codes. */
 
 void free_descendants(struct rnode *node);
+
+/* Returns an array of pointers to all children, in order. */
+// TODO: write test
+struct rnode** children_array(struct rnode *node);

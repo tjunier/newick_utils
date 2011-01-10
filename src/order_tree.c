@@ -73,18 +73,16 @@ int order_tree_lbl(struct rooted_tree *tree)
 			 * order the children on their sort field. */
 
 			struct rnode ** kids_array;
-			int count = current->children->count;
+			int count = current->child_count;
 			kids_array = (struct rnode **)
-				llist_to_array(current->children);
+				children_array(current);
 			if (NULL == kids_array) return FAILURE;
-			destroy_llist(current->children);
 			qsort(kids_array, count, sizeof(struct rnode *),
 					lbl_comparator);
-			struct llist *ordered_kids_list;
-			ordered_kids_list = array_to_llist(
-				(void **) kids_array, count);
-			if (NULL == ordered_kids_list) return FAILURE;
-			current->children = ordered_kids_list;
+			remove_children(current);
+			int i;
+			for (i = 0; i < count; i++)
+				add_child(current, kids_array[i]);
 
 			// Get sort field from first child ("back-inherit") [?]
 			current->data = strdup(kids_array[0]->data);
@@ -109,6 +107,8 @@ int num_desc_comparator(const void *a, const void *b)
 	return 0;
 }
 
+// TODO: why do we need another ordering f()? This is a clone of
+// order_tree_lbl()!!
 int order_tree_num_desc(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -125,7 +125,7 @@ int order_tree_num_desc(struct rooted_tree *tree)
 			 * traversing the tree in parse order), we can just
 			 * order the children on their sort field. */
 			struct rnode ** kids_array;
-			int count = current->children->count;
+			int count = current->child_count;
 			kids_array = (struct rnode **)
 				llist_to_array(current->children);
 			if (NULL == kids_array) return FAILURE;

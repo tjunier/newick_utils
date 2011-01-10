@@ -119,3 +119,7 @@ struct rnode *get_unlink_rnode_root_child();
  * to have just one child), but this is unusual. */
 
 struct llist *siblings(struct rnode *);
+
+/* Removes all children (does not free them). */
+// TODO: write test
+void remove_children(struct rnode *);

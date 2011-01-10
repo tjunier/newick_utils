@@ -160,3 +160,19 @@ void free_descendants(struct rnode *node)
         destroy_hash(to_free);
 	destroy_rnode_iterator(it);
 }
+
+struct rnode** children_array(struct rnode *node)
+{
+	struct rnode **array = malloc(node->child_count *
+			sizeof(struct rnode *));
+	if (NULL == array) return NULL;
+
+	struct rnode *kid;
+	int i;
+	for (kid = node->first_child, i = 0;
+		NULL != kid;
+		kid = kid->next_sibling, i++)
+		array[i] = kid;
+
+	return array;
+}
