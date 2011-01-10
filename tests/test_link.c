@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "common.h"
 #include "rnode.h"
 #include "link.h"
 #include "list.h"
@@ -212,6 +213,7 @@ int test_singleton()
 	}
 
 	printf("%s ok.\n", test_name);
+	return 0;
 }
 
 int test_insert_node_above()
@@ -674,26 +676,190 @@ int test_siblings()
 	return 0;
 }
 
-int test_insert_remove_child()
+int test_insert_remove_child_noop()
 {
-	char * test_name = "test_insert_remove_child";
+	const char* test_name = __func__;
 
 	struct rnode *mum = create_rnode("mum","");
 	struct rnode *kid1 = create_rnode("kid1","");
 	struct rnode *kid2 = create_rnode("kid2","");
 	struct rnode *kid3 = create_rnode("kid3","");
 	struct rnode *kid4 = create_rnode("kid4","");
-	struct rnode *kid5 = create_rnode("kid5","");
-	struct rnode *kid6 = create_rnode("kid6","");
+	struct rnode *grandkid1 = create_rnode("grandkid1", "");
+	struct rnode *grandkid2 = create_rnode("grandkid2", "");
+	int status;
+
+	add_child(mum, kid1);
+	add_child(mum, kid2);
+	add_child(mum, kid3);
+	add_child(kid4, grandkid1);
+	add_child(kid4, grandkid2);
+
+	/* Insertion at negative index should fail, all nodes involved should
+	 * be left untouched. */
+	/* Ok, we can't check that everything was left alone, but at least we
+	 * check the usual suspects. */
+	status = insert_child(mum, kid4, -1);
+	if (status != FAILURE) {
+		printf("%s: insertion at index <0 should fail.\n", test_name);
+		return 1;
+	}
+	if (mum->first_child != kid1) {
+		printf ("%s: failed insertion wrongly altered first_child\n",
+				test_name);
+		return 1;
+	}
+	if (mum->last_child != kid3) {
+		printf ("%s: failed insertion wrongly altered last_child\n",
+				test_name);
+		return 1;
+	}
+	if (kid4->parent != NULL) {
+		printf ("%s: failed insertion wrongly altered parent\n",
+				test_name);
+		return 1;
+	}
+	if (kid1->next_sibling != kid2) {
+		printf ("%s: failed insertion wrongly altered next_sibling\n",
+				test_name);
+		return 1;
+	}
+	if (kid4->first_child != grandkid1) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"first child\n", test_name);
+		return 1;
+	}
+	if (kid4->last_child != grandkid2) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"last child\n", test_name);
+		return 1;
+	}
+
+	/* Insertion at index > #kids should fail */
+	status = insert_child(mum, kid4, 4);
+	if (status != FAILURE) {
+		printf("%s: insertion at index > #children should fail.\n", test_name);
+		return 1;
+	}
+	if (mum->first_child != kid1) {
+		printf ("%s: failed insertion wrongly altered first_child\n",
+				test_name);
+		return 1;
+	}
+	if (mum->last_child != kid3) {
+		printf ("%s: failed insertion wrongly altered last_child\n",
+				test_name);
+		return 1;
+	}
+	if (kid4->parent != NULL) {
+		printf ("%s: failed insertion wrongly altered parent\n",
+				test_name);
+		return 1;
+	}
+	if (kid3->next_sibling != NULL) {
+		printf ("%s: failed insertion wrongly altered next_sibling\n",
+				test_name);
+		return 1;
+	}
+	if (kid4->first_child != grandkid1) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"first child\n", test_name);
+		return 1;
+	}
+	if (kid4->last_child != grandkid2) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"last child\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_insert_remove_child_head()
+{
+	const char * test_name = __func__;
+
+	struct rnode *mum = create_rnode("mum","");
+	struct rnode *kid1 = create_rnode("kid1","");
+	struct rnode *kid2 = create_rnode("kid2","");
+	struct rnode *kid3 = create_rnode("kid3","");
+	struct rnode *kid4 = create_rnode("kid4","");
+	struct rnode *grandkid1 = create_rnode("grandkid1", "");
+	struct rnode *grandkid2 = create_rnode("grandkid2", "");
 	struct rnode *node;
 	int index = -1;
 
 	add_child(mum, kid1);
 	add_child(mum, kid2);
 	add_child(mum, kid3);
+	add_child(kid4, grandkid1);
+	add_child(kid4, grandkid2);
 
-	/* Removal and insertion in the middle of the list, checking parent
-	 * links */
+	/* Removal and insertion at the beginning of the list */
+	index = remove_child(kid1);
+	if (index != 0) {
+		printf("%s: expected index 0, got %d\n", test_name, index);
+		return 1;
+	}
+	insert_child(mum, kid4, 0);
+	node = mum->first_child;
+	if (node != kid4) {
+		printf("%s: expected node %p, got %p.\n", test_name, kid4, node);
+		return 1;
+	}
+	if (kid4->next_sibling != kid2) {
+		printf("%s: expected kid2 as next sib, got %s.\n", test_name,
+				kid4->next_sibling->label);
+		return 1;
+	}
+	if (mum->last_child != kid3) {
+		printf ("%s: expected kid3 as last child, got %s\n", test_name,
+				mum->last_child->label);
+		return 1;
+	}
+	if (kid4->parent != mum) {
+		printf ("%s: expected mum as parent, got %p\n", test_name,
+				kid4->parent);
+		return 1;
+	}
+	if (kid4->first_child != grandkid1) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"first child\n", test_name);
+		return 1;
+	}
+	if (kid4->last_child != grandkid2) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"last child\n", test_name);
+		return 1;
+	}
+				
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_insert_remove_child_middle()
+{
+	const char * test_name = __func__;
+
+	struct rnode *mum = create_rnode("mum","");
+	struct rnode *kid1 = create_rnode("kid1","");
+	struct rnode *kid2 = create_rnode("kid2","");
+	struct rnode *kid3 = create_rnode("kid3","");
+	struct rnode *kid4 = create_rnode("kid4","");
+	struct rnode *grandkid1 = create_rnode("grandkid1", "");
+	struct rnode *grandkid2 = create_rnode("grandkid2", "");
+	struct rnode *node;
+	int index = -1;
+
+	add_child(mum, kid1);
+	add_child(mum, kid2);
+	add_child(mum, kid3);
+	add_child(kid4, grandkid1);
+	add_child(kid4, grandkid2);
+
+	/* Removal and insertion in the middle of the list */
 	index = remove_child(kid2);
 	if (index != 1) {
 		printf("%s: expected index 1, got %d\n", test_name, index);
@@ -720,28 +886,77 @@ int test_insert_remove_child()
 				mum, kid4->parent);
 		return 1;
 	}
-	/* Removal and insertion at the beginning of the list */
-	index = remove_child(kid1);
-	if (index != 0) {
-		printf("%s: expected index 0, got %d\n", test_name, index);
+	if (kid4->next_sibling != kid3) {
+		printf ("%s: expected kid3 as next sib, got %s\n", test_name,
+				kid4->next_sibling->label);
 		return 1;
 	}
-	insert_child(mum, kid5, 0);
-	node = mum->first_child;
-	if (node != kid5) {
-		printf("%s: expected node %p, got %p.\n", test_name, kid5, node);
+	if (kid4->first_child != grandkid1) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"first child\n", test_name);
 		return 1;
 	}
+	if (kid4->last_child != grandkid2) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"last child\n", test_name);
+		return 1;
+	}
+
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_insert_remove_child_tail()
+{
+	const char * test_name = __func__;
+
+	struct rnode *mum = create_rnode("mum","");
+	struct rnode *kid1 = create_rnode("kid1","");
+	struct rnode *kid2 = create_rnode("kid2","");
+	struct rnode *kid3 = create_rnode("kid3","");
+	struct rnode *kid4 = create_rnode("kid4","");
+	struct rnode *grandkid1 = create_rnode("grandkid1", "");
+	struct rnode *grandkid2 = create_rnode("grandkid2", "");
+	struct rnode *node;
+	int index = -1;
+
+	add_child(mum, kid1);
+	add_child(mum, kid2);
+	add_child(mum, kid3);
+	add_child(kid4, grandkid1);
+	add_child(kid4, grandkid2);
+
 	/* Removal and insertion at the end of the list */
 	index = remove_child(kid3);
 	if (index != 2) {
 		printf("%s: expected index 2, got %d\n", test_name, index);
 		return 1;
 	}
-	insert_child(mum, kid6, 2);
+	insert_child(mum, kid4, 2);
 	node = mum->last_child;
-	if (node != kid6) {
-		printf("%s: expected node %p, got %p.\n", test_name, kid6, node);
+	if (node != kid4) {
+		printf("%s: expected node %p, got %p.\n", test_name, kid4, node);
+		return 1;
+	}
+	if (kid2->next_sibling != kid4) {
+		printf("%s: expected kid4 as next sib, got %s\n", test_name,
+				kid4->next_sibling->label);
+		return 1;
+	}
+	if (kid4->parent != mum) {
+		printf ("%s: expected mum for parent, got %p\n", test_name,
+				kid4->parent);
+		return 1;
+	}
+	if (kid4->first_child != grandkid1) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"first child\n", test_name);
+		return 1;
+	}
+	if (kid4->last_child != grandkid2) {
+		printf ("%s: failed insertion wrongly altered insert's "
+			"last child\n", test_name);
 		return 1;
 	}
 
@@ -811,7 +1026,10 @@ int main()
 	failures += test_unlink_rnode_rad_leaf();
 	failures += test_unlink_rnode_3sibs();
 	failures += test_siblings();
-	failures += test_insert_remove_child();
+	failures += test_insert_remove_child_noop();
+	failures += test_insert_remove_child_head();
+	failures += test_insert_remove_child_middle();
+	failures += test_insert_remove_child_tail();
 	failures += test_swap_nodes();
 	// failures += test_is_stair();
 	if (0 == failures) {

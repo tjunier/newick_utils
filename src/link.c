@@ -56,7 +56,12 @@ void add_child(struct rnode *parent, struct rnode *child)
 {
 	child->parent = parent;
 
-	parent->last_child->next_sibling = child;
+	if (0 == parent->child_count)
+		parent->first_child = child;
+	else
+		parent->last_child->next_sibling = child;
+
+	parent->child_count++;
 	parent->last_child = child;
 }
 
@@ -105,6 +110,8 @@ int insert_node_above(struct rnode *this, char *label)
 	return SUCCESS;
 }
 	
+// TODO: 'node' argument is unneeded, as it can be derived from old->parent.
+
 void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
 {
 	/* To replace the old node by the new one, we need a pointer to the
@@ -118,17 +125,17 @@ void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
 	dummy_first.next_sibling = node->first_child;
 
 	for (current = &dummy_first; NULL != current->next_sibling;
-			current = current->next_sibling) {
-		if (current->next_sibling == old) {
-			current->next_sibling = new;
-			new->next_sibling = old->next_sibling; 
-			if (node->first_child == old) 
-				node->first_child = new;
-			if (node->last_child == old)
-				node->last_child = new;
-		}
-	}
+			current = current->next_sibling) 
+		if (current->next_sibling == old) 
+			break;
 
+	current->next_sibling = new;
+	new->next_sibling = old->next_sibling; 
+	if (node->first_child == old) 
+		node->first_child = new;
+	if (node->last_child == old)
+		node->last_child = new;
+	new->parent = node;
 }
 
 char *add_len_strings(char *ls1, char *ls2)
@@ -184,6 +191,7 @@ int splice_out_rnode(struct rnode *this)
 		if (current_sibling->next_sibling == this) {
 			current_sibling->next_sibling = this->first_child;
 			this->last_child->next_sibling = this->next_sibling;
+			break;
 		}
 	}
 
@@ -209,22 +217,22 @@ int remove_child(struct rnode *child)
 	int n;
 
 	child->parent = NULL;	// TODO: Is this a good idea?
-	parent->child_count --;
 
 	/* Easy special case: parent has exactly one child. */
 	if (1 == parent->child_count) {
 		parent->first_child = NULL;
 		parent->last_child = NULL;
+		parent->child_count = 0;
 		return 0;
 	}
 
 	/* Find node previous to child */
+	dummy_head.next_sibling = parent->first_child;
 	for (n = 0, previous = &dummy_head;
 		NULL != previous->next_sibling;
 		n++, previous = previous->next_sibling) 
 		if (previous->next_sibling == child) 
 			break;
-		
 	
 	/* Update parent's first_child and last_child, if needed. */
 	if (parent->first_child == child)
@@ -235,14 +243,33 @@ int remove_child(struct rnode *child)
 	/* Skip 'child', effectively removing if from children list */
 	previous->next_sibling = previous->next_sibling->next_sibling;
 
+	parent->child_count --;
 	return n;	// TODO: is this ever used?
 }
 
-int insert_child(struct rnode *parent, struct rnode *child, int index)
+int insert_child(struct rnode *parent, struct rnode *insert, int index)
 {
+	struct rnode dummy_head, *current;
 
-	// TODO: fetch back from master branch
-	child->parent = parent;
+	if (index < 0 || index > parent->child_count)
+		return FAILURE;	/* invalid index */
+
+	/* Update parent's child pointers */
+	if (0 == index)
+		parent->first_child = insert;
+	if (parent->child_count == index)
+		parent->last_child = insert;
+
+	/* Find node just before insertion point */
+	dummy_head.next_sibling = parent->first_child;
+	for (	current = &dummy_head; 
+		index > 0;
+		current = current->next_sibling, index--);
+
+	/* current is now the node before the insertion point */
+	insert->next_sibling = current->next_sibling;
+	current->next_sibling = insert;
+	insert->parent = parent;
 
 	return SUCCESS;
 }
@@ -291,24 +318,19 @@ int unlink_rnode(struct rnode *node)
 	return UNLINK_RNODE_DONE;
 }
 
-/* TODO: Obsolete - remove when all tests pass. */
-/*
 struct llist *siblings(struct rnode *node)
 {
-	struct rnode *sib;
+	struct rnode *sib, *parent;
 	struct llist *result = create_llist();
 	if (NULL == result) return NULL;
-	struct list_elem *elem;
 
 	if (is_root(node)) return result;
 
-	for (elem = node->parent->children->head; NULL != elem; elem = elem->next) {
-		sib = (struct rnode *) elem->data;
+	parent = node->parent;
+	for (sib = parent->first_child; NULL != sib; sib = sib->next_sibling)
 		if (sib != node)
 			if (! append_element(result, sib))
 				return NULL;
-	}
 
 	return result;
 }
-*/

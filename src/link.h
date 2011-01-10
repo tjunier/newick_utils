@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* Functions for creating and manipulating trees at the node level. */
 
+// TODO: use an enum for these?
 #define RM_CHILD_IS_ROOT (-1)
 #define RM_CHILD_MEM_ERROR (-2)
 
@@ -79,11 +80,13 @@ int splice_out_rnode(struct rnode *node);
 
 int remove_child(struct rnode *child);
 
-/* Inserts child into parent's children list, at the specified index. Sets the
- * child's parent. */
-/* Returns FAILURE iff there was a problem (malloc(), most probably) */
+/* Inserts 'insert' into 'parent's children list, at the specified index. Sets
+ * the child's parent. An index of 0 means insertion before the first child, an
+ * index of 1 means after the first child, etc. If there are n children, an
+ * index of n means inserttion after the last child. */
+/* Returns FAILURE iff index is off limits (<0 or > number of children). */
 
-int insert_child(struct rnode *parent, struct rnode *child, int index);
+int insert_child(struct rnode *parent, struct rnode *insert, int index);
 
 /* Swaps 'node' and its parent, i.e, parent becomes a child of 'node' */
 /* Returns FAILURE in case of problem (memory) */
@@ -97,8 +100,8 @@ int swap_nodes(struct rnode *node);
  * possibilities: i) the parent is the root (case 2) - the function stops there
  * and sets an external variable to the root's (only) child so that it may
  * become the tree's root (we cannot do this here, since we're working at node
- * level, not tree level) - function get_unlink_rnode_root_child() can be use
- * to retrieve it; * ii) the parent is an inner node (case 3) - it gets spliced
+ * level, not tree level) - function get_unlink_rnode_root_child() can be used
+ * to retrieve it; ii) the parent is an inner node (case 3) - it gets spliced
  * out.
  * RETURN VALUE:
 	UNLINK_RNODE_ERROR - there was an error (malloc(), most probably)
@@ -110,10 +113,9 @@ int swap_nodes(struct rnode *node);
 int unlink_rnode(struct rnode *);
 struct rnode *get_unlink_rnode_root_child();
 
-// TODO: obsolete!
-/* Returns the node's list of siblings. Siblings appear in the same order as in
- * the parent's children list. The list is empty for root, it may be empty for
- * leaves (it's not illegal for a node to have just one child), but this is
- * unusual. */
+/* Returns the node's list of siblings (NOT including the argument node).
+ * Siblings appear in the same order as in the parent's children list. The list
+ * is empty for root, it may be empty for leaves (it's not illegal for a node
+ * to have just one child), but this is unusual. */
 
-// struct llist *siblings(struct rnode *);
+struct llist *siblings(struct rnode *);
