@@ -163,7 +163,7 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	 * node has children. We see if we visited them all (in which case we
 	 * go to the parent) or not (in which case we go to the first unvisited
 	 * child).
-	 * Variable current_child_elem points to a node's currently visited
+	 * Variable current_child points to a node's currently visited
 	 * child.*/
 	if (iter->current->current_child
 	    == iter->current->last_child) {	/* seen all children */
