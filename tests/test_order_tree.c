@@ -75,7 +75,7 @@ int test_order()
 
 int test_order_num_desc()
 {
-	const char *test_name = "test_order_num_desc";
+	const char *test_name = __func__;
 	/* tree is top-heavy */
 	struct rooted_tree test_tree = tree_15();
 	/* expected tree is top-light */
@@ -97,7 +97,7 @@ int test_order_num_desc()
 
 int test_order_deladderize()
 {
-	const char *test_name = "test_order_num_desc";
+	const char *test_name = __func__;
 	struct rooted_tree test_tree = tree_15();
 	order_tree(&test_tree, num_desc_comparator);
 	char *obt_newick = to_newick(test_tree.root);

@@ -56,6 +56,10 @@ int lbl_comparator(const void *a, const void *b)
 	return cmp;
 }
 
+// TODO: use a setter to set the sort field of inner nodes (after their
+// children have been sorted); also provide convenience wrappers like the old
+// functions order_tree_lbl(), etc.
+
 int order_tree(struct rooted_tree *tree,
 		int (*comparator)(const void*,const void*))
 {
