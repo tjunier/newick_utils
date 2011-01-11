@@ -174,6 +174,8 @@ struct parameters get_params(int argc, char *argv[])
 /* Counts the number of descendants of the tree, using the data pointer of each
  * node. */
 
+/* TODO: may not be needed */
+/*
 static void count_descendants(struct rooted_tree *tree)
 {
 	struct list_elem *el;
@@ -193,36 +195,35 @@ static void count_descendants(struct rooted_tree *tree)
 		}
 	}
 }
+*/
 
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params = get_params(argc, argv);
 	int (*comparator)(const void*,const void*);
+	int (*sort_field_setter)(struct rnode *);
 
 	// TODO: parametrize order flags
 	switch(params.criterion) {
 	case ORDER_ALNUM_LBL:
 		comparator = lbl_comparator;
+		sort_field_setter = set_sort_field_label;
 		break;
 	case ORDER_DELADDERIZE:
-		// TODO: parametrize 1/2 behaviour
-		comparator = num_desc_comparator;
+		comparator = num_desc_deladderize;
+		sort_field_setter = set_sort_field_num_desc;
 		break;
 	case ORDER_NUM_DESCENDANTS:
-		// TODO: src/scheme_tree_editor.c has a f() for finding the
-		// number of descendants. This should be factered out and put
-		// (say) in rnode.h, or something.
 		comparator = num_desc_comparator;
+		sort_field_setter = set_sort_field_num_desc;
 		break;
 	default:
 		assert(0); // programmer error
 	}
 
 	while (NULL != (tree = parse_tree())) {
-		if (ORDER_NUM_DESCENDANTS == params.criterion)
-			count_descendants(tree);
-		if (! order_tree (tree, comparator)) {
+		if (! order_tree (tree, comparator, sort_field_setter)) {
 			perror(NULL);
 			exit(EXIT_FAILURE);
 		}

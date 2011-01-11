@@ -42,26 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "order_tree.h"
 
-int lbl_comparator(const void *a, const void *b)
-{
-	/* I really have trouble understanding how qsort() passes the
-	 * comparands to the comparator... but thanks to GDB I figured out this
-	 * one. */	
-	char *a_lbl = (*(struct rnode **)a)->data;
-	char *b_lbl = (*(struct rnode **)b)->data;
-
-	int cmp = strcmp(a_lbl, b_lbl);
-	// printf ("%s <=> %s: %d\n", a_lbl, b_lbl, cmp);
-
-	return cmp;
-}
-
 // TODO: use a setter to set the sort field of inner nodes (after their
 // children have been sorted); also provide convenience wrappers like the old
 // functions order_tree_lbl(), etc.
 
 int order_tree(struct rooted_tree *tree,
-		int (*comparator)(const void*,const void*))
+		int (*comparator)(const void*,const void*),
+		int (*sort_field_setter)(struct rnode *))
 {
 	struct list_elem *elem;
 
@@ -100,45 +87,10 @@ int order_tree(struct rooted_tree *tree,
 	return SUCCESS;
 }
 
-#ifdef dummy
 int order_tree_lbl(struct rooted_tree *tree)
 {
-	struct list_elem *elem;
-
-	/* the rnode->data member is used to store the sort field. For leaves,
-	 * this is just the label; for inner nodes it is the sort field of the
-	 * first child (after sorting). */
-
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		struct rnode *current = elem->data;
-		if (is_leaf(current)) {
-			current->data = strdup(current->label);
-		} else {
-			/* Since all children have been visited (because we're
-			 * traversing the tree in parse order), we can just
-			 * order the children on their sort field. */
-
-			struct rnode ** kids_array;
-			int count = current->child_count;
-			kids_array = (struct rnode **)
-				children_array(current);
-			if (NULL == kids_array) return FAILURE;
-			qsort(kids_array, count, sizeof(struct rnode *),
-					lbl_comparator);
-			remove_children(current);
-			int i;
-			for (i = 0; i < count; i++)
-				add_child(current, kids_array[i]);
-
-			// Get sort field from first child ("back-inherit") [?]
-			current->data = strdup(kids_array[0]->data);
-			free(kids_array);
-		}
-	}
-
-	return SUCCESS;
+	return order_tree(tree, lbl_comparator, set_sort_field_label);
 }
-#endif
 
 int num_desc_comparator(const void *a, const void *b)
 {
@@ -154,120 +106,84 @@ int num_desc_comparator(const void *a, const void *b)
 	return 0;
 }
 
-// TODO: why do we need another ordering f()? This is a clone of
-// order_tree_lbl()!!
-#ifdef dummy
-int order_tree_num_desc(struct rooted_tree *tree)
+int num_desc_deladderize(const void *a, const void *b)
 {
-	struct list_elem *elem;
+	static orientation = 1;
+	/* This changes sign at every invocation, therefore one call considers
+	 * a heavy node greater than a light node (in terms of number of
+	 * descendants), but the next call does the opposite. */
+	orientation *= -1;
 
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		struct rnode *current = elem->data;
-		/* data is just an int: the number of descendants */
-		current->data = (int *) malloc(sizeof(int));
-		if (NULL == current->data) return FAILURE;
-		if (is_leaf(current)) {
-			*((int *) current->data) = 1;	/* leaves count as 1 */
-		} else {
-			/* Since all children have been visited (because we're
-			 * traversing the tree in parse order), we can just
-			 * order the children on their sort field. */
-			struct rnode ** kids_array;
-			int count = current->child_count;
-			kids_array = (struct rnode **)
-				llist_to_array(current->children);
-			if (NULL == kids_array) return FAILURE;
-			destroy_llist(current->children);
-			qsort(kids_array, count, sizeof(struct rnode *),
-					num_desc_comparator);
-			struct llist *ordered_kids_list;
-			ordered_kids_list = array_to_llist(
-				(void **) kids_array, count);
-			if (NULL == ordered_kids_list) return FAILURE;
-			free(kids_array);
-			current->children = ordered_kids_list;
-
-			/* Get number of descendants as sum of kids' */
-			struct list_elem *el;
-			int nb_descendants = 0;
-			for (el=current->children->head; NULL != el; el=el->next) {
-				struct rnode *kid = el->data;
-				nb_descendants += *((int *) kid->data);
-			}
-			*((int *) current->data) = nb_descendants;
-		}
-	}
-
-	return SUCCESS;
-}
-#endif
-
-int reverse_num_desc_comparator(const void *a, const void *b)
-{
 	struct rnode *rnode_a = *((struct rnode **) a);
 	struct rnode *rnode_b = *((struct rnode **) b);
 	int a_num_desc = *((int *) rnode_a->data);
 	int b_num_desc = *((int *) rnode_b->data);
 
-	if (a_num_desc < b_num_desc)
-		return 1;
 	if (a_num_desc > b_num_desc)
-		return -1;
+		return orientation;
+	if (a_num_desc < b_num_desc)
+		return -orientation;
 	return 0;
 }
 
-// TODO: try to have only one ordering function, and factor out differences in
-// the comparator.
+int lbl_comparator(const void *a, const void *b)
+{
+	/* I really have trouble understanding how qsort() passes the
+	 * comparands to the comparator... but thanks to GDB I figured out this
+	 * one. */	
+	char *a_lbl = (*(struct rnode **)a)->data;
+	char *b_lbl = (*(struct rnode **)b)->data;
 
-#ifdef dummy
+	int cmp = strcmp(a_lbl, b_lbl);
+	// printf ("%s <=> %s: %d\n", a_lbl, b_lbl, cmp);
+
+	return cmp;
+}
+
+int order_tree_num_desc(struct rooted_tree *tree)
+{
+	return order_tree(tree, num_desc_comparator, set_sort_field_num_desc);
+}
+
 int order_tree_deladderize(struct rooted_tree *tree)
 {
-	struct list_elem *elem;
-	int node_nb = 0;
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		struct rnode *current = elem->data;
-		/* data is just an int: the number of descendants */
-		current->data = (int *) malloc(sizeof(int));
-		if (NULL == current->data) return FAILURE;
-		if (is_leaf(current)) {
-			*((int *) current->data) = 1;	/* leaves count as 1 */
-		} else {
-			/* Since all children have been visited (because we're
-			 * traversing the tree in parse order), we can just
-			 * order the children on their sort field. */
-			struct rnode ** kids_array;
-			int count = current->children->count;
-			kids_array = (struct rnode **)
-				llist_to_array(current->children);
-			if (NULL == kids_array) return FAILURE;
-			destroy_llist(current->children);
-			/* Alternatively order fewer-descendants-first and
-			 * fewer-descendants last */
-			if (0 == node_nb % 2)
-				qsort(kids_array, count, sizeof(struct rnode *),
-					num_desc_comparator);
-			else
-				qsort(kids_array, count, sizeof(struct rnode *),
-					reverse_num_desc_comparator);
-			node_nb++;
-			struct llist *ordered_kids_list;
-			ordered_kids_list = array_to_llist(
-				(void **) kids_array, count);
-			if (NULL == ordered_kids_list) return FAILURE;
-			free(kids_array);
-			current->children = ordered_kids_list;
+	return order_tree(tree, num_desc_deladderize, set_sort_field_num_desc);
+}
 
-			/* Get number of descendants as sum of kids' */
-			struct list_elem *el;
-			int nb_descendants = 0;
-			for (el=current->children->head; NULL != el; el=el->next) {
-				struct rnode *kid = el->data;
-				nb_descendants += *((int *) kid->data);
-			}
-			*((int *) current->data) = nb_descendants;
-		}
+int set_sort_field_label(struct rnode *node)
+{
+	if (is_leaf(node))
+		return SUCCESS;	/* nothing to do: field is node's label. */
+
+	/* If label is "", use that of first child, otherwise keep own. */
+	if (strcmp("", node->label) == 0) {
+		char *label = strdup(node->first_child->label);
+		if (NULL == label) return FAILURE;
+		free(node->label);
+		node->label = label;
 	}
 
 	return SUCCESS;
 }
-#endif
+
+int set_sort_field_num_desc(struct rnode *node)
+{
+
+	/* node's descendant count is 1 + the sum of the descendant counts of
+	 * its children */
+
+	node->data = malloc(sizeof(int));
+	if (NULL == node->data) return FAILURE;
+
+	if (is_leaf(node)) {
+		*((int *) node->data) = 1;	/* counts as one */
+	} else {
+		int sum = 0;
+		struct rnode *kid = node->first_child;
+		for(; NULL != kid; kid = kid->next_sibling)
+			sum += *((int *) kid->data);
+		*((int *) node->data) = sum;
+	}
+
+	return SUCCESS;
+}
