@@ -58,27 +58,27 @@ int order_tree(struct rooted_tree *tree,
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
 		struct rnode *current = elem->data;
 		if (is_leaf(current)) {
-			current->data = strdup(current->label);
+			sort_field_setter(current);
 		} else {
 			/* Since all children have been visited (because we're
-			 * traversing the tree in parse order), we can just
-			 * order the children on their sort field. */
-
+			 * traversing the tree in postorder), we can
+			 * just order the children on their sort field. */
 			struct rnode ** kids_array;
 			int count = current->child_count;
 			kids_array = (struct rnode **)
 				children_array(current);
 			if (NULL == kids_array) return FAILURE;
+
 			qsort(kids_array, count, sizeof(struct rnode *),
 					comparator);
+
 			remove_children(current);
 			int i;
 			for (i = 0; i < count; i++)
 				add_child(current, kids_array[i]);
 			current->last_child->next_sibling = NULL;
 
-			// Get sort field from first child ("back-inherit") [?]
-			current->data = strdup(kids_array[0]->data);
+			sort_field_setter(current);
 			free(kids_array);
 		}
 	}
@@ -107,7 +107,8 @@ int num_desc_comparator(const void *a, const void *b)
 
 int num_desc_deladderize(const void *a, const void *b)
 {
-	static orientation = 1;
+	static int orientation = -1;
+
 	/* This changes sign at every invocation, therefore one call considers
 	 * a heavy node greater than a light node (in terms of number of
 	 * descendants), but the next call does the opposite. */
@@ -153,12 +154,12 @@ int set_sort_field_label(struct rnode *node)
 {
 	/* If the node has a non-empty label, or if it is a leaf (or both), we
 	 * just use the label as sort field. Otherwise, we use the first
-	 * child's.  */
+	 * child's sort field.  */
 
 	if (is_leaf(node) || (strcmp(node->label, "") != 0))
 		node->data = strdup(node->label);
 	else 
-		node->data = strdup(node->first_child->label);
+		node->data = strdup((char *) node->first_child->data);
 
 	if (NULL == node->data)
 		return FAILURE;

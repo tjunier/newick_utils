@@ -25,7 +25,7 @@ int test_order()
 	struct rnode *node_vertebrates = tree.root->last_child;
 	struct rnode *node_carnivores = node_vertebrates->last_child;
 
-	order_tree(&tree, lbl_comparator);
+	order_tree(&tree, lbl_comparator, set_sort_field_label);
 	
 	/* insect node should still be 1st */
 	if (tree.root->first_child != node_insects) {
@@ -80,7 +80,7 @@ int test_order_num_desc()
 	struct rooted_tree test_tree = tree_15();
 	/* expected tree is top-light */
 	struct rooted_tree exp_tree = tree_14();
-	order_tree(&test_tree, num_desc_comparator);
+	order_tree(&test_tree, num_desc_comparator, set_sort_field_num_desc);
 	char *obt_newick = to_newick(test_tree.root);
 	char *exp_newick = to_newick(exp_tree.root);
 
@@ -99,7 +99,7 @@ int test_order_deladderize()
 {
 	const char *test_name = __func__;
 	struct rooted_tree test_tree = tree_15();
-	order_tree(&test_tree, num_desc_comparator);
+	order_tree(&test_tree, num_desc_deladderize, set_sort_field_num_desc);
 	char *obt_newick = to_newick(test_tree.root);
 	char *exp_newick = "(Petromyzon,((Xenopus,((Equus,Homo)Mammalia,Columba)Amniota)Tetrapoda,Carcharodon)Gnathostomata)Vertebrata;";
 
