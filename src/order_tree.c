@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "tree.h"
 #include "list.h"
+#include "link.h"
 #include "common.h"
 #include "order_tree.h"
 

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "masprintf.h"
 #include "rnode.h"
 #include "list.h"
+#include "link.h"
 
 enum {DEPTH_DISTANCE, DEPTH_ANCESTORS};
 

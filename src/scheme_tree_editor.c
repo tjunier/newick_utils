@@ -522,6 +522,8 @@ static void process_tree(struct rooted_tree *tree, SCM address,
 static SCM scm_dump_subclade()
 {
 	dump_newick(current_node);
+
+	return SCM_UNSPECIFIED;
 }
 
 static SCM scm_unlink_node()
@@ -576,6 +578,8 @@ static SCM scm_get_current_node()
 static SCM scm_get_node_label(SCM node)
 {
 	/* WTF? no idea how to to this... */
+	node = node;		// dummy, gcc warnings
+	return SCM_UNSPECIFIED;	// for now, to silence gcc warnings
 }
 
 /* Sets the current node's parent edge length. Argument must be a number or a
@@ -583,7 +587,7 @@ static SCM scm_get_node_label(SCM node)
 
 static SCM scm_set_length(SCM edge_length)
 {
-	char *length_as_string;
+	//char *length_as_string;
 	size_t buffer_length;	/* storage for length as string */
 
 	/* If edge_length is a string, we first try to convert it to a number.
@@ -614,8 +618,7 @@ static SCM scm_set_length(SCM edge_length)
 			SCM_UNDEFINED);
 	buffer_length = scm_c_string_length(edge_length_as_scm_string);
 	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	size_t copied = scm_to_locale_stringbuf(
-			edge_length_as_scm_string, buffer, buffer_length);
+	// size_t copied = scm_to_locale_stringbuf( edge_length_as_scm_string, buffer, buffer_length);
 	buffer[buffer_length] = '\0';
 
 	/* Set the allocated buffer as the current node's length-as-string */
@@ -638,7 +641,7 @@ static SCM scm_set_label(SCM label)
 
 	buffer_length = scm_c_string_length(label);
 	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	size_t copied = scm_to_locale_stringbuf(label, buffer, buffer_length);
+	// size_t copied = scm_to_locale_stringbuf(label, buffer, buffer_length);
 	buffer[buffer_length] = '\0';
 
 	/* Set the allocated buffer as the current node's length-as-string */
@@ -682,6 +685,7 @@ static void inner_main(void *closure, int argc, char* argv[])
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
 
+	closure = closure;	// suppresses gcc warnings about unused param
 	define_node();
 
 	/* Aliases and simple functions */

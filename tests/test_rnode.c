@@ -36,6 +36,11 @@ int test_create_rnode()
 		printf ("%s: last_child should be NULL.\n", test_name);
 		return 1;
 	}
+	if (0 != node->child_count) {
+		printf("%s: 'child_count' should be 0 (got %d)\n", test_name,
+				node->child_count);
+		return 1;
+	}
 	if (0 != node->seen) {
 		printf("%s: 'seen' should be 0 (got %d)\n", test_name,
 				node->seen);
