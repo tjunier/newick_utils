@@ -581,6 +581,33 @@ int test_unlink_rnode_3sibs()
 
 }
 
+int test_remove_children()
+{
+	const char *test_name = __func__;
+
+	struct rooted_tree tree2 = tree_2();
+	struct hash *map = create_label2node_map(tree2.nodes_in_order);
+	struct rnode *node_f = hash_get(map, "f");
+
+	remove_children(node_f);
+
+	if (node_f->first_child != 0) {
+		printf ("%s: first child should be NULL\n", test_name);
+		return 1;
+	}
+	if (node_f->last_child != 0) {
+		printf ("%s: last child should be NULL\n", test_name);
+		return 1;
+	}
+	if (node_f->child_count != 0) {
+		printf ("%s: children cound should be 0\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int test_siblings()
 {
 	const char *test_name = "test_siblings";
@@ -1057,6 +1084,7 @@ int main()
 	failures += test_unlink_rnode_rad_leaf();
 	failures += test_unlink_rnode_3sibs();
 	failures += test_siblings();
+	failures += test_remove_children();
 	failures += test_insert_remove_child_noop();
 	failures += test_insert_remove_child_head();
 	failures += test_insert_remove_child_middle();

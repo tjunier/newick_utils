@@ -336,3 +336,10 @@ struct llist *siblings(struct rnode *node)
 
 	return result;
 }
+
+void remove_children(struct rnode *node)
+{
+	node->first_child = NULL;
+	node->last_child = NULL;
+	node->child_count = 0;
+}
