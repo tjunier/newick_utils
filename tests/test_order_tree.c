@@ -10,7 +10,7 @@ int test_order_lbl()
 {
 	const char *test_name = "test_order_lbl";
 	struct rooted_tree tree = tree_13();
-	order_tree_lbl(&tree);
+	order_tree(&tree, lbl_comparator);
 	char *obt_newick = to_newick(tree.root);
 	char *exp_newick = "((Ant,Bee),((Cat,Dog),Eel));";
 
@@ -32,7 +32,7 @@ int test_order_num_desc()
 	struct rooted_tree test_tree = tree_15();
 	/* expected tree is top-light */
 	struct rooted_tree exp_tree = tree_14();
-	order_tree_num_desc(&test_tree);
+	order_tree(&test_tree, num_desc_comparator);
 	char *obt_newick = to_newick(test_tree.root);
 	char *exp_newick = to_newick(exp_tree.root);
 
@@ -51,7 +51,7 @@ int test_order_deladderize()
 {
 	const char *test_name = "test_order_num_desc";
 	struct rooted_tree test_tree = tree_15();
-	order_tree_deladderize(&test_tree);
+	order_tree(&test_tree, num_desc_comparator);
 	char *obt_newick = to_newick(test_tree.root);
 	char *exp_newick = "(Petromyzon,((Xenopus,((Equus,Homo)Mammalia,Columba)Amniota)Tetrapoda,Carcharodon)Gnathostomata)Vertebrata;";
 
