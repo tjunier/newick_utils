@@ -52,9 +52,8 @@ int order_tree(struct rooted_tree *tree,
 {
 	struct list_elem *elem;
 
-	/* the rnode->data member is used to store the sort field. For leaves,
-	 * this is just the label; for inner nodes it is the sort field of the
-	 * first child (after sorting). */
+	/* the rnode->data member is used to store the sort field. This is set
+	 * by the set_sort_field_num_desc callback.*/
 
 	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
 		struct rnode *current = elem->data;
@@ -152,16 +151,17 @@ int order_tree_deladderize(struct rooted_tree *tree)
 
 int set_sort_field_label(struct rnode *node)
 {
-	if (is_leaf(node))
-		return SUCCESS;	/* nothing to do: field is node's label. */
+	/* If the node has a non-empty label, or if it is a leaf (or both), we
+	 * just use the label as sort field. Otherwise, we use the first
+	 * child's.  */
 
-	/* If label is "", use that of first child, otherwise keep own. */
-	if (strcmp("", node->label) == 0) {
-		char *label = strdup(node->first_child->label);
-		if (NULL == label) return FAILURE;
-		free(node->label);
-		node->label = label;
-	}
+	if (is_leaf(node) || (strcmp(node->label, "") != 0))
+		node->data = strdup(node->label);
+	else 
+		node->data = strdup(node->first_child->label);
+
+	if (NULL == node->data)
+		return FAILURE;
 
 	return SUCCESS;
 }
