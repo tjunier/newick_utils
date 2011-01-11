@@ -55,7 +55,8 @@ int lbl_comparator(const void *a, const void *b)
 	return cmp;
 }
 
-int order_tree(struct rooted_tree *tree, int (*comparator)(void*,void*))
+int order_tree(struct rooted_tree *tree,
+		int (*comparator)(const void*,const void*))
 {
 	struct list_elem *elem;
 
@@ -93,6 +94,7 @@ int order_tree(struct rooted_tree *tree, int (*comparator)(void*,void*))
 	return SUCCESS;
 }
 
+#ifdef dummy
 int order_tree_lbl(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -130,6 +132,7 @@ int order_tree_lbl(struct rooted_tree *tree)
 
 	return SUCCESS;
 }
+#endif
 
 int num_desc_comparator(const void *a, const void *b)
 {
@@ -147,6 +150,7 @@ int num_desc_comparator(const void *a, const void *b)
 
 // TODO: why do we need another ordering f()? This is a clone of
 // order_tree_lbl()!!
+#ifdef dummy
 int order_tree_num_desc(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -190,6 +194,7 @@ int order_tree_num_desc(struct rooted_tree *tree)
 
 	return SUCCESS;
 }
+#endif
 
 int reverse_num_desc_comparator(const void *a, const void *b)
 {
@@ -205,6 +210,10 @@ int reverse_num_desc_comparator(const void *a, const void *b)
 	return 0;
 }
 
+// TODO: try to have only one ordering function, and factor out differences in
+// the comparator.
+
+#ifdef dummy
 int order_tree_deladderize(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -255,3 +264,4 @@ int order_tree_deladderize(struct rooted_tree *tree)
 
 	return SUCCESS;
 }
+#endif

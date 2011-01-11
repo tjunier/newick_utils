@@ -161,7 +161,7 @@ void trim(struct rnode *node, struct parameters params)
 		node->edge_length_as_string = new_length;
 	}
 
-	clear_llist(node->children);	/* no effect on leaves */
+	remove_children(node);	/* no effect on leaves */
 
 	ndata->trimmed = true;
 }

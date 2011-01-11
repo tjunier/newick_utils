@@ -34,7 +34,8 @@ struct rooted_tree;
 /* A general-purpose sort function. Any of the comparators below can be passed
  * to it. */
 
-int order_tree(struct rooted_tree *tree, int (*comparator)(void*,void*));
+int order_tree(struct rooted_tree *tree,
+		int (*comparator)(const void*,const void*));
 
 /* This compares node labels. */
 
@@ -45,20 +46,17 @@ int lbl_comparator(const void *, const void *);
 
 int num_desc_comparator(const void *a, const void *b);
 
-/* Reverse of num_desc_comparator(). Also relies on node->data pointing to the
- * count of descendants. */
-
-int reverse_num_desc_comparator(const void *a, const void *b);
+//int reverse_num_desc_comparator(const void *a, const void *b);
 
 /* Orders all nodes in the tree, according to lbl_comparator() - this could be
  * parametered, if we can think of other interesting orders. NOTE: this
  * function uses (and modifies) the rnode's data attribute. */
 
-int order_tree_lbl(struct rooted_tree *tree);
+//int order_tree_lbl(struct rooted_tree *tree);
 
 /* Idem, but orders according to number of descendants. */
 
-int order_tree_num_desc(struct rooted_tree *tree);
+//int order_tree_num_desc(struct rooted_tree *tree);
 
 /* Idem, but de-ladderizes */
 

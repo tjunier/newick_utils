@@ -120,5 +120,7 @@ struct rnode *get_unlink_rnode_root_child();
 
 struct llist *siblings(struct rnode *);
 
-/* Removes all children (does not free them). Has no effect is node is a leaf. */ 
+/* Removes all children (does not free them). Has no effect is node is a leaf.
+ * */ 
+
 void remove_children(struct rnode *);

@@ -298,13 +298,11 @@ static struct parameters get_params(int argc, char *argv[])
 
 static int get_nb_descendants(struct rnode *node)
 {
-	struct list_elem *e;
 	struct rnode *kid;
 	struct rnode_data *rndata;
 	int descendants = 0;
 
-	for (e = node->children->head; NULL != e; e = e->next) {
-		kid = e->data;
+	for (kid = node->first_child; NULL != kid; kid = kid->next_sibling) {
 		rndata = kid->data;
 		descendants += rndata->nb_descendants;
 		descendants += 1;	/* kid itself (no pun intended :-) ) */
@@ -436,7 +434,7 @@ static void set_predefined_variables(struct rnode *node)
 				edge_length_as_scm_string, SCM_UNDEFINED));
 
 	/* c: number of children */
-	scm_c_define("c", scm_from_int(current_node->children->count));
+	scm_c_define("c", scm_from_int(current_node->child_count));
 	
 	struct rnode_data *data = current_node->data;
 

@@ -207,7 +207,7 @@ static int get_properties(struct rooted_tree *tree,
 	struct list_elem *el;
 	for (el = tree->nodes_in_order->head; NULL != el; el =el->next) {
 		struct rnode *current = (struct rnode *) el->data;
-		int num_kids = current->children->count;
+		int num_kids = current->child_count;
 		/* tests */
 		if (2 == num_kids)
 			props->num_dichotomies++;

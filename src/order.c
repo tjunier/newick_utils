@@ -170,24 +170,32 @@ int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params = get_params(argc, argv);
-	int (*order_function)(struct rooted_tree *);
+	int (*comparator)(const void*,const void*);
 
+	// TODO: parametrize order flags
 	switch(params.criterion) {
 	case ORDER_ALNUM_LBL:
-		order_function =  order_tree_lbl;
+		comparator = lbl_comparator;
 		break;
 	case ORDER_DELADDERIZE:
-		order_function =  order_tree_deladderize;
+		// TODO: parametrize 1/2 behaviour
+		comparator = num_desc_comparator;
 		break;
 	case ORDER_NUM_DESCENDANTS:
-		order_function =  order_tree_num_desc;
+		// TODO: src/scheme_tree_editor.c has a f() for finding the
+		// number of descendants. This should be factered out and put
+		// (say) in rnode.h, or something.
+		comparator = num_desc_comparator;
 		break;
 	default:
 		assert(0); // programmer error
 	}
 
 	while (NULL != (tree = parse_tree())) {
-		if (! order_function(tree)) { perror(NULL); exit(EXIT_FAILURE); }
+		if (! order_tree (tree, comparator)) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
 		dump_newick(tree->root);
 		destroy_tree_cb(tree, NULL);
 	}
