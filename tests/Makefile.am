@@ -64,7 +64,7 @@ test_to_newick_SOURCES = test_to_newick.c $(SRC)/to_newick.c \
 	$(SRC)/rnode.c $(SRC)/link.c $(SRC)/concat.c \
 	$(SRC)/list.c $(SRC)/rnode_iterator.c $(SRC)/hash.c \
 	$(SRC)/masprintf.c $(SRC)/parser.c $(SRC)/newick_scanner.c \
-	$(SRC)/newick_parser.c
+	$(SRC)/newick_parser.c tree_stubs.c
 
 test_tree_SOURCES = test_tree.c $(SRC)/tree.c $(SRC)/rnode.c $(SRC)/list.c \
 	$(SRC)/to_newick.c $(SRC)/nodemap.c $(SRC)/link.c $(SRC)/concat.c \
@@ -101,7 +101,7 @@ test_error_SOURCES = test_error.c $(SRC)/error.c
 
 test_order_tree_SOURCES = test_order_tree.c $(SRC)/order_tree.c tree_stubs.c \
 	$(SRC)/link.c $(SRC)/to_newick.c $(SRC)/rnode.c $(SRC)/list.c \
-	$(SRC)/masprintf.c $(SRC)/concat.c $(SRC)/hash.c \
+	$(SRC)/masprintf.c $(SRC)/concat.c $(SRC)/hash.c $(SRC)/nodemap.c \
 	$(SRC)/rnode_iterator.c
 
 test_graph_common_SOURCES = test_graph_common.c $(SRC)/graph_common.c \

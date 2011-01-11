@@ -85,6 +85,7 @@ int order_tree(struct rooted_tree *tree,
 			int i;
 			for (i = 0; i < count; i++)
 				add_child(current, kids_array[i]);
+			current->last_child->next_sibling = NULL;
 
 			// Get sort field from first child ("back-inherit") [?]
 			current->data = strdup(kids_array[0]->data);

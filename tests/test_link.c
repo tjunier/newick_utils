@@ -41,6 +41,7 @@ int test_children_count()
 				test_name, children_count(parent));
 		return 1;
 	}
+
 	printf("%s ok.\n", test_name);
 	return 0;
 }

@@ -45,7 +45,9 @@ enum unlink_rnode_status { UNLINK_RNODE_DONE, UNLINK_RNODE_ROOT_CHILD,
 
 struct rnode;
 
-/* Adds 'child' to 'parent''s children (after last child) */
+/* Adds 'child' to 'parent''s children (after last child). Added child's
+ * next_sibling is LEFT UNTOUCHED, so don't count on it being NULL. */
+
 void add_child(struct rnode *parent, struct rnode *child);
 
 /* sets 'edge' as 'child''s parent edge, and 'child' as 'edge''s child

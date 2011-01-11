@@ -43,9 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "order_tree.h"
 
 enum order_criterion { ORDER_ALNUM_LBL, ORDER_NUM_DESCENDANTS, ORDER_DELADDERIZE };
+enum sort_order { ORDER_DIRECT, ORDER_REVERSE };
 
 struct parameters {
 	enum order_criterion criterion;
+	enum sort_order order;
 };
 
 void help (char *argv[])
@@ -133,13 +135,16 @@ struct parameters get_params(int argc, char *argv[])
 	params.criterion = ORDER_ALNUM_LBL;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "c:hn")) != -1) {
+	while ((opt_char = getopt(argc, argv, "c:hr")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'c':
 			params.criterion = get_criterion(optarg);
+			break;
+		case 'r':
+			params.order = ORDER_REVERSE;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -159,11 +164,34 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-h] <filename|->\n", argv[0]);
+		fprintf(stderr, "Usage: %s [-c:hr] <filename|->\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
 	return params;
+}
+
+/* Counts the number of descendants of the tree, using the data pointer of each
+ * node. */
+
+static void count_descendants(struct rooted_tree *tree)
+{
+	struct list_elem *el;
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+		el->data = malloc(sizeof(int));
+		if (NULL == el->data) { perror(NULL); exit(EXIT_FAILURE); }
+		if (is_leaf(current)) {
+			*((int *) el->data) = 1;	
+		} else {
+			struct rnode *kid = current->first_child;
+			int desc_count = 0;
+			for (; NULL != kid; kid = kid->next_sibling)
+				desc_count += *((int *) kid->data);
+			*((int *) current->data) = desc_count;
+		}
+	}
 }
 
 int main(int argc, char *argv[])
@@ -192,6 +220,8 @@ int main(int argc, char *argv[])
 	}
 
 	while (NULL != (tree = parse_tree())) {
+		if (ORDER_NUM_DESCENDANTS == params.criterion)
+			count_descendants(tree);
 		if (! order_tree (tree, comparator)) {
 			perror(NULL);
 			exit(EXIT_FAILURE);

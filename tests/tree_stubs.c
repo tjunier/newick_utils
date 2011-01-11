@@ -494,7 +494,7 @@ struct rooted_tree tree_12()
 }
 
 /* A tree with short labels, out of alphabetical order */
-/* ((Bee,Ant)f,(Eel,(Dog,Cat)g)h)i; */
+/* ((Bee,Ant),(Eel,(Dog,Cat))); */
 struct rooted_tree tree_13()
 {
 	struct rnode *node_A, *node_B, *node_C, *node_D, *node_E;
