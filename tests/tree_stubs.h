@@ -51,7 +51,7 @@ struct rooted_tree tree_11();
 struct rooted_tree tree_12();
 
 /* A tree with short labels, out of alphabetical order */
-/* ((Bee,Ant)f,(Eel,(Dog,Cat)g)h)i; */
+/* ((Bee,Ant),(Eel,(Dog,Cat))); */
 struct rooted_tree tree_13();
 
 /* A top-light ladder tree */

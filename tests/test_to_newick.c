@@ -227,7 +227,7 @@ int test_bug3()
 	/* ((Bee,Ant)f,(Eel,(Dog,Cat)g)h)i; */
 	struct rooted_tree tree = tree_13();
 	char *obt_newick = to_newick(tree.root);
-	char *exp_newick = "((Bee,Ant)f,(Eel,(Dog,Cat)g)h)i;";
+	char *exp_newick = "((Bee,Ant),(Eel,(Dog,Cat)));";
 
 	if (0 != strcmp(obt_newick, exp_newick)) {
 		printf ("%s: expected '%s', got '%s'.\n",
