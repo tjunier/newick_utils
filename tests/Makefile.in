@@ -152,7 +152,8 @@ test_readline_OBJECTS = $(am_test_readline_OBJECTS)
 test_readline_LDADD = $(LDADD)
 am_test_rnode_OBJECTS = test_rnode.$(OBJEXT) rnode.$(OBJEXT) \
 	list.$(OBJEXT) rnode_iterator.$(OBJEXT) hash.$(OBJEXT) \
-	masprintf.$(OBJEXT)
+	masprintf.$(OBJEXT) tree_stubs.$(OBJEXT) nodemap.$(OBJEXT) \
+	link.$(OBJEXT)
 test_rnode_OBJECTS = $(am_test_rnode_OBJECTS)
 test_rnode_LDADD = $(LDADD)
 am_test_rnode_iterator_OBJECTS = test_rnode_iterator.$(OBJEXT) \
@@ -371,7 +372,8 @@ test_newick_parser_SOURCES = test_newick_parser.c $(SRC)/parser.c \
 	$(SRC)/masprintf.c $(SRC)/to_newick.c $(SRC)/concat.c
 
 test_rnode_SOURCES = test_rnode.c $(SRC)/rnode.c $(SRC)/list.c \
-	$(SRC)/rnode_iterator.c $(SRC)/hash.c $(SRC)/masprintf.c
+	$(SRC)/rnode_iterator.c $(SRC)/hash.c $(SRC)/masprintf.c \
+	tree_stubs.c $(SRC)/nodemap.c $(SRC)/link.c
 
 test_list_SOURCES = test_list.c $(SRC)/list.c
 test_link_SOURCES = test_link.c $(SRC)/link.c $(SRC)/nodemap.c \

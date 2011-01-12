@@ -96,44 +96,6 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	return SUCCESS;
 }
 
-/* Returns true IFF all children are leaves. Assumes n is not a leaf. */
-
-// TODO: return bool instead of int
-int all_children_are_leaves(struct rnode *node)
-{
-	struct rnode *curr;
-	for (curr=node->first_child; NULL != curr; curr=curr->next_sibling)
-		if (! is_leaf(curr)) return 0;
-
-	return 1;
-}
-
-/* Returns true IFF all children have the same label. If true, sets 'label' to
- * the shared label. Assumes n is inner node, and all its children are leaves.
- * */
-
-// TODO: return boolean 
-
-int all_children_have_same_label(struct rnode *node, char **label)
-{
-
-	/* get first child's label */
-
-	struct rnode *curr = node->first_child;
-	char *ref_label = curr->label;
-
-	/* iterate over other children, and compare their label to the first's
-	 * */
-
-	*label = NULL;
-	for (curr = curr->next_sibling; NULL != curr; curr = curr->next_sibling)
-		if (0 != strcmp(ref_label, curr->label))
-			return 0; /* found a different label */
-
-	*label = ref_label;
-	return 1;
-}
-
 void collapse_pure_clades(struct rooted_tree *tree)
 {
 	struct list_elem *el;		
@@ -150,7 +112,7 @@ void collapse_pure_clades(struct rooted_tree *tree)
 			 * because it will be later passed to free() */
 			free(current->label);
 			current->label = strdup(label);
-			/* remove children */
+			remove_children(current);
 		}
 	}
 }

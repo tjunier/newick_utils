@@ -36,7 +36,8 @@ test_newick_parser_SOURCES = test_newick_parser.c $(SRC)/parser.c \
 	$(SRC)/masprintf.c $(SRC)/to_newick.c $(SRC)/concat.c
 
 test_rnode_SOURCES = test_rnode.c $(SRC)/rnode.c $(SRC)/list.c \
-	$(SRC)/rnode_iterator.c $(SRC)/hash.c $(SRC)/masprintf.c
+	$(SRC)/rnode_iterator.c $(SRC)/hash.c $(SRC)/masprintf.c \
+	tree_stubs.c $(SRC)/nodemap.c $(SRC)/link.c
 
 test_list_SOURCES = test_list.c $(SRC)/list.c
 
