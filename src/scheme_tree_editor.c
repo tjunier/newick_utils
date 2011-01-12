@@ -587,7 +587,6 @@ static SCM scm_get_node_label(SCM node)
 
 static SCM scm_set_length(SCM edge_length)
 {
-	//char *length_as_string;
 	size_t buffer_length;	/* storage for length as string */
 
 	/* If edge_length is a string, we first try to convert it to a number.
@@ -618,7 +617,7 @@ static SCM scm_set_length(SCM edge_length)
 			SCM_UNDEFINED);
 	buffer_length = scm_c_string_length(edge_length_as_scm_string);
 	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	// size_t copied = scm_to_locale_stringbuf( edge_length_as_scm_string, buffer, buffer_length);
+	scm_to_locale_stringbuf(edge_length_as_scm_string, buffer, buffer_length);
 	buffer[buffer_length] = '\0';
 
 	/* Set the allocated buffer as the current node's length-as-string */
@@ -641,7 +640,7 @@ static SCM scm_set_label(SCM label)
 
 	buffer_length = scm_c_string_length(label);
 	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	// size_t copied = scm_to_locale_stringbuf(label, buffer, buffer_length);
+	scm_to_locale_stringbuf(label, buffer, buffer_length);
 	buffer[buffer_length] = '\0';
 
 	/* Set the allocated buffer as the current node's length-as-string */
