@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <stdbool.h>
+
 struct rnode;
 
 struct rnode {
@@ -84,6 +86,11 @@ int is_root(struct rnode *node);
 /* Returns true IFF node is neither a leaf nor the root */
 
 int is_inner_node(struct rnode *node);
+
+/* Returns true IFF i) node is not a leaf, and ii) all its children are leaves.
+ * */
+
+bool all_children_are_leaves(struct rnode *);
 
 /* Writes the node's address and label to stdout. Argument is void* so that
  * this function can be passed to dump_llist(). */

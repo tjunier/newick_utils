@@ -2,6 +2,10 @@
 #include <string.h>
 
 #include "rnode.h"
+#include "tree.h"
+#include "hash.h"
+#include "nodemap.h"
+#include "tree_stubs.h"
 
 int test_create_rnode()
 {
@@ -248,6 +252,43 @@ int test_create_many()
 	return 0; 	/* crashes on failure */
 }
 
+int test_all_children_are_leaves()
+{
+	const char *test_name = __func__;
+	/* ((A,B)f,(C,(D,E)g)h)i; */
+	struct rooted_tree tree = tree_2();
+	struct hash *map = create_label2node_map(tree.nodes_in_order);
+	struct rnode *node_A = hash_get(map, "A");
+	struct rnode *node_f = hash_get(map, "f");
+	struct rnode *node_g = hash_get(map, "g");
+	struct rnode *node_h = hash_get(map, "h");
+	struct rnode *node_i = hash_get(map, "i");
+
+	if (all_children_are_leaves(node_A)) {
+		printf ("%s: A _is_ a leaf: f() should be false.\n", test_name);
+		return 1;
+	}
+	if (! all_children_are_leaves(node_f)) {
+		printf ("%s: all f's children are leaves.\n", test_name);
+		return 1;
+	}
+	if (! all_children_are_leaves(node_g)) {
+		printf ("%s: all g's children are leaves.\n", test_name);
+		return 1;
+	}
+	if (all_children_are_leaves(node_h)) {
+		printf ("%s: only one of h's chldren is a leaf\n", test_name);
+		return 1;
+	}
+	if (all_children_are_leaves(node_i)) {
+		printf ("%s: none of i's chldren is a leaf\n", test_name);
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -257,6 +298,7 @@ int main()
 	failures += test_create_rnode_emptylabel();
 	failures += test_create_rnode_nulllength();
 	failures += test_create_rnode_emptylength();
+	failures += test_all_children_are_leaves();
 	failures += test_create_many();
 	if (0 == failures) {
 		printf("All tests ok.\n");

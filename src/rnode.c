@@ -111,6 +111,18 @@ int is_inner_node(struct rnode *node)
 	return 	(!is_leaf(node) && !is_root(node));
 }
 
+bool all_children_are_leaves(struct rnode *node)
+{
+	if (is_leaf(node))
+		return false;
+
+	struct rnode *curr;
+	for (curr=node->first_child; NULL != curr; curr=curr->next_sibling)
+		if (! is_leaf(curr)) return false;
+
+	return true;
+}
+
 void dump_rnode(void *arg)
 {
 	struct rnode *node = (struct rnode *) arg;
