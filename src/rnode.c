@@ -123,6 +123,28 @@ bool all_children_are_leaves(struct rnode *node)
 	return true;
 }
 
+bool all_children_have_same_label(struct rnode *node, char **label)
+{
+
+	if (is_leaf(node))
+		return false;
+
+	/* get first child's label */
+	struct rnode *curr = node->first_child;
+	char *ref_label = curr->label;
+
+	/* iterate over other children, and compare their label to the first's
+	 * */
+
+	*label = NULL;
+	for (curr = curr->next_sibling; NULL != curr; curr = curr->next_sibling)
+		if (0 != strcmp(ref_label, curr->label))
+			return 0; /* found a different label */
+
+	*label = ref_label;
+	return 1;
+}
+
 void dump_rnode(void *arg)
 {
 	struct rnode *node = (struct rnode *) arg;

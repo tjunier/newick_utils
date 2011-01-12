@@ -92,6 +92,12 @@ int is_inner_node(struct rnode *node);
 
 bool all_children_are_leaves(struct rnode *);
 
+/* Returns true IFF i) node is not a leaf, and ii) all its children have the
+ * same label. Sets 'label' to the common label (or to NULL if label isn't the
+ * same in every child). */
+
+bool all_children_have_same_label(struct rnode *, char **label);
+
 /* Writes the node's address and label to stdout. Argument is void* so that
  * this function can be passed to dump_llist(). */
 

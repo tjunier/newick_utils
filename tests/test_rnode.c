@@ -289,6 +289,59 @@ int test_all_children_are_leaves()
 	return 0;
 }
 
+int test_all_children_have_same_label()
+{
+	const char *test_name = __func__;
+	/* ((A:1,B:1.0)f:2.0,(C:1,(C:1,C:1)g:2)h:3)i;  - one clade made of
+	 * three 'C's */
+	struct rooted_tree tree = tree_4();
+	struct hash *map = create_label2node_map(tree.nodes_in_order);
+	struct rnode *node_A = hash_get(map, "A");
+	struct rnode *node_f = hash_get(map, "f");
+	struct rnode *node_g = hash_get(map, "g");
+	struct rnode *node_i = hash_get(map, "i");
+
+	struct rnode *mum = create_rnode("mum", "");
+	struct rnode *kid1 = create_rnode("", "");
+	struct rnode *kid2 = create_rnode("", "");
+	add_child(mum, kid1);
+	add_child(mum, kid2);
+
+	char *label;
+
+	if (all_children_have_same_label(node_A, &label)) {
+		printf ("%s: A is a leaf: f() should be false.\n", test_name);
+		return 1;
+	}
+	if (all_children_have_same_label(node_f, &label)) {
+		printf ("%s: f's children have different labels.\n", test_name);
+		return 1;
+	}
+	if (! all_children_have_same_label(node_g, &label)) {
+		printf ("%s: all g's children have the same label.\n", test_name);
+		return 1;
+	}
+	if (strcmp(label, "C") != 0) {
+		printf("%s: shared label should be 'C'\n", test_name);
+		return 1;
+	}
+	if (all_children_have_same_label(node_i, &label)) {
+		printf ("%s: h's children have different labels.\n", test_name);
+		return 1;
+	}
+	if (! all_children_have_same_label(mum, &label)) {
+		printf ("%s: all mum's children have the same label.\n", test_name);
+		return 1;
+	}
+	if (strcmp(label, "") != 0) {
+		printf("%s: shared label should be ''\n", test_name);
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -299,6 +352,7 @@ int main()
 	failures += test_create_rnode_nulllength();
 	failures += test_create_rnode_emptylength();
 	failures += test_all_children_are_leaves();
+	failures += test_all_children_have_same_label();
 	failures += test_create_many();
 	if (0 == failures) {
 		printf("All tests ok.\n");
