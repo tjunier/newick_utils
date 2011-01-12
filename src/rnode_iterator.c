@@ -113,6 +113,13 @@ bool more_children_to_visit (struct rnode_iterator *iter)
 		return false;
 }
 
+/* The iterator keeps state in member 'current'. This is a rnode, and it uses
+ * its 'current_child' member to keep track of which of its children have
+ * already been visited. Before a node is visited for the first time, its
+ * 'current_child' is NULL, then it visits all children in turn. This function
+ * thus needs to update two things: i) the current node in the iterator, and
+ * ii) the current child in the current node. */
+
 struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 {
 	/* We have to consider the case of a single-node tree (this happens
@@ -125,7 +132,7 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	if (is_leaf(iter->current)) {
 		if (iter->current == iter->root) {
 			struct rnode dummy;
-			/* we use current_child_elem in a different
+			/* we use current_child in a different
 			 * way here - this is a leaf, so it obviously has no
 			 * children. current_child_elem is set to the current
 			 * node the first time, and reset to NULL the second
@@ -185,11 +192,12 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 		// first time on this node
 		iter->current->current_child = iter->current->first_child;
 	else
-		iter->current->current_child = iter->current->next_sibling;
+		iter->current->current_child =
+			iter->current->current_child->next_sibling;
 
-	iter->current = iter->current->next_sibling;
+	iter->current = iter->current->current_child;	
 	SHOW;
-	return iter->current;	
+	return iter->current;
 }
 
 /* Computes the list by doing a tree traversal, then reversing it, printing out
