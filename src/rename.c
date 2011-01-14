@@ -139,16 +139,15 @@ struct hash *read_map(const char *filename)
 		key = wt_next(wtok);	/* find first whitespace */
 		if (NULL == key) {
 			fprintf (stderr,
-				"Wrong format in line %s - aborting.\n",
+				"Wrong format in line '%s' - aborting.\n",
 				line);
 			exit(EXIT_FAILURE);
 		}
 		value = wt_next(wtok);
 		if (NULL == value) {
-			fprintf (stderr,
-				"Wrong format in line %s - aborting.\n",
-				line);
-			exit(EXIT_FAILURE);
+			/* If 2nd token is NULL, replace label with empty
+			 * string */
+			value = strdup("");
 		}
 		if (! hash_set(map, key, (void *) value)) {
 			perror(NULL);
