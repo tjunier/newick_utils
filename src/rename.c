@@ -45,8 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 struct parameters {
-	char  *map_filename;
-	int only_leaves;
+	/* Either uses a rename map (whose name is then stored in
+	 * map_filename), or gets the old and new labels from the command line.
+	 * This is determined from the number of arguments. */
+	char *map_filename;
+	char *old_label;
+	char *new_label;
+	bool only_leaves;
 };
 
 void help(char *argv[])
@@ -58,6 +63,8 @@ void help(char *argv[])
 "--------\n"
 "\n"
 "%s [-hl] <newick trees filename|-> <map filename>\n"
+"or"
+"%s [-hl] <newick trees filename|-> <old-label> <new-label>\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -65,14 +72,23 @@ void help(char *argv[])
 "First argument is the name of a file that contains Newick trees, or '-' (in\n"
 "which case trees are read from standard input).\n"
 "\n"
-"Second argument is the name of the map file, which has one (old-name,\n"
-"new-name) pair per line, e.g:\n"
+"In the first (two-argument) form, the second argument is the name of the\n"
+"_map file_, which has one (old-name, new-name) pair per line, e.g:\n"
 "\n"
 "cmp1	Compsognathus\n"
 "trc	Triceratops\n"
+"hnr\n"
 "vlcr	Velociraptor\n"
 "\n"
-"Old and new names should be separated by whitespace.\n"
+"Old and new names should be separated by whitespace. If the new-name\n"
+"is empty (such as for 'hnr' above), the label will be removed.\n"
+"\n"
+"In the second (three-argument) form, the second argument is the old label\n"
+"(i.e., the one to be replaced), and the third argument is the replacement.\n"
+"\n"
+"In other words, the first form can replace more than one label, but\n"
+"requires a map file, while the second form requires no file but is limited\n"
+"to one label.\n"
 "\n"
 "Output\n"
 "------\n"
@@ -108,6 +124,7 @@ void help(char *argv[])
 "# family is left:\n"
 "\n"
 "$ %s data/falconiformes data/falc_map | nw_condense -\n",
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
@@ -167,6 +184,9 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	params.only_leaves = FALSE;	/* default: rename all nodes */
+	params.map_filename = NULL;
+	params.old_label = NULL;
+	params.new_label = NULL;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "hl")) != -1) {
@@ -181,21 +201,26 @@ struct parameters get_params(int argc, char *argv[])
 	}
 
 	/* check arguments */
-	if ((argc - optind) == 2)	{
-		if (0 != strcmp("-", argv[optind])) {
-			FILE *fin = fopen(argv[optind], "r");
-			extern FILE *nwsin;
-			if (NULL == fin) {
-				perror(NULL);
-				exit(EXIT_FAILURE);
-			}
-			nwsin = fin;
-		}
-		params.map_filename = argv[optind+1];
-	} else {
+	if ((argc - optind) < 2)	{
 		fprintf(stderr, "Usage: %s [-hl] <filename|-> <map_filename>\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
+	} 
+
+	if (0 != strcmp("-", argv[optind])) {
+		FILE *fin = fopen(argv[optind], "r");
+		extern FILE *nwsin;
+		if (NULL == fin) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+		nwsin = fin;
+	}
+	if ((argc - optind) == 2)
+		params.map_filename = argv[optind+1];
+	else  {
+		params.old_label = argv[optind+1];
+		params.new_label = argv[optind+2];
 	}
 
 	return params;
@@ -220,6 +245,23 @@ void process_tree(struct rooted_tree *tree, struct hash *rename_map,
 	dump_newick(tree->root);
 }
 
+struct hash *set_map(struct parameters params)
+{
+	if (NULL != params.map_filename)
+		return read_map(params.map_filename);
+
+	struct hash *map = create_hash(1);
+	if (NULL == map) { perror(NULL); exit(EXIT_FAILURE); }
+
+	char *key = strdup(params.old_label);
+	char *val = strdup(params.new_label);
+	if (! hash_set(map, key, val)) {
+		perror(NULL); exit(EXIT_FAILURE);
+	}
+
+	return map;
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
@@ -228,7 +270,7 @@ int main(int argc, char *argv[])
 	
 	params = get_params(argc, argv);
 
-	rename_map = read_map(params.map_filename);
+	rename_map = set_map(params);
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, rename_map, params);
