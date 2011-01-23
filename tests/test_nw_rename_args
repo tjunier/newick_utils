@@ -1,3 +1,6 @@
 simple:newtree.nw newtree.map
 l:-l numID.nw numID.map
 multi:multi_newtree.nw newtree.map
+undef: newtree.nw undef.map
+simple_cli: newtree.nw HRV16 A
+undef_cli: newtree.nw HRV16 ""
