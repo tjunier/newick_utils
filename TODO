@@ -119,13 +119,10 @@ allow selection of a branch by its LCA.
 
 nw_display: craft test tree for numeric verification of lengths and positions
 
-
 nw_display: use CSS in scale bar
 
 [partly done] nw_display: add scale bar to SVG radial -- in progress, but scale
 is too compressed in radial trees -- try with catarrhini.
-
-nw_display: add scale bar to text display
 
 nw_display: CSS node groups that aren't clades (flag Invariant) should not be
 called 'clade_xy' in the SVG, but 'group_xy'.
@@ -149,6 +146,8 @@ out as output.
 [later] nw_ed should be able to visit the tree in reverse order, and to flag
 nodes for no further processing (if they meet the condition or if their parent
 is flagged), like in the Ruby version.
+
+[done] nw_display: add scale bar to text display
 
 [done] Valgrind nw_clade
 
@@ -503,3 +502,7 @@ be undefined.
 nw_sched: implement lbl!
 
 nw_shed: check help page, and sync w/ tutorial; add examples incl. implementation of other nutils (nw_topology, nw_label, nw_trim?)
+
+new rnode: some TODO items list tests to write. Write them. Now.
+
+nw_display: add CSS to labels (in CSS map) 
