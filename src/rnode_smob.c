@@ -41,7 +41,7 @@ SCM rnode_smob_label(SCM rnode_smob, SCM label)
 	struct rnode *node;
 	node = (struct rnode*) SCM_SMOB_DATA (rnode_smob);
 
-	if (scm_defined_p(label, SCM_UNDEFINED)) {
+	if (SCM_UNDEFINED == label) { 
 		// TODO: set
 	}
 	

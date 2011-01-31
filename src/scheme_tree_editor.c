@@ -659,7 +659,7 @@ static void register_C_functions()
 	scm_c_define_gsubr("set-label!", 1, 0, 0, scm_set_label);
 	scm_c_define_gsubr("N", 0, 0, 0, scm_get_current_node);
 	scm_c_define_gsubr("get-current-node", 0, 0, 0, scm_get_current_node);
-	scm_c_define_gsubr("lab", 2, 0, 0, scm_get_label);
+	scm_c_define_gsubr("lab", 1, 0, 0, scm_get_label);
 }
 
 static void inner_main(void *closure, int argc, char* argv[])
