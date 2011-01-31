@@ -565,20 +565,14 @@ static SCM scm_splice_out_node() 	/* "open" */
 
 static SCM scm_get_current_node()
 {
-	char *cmd = masprintf("(make-node \"%p\")", current_node);
-	// printf("command: %s\n", cmd);
-	SCM current = scm_c_eval_string(cmd);
-	free(cmd);
+	SCM current = rnode_smob(current_node); 
 
 	return current;
 }
 
-/* Returns the label of the node passed as argument, as a string. */
-
-static SCM scm_get_node_label(SCM node)
+static SCM scm_get_label(SCM node)
 {
-	// TODO: probably need to define a SMOB for this (and if so,
-	// scm_get_current_node() will need to be modified, too.
+	return rnode_smob_label(node, SCM_UNDEFINED);
 }
 
 /* Sets the current node's parent edge length. Argument must be a number or a
@@ -651,19 +645,6 @@ static SCM scm_set_label(SCM label)
 	return SCM_UNSPECIFIED;
 }
 
-/* Defines an rnode type for use in Scheme */
-
-static void define_node()
-{
-	/* We just store the node's address (struct rnode*). We will access the
-	 * node's field through the pointer. */
-	scm_c_eval_string(
-		"(define node (make-record-type \"node\" '(address)))"
-		"(define make-node (record-constructor node '(address)))"
-		"(define get-node-address (record-accessor node 'address))"
-	);
-}
-
 static void register_C_functions()
 {
 	scm_c_define_gsubr("s", 0, 0, 0, scm_dump_subclade);
@@ -678,6 +659,7 @@ static void register_C_functions()
 	scm_c_define_gsubr("set-label!", 1, 0, 0, scm_set_label);
 	scm_c_define_gsubr("N", 0, 0, 0, scm_get_current_node);
 	scm_c_define_gsubr("get-current-node", 0, 0, 0, scm_get_current_node);
+	scm_c_define_gsubr("lab", 2, 0, 0, scm_get_label);
 }
 
 static void inner_main(void *closure, int argc, char* argv[])
@@ -685,7 +667,7 @@ static void inner_main(void *closure, int argc, char* argv[])
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
 
-	define_node();
+	init_scm_rnode();
 
 	/* Aliases and simple functions */
 	// TODO: put in a separate f(); and call scm_c_eval_string() once on all

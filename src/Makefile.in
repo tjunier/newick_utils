@@ -135,7 +135,8 @@ nw_rename_DEPENDENCIES = libnw.la
 am_nw_reroot_OBJECTS = reroot.$(OBJEXT)
 nw_reroot_OBJECTS = $(am_nw_reroot_OBJECTS)
 nw_reroot_DEPENDENCIES = libnw.la
-am_nw_sched_OBJECTS = scheme_tree_editor.$(OBJEXT)
+am_nw_sched_OBJECTS = scheme_tree_editor.$(OBJEXT) \
+	rnode_smob.$(OBJEXT)
 nw_sched_OBJECTS = $(am_nw_sched_OBJECTS)
 nw_sched_DEPENDENCIES = libnw.la
 am_nw_stats_OBJECTS = stats.$(OBJEXT)
@@ -376,7 +377,7 @@ nw_duration_SOURCES = duration.c
 nw_duration_LDADD = @LEXLIB@ libnw.la
 nw_stats_SOURCES = stats.c
 nw_stats_LDADD = @LEXLIB@ libnw.la
-nw_sched_SOURCES = scheme_tree_editor.c
+nw_sched_SOURCES = scheme_tree_editor.c rnode_smob.c
 nw_sched_LDADD = @LEXLIB@  libnw.la -lguile
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -598,6 +599,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reroot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rnode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rnode_iterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rnode_smob.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scheme_tree_editor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple_node_pos.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stats.Po@am__quote@
