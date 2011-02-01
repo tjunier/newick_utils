@@ -1,3 +1,8 @@
+nw_sched: would be nice to merge with new_rnode, as this would open up the possibility of a 'next-sib' function.
+
+nw_sched: define a SMOB for trees. Access the nodes_in_order as a Scheme list
+(what else?), then... car and cdr!
+
 nw_match: try to implement the whole thing using iterators rather than comparing Newick strings.
 
 nw_stats: should say if root is labeled or not.

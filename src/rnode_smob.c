@@ -45,10 +45,23 @@ SCM rnode_smob_label(SCM node_smob, SCM label)
 	struct rnode *node;
 	node = (struct rnode*) SCM_SMOB_DATA (node_smob);
 
-	if (SCM_UNDEFINED == label) { 
-		// TODO: set
+	if (SCM_UNDEFINED != label) { 
+		size_t buffer_length;	/* storage for label */
+
+		if (scm_is_number (label))
+			label = scm_number_to_string(label, SCM_UNDEFINED);	
+
+		buffer_length = scm_c_string_length(label);
+		char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
+		scm_to_locale_stringbuf(label, buffer, buffer_length);
+		buffer[buffer_length] = '\0';
+
+		/* Set the allocated buffer as the node's length-as-string */
+		free(node->label);
+		node->label = buffer;
 	}
 	
+	// TODO This is inefficient!
 	char *c_label = strdup(node->label);
 	/* no need to free label (see scm_take_locale_string()) */
 
