@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree_editor_rnode_data.h"
 #include "common.h"
 #include "masprintf.h"
+#include "rnode_smob.h"
 
 struct rnode *current_node;
 
@@ -404,6 +405,10 @@ static void set_predefined_variables(struct rnode *node)
 			node->edge_length_as_string);
 	scm_c_define("lbl", label);
 
+	/* N: current node */
+	SCM node_smob = rnode_smob(node);
+	scm_c_define("N", node_smob);
+
 	/* b: returns node label, as a bootstrap support value (or undefined if
 	this can't be done) */
 	if (is_leaf(node))
@@ -575,6 +580,11 @@ static SCM scm_get_label(SCM node)
 	return rnode_smob_label(node, SCM_UNDEFINED);
 }
 
+static SCM scm_set_label(SCM node, SCM label)
+{
+	return rnode_smob_label(node, label);
+}
+
 /* Sets the current node's parent edge length. Argument must be a number or a
  * string. */
 
@@ -626,7 +636,7 @@ static SCM scm_set_length(SCM edge_length)
  * able to set support values), if numeric it will be converted to a string
  * using format. */
 
-static SCM scm_set_label(SCM label)
+static SCM scm_set_current_node_label(SCM label)
 {
 	size_t buffer_length;	/* storage for label */
 
@@ -655,11 +665,12 @@ static void register_C_functions()
 	scm_c_define_gsubr("splice-out-node", 0, 0, 0, scm_splice_out_node);
 	scm_c_define_gsubr("L!", 1, 0, 0, scm_set_length);
 	scm_c_define_gsubr("set-length!", 1, 0, 0, scm_set_length);
-	scm_c_define_gsubr("lbl!", 1, 0, 0, scm_set_label);
-	scm_c_define_gsubr("set-label!", 1, 0, 0, scm_set_label);
-	scm_c_define_gsubr("N", 0, 0, 0, scm_get_current_node);
-	scm_c_define_gsubr("get-current-node", 0, 0, 0, scm_get_current_node);
+	scm_c_define_gsubr("lbl!", 1, 0, 0, scm_set_current_node_label);
+	scm_c_define_gsubr("set-label!", 1, 0, 0, scm_set_current_node_label);
 	scm_c_define_gsubr("lab", 1, 0, 0, scm_get_label);
+	scm_c_define_gsubr("lab!", 2, 0, 0, scm_set_label);
+	scm_c_define_gsubr("par", 1, 0, 0, rnode_smob_parent);
+	scm_c_define_gsubr("parent", 1, 0, 0, rnode_smob_parent);
 }
 
 static void inner_main(void *closure, int argc, char* argv[])

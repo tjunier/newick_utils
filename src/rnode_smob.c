@@ -36,10 +36,14 @@ SCM rnode_smob(struct rnode *node)
 	return smob;
 }
 
-SCM rnode_smob_label(SCM rnode_smob, SCM label)
+SCM rnode_smob_label(SCM node_smob, SCM label)
 {
+
+	if (SCM_UNDEFINED == node_smob)
+		return SCM_UNDEFINED;
+
 	struct rnode *node;
-	node = (struct rnode*) SCM_SMOB_DATA (rnode_smob);
+	node = (struct rnode*) SCM_SMOB_DATA (node_smob);
 
 	if (SCM_UNDEFINED == label) { 
 		// TODO: set
@@ -49,4 +53,17 @@ SCM rnode_smob_label(SCM rnode_smob, SCM label)
 	/* no need to free label (see scm_take_locale_string()) */
 
 	return label = scm_take_locale_string(c_label);
+}
+
+SCM rnode_smob_parent(SCM node_smob)
+{
+	if (SCM_UNDEFINED == node_smob)
+		return SCM_UNDEFINED;
+
+	struct rnode *node;
+	node = (struct rnode*) SCM_SMOB_DATA (node_smob);
+	if (is_root(node))
+		return SCM_UNDEFINED;
+
+	return rnode_smob(node->parent);
 }
