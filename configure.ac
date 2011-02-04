@@ -9,6 +9,8 @@ AC_CONFIG_SRCDIR([src])
 
 AC_CONFIG_HEADER([config.h])
 
+# LibXML
+
 AC_ARG_WITH([libxml],
 	[
 	 	AS_HELP_STRING([--with-libxml],
@@ -29,6 +31,29 @@ AC_ARG_WITH([libxml-headers],
 	]
 	)
 
+# Guile
+
+AC_ARG_WITH([guile],
+	[
+	 	AS_HELP_STRING([--with-guile],
+		[compile nw_sched (stream editor for trees, embeds Guile) @<:@default=yes@:>@])
+	],
+	[],	# do nothing special if passed (but see below in lib section)
+	[with_guile=yes]	# if not passed, set to 'yes' (default)
+	)
+
+AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile != xno])
+
+AC_ARG_WITH([guile-headers],
+	[
+	 	AS_HELP_STRING([--with-guile-headers],
+		[specify alternative include directory for guile headers @<:@default=/usr/include@:>@])
+	],
+	[
+	 	AC_MSG_NOTICE([Note: --with-guile set to 'yes' as guile include dirs were provided])
+		with_guile=yes
+	]
+	)
 
 # Checks for programs.
 AC_PROG_CC
@@ -60,6 +85,18 @@ AS_IF([test "x$with_libxml" != xno],
 	]
 	)
 
+AS_IF([test "x$with_guile" != xno],
+	[
+	 	# use guile.
+	 	AS_IF([test "x$with_guile" != xyes],
+			[
+			 	# look for guile where user said: in $with_guile
+				LDFLAGS="-L$with_guile $LDFLAGS"
+			]
+		)
+		AC_CHECK_LIB([guile])
+	]
+	)
 # Checks for header files.
 
 
@@ -97,6 +134,20 @@ AS_IF([test "x$with_libxml" != xno],
 	]
 )
 
+AS_IF([test "$with_guile_headers" != ""],
+	[
+	 	# look for headers where user said: in $with_guile_headers
+	 	CPPFLAGS="-I$with_guile_headers $CPPFLAGS"
+	]
+	)
+
+AS_IF([test "x$with_guile" != xno],
+	[
+		# look for guile headers IFF with-guile is not 'no'. Where to look for
+		# them is governed by CPPFLAGS (see above).
+		AC_CHECK_HEADERS(libguile.h)
+	]
+)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
