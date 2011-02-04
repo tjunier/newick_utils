@@ -10,3 +10,5 @@ tags
 *.tar.gz
 Session.vim
 *~
+config.h.in
+configure
