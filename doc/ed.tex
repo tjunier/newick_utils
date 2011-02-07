@@ -34,23 +34,24 @@ now. They were in fact inspired by \texttt{sed} and \texttt{awk}, which perform
 an action on the parts of input (usually lines) that meet some condition. Rather
 than lines in a file, the programs presented here work with nodes in a tree:
 each node is visited in turn, and if it meets a user-specified condition, a
-user-specified action is performed. In other word, they are node-oriented stream
-editors for trees.
+user-specified action is performed. In other words, they are node-oriented
+stream editors for trees.
 
 As a word of warning, I should say that these programs are among the more
-experimental in the \nutils{} package. This is why there are two (at least one
-more is on the way) programs that do basically the same thing, although
+experimental in the \nutils{} package. This is why there are two programs (at
+least one more is on the way) that do basically the same thing, although
 differently and with different capabilities: \ed{} is the simplest (and first),
 it is written entirely in C and it is fairly limited. \sched{} was developed to
-address \ed{}'s limitations: by embedding a Scheme (\url{www.schemers.org})
-interpreter (\gnu{} Guile), its flexibility is, for practical purposes,
-limitless. Of course, this comes at the price of linking to an external library,
-which may not be available. Therefore \ed{}, for all its limitations, will stay
-in the package as it does not depend on Guile. Finally, I understand that Scheme
-is not the only solution as an embedded language, and that many people (myself
-included) find learning it a challenge. Therefore, my intention is to try the
-same approach with Lua (\url{www.lua.org}, which is designed as an embeddable
-language.
+address \ed{}'s limitations: by embedding a Scheme (\url{http://www.r6rs.org})
+interpreter (\gnu{} Guile, \url{http://www.gnu.org/software/guile/}), its
+flexibility is, for practical purposes, limitless. Of course, this comes at the
+price of linking to an external library, which may not be available. Therefore
+\ed{}, for all its limitations, will stay in the package as it does not depend
+on Guile. Finally, I understand that Scheme is not the only solution as an
+embedded language, and that many people (myself included) find learning it a
+challenge. Therefore, my intention is to try the same approach with Lua
+(\url{http://www.lua.org}), which is designed as an embeddable language, is
+even smaller than Guile, and by many accounts easier to learn.
 
 \subsection{\ed}
 
@@ -203,9 +204,15 @@ support.
 \subsection{\sched}
 
 As mentioned above, \sched{} works like \ed{}, but embeds a Scheme interpreter
-so that the address (also called the {\tt selector}) and action are passed as a
-Scheme expression.
-\noindent{}As a first example, let's again extract all well-supported clades from the tree of vertebrate genera, as we did with \ed.
+so that the address (also called the {\em selector}) and action are passed as a
+Scheme expression. The Scheme language (see link above) has a simple syntax,
+but it can be slightly surprising at first. To understand the following
+examples, you just need to know that operators \emph{precede} their arguments,
+as do function names, so that the sum of 2 and 2 is written \texttt{(+ 2 2)},
+the sine of $x$ is \texttt{(sin x)}, \texttt{(< 3 2)} is false, etc.
+
+\noindent{}As a first example, let's again extract all
+well-supported clades from the tree of vertebrate genera, as we did with \ed.
 
 \verbatiminput{ed_5_txt.cmd}
 \begin{samepage}
@@ -214,19 +221,22 @@ Scheme expression.
 
 The expression \texttt{((\& (def? 'b) (>= 95 b)) (s))} parses as follows:
 \begin{itemize}
-	\item the first element, \texttt{(\& (def? 'b) (>= 95 b))}, is the selector.
-	It is a Boolean expression, namely a conjunction
-	(\texttt{\&})\footnote{\texttt{\&} is a short name for the Scheme form
-	\texttt{and}.} of the expressions \texttt{(def? 'b)} and \texttt{(>= 95 b)}.
-	The former verifies that variable \texttt{b} is defined\footnote{In \ed,
-	\texttt{b} was zero if the support was not defined. \sched{} distinguishes
-	between undefined and zero, which is why one has to check that \texttt{b} is
-	defined before using it. \texttt{def?} is just a shorter name for
-	\texttt{defined?}.}, and the latter is true iff \texttt{b} is not smaller than
-	95.
-	\item the second element, \texttt{(s)}, is the action -- in this case, a call
-	to function \texttt{s}, which has the same meaning as action \texttt{s} in
-	\ed, namely to print out the subclade rooted at the current node.
+	\item the first element (or \texttt{car}, in Scheme parlance),
+	\texttt{(\& (def? 'b) (>= 95 b))}, is the selector.  It is a Boolean
+	expression, namely a conjunction (\texttt{\&})\footnote{\texttt{\&} is
+	a short name for the Scheme form \texttt{and}, which is defined by
+	\sched{} to allow for shorter expressions on the command line.} of the
+	expressions \texttt{(def? 'b)} and \texttt{(>= 95 b)}.  The former
+	checks that variable \texttt{b} (bootstrap support) is
+	defined\footnote{In \ed, \texttt{b} was zero if the support was not
+	defined. \sched{} distinguishes between undefined and zero, which is
+	why one has to check that \texttt{b} is defined before using it.
+	\texttt{def?} is just a shorter name for \texttt{defined?}.}, and the
+	latter is true iff \texttt{b} is not smaller than 95.
+	\item the second element (\texttt{cadr} in Scheme jargon),
+	\texttt{(s)}, is the action -- in this case, a call to function
+	\texttt{s}, which has the same meaning as action \texttt{s} in \ed,
+	namely to print out the subclade rooted at the current node.
 \end{itemize}
 
 \subsubsection{Selectors}
@@ -281,7 +291,7 @@ Scheme & \sched{} short form & meaning \\
 \begin{tabular}{cl}
 expression & selects: \\
 \hline
-\texttt{l} & all leaves \\
+\texttt{l} (lowercase ell) & all leaves \\
 \texttt{(\& l (<= a 3))} & leaves with 3 ancestors or less \\
 \texttt{(\& i (def? 'b) (>= b 95))} & internal nodes with support greater than 95\% \\ 
 \texttt{(\& i (def? 'b) (b < 50)} & unsupported nodes (less than 50\%) \\
@@ -336,15 +346,40 @@ of decimal places. For example, the \texttt{HRV.nw} tree has six:
 \verbatiminput{ed_6_txt.out}
 \end{samepage}
 
-\noindent{}I use \nwindent{} to show each node on a line for clarity, and show
-only the last ten.\footnote{the \emph{first} ten lines contain only opening
-parentheses.} To format\footnote{\sched{} automatically loads the {\tt format}
-module so that the full-fledged {\tt format} function is available.} the lengths
-to two decimal places, do the following:
+\noindent{}Here I use \nwindent{} to show each node on a line for clarity, and
+show only the last ten.\footnote{the \emph{first} ten lines contain only
+opening parentheses.} To format\footnote{\sched{} automatically loads the {\tt
+format} module so that the full-fledged {\tt format} function is available.}
+the lengths to two decimal places, do the following:
 
 \verbatiminput{ed_7_txt.cmd}
 \begin{samepage}
 \verbatiminput{ed_7_txt.out}
+\end{samepage}
+
+\noindent{}{\it Multiplying lengths by a constant}
+
+It may be necessary to have two trees which only differ by a constant multiple
+of the branch lengths. This can be used, for example, to test competing
+hypotheses about evolution rates.
+
+
+\begin{samepage}
+Here is our good friend the Catarrhinine tree again:
+
+\verbatiminput{ed_8_svg.cmd}
+\begin{center}
+\includegraphics{ed_8_svg.pdf}
+\end{center}
+\end{samepage}
+
+To multiply all its branch lengths by (say) 3.5, do the following:
+
+\begin{samepage}
+\verbatiminput{ed_9_svg.cmd}
+\begin{center}
+\includegraphics{ed_9_svg.pdf}
+\end{center}
 \end{samepage}
 
 \begin{samepage}
