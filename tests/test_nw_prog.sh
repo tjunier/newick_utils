@@ -40,10 +40,10 @@ else
 	xml='off'
 fi
 
-if grep '^#define.*HAVE_LIBGUILE' ../config.h > /dev/null ; then
-	guile='on'
+if grep '^#define.*CHECK_NW_SCHED' ../config.h > /dev/null ; then
+	check_nw_sched='on'
 else
-	guile='off'
+	check_nw_sched='off'
 fi
 
 # I can't use these in strict Bourne shell, so I use a sed command
@@ -56,7 +56,7 @@ args_file=test_${prog}_args
 # nw_sched is only tested if Guile is being used
 
 if [ "$prog" = "nw_sched" ] ; then
-	if [ "$guile" = "off" ]; then
+	if [ "$check_nw_sched" = "off" ]; then
 		echo "Guile not used - nw_sched test disabled."
 		exit 0
 	fi

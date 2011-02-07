@@ -7,7 +7,7 @@ AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src])
 
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 # LibXML
 
@@ -42,18 +42,7 @@ AC_ARG_WITH([guile],
 	[with_guile=yes]	# if not passed, set to 'yes' (default)
 	)
 
-AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile != xno])
 
-AC_ARG_WITH([guile-headers],
-	[
-	 	AS_HELP_STRING([--with-guile-headers],
-		[specify alternative include directory for guile headers @<:@default=/usr/include@:>@])
-	],
-	[
-	 	AC_MSG_NOTICE([Note: --with-guile set to 'yes' as guile include dirs were provided])
-		with_guile=yes
-	]
-	)
 
 # Checks for programs.
 AC_PROG_CC
@@ -85,18 +74,6 @@ AS_IF([test "x$with_libxml" != xno],
 	]
 	)
 
-AS_IF([test "x$with_guile" != xno],
-	[
-	 	# use guile.
-	 	AS_IF([test "x$with_guile" != xyes],
-			[
-			 	# look for guile where user said: in $with_guile
-				LDFLAGS="-L$with_guile $LDFLAGS"
-			]
-		)
-		AC_CHECK_LIB([guile])
-	]
-	)
 # Checks for header files.
 
 
@@ -134,20 +111,25 @@ AS_IF([test "x$with_libxml" != xno],
 	]
 )
 
-AS_IF([test "$with_guile_headers" != ""],
-	[
-	 	# look for headers where user said: in $with_guile_headers
-	 	CPPFLAGS="-I$with_guile_headers $CPPFLAGS"
-	]
-	)
-
 AS_IF([test "x$with_guile" != xno],
 	[
-		# look for guile headers IFF with-guile is not 'no'. Where to look for
-		# them is governed by CPPFLAGS (see above).
-		AC_CHECK_HEADERS(libguile.h)
+		AC_CHECK_HEADERS([libguile.h], [],
+						 [
+						  AC_MSG_NOTICE([libguile.h not found - Guile disabled.])
+						  with_guile=no
+						  ])
+		AC_CHECK_LIB([guile], [scm_with_guile], [],
+					 [
+					 	AC_MSG_NOTICE([libguile.so not found - Guile disabled.])
+						with_guile=no
+					])
 	]
 )
+
+# If with_guile is still not 'no', set some variables
+AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile != xno])
+AS_IF([test "x$with_guile" != xno],
+	  [ AC_DEFINE([CHECK_NW_SCHED], 1, [Check nw_sched]) ])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
