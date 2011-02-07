@@ -78,6 +78,8 @@ void help(char *argv[])
 "\n"
 "%s [-hnor] <newick trees filename|-> <Scheme expression>\n"
 "\n"
+"NOTE: this program is still very experimental and will probably change!\n"
+"\n"
 "Input\n"
 "-----\n"
 "\n"
