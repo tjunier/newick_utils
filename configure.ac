@@ -41,7 +41,7 @@ AC_ARG_WITH([guile],
 	[], # default: do nothing
 	[with_guile=yes]	# not passed: set to yes (default)
 )
-AC_MSG_NOTICE([Guile: with_guile = $with_guile])
+#AC_MSG_NOTICE([Guile: with_guile = $with_guile])
 
 
 # Checks for programs.
@@ -121,7 +121,7 @@ AS_IF([test "x$with_guile" = xyes],
 AS_CASE([x$with_guile],
 		[xyes],
 			[
-			 	AC_MSG_NOTICE([Guile enabled.])
+			 	#AC_MSG_NOTICE([Guile enabled.])
 			 	AC_DEFINE([CHECK_NW_SCHED], 1, [Check nw_sched])
 			],
 		[xno],
