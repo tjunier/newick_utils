@@ -33,14 +33,15 @@ AC_ARG_WITH([libxml-headers],
 
 # Guile
 
-with_guile=yes	# default
 AC_ARG_WITH([guile],
 	[
 	 	AS_HELP_STRING([--with-guile],
 			[Use Guile (enables nw_sched) @<:@default=yes@:>@])
-	]
+	],
+	[], # default: do nothing
+	[with_guile=yes]	# not passed: set to yes (default)
 )
-
+AC_MSG_NOTICE([Guile: with_guile = $with_guile])
 
 
 # Checks for programs.
@@ -132,6 +133,8 @@ AS_CASE([x$with_guile],
 		[AC_MSG_NOTICE([Invalid argument --with-guile=$with_guile])]
 )
 AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile = xyes])
+
+#LDFLAGS="$LDFLAGS -L/lib -L/usr/lib -L/usr/local/lib -L/usr/lib64 -L/usr/local/lib64"
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
