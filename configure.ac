@@ -18,7 +18,7 @@ AC_ARG_WITH([libxml],
 	],
 	[],	# do nothing special if passed (but see below in lib section)
 	[with_libxml=yes]	# if not passed, set to 'yes' (default)
-	)
+)
 
 AC_ARG_WITH([libxml-headers],
 	[
@@ -29,18 +29,17 @@ AC_ARG_WITH([libxml-headers],
 	 	AC_MSG_NOTICE([Note: --with-libxml set to 'yes' as libxml include dirs were provided])
 		with_libxml=yes
 	]
-	)
+)
 
 # Guile
 
+with_guile=yes	# default
 AC_ARG_WITH([guile],
 	[
 	 	AS_HELP_STRING([--with-guile],
-		[compile nw_sched (stream editor for trees, embeds Guile) @<:@default=yes@:>@])
-	],
-	[],	# do nothing special if passed (but see below in lib section)
-	[with_guile=yes]	# if not passed, set to 'yes' (default)
-	)
+			[Use Guile (enables nw_sched) @<:@default=yes@:>@])
+	]
+)
 
 
 
@@ -111,25 +110,28 @@ AS_IF([test "x$with_libxml" != xno],
 	]
 )
 
-AS_IF([test "x$with_guile" != xno],
+AS_IF([test "x$with_guile" = xyes],
 	[
-		AC_CHECK_HEADERS([libguile.h], [],
-						 [
-						  AC_MSG_NOTICE([libguile.h not found - Guile disabled.])
-						  with_guile=no
-						  ])
-		AC_CHECK_LIB([guile], [scm_with_guile], [],
-					 [
-					 	AC_MSG_NOTICE([libguile.so not found - Guile disabled.])
-						with_guile=no
-					])
+		AC_CHECK_HEADERS([libguile.h], [], [with_guile=no_hdr])
+		AC_CHECK_LIB([guile], [scm_with_guile], [], [with_guile=no_lib])
 	]
 )
 
-# If with_guile is still not 'no', set some variables
-AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile != xno])
-AS_IF([test "x$with_guile" != xno],
-	  [ AC_DEFINE([CHECK_NW_SCHED], 1, [Check nw_sched]) ])
+AS_CASE([x$with_guile],
+		[xyes],
+			[
+			 	AC_MSG_NOTICE([Guile enabled.])
+			 	AC_DEFINE([CHECK_NW_SCHED], 1, [Check nw_sched])
+			],
+		[xno],
+			[AC_MSG_NOTICE([Guile disabled by user.])],
+		[xno_hdr],
+			[AC_MSG_NOTICE([Guile disabled due to missing header.])],
+		[xno_lib],
+			[AC_MSG_NOTICE([Guile disabled due to missing lib.])],
+		[AC_MSG_NOTICE([Invalid argument --with-guile=$with_guile])]
+)
+AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile = xyes])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
