@@ -8,6 +8,7 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src])
 
 AC_CONFIG_HEADERS([config.h])
+AH_TEMPLATE([HAVE_LIBXML2],[Using libXML2]) #TODO: is this needed?
 
 # LibXML
 
