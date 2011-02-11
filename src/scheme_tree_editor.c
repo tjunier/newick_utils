@@ -524,6 +524,7 @@ void process_tree(struct rooted_tree *tree, SCM address,
 SCM scm_dump_subclade()
 {
 	dump_newick(current_node);
+	return SCM_UNDEFINED;
 }
 
 SCM scm_unlink_node()
