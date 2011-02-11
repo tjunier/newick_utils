@@ -33,9 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifdef HAVE_LIBXML_TREE_H
 #include <libxml/tree.h>
+#endif
+#ifdef HAVE_LIBXML_PARSER_H
 #include <libxml/parser.h>
+#endif
+#ifdef HAVE_LIBXML_XPATH__H
 #include <libxml/xpath.h>
+#endif
 
 #include "config.h"
 
