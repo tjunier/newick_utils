@@ -13,3 +13,4 @@ Session.vim
 config.h.in
 configure
 aclocal.m4
+Makefile.in
