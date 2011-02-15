@@ -8,7 +8,7 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src])
 
 AC_CONFIG_HEADERS([config.h])
-AH_TEMPLATE([HAVE_LIBXML2],[Using libXML2]) #TODO: is this needed?
+AH_TEMPLATE([USE_LIBXML2],[Using libXML2]) #TODO: is this needed?
 
 # LibXML
 
@@ -51,7 +51,6 @@ AC_CHECK_LIB([m], [log])
 
 # Checks for header files.
 
-
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_CHECK_HEADERS(inttypes.h)
@@ -85,7 +84,10 @@ AS_IF([test "x$with_guile" = xyes],
 
 AS_CASE([x$with_libxml],
 		[xyes],
-			[], # nothing else to do
+			[
+			 	# This goes into config.h
+			 	AC_DEFINE([USE_LIBXML2], 1, [Use LibXML])
+			],
 		[xno],
 			[AC_MSG_NOTICE([libXML disabled by user.])],
 		[xno_lib],
@@ -98,7 +100,7 @@ AS_CASE([x$with_libxml],
 AS_CASE([x$with_guile],
 		[xyes],
 			[
-			 	#AC_MSG_NOTICE([Guile enabled.])
+			 	# This goes into config.h
 			 	AC_DEFINE([CHECK_NW_SCHED], 1, [Check nw_sched])
 			],
 		[xno],
@@ -109,6 +111,7 @@ AS_CASE([x$with_guile],
 			[AC_MSG_NOTICE([libguile missing (disabled).])],
 		[AC_MSG_NOTICE([Invalid argument --with-guile=$with_guile])]
 )
+# This is accessible in Makefile.in's
 AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile = xyes])
 
 
