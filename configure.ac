@@ -31,9 +31,13 @@ AC_ARG_WITH([guile],
 	[], # default: do nothing
 	[with_guile=yes]	# not passed: set to yes (default)
 )
-#AC_MSG_NOTICE([Guile: with_guile = $with_guile])
 
-
+AC_ARG_WITH([guile-libdir],
+			[
+			 AS_HELP_STRING([--with-guile-libdir],
+				[Specify alternative lib dir for Guile])
+			 ])
+		
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_YACC
@@ -74,6 +78,7 @@ AS_IF([test "x$with_libxml" = xyes],
 AS_IF([test "x$with_guile" = xyes],
 	[
 		AC_CHECK_HEADERS([libguile.h], [], [with_guile=no_hdr])
+		#AS_IF([test "x$with_guile_libdir" != xno], [LDFLAGS="$LDFLAGS -L$with_guile_libdir"])
 		AC_CHECK_LIB([guile], [scm_with_guile], [], [with_guile=no_lib])
 	]
 )
@@ -111,8 +116,10 @@ AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile = xyes])
 AC_C_CONST
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
+# NOTE: checking for malloc and realloc causes weird problems on Fedora 13.
+# OTOH it should be a very rare system that doesn't have them.
+#AC_FUNC_MALLOC
+#AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memset rint strdup strpbrk strspn])
 
