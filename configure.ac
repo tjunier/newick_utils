@@ -8,7 +8,7 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src])
 
 AC_CONFIG_HEADERS([config.h])
-AH_TEMPLATE([USE_LIBXML2],[Using libXML2]) #TODO: is this needed?
+AH_TEMPLATE([USE_LIBXML2],[Defined to 1 if all conditions are met for use of LibXML2])
 
 # LibXML
 
@@ -86,7 +86,7 @@ AS_CASE([x$with_libxml],
 		[xyes],
 			[
 			 	# This goes into config.h
-			 	AC_DEFINE([USE_LIBXML2], 1, [Use LibXML])
+			 	AC_DEFINE([USE_LIBXML2], 1, [Can use LibXML2])
 			],
 		[xno],
 			[AC_MSG_NOTICE([libXML disabled by user.])],
