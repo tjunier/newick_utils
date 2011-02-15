@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-#ifdef HAVE_LIBXML2
+#ifdef USE_LIBXML2
 
 char *xml_transform_ornaments(const char *, double, double, double);
 
@@ -103,11 +103,11 @@ unsigned int test_transform_ornaments()
 	return 0;
 }
 
-#endif	/* HAVE_LIBXML2 */
+#endif	/* USE_LIBXML2 */
 
 int main()
 {
-#ifdef HAVE_LIBXML2
+#ifdef USE_LIBXML2
 	int failures = 0;
 	printf("Starting svg_graph_radial test...\n");
 	failures += test_transform_ornaments();

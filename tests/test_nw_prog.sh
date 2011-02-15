@@ -34,7 +34,7 @@ check_applies()
 
 # Set flags, for checking which tests apply.
 
-if grep '^#define.*HAVE_LIBXML2' ../config.h > /dev/null ; then
+if grep '^#define.*USE_LIBXML2' ../config.h > /dev/null ; then
 	xml='on'
 else
 	xml='off'
