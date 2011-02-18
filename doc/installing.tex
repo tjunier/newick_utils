@@ -11,30 +11,35 @@ preinstalled, but some distributions (\eg, Ubuntu) do not install \textsc{gcc},
 etc. by default. Check that you have \textsc{gcc}, Bison, Flex, and the
 \textsc{gnu} autotools, including Libtool. The same goes for Cygwin. On MacOS X,
 you need to install XCode (\url{http://developer.apple.com/tools/xcode}).
-Here are the versions I use (as reported by passing \texttt{--version} to the
-program):
-
-\medskip
-\begin{tabular}{lll}
-Autoconf	& autoconf (GNU Autoconf) & 2.63 \\
-Automake	& automake (GNU automake) & 1.11.1 \\
-Bison  		& bison (GNU Bison) 			& 2.4.1 \\ 
-Flex			& flex 										& 2.5.35 \\
-GCC 			& gcc (GCC) 							& 4.4.1 20090725 (Red Hat 4.4.1-2) \\
-Libtool		& ltmain.sh (GNU libtool) & 2.2.6b \\
-Make			& GNU Make 								& 3.81
-\end{tabular}
-\medskip
 
 \noindent{}If \libxml{} is present on your system, the \nutils{} can use it to
 produce better \svg{} graphics. This is the default behaviour, but it is
 optional: if the library is not present (or not found), or if you specify not to
 use it (see below), the build process will work all the same, and most programs
-will not be affected in any way (currently this only affects ornaments to \svg{}
-trees).
+will not be affected in any way (currently this only affects ornaments to
+radial \svg{} trees).  Likewise, the system will build \sched{} unless Guile is
+not found or you explicitly disable it (see below).
 
-\noindent{}The package uses the \textsc{gnu} autotools, like many other open source
-software packages. So all you need to do is the usual
+Note that you need \emph{both} the library \emph{and} the headers for \libxml{}
+or Guile to work.
+
+\noindent{}Here are the versions I use (as reported by passing \texttt{--version} to the program):
+
+\medskip
+\begin{tabular}{lll}
+Autoconf					& autoconf (GNU Autoconf) & 2.67 \\
+Automake					& automake (GNU automake) & 1.11.1 \\
+Bison  						& bison (GNU Bison) 			& 2.4.1 \\ 
+Flex							& flex 										& 2.5.35 \\
+Guile	(optional)	& guile										& 1.8.7 \\
+GCC 							& gcc (GCC) 							& 4.4.5 \\
+Libtool						& ltmain.sh (GNU libtool) & 2.2.6b \\
+\libxml{} (optional)	& xml2-config							& 2.7.7 \\ 
+Make							& GNU Make 								& 3.81
+\end{tabular}
+\medskip
+
+\noindent{}The package uses the \textsc{gnu} autotools, like many other open source software packages. So all you need to do is the usual
 \begin{verbatim}
 $ tar xzf newick-utils-x.y.z.tar.gz
 $ cd newick-utils-x.y.z
@@ -48,10 +53,17 @@ the \gen{} test may fail - this is due to differences in pseudo-random number
 generators, as far as I can tell.
 
 \noindent{}To prevent the use of \libxml, pass \texttt{--without-libxml} to
-\texttt{./configure}. If you want to use \libxml{} but your \texttt{.so} files
-are in a nonstandard location, use \texttt{--with-libxml=<lib directory>}.
-Likewise, if the \libxml{} header files are in a nonstandard location, use
-\texttt{--with-libxml-headers=<include dir>}.
+\texttt{./configure}. Likewise, to prevent the use of Guile, pass
+\texttt{--without-guile}. 
+
+If your Guile or \libxml{} libraries are in a non-standard location, set the
+\texttt{LDFLAGS} environment variable before running \texttt{./configure}. If
+your headers are in a non-standard location, set \texttt{CPPFLAGS}. For example,
+
+\texttt{LDFLAGS='-L/opt/lib' CPPFLAGS='-I/opt/include' ./configure}
+
+would cause \texttt{/opt/lib} and \texttt{/opt/include} to be searched for
+libraries and headers, respectively.
 
 \section{As binaries}
 
