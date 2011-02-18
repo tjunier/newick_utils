@@ -32,12 +32,6 @@ AC_ARG_WITH([guile],
 	[with_guile=yes]	# not passed: set to yes (default)
 )
 
-AC_ARG_WITH([guile-libdir],
-			[
-			 AS_HELP_STRING([--with-guile-libdir],
-				[Specify alternative lib dir for Guile])
-			 ])
-		
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_YACC
