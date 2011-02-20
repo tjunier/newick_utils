@@ -1,3 +1,4 @@
+
 nw_reroot: if the outgroup-to-be is already the outgroup, the tree should not change (both because there is no need (PLOS), and also because it saves time). Try e.g. rerooting '(((Dog,Cat),Cow),Jay);' on Jay: should be an invariant.
 
 nw_match: try to implement the whole thing using iterators rather than comparing Newick strings.
@@ -508,3 +509,5 @@ nw_shed: check help page, and sync w/ tutorial; add examples incl. implementatio
 new rnode: some TODO items list tests to write. Write them. Now.
 
 nw_display: add CSS to labels (in CSS map) 
+
+nw_display: add branch lengths to radial trees.
