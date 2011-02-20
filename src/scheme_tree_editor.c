@@ -123,7 +123,8 @@ void help(char *argv[])
 "\n"
 "				 (and i (> b 75))\n"
 "\n"
-"will match internal nodes with a bootstrap support value greater than 75.\n"
+"will match internal nodes with a bootstrap support value greater than 75\n"
+"(assuming that the support value is defined).\n"
 "\n"
 "The variables have short names to allow for compact expressions on the\n"
 "command line.\n"
@@ -144,10 +145,10 @@ void help(char *argv[])
 "    	r	boolean    	true iff node is the root\n"
 "\n"
 "Notes:\n"
-"    o Exactly one of i, l, and r is true for every node.\n"
-"    o The difference between b and lbl is that b interprets the label as a\n"
-"      number (if possible), while lbl returns the label as a string.\n"
-"    o Variables b, d, L and lbl may be undefined.\n"
+"    	o Exactly one of i, l, and r is true for every node.\n"
+"    	o The difference between b and lbl is that b interprets the label as\n"
+"	  a number (if possible), while lbl returns the label as a string.\n"
+"    	o Variables b, d, L and lbl may be undefined.\n"
 "\n"
 " The following Scheme forms and functions also have shorter names\n"
 " predefined:\n"
@@ -229,7 +230,17 @@ void help(char *argv[])
 "# get all clades with at least one ancestor, 980 or better support. Do not\n"
 "# print subtrees of matching clades, even if they match (option -o)\n"
 "\n"
-"$ %s data/big.rn.nw -n -o '((& (>= a 1) (>= b 980)) (s))'\n",
+"$ %s data/big.rn.nw -n -o '((& (>= a 1) (>= b 980)) (s))'\n"
+"\n"
+"# format all defined lengths to 2 decimal places, instead of 6 in the\n"
+"original:\n"
+"\n"
+"$ %s HRV.nw \"((def? 'L) (L! (format #f \\\"~,2f\\\" L)))\"\n"
+"\n"
+"# In the last example, I use def? to check that L (the length) is defined\n"
+"# and when true, I use function L! to set the length to a new value, namely\n"
+"# the result of the call to format.\n", 
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
