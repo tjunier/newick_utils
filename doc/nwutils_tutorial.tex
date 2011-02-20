@@ -16,6 +16,10 @@
 \definecolor{Blue}{rgb}{0,0,1}
 \definecolor{Red}{rgb}{1,0,0}
 
+% Parameters
+\widowpenalty=9999
+\clubpenalty=9999
+
 % frequent acronyms, abbreviations, aliases, etc.
 \newcommand{\ascii}{\textsc{ascii}}
 \newcommand{\css}{\textsc{css}}
@@ -68,7 +72,7 @@
 \begin{center}
 \Hrule{0.5mm} \\[0.8cm]
 {\Huge Newick Utilities Tutorial} \\[0.5cm]
-Version 1.3.5 -- \today \\
+Version 1.5.0 -- \today \\
 \medskip
 Thomas Junier \texttt{thomas.junier@unige.ch} \\
 Computational Evolutionary Genomics Group \\
@@ -103,6 +107,8 @@ Swiss Institute of Bioinformatics \\
 \include{newick_order}
 
 \include{installing}
+
+\include{changes}
 
 \bibliographystyle{plain}
 \bibliography{references}
