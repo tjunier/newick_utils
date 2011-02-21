@@ -8,8 +8,12 @@
 
 make distclean
 ./configure --disable-shared && \
-	make && make check && make EXTRA=enabled bin-dist
+	make && \
+	#make check && \
+	make EXTRA=enabled bin-dist
 
 make distclean
 ./configure --disable-shared --without-libxml --without-guile && \
-	make && make check && make EXTRA=disabled bin-dist
+	make && \
+	#make check && \
+	make EXTRA=disabled bin-dist
