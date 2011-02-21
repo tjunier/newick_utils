@@ -36,8 +36,10 @@ use it (see below), the build process will work all the same, and most programs
 will not be affected in any way (currently this only affects ornaments to
 radial \svg{} trees).
 
-Likewise, the system will build \sched{} unless Guile is
-not found or you explicitly disable it (see below).
+Likewise, the system will build \sched{} unless Guile is not found or you
+explicitly disable it (see below). On MacOS (10.6) I had to install it with
+Fink, and I needed to use the "x86\_64 only" option when installing Fink
+(otherwise the Guile library was 32 bit and the \nutils{} would not link to it).
 
 Note that you need \emph{both} the library \emph{and} the headers for the build
 to succeed.
@@ -117,7 +119,7 @@ wherever it suits you.
 \begin{tabular}{llll}
 \textbf{tool}	& \textbf{program} & \textbf{version} & \textbf{required for} \\
 \hline \\
-\gnu{} Autoconf	& \texttt{autoconf}	  	& 2.67 		& non-stable source \\
+\gnu{} Autoconf	& \texttt{autoconf}	  	& 2.61 		& non-stable source \\
 \gnu{} Automake	& \texttt{automake} 	 	& 1.11.1	& non-stable source \\
 \gnu{} Bison 		& \texttt{bison}  			& 2.4.1 	& source \\ 
 Flex						& \texttt{flex} 				& 2.5.35 	& source \\
