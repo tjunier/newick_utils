@@ -192,5 +192,7 @@ int dump_newick(struct rnode *node)
 		printf("%s", (char *) e->data);
 	printf("\n");
 
+	destroy_llist(nw_strings);
+
 	return SUCCESS;
 }
