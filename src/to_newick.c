@@ -192,6 +192,8 @@ int dump_newick(struct rnode *node)
 		printf("%s", (char *) e->data);
 	printf("\n");
 
+	for (e = nw_strings->head; NULL != e; e = e->next) 
+		free(e->data);
 	destroy_llist(nw_strings);
 
 	return SUCCESS;
