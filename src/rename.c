@@ -253,9 +253,8 @@ struct hash *set_map(struct parameters params)
 	struct hash *map = create_hash(1);
 	if (NULL == map) { perror(NULL); exit(EXIT_FAILURE); }
 
-	char *key = strdup(params.old_label);
 	char *val = strdup(params.new_label);
-	if (! hash_set(map, key, val)) {
+	if (! hash_set(map, params.old_label, val)) {
 		perror(NULL); exit(EXIT_FAILURE);
 	}
 
