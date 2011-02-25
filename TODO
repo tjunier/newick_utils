@@ -511,3 +511,5 @@ new rnode: some TODO items list tests to write. Write them. Now.
 nw_display: add CSS to labels (in CSS map) 
 
 nw_display: add branch lengths to radial trees.
+
+nw_rename: add example to -h about 3-arg form; also discuss in tutorial.

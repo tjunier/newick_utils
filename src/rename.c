@@ -63,7 +63,7 @@ void help(char *argv[])
 "--------\n"
 "\n"
 "%s [-hl] <newick trees filename|-> <map filename>\n"
-"or"
+"or\n"
 "%s [-hl] <newick trees filename|-> <old-label> <new-label>\n"
 "\n"
 "Input\n"
