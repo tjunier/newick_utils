@@ -180,11 +180,10 @@ node_set union_of_child_node_sets(struct rnode *node)
 {
 	node_set result = create_node_set(num_leaves);
 	if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
-	struct list_elem *el;
+	struct rnode *curr;
 
-	for (el = node->children->head; NULL != el; el = el->next) {
-		struct rnode *child = el->data;
-		node_set child_node_set = (node_set) child->data;
+	for (curr=node->first_child; NULL != curr; curr = curr->next_sibling) {
+		node_set child_node_set = (node_set) curr->data;
 		node_set_add_set(result, child_node_set, num_leaves);
 	}
 

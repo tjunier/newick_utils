@@ -31,28 +31,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rooted_tree;
 
-/* A helper function, to pass as parameter to qsort(). This compares node labels. */
+
+int order_tree_lbl(struct rooted_tree *);
+int order_tree_num_desc(struct rooted_tree *);
+
+/* A general-purpose sort function. Arguments are a tree, a node comparator
+ * function, and a sort field setter function. The comparator is used by
+ * qsort() to sort the children of a node, and the setter function sets the
+ * node's sort field once its children have been sorted. See also
+ * order_tree_lbl() and order_tree_num_desc(), which are
+ * canned, easy-to-remember calls to this function. */
+
+int order_tree(struct rooted_tree *tree,
+		int (*comparator)(const void*,const void*),
+		int (*sort_field_setter)(struct rnode *));
+
+/* Comparators */
+
+/* This compares node labels. */
 
 int lbl_comparator(const void *, const void *);
 
-/* Idem, but for ordering children by increasing number of descendants */
+/* Idem, but for ordering children by increasing number of descendants. Node
+ * data must point to an int that holds the number of descendants. */
 
 int num_desc_comparator(const void *a, const void *b);
 
-/* reverse of num_desc_comparator() */
+/* This comparator is like num_desc_comparator(), but it reverses the
+ * comparison every two nodes, breaking any ladder. */
 
-int reverse_num_desc_comparator(const void *a, const void *b);
+int num_desc_deladderize(const void *a, const void *b);
 
-/* Orders all nodes in the tree, according to lbl_comparator() - this could be
- * parametered, if we can think of other interesting orders. NOTE: this
- * function uses (and modifies) the rnode's data attribute. */
+/* Sort field setters. These return SUCCESS unless there was a memory problem.
+ * */
 
-int order_tree_lbl(struct rooted_tree *tree);
+/* Sets a node's sort field as the label of its first child */
+int set_sort_field_label(struct rnode *);
 
-/* Idem, but orders according to number of descendants. */
-
-int order_tree_num_desc(struct rooted_tree *tree);
-
-/* Idem, but de-ladderizes */
-
-int order_tree_deladderize(struct rooted_tree *tree);
+/* Sets a node's sort field as the number of its descendants */
+int set_sort_field_num_desc(struct rnode *);

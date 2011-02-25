@@ -62,11 +62,20 @@ int test_reroot_2()
 
 int test_collapse_pure_clades()
 {
-	char *test_name = "test_collapse_pure_clade";
+	const char *test_name = __func__;;
 	char *exp = "((A:1,B:1.0)f:2.0,C:3)i;";
+	/* ((A:1,B:1.0)f:2.0,(C:1,(C:1,C:1)g:2)h:3)i;  - one clade made of
+	 * three 'C's */
 	struct rooted_tree tree = tree_4();
 
 	collapse_pure_clades(&tree);
+
+	if (! is_leaf(tree.root->last_child)) {
+		printf("%s: node h should be a leaf after being collapsed\n",
+				test_name);
+		return 1;
+	}
+
 	char *obt = to_newick(tree.root);
 
 	if (0 != strcmp(exp, obt)) {

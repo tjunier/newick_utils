@@ -284,13 +284,11 @@ struct parameters get_params(int argc, char *argv[])
 
 int get_nb_descendants(struct rnode *node)
 {
-	struct list_elem *e;
 	struct rnode *kid;
 	struct rnode_data *rndata;
 	int descendants = 0;
 
-	for (e = node->children->head; NULL != e; e = e->next) {
-		kid = e->data;
+	for (kid = node->first_child; NULL != kid; kid = kid->next_sibling) {
 		rndata = kid->data;
 		descendants += rndata->nb_descendants;
 		descendants += 1;	/* kid itself (no pun intended :-) ) */
@@ -364,6 +362,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct llist *nodes;
 	struct list_elem *el;
 	enum unlink_rnode_status result;
+	struct rnode *root_child;
 	char *newick;
 
 	/* these two traversals fill the node data. */
@@ -427,8 +426,10 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				case UNLINK_RNODE_DONE:
 					break;
 				case UNLINK_RNODE_ROOT_CHILD:
-					unlink_rnode_root_child->parent = NULL;
-					tree->root = unlink_rnode_root_child;
+					root_child =
+						get_unlink_rnode_root_child();
+					root_child->parent = NULL;
+					tree->root = root_child;
 					break;
 				case UNLINK_RNODE_ERROR:
 					fprintf (stderr, "Memory error - "

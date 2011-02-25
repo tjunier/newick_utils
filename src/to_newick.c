@@ -74,22 +74,20 @@ char *subtree(struct rnode *node)
 		free(length_s);
 	} else {
 		struct rnode *child;
-		struct list_elem *elem;
 		char * child_node_s;
 
 		result = append_to(result, "(");
 
 		/* first child */
-		elem = node->children->head;
-		child = elem->data;
+		child = node->first_child;
 		child_node_s = subtree(child);
 		if (NULL == child_node_s) return NULL;
 		result = append_to(result, child_node_s);
 		free(child_node_s);
 		/* other children, comma-separated */
-		for (elem = elem->next; elem != NULL; elem = elem->next) {
+		for (child = child->next_sibling;
+				NULL != child; child = child->next_sibling) {
 			result = append_to(result, ",");
-			child = elem->data;
 			child_node_s = subtree(child);
 			if (NULL == child_node_s) return NULL;
 			result = append_to(result, child_node_s);

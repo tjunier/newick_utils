@@ -18,7 +18,7 @@ void newick_scanner_set_string_input(char *);
 
 int test_iterator()
 {
-	const char *test_name = "test_iterator";
+	const char *test_name = __func__;
 
 	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 	struct rooted_tree tree = tree_3();
@@ -37,96 +37,160 @@ int test_iterator()
 	struct rnode *next;
 
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_f != next) {
 		printf ("%s: expected node f (%p), got %s (%p).\n",
 				test_name, node_f, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_A != next) {
 		printf ("%s: expected node A (%p), got %s (%p).\n",
 				test_name, node_A, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_f != next) {
 		printf ("%s: expected node f (%p), got %s (%p).\n",
 				test_name, node_f, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_B != next) {
 		printf ("%s: expected node B (%p), got %s (%p).\n",
 				test_name, node_B, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_f != next) {
 		printf ("%s: expected node f (%p), got %s (%p).\n",
 				test_name, node_f, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_i != next) {
 		printf ("%s: expected node i (%p), got %s (%p).\n",
 				test_name, node_i, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_h != next) {
 		printf ("%s: expected node h (%p), got %s (%p).\n",
 				test_name, node_h, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_C != next) {
 		printf ("%s: expected node C (%p), got %s (%p).\n",
 				test_name, node_C, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_h != next) {
 		printf ("%s: expected node h (%p), got %s (%p).\n",
 				test_name, node_h, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_g != next) {
 		printf ("%s: expected node g (%p), got %s (%p).\n",
 				test_name, node_g, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_D != next) {
 		printf ("%s: expected node D (%p), got %s (%p).\n",
 				test_name, node_D, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_g != next) {
 		printf ("%s: expected node g (%p), got %s (%p).\n",
 				test_name, node_g, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_E != next) {
 		printf ("%s: expected node E (%p), got %s (%p).\n",
 				test_name, node_E, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_g != next) {
 		printf ("%s: expected node g (%p), got %s (%p).\n",
 				test_name, node_g, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_h != next) {
 		printf ("%s: expected node h (%p), got %s (%p).\n",
 				test_name, node_h, next->label, next);
 		return 1;
 	}
 	next = rnode_iterator_next(it);
+	if (NULL == next) {
+		printf ("%s: next node should not be NULL\n", test_name);
+		return 1;
+	}
 	if (node_i != next) {
 		printf ("%s: expected node i (%p), got %s (%p).\n",
 				test_name, node_i, next->label, next);
@@ -604,7 +668,7 @@ int test_get_leaf_label_map_from_node()
 	return 0;
 }
 
-int test_reset_current_child_elem()
+int test_reset_current_child()
 {
 	const char *test_name = "test_current_child_elem";
 
@@ -622,71 +686,71 @@ int test_reset_current_child_elem()
 	struct rnode *node_E = hash_get(nodemap, "E");
 
 	/* Set the value to non-NULL (it is set to NULL on node creation) */
-	node_i->current_child_elem = (void *) 1;
-	node_f->current_child_elem = (void *) 1;
-	node_A->current_child_elem = (void *) 1;
-	node_B->current_child_elem = (void *) 1;
-	node_h->current_child_elem = (void *) 1;
-	node_C->current_child_elem = (void *) 1;
-	node_g->current_child_elem = (void *) 1;
-	node_D->current_child_elem = (void *) 1;
-	node_E->current_child_elem = (void *) 1;
+	node_i->current_child = (void *) 1;
+	node_f->current_child = (void *) 1;
+	node_A->current_child = (void *) 1;
+	node_B->current_child = (void *) 1;
+	node_h->current_child = (void *) 1;
+	node_C->current_child = (void *) 1;
+	node_g->current_child = (void *) 1;
+	node_D->current_child = (void *) 1;
+	node_E->current_child = (void *) 1;
 
 	// Now, we reset:
 	reset_current_child_elem(&tree);
 
-	if (node_i->current_child_elem != NULL) { 
+	if (node_i->current_child != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %p.\n", test_name, node_i->current_child_elem);
+			" got %p.\n", test_name, node_i->current_child);
 		return 1;
 	}
-	if (node_f->current_child_elem != NULL) { 
+	if (node_f->current_child != NULL) { 
 		printf ("%s: reset_current_child_elem should"
 			" have reset current_child_elem to NULL, "
-			" got %p.\n", test_name, node_f->current_child_elem);
+			" got %p.\n", test_name, node_f->current_child);
 		return 1;
 	}
-	if (node_A->current_child_elem != NULL) { 
-		printf ("%s: reset_current_child_elem should"
-			" have reset current_child_elem to NULL, "
-			" got %p.\n", test_name, node_A->current_child_elem);
+	if (node_A->current_child != NULL) { 
+		printf ("%s: reset_current_child should"
+			" have reset current_child to NULL, "
+			" got %p.\n", test_name, node_A->current_child);
 		return 1;
 	}
-	if (node_B->current_child_elem != NULL) { 
-		printf ("%s: reset_current_child_elem should"
-			" have reset current_child_elem to NULL, "
-			" got %p.\n", test_name, node_B->current_child_elem);
+	if (node_B->current_child != NULL) { 
+		printf ("%s: reset_current_child should"
+			" have reset current_child to NULL, "
+			" got %p.\n", test_name, node_B->current_child);
 		return 1;
 	}
-	if (node_h->current_child_elem != NULL) { 
-		printf ("%s: reset_current_child_elem should"
-			" have reset current_child_elem to NULL, "
-			" got %p.\n", test_name, node_h->current_child_elem);
+	if (node_h->current_child != NULL) { 
+		printf ("%s: reset_current_child should"
+			" have reset current_child to NULL, "
+			" got %p.\n", test_name, node_h->current_child);
 		return 1;
 	}
-	if (node_C->current_child_elem != NULL) { 
-		printf ("%s: reset_current_child_elem should"
-			" have reset current_child_elem to NULL, "
-			" got %p.\n", test_name, node_C->current_child_elem);
+	if (node_C->current_child != NULL) { 
+		printf ("%s: reset_current_child should"
+			" have reset current_child to NULL, "
+			" got %p.\n", test_name, node_C->current_child);
 		return 1;
 	}
-	if (node_g->current_child_elem != NULL) { 
-		printf ("%s: reset_current_child_elem should"
-			" have reset current_child_elem to NULL, "
-			" got %p.\n", test_name, node_g->current_child_elem);
+	if (node_g->current_child != NULL) { 
+		printf ("%s: reset_current_child should"
+			" have reset current_child to NULL, "
+			" got %p.\n", test_name, node_g->current_child);
 		return 1;
 	}
-	if (node_D->current_child_elem != NULL) { 
-		printf ("%s: reset_current_child_elem should"
-			" have reset current_child_elem to NULL, "
-			" got %p.\n", test_name, node_D->current_child_elem);
+	if (node_D->current_child != NULL) { 
+		printf ("%s: reset_current_child should"
+			" have reset current_child to NULL, "
+			" got %p.\n", test_name, node_D->current_child);
 		return 1;
 	}
-	if (node_E->current_child_elem != NULL) { 
-		printf ("%s: reset_current_child_elem should"
-			" have reset current_child_elem to NULL, "
-			" got %p.\n", test_name, node_E->current_child_elem);
+	if (node_E->current_child != NULL) { 
+		printf ("%s: reset_current_child should"
+			" have reset current_child to NULL, "
+			" got %p.\n", test_name, node_E->current_child);
 		return 1;
 	}
 
@@ -706,7 +770,7 @@ int main()
 	failures += test_get_nodes_in_order();
 	failures += test_get_nodes_in_order_linear();
 	failures += test_get_nodes_in_order_part_linear();
-	failures += test_reset_current_child_elem();
+	failures += test_reset_current_child();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

@@ -81,8 +81,8 @@ static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 		if (NULL == kid1) return FAILURE;
 		struct rnode *kid2 = create_rnode("kid2", "");	
 		if (NULL == kid2) return FAILURE;
-		if (! add_child(leaf, kid1)) return FAILURE;
-		if (! add_child(leaf, kid2)) return FAILURE;
+		add_child(leaf, kid1);
+		add_child(leaf, kid2);
 		if (! append_element(leaves_queue, kid1)) return FAILURE;
 		if (! append_element(leaves_queue, kid2)) return FAILURE;
 	} else {
@@ -218,7 +218,6 @@ void free_data(struct llist *leaves_queue,
 		free(kid->edge_length_as_string);
 		free(kid->label);
 	       	free(kid->data);
-		destroy_llist(kid->children);
 		free(kid);
 	}
 	destroy_llist(all_children);
@@ -247,14 +246,14 @@ int time_limited_tree(double branch_termination_rate, double duration)
 	kid = create_child_with_time_limit(duration);
 	if (NULL == kid) return FAILURE;
 	/* add_child(...): length is determined below */
-	if (! add_child(root, kid)) return FAILURE;
+	add_child(root, kid);
 	if (! append_element(leaves_queue, kid)) return FAILURE;
 	if (! append_element(all_children, kid)) return FAILURE;
 
 	/* 2nd child */
 	kid = create_child_with_time_limit(duration);
 	if (NULL == kid) return FAILURE;
-	if (! add_child(root, kid)) return FAILURE;
+	add_child(root, kid);
 	if (! append_element(leaves_queue, kid)) return FAILURE;
 	if (! append_element(all_children, kid)) return FAILURE;
 
@@ -269,13 +268,13 @@ int time_limited_tree(double branch_termination_rate, double duration)
 		if (remaining_time > 0) {
 			kid = create_child_with_time_limit(remaining_time);
 			if (NULL == kid) return FAILURE;
-			if (! add_child(current, kid)) return FAILURE;
+			add_child(current, kid);
 			if (! append_element(leaves_queue, kid)) return FAILURE;
 			if (! append_element(all_children, kid)) return FAILURE;
 
 			kid = create_child_with_time_limit(remaining_time);
 			if (NULL == kid) return FAILURE;
-			if (! add_child(current, kid)) return FAILURE;
+			add_child(current, kid);
 			if (! append_element(leaves_queue, kid)) return FAILURE;
 			if (! append_element(all_children, kid)) return FAILURE;
 		} 

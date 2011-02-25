@@ -20,7 +20,7 @@ void newick_scanner_set_string_input(char *);
 /* NOTE HOWEVER: one of the test cases below (test_jf) actually uncovered a bug
  * in to_newick()... This should serve as a lesson :-) */
 
-int check_tree(char *test_name, char *newick)
+int check_tree(const char *test_name, char *newick)
 {
 	newick_scanner_set_string_input(newick);
 
@@ -59,7 +59,7 @@ int test_simple()
 int test_jf()
 {
 
-	char *test_name = "test_jf";
+	const char *test_name = __func__;
 
 	int failures = 0;
 

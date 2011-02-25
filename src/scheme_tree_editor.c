@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "to_newick.h"
 #include "tree_editor_rnode_data.h"
 #include "common.h"
+#include "masprintf.h"
 
 struct rnode *current_node;
 
@@ -250,7 +251,7 @@ void help(char *argv[])
 	);
 }
 
-struct parameters get_params(int argc, char *argv[])
+static struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
@@ -308,15 +309,13 @@ struct parameters get_params(int argc, char *argv[])
  * parse_order_traversal().
  * */
 
-int get_nb_descendants(struct rnode *node)
+static int get_nb_descendants(struct rnode *node)
 {
-	struct list_elem *e;
 	struct rnode *kid;
 	struct rnode_data *rndata;
 	int descendants = 0;
 
-	for (e = node->children->head; NULL != e; e = e->next) {
-		kid = e->data;
+	for (kid = node->first_child; NULL != kid; kid = kid->next_sibling) {
 		rndata = kid->data;
 		descendants += rndata->nb_descendants;
 		descendants += 1;	/* kid itself (no pun intended :-) ) */
@@ -331,7 +330,7 @@ int get_nb_descendants(struct rnode *node)
  * parent nor on the children, I also set them here (this is arbitrary, I
  * could set them in parse_order_traversal() below as well). */
 
-void reverse_parse_order_traversal(struct rooted_tree *tree)
+static void reverse_parse_order_traversal(struct rooted_tree *tree)
 {
 	struct list_elem *el;
 	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
@@ -388,7 +387,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
  * allocated, which is done in reverse_parse_order_traversal(). Data that does
  * not depend on order is also filled in here. */
 
-void parse_order_traversal(struct rooted_tree *tree)
+static void parse_order_traversal(struct rooted_tree *tree)
 {
 	struct list_elem *el;
 	struct rnode *node;
@@ -409,7 +408,7 @@ void parse_order_traversal(struct rooted_tree *tree)
  * variables, e.g. (< 2 a) instead of (< 2 (a)) to check that the current node
  * has fewer than two ancestors. On the command line, this is handy. */
 
-void set_predefined_variables(struct rnode *node)
+static void set_predefined_variables(struct rnode *node)
 {
 	SCM label = scm_from_locale_string(node->label);
 	SCM edge_length_as_scm_string  = scm_from_locale_string(
@@ -448,7 +447,7 @@ void set_predefined_variables(struct rnode *node)
 				edge_length_as_scm_string, SCM_UNDEFINED));
 
 	/* c: number of children */
-	scm_c_define("c", scm_from_int(current_node->children->count));
+	scm_c_define("c", scm_from_int(current_node->child_count));
 	
 	struct rnode_data *data = current_node->data;
 
@@ -475,7 +474,7 @@ void set_predefined_variables(struct rnode *node)
  * 'address' is evaluated at each node (though some may be skipped). If
  * 'address' is true, 'action' is perfomed. */
 
-void process_tree(struct rooted_tree *tree, SCM address,
+static void process_tree(struct rooted_tree *tree, SCM address,
 		SCM action, struct parameters params)
 {
 	struct llist *nodes;
@@ -530,15 +529,16 @@ void process_tree(struct rooted_tree *tree, SCM address,
 	if (PRE_ORDER == params.order)
 		destroy_llist(nodes);
 }
+
 /* Makes C functions available to Scheme */
 
-SCM scm_dump_subclade()
+static SCM scm_dump_subclade()
 {
 	dump_newick(current_node);
 	return SCM_UNDEFINED;
 }
 
-SCM scm_unlink_node()
+static SCM scm_unlink_node()
 {
 	if (is_root(current_node)) {
 		fprintf (stderr, "Warning: tried to delete root\n");
@@ -560,7 +560,7 @@ SCM scm_unlink_node()
 	return SCM_UNSPECIFIED;
 }
 
-SCM scm_splice_out_node() 	/* "open" */
+static SCM scm_splice_out_node() 	/* "open" */
 {
 	if (is_inner_node(current_node)) {
 		if (! splice_out_rnode(current_node)) {
@@ -573,12 +573,32 @@ SCM scm_splice_out_node() 	/* "open" */
 	return SCM_UNSPECIFIED;
 }
 
+/* Returns the current node as a 'node' record */
+
+static SCM scm_get_current_node()
+{
+	char *cmd = masprintf("(make-node \"%p\")", current_node);
+	// printf("command: %s\n", cmd);
+	SCM current = scm_c_eval_string(cmd);
+	free(cmd);
+
+	return current;
+}
+
+/* Returns the label of the node passed as argument, as a string. */
+
+static SCM scm_get_node_label(SCM node)
+{
+	/* WTF? no idea how to to this... */
+	node = node;		// dummy, gcc warnings
+	return SCM_UNSPECIFIED;	// for now, to silence gcc warnings
+}
+
 /* Sets the current node's parent edge length. Argument must be a number or a
  * string. */
 
-SCM scm_set_length(SCM edge_length)
+static SCM scm_set_length(SCM edge_length)
 {
-	char *length_as_string;
 	size_t buffer_length;	/* storage for length as string */
 
 	/* If edge_length is a string, we first try to convert it to a number.
@@ -609,8 +629,7 @@ SCM scm_set_length(SCM edge_length)
 			SCM_UNDEFINED);
 	buffer_length = scm_c_string_length(edge_length_as_scm_string);
 	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	size_t copied = scm_to_locale_stringbuf(
-			edge_length_as_scm_string, buffer, buffer_length);
+	scm_to_locale_stringbuf(edge_length_as_scm_string, buffer, buffer_length);
 	buffer[buffer_length] = '\0';
 
 	/* Set the allocated buffer as the current node's length-as-string */
@@ -624,7 +643,7 @@ SCM scm_set_length(SCM edge_length)
  * able to set support values), if numeric it will be converted to a string
  * using format. */
 
-SCM scm_set_label(SCM label)
+static SCM scm_set_label(SCM label)
 {
 	size_t buffer_length;	/* storage for label */
 
@@ -633,7 +652,7 @@ SCM scm_set_label(SCM label)
 
 	buffer_length = scm_c_string_length(label);
 	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	size_t copied = scm_to_locale_stringbuf(label, buffer, buffer_length);
+	scm_to_locale_stringbuf(label, buffer, buffer_length);
 	buffer[buffer_length] = '\0';
 
 	/* Set the allocated buffer as the current node's length-as-string */
@@ -641,6 +660,19 @@ SCM scm_set_label(SCM label)
 	current_node->label = buffer;
 
 	return SCM_UNSPECIFIED;
+}
+
+/* Defines an rnode type for use in Scheme */
+
+static void define_node()
+{
+	/* We just store the node's address (struct rnode*). We will access the
+	 * node's field through the pointer. */
+	scm_c_eval_string(
+		"(define node (make-record-type \"node\" '(address)))"
+		"(define make-node (record-constructor node '(address)))"
+		"(define get-node-address (record-accessor node 'address))"
+	);
 }
 
 static void register_C_functions()
@@ -655,12 +687,17 @@ static void register_C_functions()
 	scm_c_define_gsubr("set-length!", 1, 0, 0, scm_set_length);
 	scm_c_define_gsubr("lbl!", 1, 0, 0, scm_set_label);
 	scm_c_define_gsubr("set-label!", 1, 0, 0, scm_set_label);
+	scm_c_define_gsubr("N", 0, 0, 0, scm_get_current_node);
+	scm_c_define_gsubr("get-current-node", 0, 0, 0, scm_get_current_node);
 }
 
 static void inner_main(void *closure, int argc, char* argv[])
 {
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
+
+	closure = closure;	// suppresses gcc warnings about unused param
+	define_node();
 
 	/* Aliases and simple functions */
 	// TODO: put in a separate f(); and call scm_c_eval_string() once on all

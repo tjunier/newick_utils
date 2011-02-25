@@ -107,12 +107,18 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
 
 bool more_children_to_visit (struct rnode_iterator *iter)
 {
-	if  (iter->current->current_child_elem
-	    != iter->current->children->tail) 
+	if  (iter->current->current_child != iter->current->last_child)
 		return true;
 	else
 		return false;
 }
+
+/* The iterator keeps state in member 'current'. This is a rnode, and it uses
+ * its 'current_child' member to keep track of which of its children have
+ * already been visited. Before a node is visited for the first time, its
+ * 'current_child' is NULL, then it visits all children in turn. This function
+ * thus needs to update two things: i) the current node in the iterator, and
+ * ii) the current child in the current node. */
 
 struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 {
@@ -125,20 +131,19 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	 * the parent node. */
 	if (is_leaf(iter->current)) {
 		if (iter->current == iter->root) {
-			struct list_elem dummy;
-			/* we use current_child_elem in a different
+			struct rnode dummy;
+			/* we use current_child in a different
 			 * way here - this is a leaf, so it obviously has no
 			 * children. current_child_elem is set to the current
 			 * node the first time, and reset to NULL the second
 			 * time. This allows the iterator to return a leaf when
 			 * and only when it starts on a leaf. */
-			if (NULL == iter->current->current_child_elem) {
-				iter->current->current_child_elem =
-					&dummy;
+			if (NULL == iter->current->current_child) {
+				iter->current->current_child = &dummy;
 					SHOW;
 				return iter->current;
 			} else {
-				iter->current->current_child_elem = NULL;
+				iter->current->current_child = NULL;
 				SHOW_END;
 				return NULL;
 			}
@@ -165,11 +170,11 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	 * node has children. We see if we visited them all (in which case we
 	 * go to the parent) or not (in which case we go to the first unvisited
 	 * child).
-	 * Variable current_child_elem points to a node's currently visited
+	 * Variable current_child points to a node's currently visited
 	 * child.*/
-	if (iter->current->current_child_elem
-	    == iter->current->children->tail) {	/* seen all children */
-		iter->current->current_child_elem = NULL; /* reset */
+	if (iter->current->current_child
+	    == iter->current->last_child) {	/* seen all children */
+		iter->current->current_child = NULL; /* reset */
 		if (iter->root == iter->current) {
 			// TODO: should we not set a value to indicate the
 			// reason for NULL (as NULL can also signal an error)?
@@ -183,18 +188,16 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	}
 
 	/* More children to visit... */
-	if (NULL == iter->current->current_child_elem) 
+	if (NULL == iter->current->current_child) 
 		// first time on this node
-		iter->current->current_child_elem =
-			iter->current->children->head;
+		iter->current->current_child = iter->current->first_child;
 	else
-		iter->current->current_child_elem =
-			iter->current->current_child_elem->next;
+		iter->current->current_child =
+			iter->current->current_child->next_sibling;
 
-	struct rnode *next = iter->current->current_child_elem->data;
-	iter->current = next;
+	iter->current = iter->current->current_child;	
 	SHOW;
-	return next;	// TODO: change to iter->current, as everywhere else.
+	return iter->current;
 }
 
 /* Computes the list by doing a tree traversal, then reversing it, printing out
@@ -288,6 +291,6 @@ void reset_current_child_elem(struct rooted_tree *tree)
 
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = el->data;
-		current->current_child_elem = NULL;
+		current->current_child = NULL;
 	}
 }
