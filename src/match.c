@@ -55,6 +55,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode_iterator.h"
 #include "masprintf.h"
 
+#ifdef DEBUG_MATCH
+#define DEBUG 1
+#else
+#define DEBUG 0
+#endif
+
 void newick_scanner_set_string_input(char *);
 void newick_scanner_clear_string_input();
 void newick_scanner_set_file_input(FILE *);
@@ -328,13 +334,21 @@ void process_tree(struct rooted_tree *tree, struct hash *pattern_labels,
 	 * list being invalid. WARNING: I did this just enough to make all
 	 * tests pass, NOT systemytically after each tree-function call. It may
 	 * be necessary to do it more thoroughly later on. */
+	set_show_addresses(true);
 	char *original_newick = to_newick(tree->root);
+	if (DEBUG) printf ("original: %s\n", original_newick);
 	remove_inner_node_labels(tree);
+	if (DEBUG) { printf ("rm i-lbl: "); dump_newick(tree->root); }
 	prune_extra_labels(tree, pattern_labels);
+	if (DEBUG) { printf ("rm x-lbl: "); dump_newick(tree->root); }
 	prune_empty_labels(tree);
+	if (DEBUG) { printf ("rm e-lbl: "); dump_newick(tree->root); }
 	remove_knee_nodes(tree);
+	if (DEBUG) { printf ("rm k-nod: "); dump_newick(tree->root); }
 	remove_branch_lengths(tree);	
+	if (DEBUG) { printf ("rm b-len: "); dump_newick(tree->root); }
 	if (! order_tree_lbl(tree)) { perror(NULL); exit(EXIT_FAILURE); }
+	if (DEBUG) { printf ("order: "); dump_newick(tree->root); }
 	char *processed_newick = to_newick(tree->root);
 	int match = (0 == strcmp(processed_newick, pattern_newick));
 	match = params.reverse ? !match : match;

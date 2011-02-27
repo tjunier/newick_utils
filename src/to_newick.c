@@ -39,7 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode_iterator.h"
 #include "hash.h"
 
+static bool show_addresses = false;
+
 // TODO: make all functions static unless needed otherwise
+
+void set_show_addresses(bool show) { show_addresses = show; }
 
 /* returns the length part of a node, e.g. ":12.345" */
 
@@ -135,6 +139,8 @@ struct llist *to_newick_i(struct rnode *node)
 		if (is_leaf(current)) {
 			/* leaf: just print label */
 			append_element(result, strdup(current->label));
+			if (show_addresses) 
+				append_element(result, masprintf("@%p", current));
 			if (strcmp("", current->edge_length_as_string) != 0) {
 				append_element(result, strdup(":"));
 				append_element(result,
@@ -158,6 +164,11 @@ struct llist *to_newick_i(struct rnode *node)
 					if (strcmp("", current->label) != 0)
 						append_element(result,
 							strdup(current->label));
+					if (show_addresses) 
+						append_element(
+							result,
+							masprintf("@%p",
+								current));
 					if (strcmp("",
 						current->edge_length_as_string) != 0) {
 						//printf(":%s", current->edge_length_as_string);
