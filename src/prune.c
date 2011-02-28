@@ -173,12 +173,14 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 		if (NULL == goner->parent)
 			continue;
 		enum unlink_rnode_status result = unlink_rnode(goner);
+		struct rnode *root_child;
 		switch(result) {
 		case UNLINK_RNODE_DONE:
 			break;
 		case UNLINK_RNODE_ROOT_CHILD:
-			unlink_rnode_root_child->parent = NULL;
-			tree->root = unlink_rnode_root_child;
+			root_child = get_unlink_rnode_root_child();
+			root_child->parent = NULL;
+			tree->root = root_child;
 			break;
 		case UNLINK_RNODE_ERROR:
 			fprintf (stderr, "Memory error - exiting.\n");

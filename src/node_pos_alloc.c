@@ -61,13 +61,13 @@ int set_node_vpos_cb(struct rooted_tree *t,
 			struct rnode *top_child, *bottom_child;
 			/* top of this node is average of top and bottom of its
 			 * top child node */
-		       	top_child = node->children->head->data;
+		       	top_child = node->first_child;
 			set_node_top(node, 0.5 * (
 					get_node_top(top_child) +
 					get_node_bottom(top_child))
 					);
 			/* same idea for bottom */
-		       	bottom_child = node->children->tail->data;
+		       	bottom_child = node->last_child;
 			set_node_bottom(node, 0.5 * (
 					get_node_top(bottom_child) +
 					get_node_bottom(bottom_child))

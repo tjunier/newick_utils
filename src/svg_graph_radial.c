@@ -33,11 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "config.h"
+
+#ifdef USE_LIBXML2
 #include <libxml/tree.h>
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
-
-#include "config.h"
+#endif
 
 #include "list.h"
 #include "rnode.h"
@@ -49,8 +51,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "math.h"
 #include "masprintf.h"
 
-#ifndef HAVE_LIBXML2
-#define HAVE_LIBXML2 0
+/* If USE_LIBXML2 is not defined, we explicitly define it to false. */
+#ifndef USE_LIBXML2	
+#define USE_LIBXML2 0
 #endif
 
 extern enum inner_lbl_pos inner_label_pos;
@@ -97,7 +100,7 @@ void set_svg_root_length(int length)
 
 ****************************************************************/
 
-#if HAVE_LIBXML2
+#if USE_LIBXML2
 
 static char * wrap_in_dummy_doc(const char *svg_snippet)
 {
@@ -390,7 +393,7 @@ char *xml_transform_ornaments(const char *ornaments, double angle_deg, double x,
 	return tweaked_svg;
 }
 
-#endif	/* HAVE_LIBXML2 */
+#endif	/* USE_LIBXML2 */
 
 static char *embed_transform_ornaments(const char *ornaments, double angle_deg,
 		double x, double y)
@@ -420,7 +423,7 @@ static char *embed_transform_ornaments(const char *ornaments, double angle_deg,
 static char *transform_ornaments(const char *ornaments, double angle_deg,
 		double x, double y)
 {
-#if HAVE_LIBXML2
+#if USE_LIBXML2
 	return xml_transform_ornaments(ornaments, angle_deg, x, y);
 #else
 	return embed_transform_ornaments(ornaments, angle_deg, x, y);

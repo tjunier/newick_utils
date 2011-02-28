@@ -27,6 +27,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+#include <stdbool.h>
+
 /* Returns a Newick string representing the tree rooted at 'node'.*/
 
 struct rnode;
@@ -37,6 +40,12 @@ struct rnode;
  * hence is slow for big trees.  */
 
 char *to_newick(struct rnode* root);
+
+/* If passed 'true', causes to_newick_i() to append the address of each node to
+ * their labels. This is a debuging instrauction rather than a parameter,
+ * therefore it is not passed as a function argument. */
+
+void set_show_addresses(bool show);
 
 /* Like to_newick, but returns a list of strings. Concatenating the strings in
  * list order results in the Newick representation of the tree. The function

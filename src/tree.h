@@ -55,10 +55,12 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
 
 void collapse_pure_clades(struct rooted_tree *tree);
 
-/* Destroys a tree, releasing memory. Node data is freed if 'free_node_data' is
- * true (but any dynamically allocated memory pointed to by node data is NOT
- * freed), so 'free_node_data' should be set to true IFF the data can be
- * free()d directly. Otherwise, it will need to be free()d manually. */
+/* Destroys a tree, releasing memory. Node data is freed iff 'free_node_data'
+ * is true (but if that data also points to dynamically alocated data, it won't
+ * be freed), so 'free_node_data' should be set to true IFF the data can be
+ * free()d directly. Otherwise, it will need to be free()d manually. The
+ * functions destroy_tree_cb() and destroy_tree_cb_2() take a callback function
+ * to do just this. */
 
 void destroy_tree(struct rooted_tree *, int free_node_data);
 

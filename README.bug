@@ -1,0 +1,21 @@
+A node has a children count of 1, yet it has many kids. AFAICT there is
+something wrong in splice_out_rnode(). The spliced-out node's kids are attached
+to its parent, which then correctly has more kids, yet apparently its node
+count is not being updated correctly. Think of an invariant, or contract, or
+something else to assert just after entering the f() and just before exiting.
+
+Reproduce the bug with:
+
+$ valgrind ./src/nw_match prob.nw '(Gorilla,(Homo,Pan));'
+
+This causes a SEGV in Valgrind, but not with GDB:
+
+#0  splice_out_rnode (this=0x8056630) at link.c:195
+#1  0x080493e4 in remove_knee_nodes (tree=0x80521c8) at match.c:311
+#2  0x08049483 in process_tree (tree=0x80521c8, pattern_labels=0x8052460, 
+    pattern_newick=0x8052490 "(Gorilla,(Homo,Pan));", params=...)
+    at match.c:335
+#3  0x080495d0 in main (argc=3, argv=0xbffff424) at match.c:374
+
+(link.c 195 is where a next sibling is added, but the node count is not
+reflected properly.)

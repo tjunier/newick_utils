@@ -237,18 +237,18 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 
 enum deroot_status deroot(struct rooted_tree *tree)
 {
-	if (2 != tree->root->children->count)
+	if (2 != tree->root->child_count)
 		return NOT_BIFURCATING;
-	struct rnode *left_kid = tree->root->children->head->data;
-	struct rnode *right_kid = tree->root->children->tail->data;
+	struct rnode *left_kid = tree->root->first_child;
+	struct rnode *right_kid = tree->root->last_child;
 	/* We splice out the left or right kid of the root, and also free() it. */
-	if (left_kid->children->count < right_kid->children->count) {
+	if (left_kid->child_count < right_kid->child_count) {
 		if (! splice_out_rnode(right_kid)) {
 			perror(NULL); exit(EXIT_FAILURE);
 		}
 		// destroy_rnode(right_kid, NULL);
 	}
-	else if (left_kid->children->count > right_kid->children->count) {
+	else if (left_kid->child_count > right_kid->child_count) {
 		if (! splice_out_rnode(left_kid)) {
 			perror(NULL); exit(EXIT_FAILURE);
 		}

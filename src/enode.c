@@ -139,7 +139,7 @@ float eval_enode(struct enode *node)
 	case ENODE_NB_DESCENDANTS:
 		return data->nb_descendants;
 	case ENODE_NB_CHILDREN:
-		return current_tree_node->children->count;
+		return current_tree_node->child_count;
 	default:
 		assert(0);	/* programmer error */
 	}

@@ -1,34 +1,36 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.63)
-AC_INIT([Newick Utils],[1.3.5],[thomas.junier@.unige.ch])
+AC_PREREQ(2.61)
+AC_INIT([Newick Utils],[1.5.0],[thomas.junier@.unige.ch])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src])
 
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
+AH_TEMPLATE([USE_LIBXML2],[Defined to 1 if all conditions are met for use of LibXML2])
+
+# LibXML
 
 AC_ARG_WITH([libxml],
 	[
 	 	AS_HELP_STRING([--with-libxml],
 		[use libxml2 to handle ornaments @<:@default=yes@:>@])
 	],
-	[],	# do nothing special if passed (but see below in lib section)
+	[],	# do nothing special if passed 
 	[with_libxml=yes]	# if not passed, set to 'yes' (default)
-	)
+)
 
-AC_ARG_WITH([libxml-headers],
+# Guile
+
+AC_ARG_WITH([guile],
 	[
-	 	AS_HELP_STRING([--with-libxml-headers],
-		[specify alternative include directory for libxml headers @<:@default=/usr/include@:>@])
+	 	AS_HELP_STRING([--with-guile],
+			[Use Guile (enables nw_sched) @<:@default=yes@:>@])
 	],
-	[
-	 	AC_MSG_NOTICE([Note: --with-libxml set to 'yes' as libxml include dirs were provided])
-		with_libxml=yes
-	]
-	)
-
+	[], # default: do nothing
+	[with_guile=yes]	# not passed: set to yes (default)
+)
 
 # Checks for programs.
 AC_PROG_CC
@@ -40,28 +42,8 @@ LT_INIT#([disable-fast-install)]
 
 # Checks for libraries.
 AC_CHECK_LIB([m], [log])
-AS_IF([test "x$with_libxml" != xno],
-	[
-	 	# use libxml.
-	 	AS_IF([test "x$with_libxml" != xyes],
-			[
-			 	# look for libxml where user said: in $with_libxml
-				LDFLAGS="-L$with_libxml $LDFLAGS"
-			],
-			[
-			 	# try to have xml2-config tell us where libxml is
-				if xml2-config --version > /dev/null; then
-					LDFLAGS="-L$(xml2-config --prefix) $LDFLAGS"
-				fi
-				# otherwise just use defaults
-			]
-		)
-		AC_CHECK_LIB([xml2], [xmlParseMemory])
-	]
-	)
 
 # Checks for header files.
-
 
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
@@ -72,38 +54,69 @@ AC_CHECK_HEADERS(stddef.h)
 AC_CHECK_HEADERS(stdlib.h)
 AC_CHECK_HEADERS(string.h)
 AC_CHECK_HEADERS(unistd.h)
-AS_IF([test "$with_libxml_headers" != ""],
+
+AS_IF([test "x$with_libxml" = xyes],
 	[
-	 	# look for headers where user said: in $with_libxml_headers
-	 	CPPFLAGS="-I$with_libxml_headers $CPPFLAGS"
-	],
-	[
-		# try to have xml2-config tell us where the libxml headers are
-		if xml2-config --version > /dev/null; then
-			CPPFLAGS="$(xml2-config --cflags) $CPPFLAGS "
-		else
-			# a reasonable default
-			CPPFLAGS="-I/usr/include/libxml2 $CPPFLAGS"
-		fi
-	]
-	)
-AS_IF([test "x$with_libxml" != xno],
-	[
-		# look for libxml headers IFF with-libxml is not 'no'. Where to look for
-		# them is governed by CPPFLAGS (see above).
-		AC_CHECK_HEADERS(libxml/tree.h)
-		AC_CHECK_HEADERS(libxml/parser.h)
-		AC_CHECK_HEADERS(libxml/xpath.h)
+		AC_CHECK_LIB([xml2], [xmlParseMemory], [], [with_libxml=no_lib])
+		# Try to get xml2-config to tell us where the headers are.
+		AS_IF([xml2-config --version > /dev/null],
+			[CPPFLAGS="$(xml2-config --cflags) $CPPFLAGS "]
+		)
+		AC_CHECK_HEADERS([libxml/tree.h], [], [with_libxml=no_hdr])
+		AC_CHECK_HEADERS([libxml/parser.h], [], [with_libxml=no_hdr])
+		AC_CHECK_HEADERS([libxml/xpath.h], [], [with_libxml=no_hdr])
 	]
 )
+
+AS_IF([test "x$with_guile" = xyes],
+	[
+		AC_CHECK_HEADERS([libguile.h], [], [with_guile=no_hdr])
+		#AS_IF([test "x$with_guile_libdir" != xno], [LDFLAGS="$LDFLAGS -L$with_guile_libdir"])
+		AC_CHECK_LIB([guile], [scm_with_guile], [], [with_guile=no_lib])
+	]
+)
+
+AS_CASE([x$with_libxml],
+		[xyes],
+			[
+			 	# This goes into config.h
+			 	AC_DEFINE([USE_LIBXML2], 1, [Can use LibXML2])
+			],
+		[xno],
+			[AC_MSG_NOTICE([libXML disabled by user.])],
+		[xno_lib],
+			[AC_MSG_NOTICE([libXML missing (disabled).])],
+		[xno_hdr],
+			[AC_MSG_NOTICE([libXML disabled due to missing header.])],
+		[AC_MSG_NOTICE([Invalid argument --with-libxml=$with_libxml])]
+)
+
+AS_CASE([x$with_guile],
+		[xyes],
+			[
+			 	# This goes into config.h
+			 	AC_DEFINE([CHECK_NW_SCHED], 1, [Check nw_sched])
+			],
+		[xno],
+			[AC_MSG_NOTICE([Guile disabled by user.])],
+		[xno_hdr],
+			[AC_MSG_NOTICE([Guile disabled due to missing header.])],
+		[xno_lib],
+			[AC_MSG_NOTICE([libguile missing (disabled).])],
+		[AC_MSG_NOTICE([Invalid argument --with-guile=$with_guile])]
+)
+# This is accessible in Makefile.in's
+AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile = xyes])
 
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
+# NOTE: checking for malloc and realloc causes weird problems on Fedora 13.
+# OTOH it should be a very rare system that doesn't have them.
+#AC_FUNC_MALLOC
+#AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memset rint strdup strpbrk strspn])
 

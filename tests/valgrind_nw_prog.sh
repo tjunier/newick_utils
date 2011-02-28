@@ -5,7 +5,11 @@
 # Valgrind is present on user's systems, I did not include this program in the
 # test suite. But all programs should be checked in this way.
 
-progs=$(ls test_nw_*.sh)
+if [ "$1" != "" ] ; then
+	progs=$1
+else
+	progs=$(ls test_nw_*.sh)
+fi
 
 for prog in $progs; do
 	[ $prog = 'test_nw_prog.sh' ] && continue

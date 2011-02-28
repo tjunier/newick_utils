@@ -80,6 +80,8 @@ void help(char *argv[])
 "\n"
 "%s [-hnor] <newick trees filename|-> <Scheme expression>\n"
 "\n"
+"NOTE: this program is still very experimental and will probably change!\n"
+"\n"
 "Input\n"
 "-----\n"
 "\n"
@@ -123,7 +125,8 @@ void help(char *argv[])
 "\n"
 "				 (and i (> b 75))\n"
 "\n"
-"will match internal nodes with a bootstrap support value greater than 75.\n"
+"will match internal nodes with a bootstrap support value greater than 75\n"
+"(assuming that the support value is defined).\n"
 "\n"
 "The variables have short names to allow for compact expressions on the\n"
 "command line.\n"
@@ -144,10 +147,10 @@ void help(char *argv[])
 "    	r	boolean    	true iff node is the root\n"
 "\n"
 "Notes:\n"
-"    o Exactly one of i, l, and r is true for every node.\n"
-"    o The difference between b and lbl is that b interprets the label as a\n"
-"      number (if possible), while lbl returns the label as a string.\n"
-"    o Variables b, d, L and lbl may be undefined.\n"
+"    	o Exactly one of i, l, and r is true for every node.\n"
+"    	o The difference between b and lbl is that b interprets the label as\n"
+"	  a number (if possible), while lbl returns the label as a string.\n"
+"    	o Variables b, d, L and lbl may be undefined.\n"
 "\n"
 " The following Scheme forms and functions also have shorter names\n"
 " predefined:\n"
@@ -229,7 +232,17 @@ void help(char *argv[])
 "# get all clades with at least one ancestor, 980 or better support. Do not\n"
 "# print subtrees of matching clades, even if they match (option -o)\n"
 "\n"
-"$ %s data/big.rn.nw -n -o '((& (>= a 1) (>= b 980)) (s))'\n",
+"$ %s data/big.rn.nw -n -o '((& (>= a 1) (>= b 980)) (s))'\n"
+"\n"
+"# format all defined lengths to 2 decimal places, instead of 6 in the\n"
+"original:\n"
+"\n"
+"$ %s HRV.nw \"((def? 'L) (L! (format #f \\\"~,2f\\\" L)))\"\n"
+"\n"
+"# In the last example, I use def? to check that L (the length) is defined\n"
+"# and when true, I use function L! to set the length to a new value, namely\n"
+"# the result of the call to format.\n", 
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
@@ -299,13 +312,11 @@ static struct parameters get_params(int argc, char *argv[])
 
 static int get_nb_descendants(struct rnode *node)
 {
-	struct list_elem *e;
 	struct rnode *kid;
 	struct rnode_data *rndata;
 	int descendants = 0;
 
-	for (e = node->children->head; NULL != e; e = e->next) {
-		kid = e->data;
+	for (kid = node->first_child; NULL != kid; kid = kid->next_sibling) {
 		rndata = kid->data;
 		descendants += rndata->nb_descendants;
 		descendants += 1;	/* kid itself (no pun intended :-) ) */
@@ -441,7 +452,7 @@ static void set_predefined_variables(struct rnode *node)
 				edge_length_as_scm_string, SCM_UNDEFINED));
 
 	/* c: number of children */
-	scm_c_define("c", scm_from_int(current_node->children->count));
+	scm_c_define("c", scm_from_int(current_node->child_count));
 	
 	struct rnode_data *data = current_node->data;
 
@@ -529,6 +540,7 @@ static void process_tree(struct rooted_tree *tree, SCM address,
 static SCM scm_dump_subclade()
 {
 	dump_newick(current_node);
+	return SCM_UNDEFINED;
 }
 
 static SCM scm_unlink_node()
@@ -590,7 +602,6 @@ static SCM scm_set_label(SCM node, SCM label)
 
 static SCM scm_set_length(SCM edge_length)
 {
-	char *length_as_string;
 	size_t buffer_length;	/* storage for length as string */
 
 	/* If edge_length is a string, we first try to convert it to a number.
@@ -621,8 +632,7 @@ static SCM scm_set_length(SCM edge_length)
 			SCM_UNDEFINED);
 	buffer_length = scm_c_string_length(edge_length_as_scm_string);
 	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	size_t copied = scm_to_locale_stringbuf(
-			edge_length_as_scm_string, buffer, buffer_length);
+	scm_to_locale_stringbuf(edge_length_as_scm_string, buffer, buffer_length);
 	buffer[buffer_length] = '\0';
 
 	/* Set the allocated buffer as the current node's length-as-string */
@@ -645,7 +655,7 @@ static SCM scm_set_current_node_label(SCM label)
 
 	buffer_length = scm_c_string_length(label);
 	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	size_t copied = scm_to_locale_stringbuf(label, buffer, buffer_length);
+	scm_to_locale_stringbuf(label, buffer, buffer_length);
 	buffer[buffer_length] = '\0';
 
 	/* Set the allocated buffer as the current node's length-as-string */
@@ -678,7 +688,12 @@ static void inner_main(void *closure, int argc, char* argv[])
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
 
+<<<<<<< HEAD
 	init_scm_rnode();
+=======
+	closure = closure;	// suppresses gcc warnings about unused param
+	define_node();
+>>>>>>> master
 
 	/* Aliases and simple functions */
 	// TODO: put in a separate f(); and call scm_c_eval_string() once on all

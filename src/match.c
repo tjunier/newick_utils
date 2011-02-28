@@ -55,6 +55,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode_iterator.h"
 #include "masprintf.h"
 
+#ifdef DEBUG_MATCH
+#define DEBUG 1
+#else
+#define DEBUG 0
+#endif
+
+// TODO: remove this when debugging done
+
+void dump_rnode_address (void *rnode) { printf("%p ", rnode); }
+
 void newick_scanner_set_string_input(char *);
 void newick_scanner_clear_string_input();
 void newick_scanner_set_file_input(FILE *);
@@ -183,7 +193,10 @@ struct rooted_tree *get_ordered_pattern_tree(char *pattern)
 	}
 	newick_scanner_clear_string_input();
 
-	if (!order_tree_lbl(pattern_tree)) { perror(NULL); exit(EXIT_FAILURE); }
+	if (!order_tree_lbl(pattern_tree)) {
+		perror(NULL);
+		exit(EXIT_FAILURE);
+	}
 
 	return pattern_tree;
 }
@@ -297,6 +310,12 @@ void remove_branch_lengths(struct rooted_tree *target_tree)
 void remove_knee_nodes(struct rooted_tree *tree)
 {
 	/* tree was modified -> can't use its ordered node list */
+	// TODO: wouldn't it be better to call get_nodes_in_order() atthe end
+	// of the previous step, thus guaranteeing that the nodes are ok? I
+	// think it would. Let's do a programming-by-contract style of thing:
+	// each function called by process_tree() below expects a coherent tree
+	// and guarantees that the tree is in a coherent state when it returns.
+
 	struct llist *nodes_in_order = get_nodes_in_order(tree->root);
 	if (NULL == nodes_in_order) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *el;
@@ -304,19 +323,24 @@ void remove_knee_nodes(struct rooted_tree *tree)
 	for (el = nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = el->data;
 		if (is_inner_node(current))
-			if (1 == children_count(current))
+			if (1 == children_count(current)) { 
 				if (! splice_out_rnode(current)) {
 					perror(NULL);
 					exit(EXIT_FAILURE);
 				}
+				/* NOTE: don't destroy the current node here.
+				 * This is taken care of later in main(). */
+			}
 	}
 	destroy_llist(nodes_in_order);
 
 	/* If the root has only one child, make that child the new root */
-	if (1 == children_count(tree->root)) {
-		struct rnode *roots_first_child = tree->root->children->head->data;
-		tree->root = roots_first_child;
-	}
+	if (1 == children_count(tree->root)) 
+		tree->root = tree->root->first_child;
+
+	nodes_in_order = get_nodes_in_order(tree->root);
+	destroy_llist(tree->nodes_in_order);
+	tree->nodes_in_order = nodes_in_order;
 }
 
 void process_tree(struct rooted_tree *tree, struct hash *pattern_labels,
@@ -326,7 +350,8 @@ void process_tree(struct rooted_tree *tree, struct hash *pattern_labels,
 	 * as soon as possible. Then I no longer need to guard against this
 	 * list being invalid. WARNING: I did this just enough to make all
 	 * tests pass, NOT systemytically after each tree-function call. It may
-	 * be necessary to do it more thoroughly later on. */
+	 * be necessary to do it more thoroughly later on.
+	 * Indeed, see TODO in remove_knee_nodes() above. */
 	char *original_newick = to_newick(tree->root);
 	remove_inner_node_labels(tree);
 	prune_extra_labels(tree, pattern_labels);

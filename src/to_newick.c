@@ -39,7 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode_iterator.h"
 #include "hash.h"
 
+static bool show_addresses = false;
+
 // TODO: make all functions static unless needed otherwise
+
+void set_show_addresses(bool show) { show_addresses = show; }
 
 /* returns the length part of a node, e.g. ":12.345" */
 
@@ -74,22 +78,20 @@ char *subtree(struct rnode *node)
 		free(length_s);
 	} else {
 		struct rnode *child;
-		struct list_elem *elem;
 		char * child_node_s;
 
 		result = append_to(result, "(");
 
 		/* first child */
-		elem = node->children->head;
-		child = elem->data;
+		child = node->first_child;
 		child_node_s = subtree(child);
 		if (NULL == child_node_s) return NULL;
 		result = append_to(result, child_node_s);
 		free(child_node_s);
 		/* other children, comma-separated */
-		for (elem = elem->next; elem != NULL; elem = elem->next) {
+		for (child = child->next_sibling;
+				NULL != child; child = child->next_sibling) {
 			result = append_to(result, ",");
-			child = elem->data;
 			child_node_s = subtree(child);
 			if (NULL == child_node_s) return NULL;
 			result = append_to(result, child_node_s);
@@ -137,6 +139,8 @@ struct llist *to_newick_i(struct rnode *node)
 		if (is_leaf(current)) {
 			/* leaf: just print label */
 			append_element(result, strdup(current->label));
+			if (show_addresses) 
+				append_element(result, masprintf("@%p", current));
 			if (strcmp("", current->edge_length_as_string) != 0) {
 				append_element(result, strdup(":"));
 				append_element(result,
@@ -160,6 +164,11 @@ struct llist *to_newick_i(struct rnode *node)
 					if (strcmp("", current->label) != 0)
 						append_element(result,
 							strdup(current->label));
+					if (show_addresses) 
+						append_element(
+							result,
+							masprintf("@%p",
+								current));
 					if (strcmp("",
 						current->edge_length_as_string) != 0) {
 						//printf(":%s", current->edge_length_as_string);
@@ -191,6 +200,10 @@ int dump_newick(struct rnode *node)
 	for (e = nw_strings->head; NULL != e; e = e->next) 
 		printf("%s", (char *) e->data);
 	printf("\n");
+
+	for (e = nw_strings->head; NULL != e; e = e->next) 
+		free(e->data);
+	destroy_llist(nw_strings);
 
 	return SUCCESS;
 }

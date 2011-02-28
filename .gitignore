@@ -10,3 +10,14 @@ tags
 *.tar.gz
 Session.vim
 *~
+config.h.in
+configure
+aclocal.m4
+Makefile.in
+config.guess
+config.sub
+depcomp
+ltmain.sh
+missing
+mkinstalldirs
+ylwrap

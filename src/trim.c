@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "masprintf.h"
 #include "rnode.h"
 #include "list.h"
+#include "link.h"
 
 enum {DEPTH_DISTANCE, DEPTH_ANCESTORS};
 
@@ -161,7 +162,7 @@ void trim(struct rnode *node, struct parameters params)
 		node->edge_length_as_string = new_length;
 	}
 
-	clear_llist(node->children);	/* no effect on leaves */
+	remove_children(node);	/* no effect on leaves */
 
 	ndata->trimmed = true;
 }

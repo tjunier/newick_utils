@@ -16,6 +16,7 @@
 #include "parser.h"
 #include "tree.h"
 #include "list.h"
+#include "tree_stubs.h"
 
 void newick_scanner_set_string_input(char *);
 
@@ -152,7 +153,7 @@ int test_nested_2()
 	return 0;
 }
 
-/* bug 1 - this bug appeared when testing other functions */
+/* bug 1 - these bugs appeared when testing other functions */
 
 int test_bug1()
 {
@@ -213,6 +214,25 @@ int test_bug2()
 	if (strcmp(obt, newick) != 0) {
 		printf ("%s: expected '%s', got '%s'\n", test_name,
 				newick, obt);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_bug3()
+{
+	const char *test_name = __func__;
+	/* ((Bee,Ant)f,(Eel,(Dog,Cat)g)h)i; */
+	struct rooted_tree tree = tree_13();
+	char *obt_newick = to_newick(tree.root);
+	char *exp_newick = "((Bee,Ant),(Eel,(Dog,Cat)));";
+
+	if (0 != strcmp(obt_newick, exp_newick)) {
+		printf ("%s: expected '%s', got '%s'.\n",
+			test_name, exp_newick,
+			obt_newick);
 		return 1;
 	}
 
@@ -368,6 +388,7 @@ int main()
 	failures += test_nested_2();
 	failures += test_bug1();
 	failures += test_bug2();
+	failures += test_bug3();
 	failures += test_to_newick_i_leaf();
 	failures += test_to_newick_i_simple();
 	if (0 == failures) {

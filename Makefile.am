@@ -21,13 +21,13 @@ doc/nwutils_tutorial.pdf:
 # static libraries - pass option '--disable-shared' to ./configure.
 
 PLATFORM = $(shell uname -s)-$(shell uname -m)
+EXTRA = enabled
 
 show:
 	echo $(PLATFORM)
 
 bin-dist: distdir
 	cp src/nw_* $(distdir)/src
-	tardir=$(distdir) && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir)-$(PLATFORM).tar.gz
+	tardir=$(distdir) && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir)-$(PLATFORM)-$(EXTRA)-extra.tar.gz
 	$(am__remove_distdir)
 
-#ACLOCAL_AMFLAGS = -I m4

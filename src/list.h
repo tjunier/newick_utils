@@ -130,7 +130,8 @@ int llist_index_of(struct llist *list, void *data);
 int llist_index_of_f(struct llist *list, int (*func)(void*,void*), void *tgt);
 
 /* Destroys list and releases memory. List data are NOT destroyed or released,
- * only the data structure (i.e., the llist itself and the list_elements). To delete all elements without deleting the llist itself, use clear_llist(). */
+ * only the data structure (i.e., the llist itself and the list_elements). To
+ * delete all elements without deleting the llist itself, use clear_llist(). */
 
 void destroy_llist(struct llist *);
 
