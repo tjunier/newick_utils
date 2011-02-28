@@ -11,24 +11,26 @@
 
 static scm_t_bits rnode_tag;
 
-// TODO: can probably use NULL here?
+// As we don't store any SCM; we can pass NULL to scm_set_smob_mark(), etc
+// instead of defining these functions.
+
+/*
 SCM mark_rnode(SCM rnode_smob)
 {
-	/* nothing to do: rnode_smob holds no SCM. */
 	return SCM_BOOL_F;
 }
 
-// TODO: cf above
 size_t free_rnode(SCM rnode_smob)
 {
 	return 0;
 }
+*/
 
 void init_scm_rnode()
 {
 	rnode_tag = scm_make_smob_type("node", sizeof(struct rnode));
-	scm_set_smob_mark(rnode_tag, mark_rnode);
-	scm_set_smob_free(rnode_tag, free_rnode);
+	scm_set_smob_mark(rnode_tag, NULL);
+	scm_set_smob_free(rnode_tag, NULL);
 }
 
 SCM rnode_smob(struct rnode *node)
