@@ -17,7 +17,10 @@ def_d: -n part_def.nw "((def? 'd) (p lbl))"
 undef_d: -n part_def.nw "((! (def? 'd)) (p lbl))"
 set_lbl: catarrhini.nw '(#t (lbl! ""))'
 parpar: -n catarrhini.nw '((> a 1) (p (lab (par (par N)))))'
-# finds the outgroup (child of root with fewer children)
+# finds the outgroup (child of root with fewer children),
+# assuming root has 2 children
 og1: -n pecora.nw '(r (let ((c1 (first-child N)) (c2 (last-child N))) (if (< (children-count c1) (children-count c2)) (subtree c1) (subtree c2))))'
 og1short: -n pecora.nw '(r (let ((c1 (fc N)) (c2 (lc N))) (if (< (nc c1) (nc c2)) (st c1) (st c2))))'
 ogmult: -n edged_root.nw '(r (let ((c1 (fc N)) (c2 (lc N))) (if (< (nc c1) (nc c2)) (st c1) (st c2))))'
+# And e.g. this gets the ingroup:
+ig: -n pecora.nw '(r (st (if (> (nc (fc N)) (nc (lc N))) (fc N) (lc N))))'
