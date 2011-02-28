@@ -4,6 +4,10 @@
 
 #include "rnode.h"
 
+/* NOTE: I am trying to figure out how Guile's SMOBs work. For now our SMOBs
+ * for rnodes just encapsulate the rnode's address. Access to the rnode's
+ * fields is done using the address as a pointer. This may be rather
+ * inefficient, and later I might try to set other fields in the SMBO itself.*/
 
 static scm_t_bits rnode_tag;
 
@@ -25,7 +29,6 @@ void init_scm_rnode()
 	rnode_tag = scm_make_smob_type("node", sizeof(struct rnode));
 	scm_set_smob_mark(rnode_tag, mark_rnode);
 	scm_set_smob_free(rnode_tag, free_rnode);
-	// scm_set_smob_print(rnode_tag, print_rnode);
 }
 
 SCM rnode_smob(struct rnode *node)

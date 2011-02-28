@@ -665,6 +665,20 @@ static SCM scm_set_current_node_label(SCM label)
 	return SCM_UNSPECIFIED;
 }
 
+static void scheme_preamble()
+{
+
+	/* Aliases and simple functions */
+	scm_c_eval_string("(define & and)");	
+	scm_c_eval_string("(define | or)");	
+	scm_c_eval_string("(define ! not)");	
+	scm_c_eval_string("(define def? defined?)");	
+	scm_c_eval_string("(define (p obj) (display obj) (newline))");
+
+	/* Load some extra modules */
+	scm_c_eval_string("(use-modules (ice-9 format))");
+}
+
 static void register_C_functions()
 {
 	scm_c_define_gsubr("s", 0, 0, 0, scm_dump_subclade);
@@ -688,22 +702,11 @@ static void inner_main(void *closure, int argc, char* argv[])
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
 
-<<<<<<< HEAD
 	init_scm_rnode();
-=======
 	closure = closure;	// suppresses gcc warnings about unused param
-	define_node();
->>>>>>> master
+	init_scm_rnode();
 
-	/* Aliases and simple functions */
-	// TODO: put in a separate f(); and call scm_c_eval_string() once on all
-	// the Scheme functions.
-	scm_c_eval_string("(define & and)");	
-	scm_c_eval_string("(define | or)");	
-	scm_c_eval_string("(define ! not)");	
-	scm_c_eval_string("(define def? defined?)");	
-	scm_c_eval_string("(define (p obj) (display obj) (newline))");
-	scm_c_eval_string("(use-modules (ice-9 format))");
+	scheme_preamble();
 
 	SCM expr_scm = scm_from_locale_string(params.scheme_expr);
 	SCM in_port = scm_open_input_string(expr_scm);
