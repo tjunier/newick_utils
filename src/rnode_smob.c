@@ -133,3 +133,23 @@ SCM rnode_smob_dump_subclade(SCM node_smob)
 
 	return SCM_UNDEFINED;
 }
+
+SCM rnode_smob_children_list(SCM node_smob)
+{
+	if (SCM_UNDEFINED == node_smob)
+		return SCM_UNDEFINED;
+
+	struct rnode *node;
+	node = (struct rnode*) SCM_SMOB_DATA (node_smob);
+
+	SCM result = scm_list_n(SCM_UNDEFINED);
+	
+	struct rnode *n;
+	for (n = node->first_child; NULL != n; n = n->next_sibling) {
+		SCM current_node_smob = rnode_smob(n);
+		result = scm_cons(current_node_smob, result);
+	}
+
+	return scm_reverse(result);
+}
+
