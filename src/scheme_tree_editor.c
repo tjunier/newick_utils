@@ -63,7 +63,11 @@ struct rnode *current_node;
 enum order { POST_ORDER, PRE_ORDER };
 
 struct parameters {
-	char *scheme_expr;	// a (test action) pair
+	bool scheme_on_CLI;	
+	/* this can be either literal Scheme code on the command line, or the
+	 * name of a file that contains Scheme code. This is governed by
+	 * scheme_on_CLI. */
+	char *scheme_expr;	
 	int show_tree;
 	int order;
 	int stop_clade_at_first_match;
@@ -256,13 +260,19 @@ static struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
+	params.scheme_on_CLI = true;
+	params.scheme_expr = NULL;
 	params.show_tree = true;
 	params.order = POST_ORDER;
 	params.stop_clade_at_first_match = false;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hnor")) != -1) {
+	while ((opt_char = getopt(argc, argv, "f:hnor")) != -1) {
 		switch (opt_char) {
+		case 'f':
+			params.scheme_on_CLI = false;
+			params.scheme_expr = optarg;
+			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
@@ -283,7 +293,7 @@ static struct parameters get_params(int argc, char *argv[])
 	}
 
 	/* check arguments */
-	if (2 == (argc - optind))	{
+	if (2 >= (argc - optind))	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
 			extern FILE *nwsin;
@@ -293,7 +303,8 @@ static struct parameters get_params(int argc, char *argv[])
 			}
 			nwsin = fin;
 		}
-		params.scheme_expr = argv[optind+1];
+		if (2 == (argc - optind))
+			params.scheme_expr = argv[optind+1];
 	} else {
 		fprintf(stderr, "Usage: %s [-hnro] <filename|-> "
 				"<Scheme expression>\n",
@@ -719,9 +730,22 @@ static void inner_main(void *closure, int argc, char* argv[])
 	init_scm_rnode();
 
 	scheme_preamble();
-
-	SCM expr_scm = scm_from_locale_string(params.scheme_expr);
-	SCM in_port = scm_open_input_string(expr_scm);
+	
+	SCM in_port = SCM_UNDEFINED;
+	if (params.scheme_on_CLI) {
+		SCM expr_scm_string =
+			scm_from_locale_string(params.scheme_expr);
+		in_port = scm_open_input_string(expr_scm_string);
+	} else {
+		printf("%s\n", params.scheme_expr);
+		exit(0);
+		SCM fname_scm_string =
+			scm_from_locale_string(params.scheme_expr);
+		SCM mode_scm_string = 
+			scm_from_locale_string("r");
+		in_port = scm_open_file(fname_scm_string,
+				mode_scm_string);
+	}
 	SCM expr = scm_read(in_port);
 	SCM address = scm_car(expr);
 	SCM action = scm_cadr(expr);
