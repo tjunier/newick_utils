@@ -99,7 +99,8 @@ nw_stats_SOURCES = stats.c
 nw_stats_LDADD = @LEXLIB@ libnw.la
 
 nw_sched_SOURCES = scheme_tree_editor.c rnode_smob.c
-nw_sched_LDADD = @LEXLIB@  libnw.la -lguile
+# -lpthread is required by Fedora 13
+nw_sched_LDADD = @LEXLIB@  libnw.la -lguile -lpthread
 
 # disabled for release
 #nw_toy_SOURCES = toy.c
