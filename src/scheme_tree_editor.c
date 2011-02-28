@@ -681,6 +681,7 @@ static void scheme_preamble()
 
 static void register_C_functions()
 {
+	/* Current node as implicit argument */
 	scm_c_define_gsubr("s", 0, 0, 0, scm_dump_subclade);
 	scm_c_define_gsubr("dump-subclade", 0, 0, 0, scm_dump_subclade);
 	scm_c_define_gsubr("u", 0, 0, 0, scm_unlink_node);
@@ -691,10 +692,20 @@ static void register_C_functions()
 	scm_c_define_gsubr("set-length!", 1, 0, 0, scm_set_length);
 	scm_c_define_gsubr("lbl!", 1, 0, 0, scm_set_current_node_label);
 	scm_c_define_gsubr("set-label!", 1, 0, 0, scm_set_current_node_label);
+	/* rnode SMOB as argument */
 	scm_c_define_gsubr("lab", 1, 0, 0, scm_get_label);
 	scm_c_define_gsubr("lab!", 2, 0, 0, scm_set_label);
 	scm_c_define_gsubr("par", 1, 0, 0, rnode_smob_parent);
 	scm_c_define_gsubr("parent", 1, 0, 0, rnode_smob_parent);
+	scm_c_define_gsubr("fc", 1, 0, 0, rnode_smob_first_child);
+	scm_c_define_gsubr("first-child", 1, 0, 0, rnode_smob_first_child);
+	scm_c_define_gsubr("lc", 1, 0, 0, rnode_smob_last_child);
+	scm_c_define_gsubr("last-child", 1, 0, 0, rnode_smob_last_child);
+	scm_c_define_gsubr("nc", 1, 0, 0, rnode_smob_children_count);
+	scm_c_define_gsubr("children-count", 1, 0, 0, rnode_smob_children_count);
+	scm_c_define_gsubr("st", 1, 0, 0, rnode_smob_dump_subclade);
+	scm_c_define_gsubr("subtree", 1, 0, 0, rnode_smob_dump_subclade);
+
 }
 
 static void inner_main(void *closure, int argc, char* argv[])

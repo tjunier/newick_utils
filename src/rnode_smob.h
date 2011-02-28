@@ -19,3 +19,19 @@ SCM rnode_smob_label(SCM rnode_smob, SCM label);
 /* Returns the argument's parent node, as a SMOB */
 
 SCM rnode_smob_parent(SCM rnode_smob);
+
+/* Returns the argument's first child, or undefined if it is a leaf. */
+
+SCM rnode_smob_first_child(SCM rnode_smob);
+
+/* Returns the argument's last child, or undefined if it is a leaf. */
+
+SCM rnode_smob_last_child(SCM rnode_smob);
+
+/* Returns the argument's number of children */
+
+SCM rnode_smob_children_count(SCM rnode_smob);
+
+/* Dumps the subtree rooted at the argument rnode. Returns undefined. */
+
+SCM rnode_smob_dump_subclade(SCM rnode_smob);

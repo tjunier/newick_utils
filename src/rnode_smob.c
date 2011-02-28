@@ -50,6 +50,10 @@ SCM rnode_smob_label(SCM node_smob, SCM label)
 	struct rnode *node;
 	node = (struct rnode*) SCM_SMOB_DATA (node_smob);
 
+	char *c_label = strdup(node->label);
+	/* no need to free label (see scm_take_locale_string()) */
+	SCM old_label = scm_take_locale_string(c_label);
+
 	if (SCM_UNDEFINED != label) { 
 		size_t buffer_length;	/* storage for label */
 
@@ -66,11 +70,7 @@ SCM rnode_smob_label(SCM node_smob, SCM label)
 		node->label = buffer;
 	}
 	
-	// TODO This is inefficient!
-	char *c_label = strdup(node->label);
-	/* no need to free label (see scm_take_locale_string()) */
-
-	return label = scm_take_locale_string(c_label);
+	return old_label;	/* only changed if tere is a new one... */
 }
 
 SCM rnode_smob_parent(SCM node_smob)
@@ -84,4 +84,52 @@ SCM rnode_smob_parent(SCM node_smob)
 		return SCM_UNDEFINED;
 
 	return rnode_smob(node->parent);
+}
+
+SCM rnode_smob_first_child(SCM node_smob)
+{
+	if (SCM_UNDEFINED == node_smob)
+		return SCM_UNDEFINED;
+
+	struct rnode *node;
+	node = (struct rnode*) SCM_SMOB_DATA (node_smob);
+	if (is_leaf(node))
+		return SCM_UNDEFINED;
+
+	return rnode_smob(node->first_child);
+}
+
+SCM rnode_smob_last_child(SCM node_smob)
+{
+	if (SCM_UNDEFINED == node_smob)
+		return SCM_UNDEFINED;
+
+	struct rnode *node;
+	node = (struct rnode*) SCM_SMOB_DATA (node_smob);
+	if (is_leaf(node))
+		return SCM_UNDEFINED;
+
+	return rnode_smob(node->last_child);
+}
+
+SCM rnode_smob_children_count(SCM node_smob)
+{
+	if (SCM_UNDEFINED == node_smob)
+		return SCM_UNDEFINED;
+
+	struct rnode *node;
+	node = (struct rnode*) SCM_SMOB_DATA (node_smob);
+
+	return scm_from_int(node->child_count);
+}
+
+SCM rnode_smob_dump_subclade(SCM node_smob)
+{
+	if (SCM_UNDEFINED != node_smob) {
+		struct rnode *node;
+		node = (struct rnode*) SCM_SMOB_DATA (node_smob);
+		dump_newick(node);
+	}
+
+	return SCM_UNDEFINED;
 }
