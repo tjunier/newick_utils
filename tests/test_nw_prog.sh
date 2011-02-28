@@ -81,7 +81,7 @@ fi
 # name>.exp .
 
 pass=TRUE
-while IFS=':' read name args ; do
+grep -v '^#' < $args_file | while IFS=':' read name args ; do
 	# setting IFS to '' preserves whitespace through shell word splitting
 	check_applies $name
 	if [ "$?" -eq "0" ] ; then
@@ -102,7 +102,7 @@ while IFS=':' read name args ; do
 		pass=FALSE
 		break
 	fi
-done < $args_file
+done
 
 if test $pass = FALSE ; then
 	exit 1
