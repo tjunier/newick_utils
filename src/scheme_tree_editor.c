@@ -705,7 +705,8 @@ static void register_C_functions()
 	scm_c_define_gsubr("children-count", 1, 0, 0, rnode_smob_children_count);
 	scm_c_define_gsubr("st", 1, 0, 0, rnode_smob_dump_subclade);
 	scm_c_define_gsubr("subtree", 1, 0, 0, rnode_smob_dump_subclade);
-
+	scm_c_define_gsubr("kids", 1, 0, 0, rnode_smob_children_list);
+	scm_c_define_gsubr("children-list", 1, 0, 0, rnode_smob_children_list);
 }
 
 static void inner_main(void *closure, int argc, char* argv[])

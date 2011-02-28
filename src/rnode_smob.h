@@ -35,3 +35,7 @@ SCM rnode_smob_children_count(SCM rnode_smob);
 /* Dumps the subtree rooted at the argument rnode. Returns undefined. */
 
 SCM rnode_smob_dump_subclade(SCM rnode_smob);
+
+/* Returns a list of all the argument node's children (empty iff leaf) */
+
+SCM rnode_smob_children_list(SCM rnode_smob);
