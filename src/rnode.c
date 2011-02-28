@@ -198,7 +198,6 @@ void free_descendants(struct rnode *node)
 
 struct rnode** children_array(struct rnode *node)
 {
-	printf("node: %p\n", node);
 	struct rnode **array = malloc(node->child_count *
 			sizeof(struct rnode *));
 	if (NULL == array) return NULL;
@@ -207,7 +206,6 @@ struct rnode** children_array(struct rnode *node)
 	struct rnode *kid = NULL;
 	int i = 0;
 	for (kid = node->first_child; NULL != kid; kid = kid->next_sibling) {
-		printf("%d/%d\n", i, node->child_count);
 		array[i] = kid;
 		i++;
 	}

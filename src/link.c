@@ -168,9 +168,6 @@ int splice_out_rnode(struct rnode *this)
 	struct rnode *parent = this->parent;
 	struct rnode *current_child, *current_sibling;
 
-	printf("children: %d, siblings: %d\n",
-			this->child_count,
-			parent->child_count);
 	/* change the children's parent edges: they must now point to their
 	 * 'grandparent', and the length from their parent to their grandparent
 	 * must be added. */
@@ -207,8 +204,6 @@ int splice_out_rnode(struct rnode *this)
 
 	/* Update parent's children count */
 	parent->child_count += this->child_count - 1;
-
-	printf("children: %d\n", parent->child_count);
 
 	return SUCCESS;
 }
