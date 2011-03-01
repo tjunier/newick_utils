@@ -737,8 +737,6 @@ static void inner_main(void *closure, int argc, char* argv[])
 			scm_from_locale_string(params.scheme_expr);
 		in_port = scm_open_input_string(expr_scm_string);
 	} else {
-		printf("%s\n", params.scheme_expr);
-		exit(0);
 		SCM fname_scm_string =
 			scm_from_locale_string(params.scheme_expr);
 		SCM mode_scm_string = 
