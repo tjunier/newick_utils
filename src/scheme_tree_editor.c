@@ -61,6 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct rnode *current_node;
 
 enum order { POST_ORDER, PRE_ORDER };
+enum mult_values { MULT_UNSPECIFIED, MULT_SINGLE, MULT_MULTIPLE };
 
 struct parameters {
 	bool scheme_on_CLI;	
@@ -68,9 +69,10 @@ struct parameters {
 	 * name of a file that contains Scheme code. This is governed by
 	 * scheme_on_CLI. */
 	char *scheme_test_list;	
-	int show_tree;
+	bool show_tree;
 	int order;
-	int stop_clade_at_first_match;
+	bool stop_clade_at_first_match;
+	bool single;
 };
 
 void help(char *argv[])
@@ -265,17 +267,27 @@ static struct parameters get_params(int argc, char *argv[])
 	params.show_tree = true;
 	params.order = POST_ORDER;
 	params.stop_clade_at_first_match = false;
+	params.single = true;
+
+	enum mult_values mult = MULT_UNSPECIFIED;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "f:hnor")) != -1) {
+	while ((opt_char = getopt(argc, argv, "f:hnm:or")) != -1) {
 		switch (opt_char) {
 		case 'f':
 			params.scheme_on_CLI = false;
 			params.scheme_test_list = optarg;
+			params.single = false;
 			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
+		case 'm':
+			if (strcmp("1", optarg) == 0)
+				mult = MULT_SINGLE;
+			else
+				mult = MULT_MULTIPLE;
+			break;
 		case 'n':
 			params.show_tree = false;
 			break;
@@ -310,6 +322,23 @@ static struct parameters get_params(int argc, char *argv[])
 				"<Scheme expression>\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
+	}
+
+	/* How many tests? If multiplicity was explicitly set (option -m), then
+	 * honor this.  Otherwise look at where the Scheme code comes from: if
+	 * CL, assume single; if from a file, assume multiple. */
+	switch (mult) {
+	case MULT_SINGLE:
+		params.single = true;
+		break;
+	case MULT_MULTIPLE:
+		params.single = false;
+		break;
+	case MULT_UNSPECIFIED:
+		params.single = params.scheme_on_CLI;
+		break;
+	default:
+		assert(0);
 	}
 
 	return params;
@@ -758,16 +787,17 @@ static SCM get_test_list(struct parameters params)
 		SCM mode_string = scm_from_locale_string("r");
 		in_port = scm_open_file(fname_string, mode_string);
 	}
-	SCM test_list = scm_read(in_port);
-	scm_write_line(test_list, scm_current_output_port ());
-	/* At this point the test list may have two forms: either a true list
-	 * of tests, e.g. ((clause-1 action-1) ... (clause-n action-n)), or a
-	 * single test (as is typical when on the command line), e.g. (clause
-	 * action). The rest of the program expects a true list, so in the
-	 * second case we have to make a true list with it. */
-	if (SCM_BOOL_F == scm_pair_p(scm_car(test_list)))
-		test_list = scm_cons(test_list, SCM_EOL);
 
+	SCM test_list;
+	if (params.single)
+		test_list = scm_read(in_port);
+	else {
+		test_list = SCM_EOL;
+		test_list = scm_cons(scm_read(in_port), test_list);
+		test_list = scm_cons(scm_read(in_port), test_list);
+	}
+
+	scm_write_line(test_list, scm_current_output_port ());
 	return test_list;
 }
 
