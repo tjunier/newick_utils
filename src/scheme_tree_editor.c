@@ -515,65 +515,6 @@ static void set_predefined_variables(struct rnode *node)
 		scm_c_define("r", SCM_BOOL_F);
 }
 
-/* 'address' and 'action' are Scheme expressions. The tree is visited, and
- * 'address' is evaluated at each node (though some may be skipped). If
- * 'address' is true, 'action' is perfomed. */
-
-static void process_tree(struct rooted_tree *tree, SCM test_list,
-		SCM test_eval_list, struct parameters params)
-{
-	struct llist *nodes;
-	struct list_elem *el;
-
-	/* these two traversals fill the node data. */
-	// TODO: would gain time by only performing those traversals that are
-	// needed
-	reverse_parse_order_traversal(tree);
-	parse_order_traversal(tree);
-
-	if (POST_ORDER == params.order)
-		nodes = tree->nodes_in_order;
-	else if (PRE_ORDER == params.order) {
-		nodes = llist_reverse(tree->nodes_in_order);
-		if (NULL == nodes) { perror(NULL); exit(EXIT_FAILURE); }
-	}
-	else 
-		assert(0);	 /* programmer error... */
-
-
-	/* Main loop: Iterate over all nodes */
-	for (el = nodes->head; NULL != el; el = el -> next) {
-		current_node = (struct rnode *) el->data;
-
-		/* Check for stop mark in parent (see option -o) */
-		if (! is_root(current_node)) { 	/* root has no parent... */
-			if (((struct rnode_data *)
-				current_node->parent->data)->stop_mark) {
-				/* Stop-mark the current node and continue */ 
-				((struct rnode_data *)
-					current_node->data)->stop_mark = true;
-				continue;
-			}
-		} 
-
-		set_predefined_variables(current_node);
-		SCM is_match = scm_call_1(test_eval_list, test_list);
-
-		if (! scm_is_false(is_match)) {
-			/* see -o switch */
-			if (params.stop_clade_at_first_match)
-				((struct rnode_data *)
-				 current_node->data)->stop_mark = TRUE;
-		}
-
-	} /* loop over all nodes */
-
-	/* If order is PRE_ORDER, the list of nodes is an inverted copy, so we
-	 * need to free it. */
-	if (PRE_ORDER == params.order)
-		destroy_llist(nodes);
-}
-
 /* Makes C functions available to Scheme */
 
 static SCM scm_dump_subclade()
@@ -708,7 +649,7 @@ static SCM scm_set_current_node_label(SCM label)
 (clause action) pair. Iff the clause is #t, the action gets evaluated. The
 function returns #t iff at least one test is #t. */
 
-static SCM define_test_eval_list()
+static SCM define_test_list_eval()
 {
 	return scm_c_eval_string(
 "(lambda (lst)"
@@ -735,6 +676,10 @@ static void scheme_preamble()
 	scm_c_eval_string("(define ! not)");	
 	scm_c_eval_string("(define def? defined?)");	
 	scm_c_eval_string("(define (p obj) (display obj) (newline))");
+
+	/* Variables used outside the tree processing loop */
+	scm_c_eval_string("(define begin-tree #f)");
+	scm_c_eval_string("(define end-tree #f)");
 
 	/* Load some extra modules */
 
@@ -800,6 +745,83 @@ static SCM get_test_list(struct parameters params)
 	return test_list;
 }
 
+/* Allow for Scheme code to be run before processing tree (symbol :begin-tree
+ * is true). Think of BEGIN in awk, but this is run for _every_ tree. */
+
+static void preprocess(SCM test_list, SCM test_list_eval,
+		struct parameters params)
+{
+	scm_c_eval_string("(set! begin-tree #t)");
+	scm_c_eval_string("(set! end-tree #f)");
+	scm_call_1(test_list_eval, test_list);
+}
+
+/* 'test_list' is the Scheme list of tests (i.e., (clause action) pairs) and
+ * 'test_list_eval' is the Scheme function that evaluates them. */
+
+static void process_tree(struct rooted_tree *tree, SCM test_list,
+		SCM test_list_eval, struct parameters params)
+{
+	struct llist *nodes;
+	struct list_elem *el;
+
+	/* these two traversals fill the node data. */
+	// TODO: would gain time by only performing those traversals that are
+	// needed
+	reverse_parse_order_traversal(tree);
+	parse_order_traversal(tree);
+
+	if (POST_ORDER == params.order)
+		nodes = tree->nodes_in_order;
+	else if (PRE_ORDER == params.order) {
+		nodes = llist_reverse(tree->nodes_in_order);
+		if (NULL == nodes) { perror(NULL); exit(EXIT_FAILURE); }
+	}
+	else 
+		assert(0);	 /* programmer error... */
+
+
+	/* Main loop: Iterate over all nodes */
+	for (el = nodes->head; NULL != el; el = el -> next) {
+		current_node = (struct rnode *) el->data;
+
+		/* Check for stop mark in parent (see option -o) */
+		if (! is_root(current_node)) { 	/* root has no parent... */
+			if (((struct rnode_data *)
+				current_node->parent->data)->stop_mark) {
+				/* Stop-mark the current node and continue */ 
+				((struct rnode_data *)
+					current_node->data)->stop_mark = true;
+				continue;
+			}
+		} 
+
+		set_predefined_variables(current_node);
+		SCM is_match = scm_call_1(test_list_eval, test_list);
+
+		if (! scm_is_false(is_match)) {
+			/* see -o switch */
+			if (params.stop_clade_at_first_match)
+				((struct rnode_data *)
+				 current_node->data)->stop_mark = TRUE;
+		}
+
+	} /* loop over all nodes */
+
+	/* If order is PRE_ORDER, the list of nodes is an inverted copy, so we
+	 * need to free it. */
+	if (PRE_ORDER == params.order)
+		destroy_llist(nodes);
+}
+
+static void postprocess(SCM test_list, SCM test_list_eval,
+		struct parameters params)
+{
+	scm_c_eval_string("(set! begin-tree #f)");
+	scm_c_eval_string("(set! end-tree #t)");
+	scm_call_1(test_list_eval, test_list);
+}
+
 static void inner_main(void *closure, int argc, char* argv[])
 {
 	struct parameters params = get_params(argc, argv);
@@ -811,17 +833,19 @@ static void inner_main(void *closure, int argc, char* argv[])
 
 	scheme_preamble();
 	
-	SCM test_eval_list = define_test_eval_list();
+	SCM test_list_eval = define_test_list_eval();
 	SCM test_list = get_test_list(params);
 
 	register_C_functions();
 
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, test_list, test_eval_list, params);
+		preprocess(test_list, test_list_eval, params);
+		process_tree(tree, test_list, test_list_eval, params);
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
 		destroy_tree(tree, FREE_NODE_DATA);
+		postprocess(test_list, test_list_eval, params);
 	}
 }
 
