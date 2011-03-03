@@ -25,3 +25,4 @@ ogmult: -n edged_root.nw '(r (let ((c1 (fc N)) (c2 (lc N))) (if (< (nc c1) (nc c
 # And e.g. this gets the ingroup:
 ig: -n pecora.nw '(r (st (if (> (nc (fc N)) (nc (lc N))) (fc N) (lc N))))'
 kids1: -n pecora.nw '((not l) (begin (p (lab N)) (map (lambda (k) (p (nc k))) (kids N)))))'
+file_1: -n -f edges.scm catarrhini.nw

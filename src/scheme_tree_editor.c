@@ -776,7 +776,7 @@ static void register_C_functions()
 
 static SCM get_test_list(struct parameters params)
 {
-	SCM in_port = SCM_UNDEFINED;
+	SCM in_port;
 	if (params.scheme_on_CLI) {
 		SCM test_string =
 			scm_from_locale_string(params.scheme_test_list);
@@ -788,16 +788,15 @@ static SCM get_test_list(struct parameters params)
 		in_port = scm_open_file(fname_string, mode_string);
 	}
 
+	/* If a single test was passed, wrap it into a list. */
 	SCM test_list;
 	if (params.single)
+		test_list = scm_cons(scm_read(in_port), SCM_EOL);
+	else 
 		test_list = scm_read(in_port);
-	else {
-		test_list = SCM_EOL;
-		test_list = scm_cons(scm_read(in_port), test_list);
-		test_list = scm_cons(scm_read(in_port), test_list);
-	}
 
-	scm_write_line(test_list, scm_current_output_port ());
+	//scm_write_line(test_list, scm_current_output_port ());
+
 	return test_list;
 }
 
