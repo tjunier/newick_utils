@@ -67,7 +67,7 @@ struct parameters {
 	/* this can be either literal Scheme code on the command line, or the
 	 * name of a file that contains Scheme code. This is governed by
 	 * scheme_on_CLI. */
-	char *scheme_expr;	
+	char *scheme_test_list;	
 	int show_tree;
 	int order;
 	int stop_clade_at_first_match;
@@ -261,7 +261,7 @@ static struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	params.scheme_on_CLI = true;
-	params.scheme_expr = NULL;
+	params.scheme_test_list = NULL;
 	params.show_tree = true;
 	params.order = POST_ORDER;
 	params.stop_clade_at_first_match = false;
@@ -271,7 +271,7 @@ static struct parameters get_params(int argc, char *argv[])
 		switch (opt_char) {
 		case 'f':
 			params.scheme_on_CLI = false;
-			params.scheme_expr = optarg;
+			params.scheme_test_list = optarg;
 			break;
 		case 'h':
 			help(argv);
@@ -304,7 +304,7 @@ static struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 		if (2 == (argc - optind))
-			params.scheme_expr = argv[optind+1];
+			params.scheme_test_list = argv[optind+1];
 	} else {
 		fprintf(stderr, "Usage: %s [-hnro] <filename|-> "
 				"<Scheme expression>\n",
@@ -490,8 +490,8 @@ static void set_predefined_variables(struct rnode *node)
  * 'address' is evaluated at each node (though some may be skipped). If
  * 'address' is true, 'action' is perfomed. */
 
-static void process_tree(struct rooted_tree *tree, SCM address,
-		SCM action, struct parameters params)
+static void process_tree(struct rooted_tree *tree, SCM test_list,
+		SCM test_eval_list, struct parameters params)
 {
 	struct llist *nodes;
 	struct list_elem *el;
@@ -528,10 +528,9 @@ static void process_tree(struct rooted_tree *tree, SCM address,
 		} 
 
 		set_predefined_variables(current_node);
-		SCM is_match = scm_primitive_eval(address);
+		SCM is_match = scm_call_1(test_eval_list, test_list);
 
 		if (! scm_is_false(is_match)) {
-			scm_primitive_eval(action);
 			/* see -o switch */
 			if (params.stop_clade_at_first_match)
 				((struct rnode_data *)
@@ -676,10 +675,32 @@ static SCM scm_set_current_node_label(SCM label)
 	return SCM_UNSPECIFIED;
 }
 
+/* Returns a Scheme function for evaluating a list of tests. A test is a
+(clause action) pair. Iff the clause is #t, the action gets evaluated. The
+function returns #t iff at least one test is #t. */
+
+static SCM define_test_eval_list()
+{
+	return scm_c_eval_string(
+"(lambda (lst)"
+"	(letrec ((eval-tests (lambda (L)"
+"		(if (null? L)"
+"      #f"
+"      (let* ((test (car L))"
+"             (clause (car test))"
+"             (action (cadr test)))"
+"        (if (primitive-eval clause)"
+"            (begin (primitive-eval action) (or (eval-tests (cdr L)) #t))"
+"            (or (eval-tests (cdr L)) #f )))))))"
+"	(eval-tests lst)))"
+	);
+}
+	
 static void scheme_preamble()
 {
 
 	/* Aliases and simple functions */
+
 	scm_c_eval_string("(define & and)");	
 	scm_c_eval_string("(define | or)");	
 	scm_c_eval_string("(define ! not)");	
@@ -687,7 +708,11 @@ static void scheme_preamble()
 	scm_c_eval_string("(define (p obj) (display obj) (newline))");
 
 	/* Load some extra modules */
+
 	scm_c_eval_string("(use-modules (ice-9 format))");
+	/* this one is mostly useful for debugging */
+	scm_c_eval_string("(use-modules (ice-9 pretty-print))");
+	scm_c_eval_string("(use-modules (ice-9 rdelim))");
 }
 
 static void register_C_functions()
@@ -720,6 +745,32 @@ static void register_C_functions()
 	scm_c_define_gsubr("children-list", 1, 0, 0, rnode_smob_children_list);
 }
 
+static SCM get_test_list(struct parameters params)
+{
+	SCM in_port = SCM_UNDEFINED;
+	if (params.scheme_on_CLI) {
+		SCM test_string =
+			scm_from_locale_string(params.scheme_test_list);
+		in_port = scm_open_input_string(test_string);
+	} else {
+		SCM fname_string =
+			scm_from_locale_string(params.scheme_test_list);
+		SCM mode_string = scm_from_locale_string("r");
+		in_port = scm_open_file(fname_string, mode_string);
+	}
+	SCM test_list = scm_read(in_port);
+	scm_write_line(test_list, scm_current_output_port ());
+	/* At this point the test list may have two forms: either a true list
+	 * of tests, e.g. ((clause-1 action-1) ... (clause-n action-n)), or a
+	 * single test (as is typical when on the command line), e.g. (clause
+	 * action). The rest of the program expects a true list, so in the
+	 * second case we have to make a true list with it. */
+	if (SCM_BOOL_F == scm_pair_p(scm_car(test_list)))
+		test_list = scm_cons(test_list, SCM_EOL);
+
+	return test_list;
+}
+
 static void inner_main(void *closure, int argc, char* argv[])
 {
 	struct parameters params = get_params(argc, argv);
@@ -731,27 +782,13 @@ static void inner_main(void *closure, int argc, char* argv[])
 
 	scheme_preamble();
 	
-	SCM in_port = SCM_UNDEFINED;
-	if (params.scheme_on_CLI) {
-		SCM expr_scm_string =
-			scm_from_locale_string(params.scheme_expr);
-		in_port = scm_open_input_string(expr_scm_string);
-	} else {
-		SCM fname_scm_string =
-			scm_from_locale_string(params.scheme_expr);
-		SCM mode_scm_string = 
-			scm_from_locale_string("r");
-		in_port = scm_open_file(fname_scm_string,
-				mode_scm_string);
-	}
-	SCM expr = scm_read(in_port);
-	SCM address = scm_car(expr);
-	SCM action = scm_cadr(expr);
+	SCM test_eval_list = define_test_eval_list();
+	SCM test_list = get_test_list(params);
 
 	register_C_functions();
 
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, address, action, params);
+		process_tree(tree, test_list, test_eval_list, params);
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
