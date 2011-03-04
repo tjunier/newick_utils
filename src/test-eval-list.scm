@@ -14,6 +14,13 @@
 	(eval-tests lst)))
 
 
+;; Partitions the test list (of the form (test1 ... testn), where each test is
+;; of the form (clause action)) into 5 lists based on the clause. The clause
+;; can be either a keyword (begin, begin-tree, end, end-tree) or something
+;; else. Tests with a keyword clause are performed at the matching phase (e.g.,
+;; tests with 'begin-tree' just before visiting the tree, etc); other tests are
+;; performed at each node in the tree.
+
 (define partition-test-list
 	(lambda (lst)
 		(let ((begin-test-list 				'())

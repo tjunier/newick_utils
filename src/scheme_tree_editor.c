@@ -645,13 +645,42 @@ static SCM scm_set_current_node_label(SCM label)
 	return SCM_UNSPECIFIED;
 }
 
-/* Takes a test list (such as returned by get_test_list()) and returns an alist
- * keyed by phase (begin, begin-tree, etc.) This is done by examinig the clause
- * of each test. */
+/* Partitions the test list (of the form (test1 ... testn), where each test is
+of the form (clause action)) into 5 lists based on the clause. The clause
+can be either a keyword (begin, begin-tree, end, end-tree) or something
+else. Tests with a keyword clause are performed at the matching phase (e.g.,
+tests with 'begin-tree' just before visiting the tree, etc); other tests are
+performed at each node in the tree. */
 
-static SCM categorize_test_list(SCM)
+static SCM define_partition_test()
 {
-	(
+	return scm_c_eval_string(
+"  (lambda (lst)"
+"    (let ((begin-test-list        '())"
+"          (begin-tree-test-list   '())"
+"          (within-tree-test-list  '())"
+"          (end-test-list          '())"
+"          (end-tree-test-list     '()))"
+"      (for-each (lambda (test)"
+"                  (cond"
+"                    ((eq? (car test) 'begin)"
+"                     (set! begin-test-list (cons test begin-test-list)))"
+"                    ((eq? (car test) 'begin-tree)"
+"                     (set! begin-tree-test-list (cons test begin-tree-test-list)))"
+"                    ((eq? (car test) 'end)"
+"                     (set! end-test-list (cons test end-test-list)))"
+"                    ((eq? (car test) 'end-tree)"
+"                     (set! end-tree-test-list (cons test end-tree-test-list)))"
+"                    (else"
+"                     (set! within-tree-test-list (cons test within-tree-test-list)))))"
+""
+"                lst)"
+"      (list (reverse begin-test-list)"
+"            (reverse begin-tree-test-list)"
+"            (reverse within-tree-test-list)"
+"            (reverse end-tree-test-list)"
+"            (reverse end-tree-test-list))))"
+			);
 }
 
 /* Returns a Scheme function for evaluating a list of tests. A test is a
