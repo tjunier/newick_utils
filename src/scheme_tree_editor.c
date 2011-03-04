@@ -645,14 +645,14 @@ static SCM scm_set_current_node_label(SCM label)
 	return SCM_UNSPECIFIED;
 }
 
-/* Partitions the test list (of the form (test1 ... testn), where each test is
-of the form (clause action)) into 5 lists based on the clause. The clause
-can be either a keyword (begin, begin-tree, end, end-tree) or something
-else. Tests with a keyword clause are performed at the matching phase (e.g.,
-tests with 'begin-tree' just before visiting the tree, etc); other tests are
-performed at each node in the tree. */
+/* Constructs a Scheme function that partitions a list of tests (of the form
+ * (test1 ... testn), where each test is of the form (clause action)) according
+ * to when the test is to be evaluated. This is derived from the clause. The
+ * clause can be either a symbol that specifies when to do the evaluation
+ * (begin, begin-tree, end, end-tree) or something else. The lists are returned
+ * as an alist keyed by this symbol (or by 'within-tree'). */ 
 
-static SCM define_partition_test()
+static SCM define_partition_tests()
 {
 	return scm_c_eval_string(
 "  (lambda (lst)"
@@ -675,12 +675,18 @@ static SCM define_partition_test()
 "                     (set! within-tree-test-list (cons test within-tree-test-list)))))"
 ""
 "                lst)"
-"      (list (reverse begin-test-list)"
-"            (reverse begin-tree-test-list)"
-"            (reverse within-tree-test-list)"
-"            (reverse end-tree-test-list)"
-"            (reverse end-test-list))))"
+"	(list (list 'begin (reverse begin-test-list))"
+"		(list 'begin-tree (reverse begin-tree-test-list))"
+"		(list 'within-tree (reverse within-tree-test-list))"
+"		(list 'end-tree (reverse end-tree-test-list))"
+"		(list 'end (reverse end-test-list)))))"
 			);
+}
+
+SCM get_within_tree_test_list(SCM test_alist)
+{
+	return scm_car(scm_assq_ref(test_alist,
+			scm_from_locale_symbol("within-tree")));
 }
 
 /* Returns a Scheme function for evaluating a list of tests. A test is a
@@ -872,18 +878,23 @@ static void inner_main(void *closure, int argc, char* argv[])
 	scheme_preamble();
 	
 	SCM test_list_eval = define_test_list_eval();
+	SCM partition_tests = define_partition_tests();
+
 	SCM test_list = get_test_list(params);
+	SCM test_alist = scm_call_1(partition_tests, test_list);
+	SCM within_tree_tests = get_within_tree_test_list(test_alist);
+	//scm_write_line(within_tree_tests, scm_current_output_port());
 
 	register_C_functions();
 
 	while (NULL != (tree = parse_tree())) {
-		preprocess(test_list, test_list_eval, params);
-		process_tree(tree, test_list, test_list_eval, params);
+		//preprocess(test_list, test_list_eval, params);
+		process_tree(tree, within_tree_tests, test_list_eval, params);
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
 		destroy_tree(tree, FREE_NODE_DATA);
-		postprocess(test_list, test_list_eval, params);
+		//postprocess(test_list, test_list_eval, params);
 	}
 }
 

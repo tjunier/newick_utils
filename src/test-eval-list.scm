@@ -15,7 +15,7 @@
 
 
 ;; Partitions the test list (of the form (test1 ... testn), where each test is
-;; of the form (clause action)) into 5 lists based on the clause. The clause
+;; of the form (clause action)) into an alist keyed by phase. The phase
 ;; can be either a keyword (begin, begin-tree, end, end-tree) or something
 ;; else. Tests with a keyword clause are performed at the matching phase (e.g.,
 ;; tests with 'begin-tree' just before visiting the tree, etc); other tests are
@@ -45,10 +45,10 @@
 								lst)
 
 			(list (list 'begin (reverse begin-test-list))
-						(reverse begin-tree-test-list)
-						(reverse within-tree-test-list)
-						(reverse end-tree-test-list)
-						(reverse end-test-list)))))
+						(list 'begin-tree (reverse begin-tree-test-list))
+						(list 'within-tree (reverse within-tree-test-list))
+						(list 'end-tree (reverse end-tree-test-list))
+						(list 'end (reverse end-test-list))))))
 
 ;; Evaluates a list of tests. A test is a (clause action) pair. Iff the clause
 ;; is #t, the action gets evaluated. The function returns #t iff at least one
