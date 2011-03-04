@@ -652,20 +652,21 @@ static SCM scm_set_current_node_label(SCM label)
  * (begin, begin-tree, end, end-tree) or something else. The lists are returned
  * as an alist keyed by this symbol (or by 'within-tree'). */ 
 
-static SCM define_partition_tests()
+// TODO: only the within-tree code list should keep the clauses. The other ones are not needed. Do e.g. (cons (cadr test) start-code) instead of (const test start-code) , etc. */
+static SCM define_partition_code()
 {
 	return scm_c_eval_string(
 "  (lambda (lst)"
-"    (let ((begin-test-list        '())"
-"          (begin-tree-test-list   '())"
+"    (let ((start-code        '())"
+"          (start-tree-code-list   '())"
 "          (within-tree-test-list  '())"
-"          (end-test-list          '())"
-"          (end-tree-test-list     '()))"
+"          (end-tree-code          '())"
+"          (end-code     '()))"
 "      (for-each (lambda (test)"
 "                  (cond"
-"                    ((eq? (car test) 'begin)"
-"                     (set! begin-test-list (cons test begin-test-list)))"
-"                    ((eq? (car test) 'begin-tree)"
+"                    ((eq? (car test) 'start)"
+"                     (set! begin-test-list (cons test start-code)))"
+"                    ((eq? (car test) 'start-tree)"
 "                     (set! begin-tree-test-list (cons test begin-tree-test-list)))"
 "                    ((eq? (car test) 'end)"
 "                     (set! end-test-list (cons test end-test-list)))"
@@ -683,10 +684,13 @@ static SCM define_partition_tests()
 			);
 }
 
-SCM get_within_tree_test_list(SCM test_alist)
+/* Gets the list of tests for phase 'phase', where 'phase' can be "begin",
+ * "begin-tree", "within-tree", "end-tree" or "end". */
+
+SCM get_test_list_for_phase(const char *phase, SCM code_phase__alist)
 {
-	return scm_car(scm_assq_ref(test_alist,
-			scm_from_locale_symbol("within-tree")));
+	return scm_car(scm_assq_ref(code_phase__alist,
+			scm_from_locale_symbol(phase)));
 }
 
 /* Returns a Scheme function for evaluating a list of tests. A test is a
@@ -710,6 +714,25 @@ static SCM define_test_list_eval()
 	);
 }
 	
+/* Defines and returns the 'begin-tree' hook. This will be called at the
+ * beginning of each tree processing loop.  It is a no-op by default (just
+ * returns #t), but if the user specified a 'begin-tree' block, then it will be
+ * called instead. */
+
+static SCM define_begin_tree_hook()
+{
+	return scm_c_eval_string(
+"(lambda (alist)"
+"  (let ((begin-tree-code"
+"        (assq 'begin-tree alist)))"
+"    (pretty-print begin-tree-code)"
+"    (if (eq? begin-tree-code #f)"
+"        (lambda () #t)"
+"        (lambda () (primitive-eval begin-tree-code)))))"
+);
+
+}
+
 static void scheme_preamble()
 {
 
@@ -763,7 +786,7 @@ static void register_C_functions()
 	scm_c_define_gsubr("children-list", 1, 0, 0, rnode_smob_children_list);
 }
 
-static SCM get_test_list(struct parameters params)
+static SCM get_user_code(struct parameters params)
 {
 	SCM in_port;
 	if (params.scheme_on_CLI) {
@@ -789,16 +812,7 @@ static SCM get_test_list(struct parameters params)
 	return test_list;
 }
 
-/* Allow for Scheme code to be run before processing tree (symbol :begin-tree
- * is true). Think of BEGIN in awk, but this is run for _every_ tree. */
 
-static void preprocess(SCM test_list, SCM test_list_eval,
-		struct parameters params)
-{
-	scm_c_eval_string("(set! begin-tree #t)");
-	scm_c_eval_string("(set! end-tree #f)");
-	scm_call_1(test_list_eval, test_list);
-}
 
 /* 'test_list' is the Scheme list of tests (i.e., (clause action) pairs) and
  * 'test_list_eval' is the Scheme function that evaluates them. */
@@ -858,14 +872,6 @@ static void process_tree(struct rooted_tree *tree, SCM test_list,
 		destroy_llist(nodes);
 }
 
-static void postprocess(SCM test_list, SCM test_list_eval,
-		struct parameters params)
-{
-	scm_c_eval_string("(set! begin-tree #f)");
-	scm_c_eval_string("(set! end-tree #t)");
-	scm_call_1(test_list_eval, test_list);
-}
-
 static void inner_main(void *closure, int argc, char* argv[])
 {
 	struct parameters params = get_params(argc, argv);
@@ -878,24 +884,33 @@ static void inner_main(void *closure, int argc, char* argv[])
 	scheme_preamble();
 	
 	SCM test_list_eval = define_test_list_eval();
-	SCM partition_tests = define_partition_tests();
+	SCM partition_code = define_partition_code();
 
-	SCM test_list = get_test_list(params);
-	SCM test_alist = scm_call_1(partition_tests, test_list);
-	SCM within_tree_tests = get_within_tree_test_list(test_alist);
-	//scm_write_line(within_tree_tests, scm_current_output_port());
+	SCM user_code = get_user_code(params);
+	SCM code_phase_alist = scm_call_1(partition_code, user_code);
+
+	SCM begin_tree_hook = scm_call_1(define_begin_tree_hook(),
+			code_phase_alist);
+	SCM begin_tree_tests = get_test_list_for_phase("begin-tree",
+			code_phase_alist);
+	SCM within_tree_tests = get_test_list_for_phase("within-tree",
+			code_phase_alist);
+	SCM end_tree_tests = get_test_list_for_phase("end-tree", code_phase_alist);
+	SCM end_tests = get_test_list_for_phase("end", code_phase_alist);
 
 	register_C_functions();
 
+	scm_call_0(begin_tree_hook);
 	while (NULL != (tree = parse_tree())) {
-		//preprocess(test_list, test_list_eval, params);
+		scm_call_1(test_list_eval, begin_tree_tests);
 		process_tree(tree, within_tree_tests, test_list_eval, params);
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
+		scm_call_1(test_list_eval, end_tree_tests);
 		destroy_tree(tree, FREE_NODE_DATA);
-		//postprocess(test_list, test_list_eval, params);
 	}
+	scm_call_1(test_list_eval, end_tests);
 }
 
 int main(int argc, char* argv[])
