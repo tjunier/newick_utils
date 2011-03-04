@@ -679,7 +679,7 @@ static SCM define_partition_test()
 "            (reverse begin-tree-test-list)"
 "            (reverse within-tree-test-list)"
 "            (reverse end-tree-test-list)"
-"            (reverse end-tree-test-list))))"
+"            (reverse end-test-list))))"
 			);
 }
 

@@ -44,11 +44,11 @@
 
 								lst)
 
-			(list (reverse begin-test-list)
+			(list (list 'begin (reverse begin-test-list))
 						(reverse begin-tree-test-list)
 						(reverse within-tree-test-list)
 						(reverse end-tree-test-list)
-						(reverse end-tree-test-list)))))
+						(reverse end-test-list)))))
 
 ;; Evaluates a list of tests. A test is a (clause action) pair. Iff the clause
 ;; is #t, the action gets evaluated. The function returns #t iff at least one
