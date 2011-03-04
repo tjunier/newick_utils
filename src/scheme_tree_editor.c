@@ -645,6 +645,15 @@ static SCM scm_set_current_node_label(SCM label)
 	return SCM_UNSPECIFIED;
 }
 
+/* Takes a test list (such as returned by get_test_list()) and returns an alist
+ * keyed by phase (begin, begin-tree, etc.) This is done by examinig the clause
+ * of each test. */
+
+static SCM categorize_test_list(SCM)
+{
+	(
+}
+
 /* Returns a Scheme function for evaluating a list of tests. A test is a
 (clause action) pair. Iff the clause is #t, the action gets evaluated. The
 function returns #t iff at least one test is #t. */

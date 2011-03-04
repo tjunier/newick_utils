@@ -13,6 +13,18 @@
 	(eval-tests lst)))
 
 
+(define categorize-tests
+ 	(lambda (lst)
+	 (letrec ((categ-tests
+						 (lambda (L)
+							(if (null? L) '()
+							 (let* ((test (car L))
+											(clause (car test)))
+								(case (clause)
+								 (('begin) (format #t "begin ~a~%" test))
+								 (else		 (format #t "main ~a~%" test))))))))
+		(categ-tests lst))))
+
 ;; Evaluates a list of tests. A test is a (clause action) pair. Iff the clause
 ;; is #t, the action gets evaluated. The function returns #t iff at least one
 ;; test is #t.
