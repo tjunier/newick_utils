@@ -657,30 +657,33 @@ static SCM define_partition_code()
 {
 	return scm_c_eval_string(
 "  (lambda (lst)"
-"    (let ((start-code        '())"
-"          (start-tree-code-list   '())"
-"          (within-tree-test-list  '())"
-"          (end-tree-code          '())"
-"          (end-code     '()))"
+"    (let ((start-code    		#f)"
+"          (start-tree-code	  	#f)"
+"          (within-tree-test-list  	'())"
+"          (end-tree-code          	#f)"
+"          (end-code     		#f))"
 "      (for-each (lambda (test)"
+"                 (let ((address (car test))"
+"                       (action  (cadr test)))"
 "                  (cond"
-"                    ((eq? (car test) 'start)"
-"                     (set! begin-test-list (cons test start-code)))"
-"                    ((eq? (car test) 'start-tree)"
-"                     (set! begin-tree-test-list (cons test begin-tree-test-list)))"
-"                    ((eq? (car test) 'end)"
-"                     (set! end-test-list (cons test end-test-list)))"
-"                    ((eq? (car test) 'end-tree)"
-"                     (set! end-tree-test-list (cons test end-tree-test-list)))"
+"                    ((eq? address 'start)"
+"                     (set! start-code action))"
+"                    ((eq? address 'start-tree)"
+"                     (set! start-tree-code action))"
+"                    ((eq? address 'end)"
+"                     (set! end-code action))"
+"                    ((eq? address 'end-tree)"
+"                     (set! end-tree-code action))"
 "                    (else"
-"                     (set! within-tree-test-list (cons test within-tree-test-list)))))"
+"                     (set! within-tree-test-list"
+"                           (cons test within-tree-test-list))))))"
 ""
 "                lst)"
-"	(list (list 'begin (reverse begin-test-list))"
-"		(list 'begin-tree (reverse begin-tree-test-list))"
+"	(list   (list 'start	   start-code)"
+"		(list 'start-tree  start-tree-code)"
 "		(list 'within-tree (reverse within-tree-test-list))"
-"		(list 'end-tree (reverse end-tree-test-list))"
-"		(list 'end (reverse end-test-list)))))"
+"		(list 'end-tree    end-tree-code)"
+"		(list 'end 	   end-code))))"
 			);
 }
 
@@ -713,24 +716,20 @@ static SCM define_test_list_eval()
 "	(eval-tests lst)))"
 	);
 }
-	
-/* Defines and returns the 'begin-tree' hook. This will be called at the
- * beginning of each tree processing loop.  It is a no-op by default (just
- * returns #t), but if the user specified a 'begin-tree' block, then it will be
- * called instead. */
 
-static SCM define_begin_tree_hook()
+/* Evaluates "phase code", i.e. user-supplied Scheme code that must be run at a
+ * particular moment in the run (start, start-tree, end-tree, or end).  'start'
+ * is like BEGIN in awk, etc.  */
+
+static SCM run_phase_code(SCM code_phase_alist, const char *phase)
 {
-	return scm_c_eval_string(
-"(lambda (alist)"
-"  (let ((begin-tree-code"
-"        (assq 'begin-tree alist)))"
-"    (pretty-print begin-tree-code)"
-"    (if (eq? begin-tree-code #f)"
-"        (lambda () #t)"
-"        (lambda () (primitive-eval begin-tree-code)))))"
-);
+	SCM phase_code = scm_car(
+			scm_assq_ref(code_phase_alist, 
+				scm_from_locale_symbol(phase)));
+	//scm_write_line(phase_code, scm_current_output_port());
+	scm_primitive_eval(phase_code);
 
+	return SCM_UNDEFINED;
 }
 
 static void scheme_preamble()
@@ -888,29 +887,26 @@ static void inner_main(void *closure, int argc, char* argv[])
 
 	SCM user_code = get_user_code(params);
 	SCM code_phase_alist = scm_call_1(partition_code, user_code);
+	// scm_write_line(code_phase_alist, scm_current_output_port ());
 
-	SCM begin_tree_hook = scm_call_1(define_begin_tree_hook(),
-			code_phase_alist);
-	SCM begin_tree_tests = get_test_list_for_phase("begin-tree",
-			code_phase_alist);
-	SCM within_tree_tests = get_test_list_for_phase("within-tree",
-			code_phase_alist);
-	SCM end_tree_tests = get_test_list_for_phase("end-tree", code_phase_alist);
-	SCM end_tests = get_test_list_for_phase("end", code_phase_alist);
 
 	register_C_functions();
+	SCM within_tree_tests = scm_car(
+			scm_assq_ref(code_phase_alist, 
+				scm_from_locale_symbol("within-tree")));
+	// scm_write_line(within_tree_tests, scm_current_output_port ());
 
-	scm_call_0(begin_tree_hook);
+	run_phase_code(code_phase_alist, "start");
 	while (NULL != (tree = parse_tree())) {
-		scm_call_1(test_list_eval, begin_tree_tests);
+		run_phase_code(code_phase_alist, "start-tree");
 		process_tree(tree, within_tree_tests, test_list_eval, params);
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
-		scm_call_1(test_list_eval, end_tree_tests);
 		destroy_tree(tree, FREE_NODE_DATA);
+		run_phase_code(code_phase_alist, "end-tree");
 	}
-	scm_call_1(test_list_eval, end_tests);
+	run_phase_code(code_phase_alist, "end");
 }
 
 int main(int argc, char* argv[])
