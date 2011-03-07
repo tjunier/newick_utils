@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 		if (NULL != tree) {
 			collapse_pure_clades(tree);
 			dump_newick(tree->root);
-			destroy_tree_cb_2(tree, NULL);
+			destroy_tree(tree, NULL);
 		}
 		// TODO: almost no other program checks parser status... what
 		// gives?

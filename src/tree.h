@@ -62,7 +62,7 @@ void collapse_pure_clades(struct rooted_tree *tree);
  * tree structure has been altered), this function will fail. Instead, call
  * free_descendants() on the tree's root. */
 
-void destroy_tree_cb_2(struct rooted_tree *, void (*destroyer)(void *));
+void destroy_tree(struct rooted_tree *, void (*destroyer)(void *));
 
 /* Returns the number of leaves of this tree */
 

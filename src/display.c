@@ -502,7 +502,7 @@ int main(int argc, char *argv[])
 					assert(0);
 			}
 		}
-		destroy_tree_cb_2(tree, node_destroyer);
+		destroy_tree(tree, node_destroyer);
 	}
 
 	return 0;

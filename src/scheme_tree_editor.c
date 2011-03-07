@@ -722,7 +722,7 @@ static void inner_main(void *closure, int argc, char* argv[])
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
-		destroy_tree_cb_2(tree, NULL);
+		destroy_tree(tree, NULL);
 	}
 }
 

@@ -253,7 +253,7 @@ int process_tree(struct rooted_tree *tree)
 		if (NULL == bipart_counts) return FAILURE;
 	}
 	compute_bipartitions(tree);
-	destroy_tree_cb_2(tree, NULL);
+	destroy_tree(tree, NULL);
 
 	return SUCCESS;
 }
@@ -393,7 +393,7 @@ int main(int argc, char *argv[])
 		printf ("%s\n", newick);
 		free(newick);
 		if (params.show_label_numbers) show_label_numbers();
-		destroy_tree_cb_2(tree, NULL);
+		destroy_tree(tree, NULL);
 	}
 
 	fclose(params.target_tree_file);

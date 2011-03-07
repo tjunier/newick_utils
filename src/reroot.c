@@ -347,7 +347,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		default:
 			assert(0);
 		}
-		destroy_tree_cb_2(tree, NULL);
+		destroy_tree(tree, NULL);
 	} else {
 		enum deroot_status result = deroot(tree);
 		switch (result) {
@@ -367,7 +367,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		default:
 			assert(0);
 		}
-		destroy_tree_cb_2(tree, NULL);
+		destroy_tree(tree, NULL);
 	}
 	destroy_llist(outgroup_nodes);
 }
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
 	while (NULL != (tree = parse_tree())) {
 		/* tree is free()d in process_tree(), as derooting is
 		 * compatible with ordinary free()ing (with
-		 * destroy_tree_cb_2()), but rerooting is not. */
+		 * destroy_tree()), but rerooting is not. */
 		process_tree(tree, params);
 	}
 

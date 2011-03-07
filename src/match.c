@@ -409,6 +409,6 @@ int main(int argc, char *argv[])
 
 	destroy_hash(pattern_labels);
 	free(pattern_newick);
-	destroy_tree_cb_2(pattern_tree, NULL);
+	destroy_tree(pattern_tree, NULL);
 	return 0;
 }
