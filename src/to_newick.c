@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "rnode_iterator.h"
 #include "hash.h"
+#include "masprintf.h"
 
 static bool show_addresses = false;
 
