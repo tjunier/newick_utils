@@ -69,6 +69,9 @@ void destroy_tree(struct rooted_tree *, int free_node_data);
 void destroy_tree_cb(struct rooted_tree *, void (*destroyer)(struct rnode*));
 
 //TODO: ...or even better, by this (but change the name):
+/* NOTE: if the tree's nodes-in-order list is no longer valid (e.g. because the
+ * tree structure has been altered), this function will fail. Instead, call
+ * free_descendants() on the tree's root. */
 
 void destroy_tree_cb_2(struct rooted_tree *, void (*destroyer)(void *));
 

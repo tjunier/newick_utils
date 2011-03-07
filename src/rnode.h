@@ -64,8 +64,7 @@ struct rnode {
 struct rnode *create_rnode(char *label, char *length_as_string);
 
 /* Destroys the rnode, including the parent edge (if any). If free_data is not
- * NULL, it is called to free the node's data TODO: this should be used in
- destroy_tree_cb - check.*/
+ * NULL, it is called to free the node's data */
 
 void destroy_rnode(struct rnode *node, void (*free_data)(void*));
 
@@ -108,7 +107,7 @@ void dump_rnode(void *arg);
 int is_stair_node(struct rnode *node);
 
 /* Frees a node and all its descendants. Use this when you cannot use
- * destroy_tree(), e.g. when the tree structure has been altered. */ 
+ * destroy_tree_cb_2(), e.g. when the tree structure has been altered. */ 
 /* Like all free()ing functions, does not return error codes. */
 
 void free_descendants(struct rnode *node);
