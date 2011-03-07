@@ -180,7 +180,7 @@ int main (int argc, char* argv[])
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params);
 		dump_newick(tree->root);
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree_cb_2(tree, NULL);
 	}
 
 	return 0;
