@@ -346,14 +346,15 @@ int main(int argc, char *argv[])
 
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params);
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+		destroy_tree_cb_2(tree, NULL);
 	}
 
 	if (EXACT == params.mode)
 		destroy_llist(params.labels);
 	else {
-		/* This does not free 'params.regexp' itself, only memory pointed to by 'params.regexp'
-		 * members and allocated by regcomp().*/
+		/* This does not free 'params.regexp' itself, only memory
+		 * pointed to by 'params.regexp' members and allocated by
+		 * regcomp().*/
 		regfree(params.regexp);
 		/* Therefore: */
 		free(params.regexp);
