@@ -6,6 +6,7 @@
 #include "hash.h"
 #include "nodemap.h"
 #include "tree_stubs.h"
+#include "link.h"
 
 int test_create_rnode()
 {
