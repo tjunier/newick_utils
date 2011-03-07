@@ -262,7 +262,7 @@ int main (int argc, char* argv[])
 	struct rooted_tree *tree;
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params.output_function);
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree_cb_2(tree, NULL);
 	}
 
 	return 0;
