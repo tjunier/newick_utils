@@ -439,7 +439,8 @@ int main(int argc, char *argv[])
 	int align_leaves;
 	int with_scale_bar;
 	enum display_status status; 
-	void (*node_destroyer)(struct rnode *) = NULL;
+	/* Stays NULL for text, but not for SVG */
+	void (*node_destroyer)(void *) = NULL;
 
 	params = get_params(argc, argv);
 
@@ -501,7 +502,7 @@ int main(int argc, char *argv[])
 					assert(0);
 			}
 		}
-		destroy_tree_cb(tree, node_destroyer);
+		destroy_tree_cb_2(tree, node_destroyer);
 	}
 
 	return 0;

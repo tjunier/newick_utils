@@ -824,9 +824,9 @@ enum display_status display_svg_tree(
 
 void svg_footer() { printf ("</svg>\n"); }
 
-void destroy_svg_node_data (struct rnode *node)
+void destroy_svg_node_data (void *node_data)
 {
-	struct svg_data *data = node->data;
+	struct svg_data *data = (struct svg_data*) node_data;
 	if (NULL != data) {
 		if (NULL != data->ornament)
 			free(data->ornament);

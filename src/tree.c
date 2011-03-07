@@ -117,58 +117,7 @@ void collapse_pure_clades(struct rooted_tree *tree)
 	}
 }
 
-void destroy_tree(struct rooted_tree *tree, int free_node_data)
-{
-	struct list_elem *e;
-
-	/* Traversing in post-order ensures that children list's data are
-	 * already empty when we destroy the list */
-	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
-		struct rnode *current = e->data;
-		free(current->label);
-		free(current->edge_length_as_string);
-		/* only works if data can be free()d, i.e. has no pointer to
-		 * allocated storage. Otherwise free the data "manually". */
-		if (free_node_data)
-			free(current->data);
-		free(current);
-	}
-
-	destroy_llist(tree->nodes_in_order);
-	free(tree);
-}
-
-/* A new version that accepts a freeing callback */
 // TODO: all programs should use this one (making the previous one obsolete).
-// If node_data_destroyer is not NULL, it should be called to free
-// current->data. If node_data_destroyer is NULL but current->data is not NULL,
-// then it is assumed that current->data can be just free()d (i.e. it is a
-// pointer to something that does not contain other pointers), otherwise
-// just don't free.  node_data_destroyer() is responsible for checking for
-// NULL in its args
-
-void destroy_tree_cb(struct rooted_tree *tree,
-		void (*node_data_destroyer)(struct rnode *))
-{
-	struct list_elem *e;
-
-	/* Traversing in post-order ensures that children list's data are
-	 * already empty when we destroy the list (since the lists contain
-	 * children edges) */
-	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
-		struct rnode *current = e->data;
-		free(current->label);
-		free(current->edge_length_as_string);
-		if (NULL != node_data_destroyer)
-			node_data_destroyer(current);
-		else if (NULL != current->data) 
-			free(current->data);
-		free(current);
-	}
-
-	destroy_llist(tree->nodes_in_order);
-	free(tree);
-}
 
 void destroy_tree_cb_2(struct rooted_tree *tree,
 		void (*node_data_destroyer)(void *))

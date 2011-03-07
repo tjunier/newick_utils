@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 		dump_newick(tree->root);
-		destroy_tree_cb(tree, NULL);
+		destroy_tree_cb_2(tree, NULL);
 	}
 
 	return 0;

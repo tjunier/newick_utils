@@ -81,6 +81,6 @@ double largest_PoT_lte(double);
 
 void draw_scale_bar(int, double, double, double, char *);
 
-/* Pass this as a callback to destroy_tree_cb */
+/* Pass this as a callback to destroy_tree_cb_2 */
 
-void destroy_svg_node_data(struct rnode *);
+void destroy_svg_node_data(void *);
