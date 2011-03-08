@@ -42,8 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static bool show_addresses = false;
 
-// TODO: make all functions static unless needed otherwise
-
 void set_show_addresses(bool show) { show_addresses = show; }
 
 /* returns the length part of a node, e.g. ":12.345" */
@@ -127,7 +125,6 @@ struct llist *to_newick_i(struct rnode *node)
 
 	it = create_rnode_iterator(node);
 	if (NULL == it) {
-		// TODO: set error msg, or sthg
 		return NULL;
 	}
 	
@@ -136,6 +133,8 @@ struct llist *to_newick_i(struct rnode *node)
 	if (! is_leaf(it->root))
 		append_element(result, strdup("("));
 
+	// TODO: the append_element() calls below return values which are never
+	// checked. Fix this. This might warrant some refactoring
 	while ((current = rnode_iterator_next(it)) != NULL) {
 		if (is_leaf(current)) {
 			/* leaf: just print label */

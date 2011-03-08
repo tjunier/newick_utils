@@ -1,3 +1,5 @@
+general: make all functions static unless needed otherwise
+
 general: check that all source files contain the BSD license.
 
 general: identify obsolete f() and replace by newer versions.
