@@ -147,7 +147,9 @@ int leaf_count(struct rooted_tree * tree)
 	return n;
 }
 
-// TODO: is this ever used?
+/* NOTE: this f() is not used in app code, but at least 1 test does use it (
+ test_graph_common.c) */
+
 struct llist *get_leaf_labels(struct rooted_tree *tree)
 {
 	struct llist *labels = create_llist();
