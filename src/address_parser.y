@@ -35,14 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 
 #include "enode.h"
-
-enum address_parser_status_type {
-	ADDRESS_PARSER_OK,
-	ADDRESS_PARSER_PARSE_ERROR,
-	ADDRESS_PARSER_MALLOC_EROR
-	};
-
-enum address_parser_status_type address_parser_status;
+#include "address_parser_status.h"
 
 extern int adslex (void);
 
@@ -87,7 +80,7 @@ expression: /* empty */ { expression_root = NULL; }
 	| expression OP_OR term {
 		struct enode *or = create_enode_op(ENODE_OR, $1, $3);
 		if (NULL == or) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
@@ -99,7 +92,7 @@ term: factor
 	| term OP_AND factor {
 		struct enode *and = create_enode_op(ENODE_AND, $1, $3);
 		if (NULL == and) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
@@ -110,7 +103,7 @@ factor: comparison
       	| BOOL_FUNC {
 		struct enode *bf = create_enode_func($1);
 		if (NULL == bf) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
@@ -119,13 +112,13 @@ factor: comparison
 	| OP_NOT BOOL_FUNC {
 		struct enode *bf = create_enode_func($2);
 		if (NULL == bf) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
 		struct enode *not = create_enode_not(bf);
 		if (NULL == not) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
@@ -137,7 +130,7 @@ factor: comparison
       	| OP_NOT OPEN_PAREN expression CLOSE_PAREN {
 		struct enode *not = create_enode_not($3);
 		if (NULL == not) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
@@ -146,7 +139,7 @@ factor: comparison
 	| CONST {
 		struct enode *n = create_enode_constant($1);
 		if (NULL == n) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
@@ -156,7 +149,7 @@ factor: comparison
 comparison: comparand COMPARATOR comparand {
 		struct enode *c = create_enode_op($2, $1, $3);
 		if (NULL == c) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
@@ -165,19 +158,19 @@ comparison: comparand COMPARATOR comparand {
 	| comparand COMPARATOR comparand COMPARATOR comparand {
 		struct enode *c1 = create_enode_op($2, $1, $3);
 		if (NULL == c1) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
 		struct enode *c2 = create_enode_op($4, $3, $5);
 		if (NULL == c2) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
 		struct enode *result = create_enode_op(ENODE_AND, c1, c2);
 		if (NULL == result) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
@@ -187,7 +180,7 @@ comparison: comparand COMPARATOR comparand {
 comparand: CONST {
 		struct enode *n = create_enode_constant($1);
 		if (NULL == n) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
@@ -196,7 +189,7 @@ comparand: CONST {
 	| NUM_FUNC {
 		struct enode *f = create_enode_func($1);
 		if (NULL == f) {
-			address_parser_status = ADDRESS_PARSER_MALLOC_EROR;
+			address_parser_status = ADDRESS_PARSER_MALLOC_ERROR;
 			expression_root = NULL;
 			YYACCEPT;
 		}
