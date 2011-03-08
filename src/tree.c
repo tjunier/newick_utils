@@ -117,8 +117,6 @@ void collapse_pure_clades(struct rooted_tree *tree)
 	}
 }
 
-// TODO: all programs should use this one (making the previous one obsolete).
-
 void destroy_tree(struct rooted_tree *tree,
 		void (*node_data_destroyer)(void *))
 {
