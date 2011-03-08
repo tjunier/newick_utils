@@ -168,6 +168,7 @@ struct llist *get_leaf_labels(struct rooted_tree *tree)
 }
 
 // TODO: is this ever used?
+/*
 struct llist *get_labels(struct rooted_tree *tree)
 {
 	struct llist *labels = create_llist();
@@ -183,6 +184,7 @@ struct llist *get_labels(struct rooted_tree *tree)
 
 	return labels;
 }
+*/
 
 int is_cladogram(struct rooted_tree *tree)
 {
