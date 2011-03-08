@@ -167,25 +167,6 @@ struct llist *get_leaf_labels(struct rooted_tree *tree)
 	return labels;
 }
 
-// TODO: is this ever used?
-/*
-struct llist *get_labels(struct rooted_tree *tree)
-{
-	struct llist *labels = create_llist();
-	if (NULL == labels) return NULL;
-	struct list_elem *el;
-
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *current = (struct rnode *) el->data;
-		if (strcmp ("", current->label) != 0)
-			if (! append_element(labels, current->label))
-				return NULL;
-	}
-
-	return labels;
-}
-*/
-
 int is_cladogram(struct rooted_tree *tree)
 {
 	return TREE_TYPE_CLADOGRAM == get_tree_type(tree);
@@ -249,49 +230,6 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 	return result;
 }
 
-// TODO: is this ever used?
-struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
-		char *regexp_string)
-{
-	int errcode;
-	regex_t *preg = malloc(sizeof(regex_t));
-	int cflags = 0;
-	if (NULL == preg) return NULL;
-	errcode = regcomp(preg, regexp_string, cflags);
-	if (errcode) {
-		size_t errbufsize = regerror(errcode, preg, NULL, 0);
-		char *errbuf = malloc(errbufsize * sizeof(char));
-		if (NULL == errbuf) return NULL;
-		/* NOTE: this would be more informative, but I want to return
-		 * an error value instead of just exit()ing. 
-		regerror(errcode, preg, errbuf, errbufsize);
-		fprintf (stderr, "%s\n", errbuf);
-		exit(EXIT_FAILURE);
-		*/
-	}
-       				       
-	struct llist *result = create_llist();
-	if (NULL == result) return NULL;
-	struct list_elem *el;
-
-	size_t nmatch = 1;	/* either matches or doesn't */
-	regmatch_t pmatch[nmatch]; 
-	int eflags = 0;
-
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *node = el->data;
-		errcode = regexec(preg, node->label, nmatch, pmatch, eflags);	
-		if (0 == errcode) 
-			if (! append_element(result, node)) return NULL;
-	}
-	/* This does not free 'preg' itself, only memory pointed to by 'preg'
-	 * members and allocated by regcomp().*/
-	regfree(preg);
-	/* Therefore: */
-	free(preg);
-
-	return result;
-}
 
 struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 {
@@ -315,38 +253,4 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 	}
 
 	return result;
-}
-
-/* Clones a clade (recursively) */
-// TODO: try an iterative version using a rnode_iterator
-static struct rnode *clone_clade(struct rnode *root)
-{
-	struct rnode *root_clone = create_rnode(root->label,
-			root->edge_length_as_string);
-	if (NULL == root_clone) return NULL;
-	struct rnode *curr;
-	for (curr=root->first_child; NULL != curr; curr=curr->next_sibling) {
-		struct rnode *kid_clone = clone_clade(curr);
-		if (NULL == kid_clone) return NULL;
-		add_child(root_clone, kid_clone);
-	}
-
-	return root_clone;
-}
-
-// TODO: is this ever used?
-struct rooted_tree* clone_subtree(struct rnode *root)
-{
-	struct rnode *root_clone = clone_clade(root);
-	if (NULL == root_clone) return NULL;
-	struct llist *nodes_in_order_clone = get_nodes_in_order(root_clone);
-	if (NULL == nodes_in_order_clone) return NULL;
-
-	struct rooted_tree *clone = malloc(sizeof(struct rooted_tree));
-	if (NULL == clone) return NULL;
-
-	clone->root = root_clone;
-	clone->nodes_in_order = nodes_in_order_clone;
-
-	return clone;
 }
