@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "parser.h"
 #include "to_newick.h"
 #include "address_parser.h"
+#include "address_parser_status.h"
 #include "tree_editor_rnode_data.h"
 #include "common.h"
 
@@ -468,7 +469,19 @@ int main(int argc, char* argv[])
 	// causes of NULL (e.g., syntax error and memory error)
 	adsparse(); /* sets 'expression_root' */ 
 	if (NULL == expression_root) {
-		fprintf (stderr, "Could not parse address.\n");
+		switch (address_parser_status) {
+			/* NOTE: for now the parser does not report parse
+			 * errors, but when (or if...) it does, it will use
+			 * this constant. */
+		case ADDRESS_PARSER_PARSE_ERROR:
+			fprintf (stderr, "Could not parse address.\n");
+			break;
+		case ADDRESS_PARSER_MALLOC_ERROR:
+			perror(NULL);
+			break;
+		default:
+			assert(0);	/* programmer error */
+		}
 		exit(EXIT_FAILURE);
 	}
 	address_scanner_clear_input();

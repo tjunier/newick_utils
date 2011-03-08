@@ -1,3 +1,5 @@
+general: check that all source files contain the BSD license.
+
 general: identify obsolete f() and replace by newer versions.
 
 nw_reroot: if the outgroup-to-be is already the outgroup, the tree should not change (both because there is no need (PLOS), and also because it saves time). Try e.g. rerooting '(((Dog,Cat),Cow),Jay);' on Jay: should be an invariant.
