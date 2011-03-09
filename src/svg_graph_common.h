@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/* Declarations used by all SVG modules, but not intended for client code. */
+/* Declarations used by SVG code, but not restricted to a single module. */
 
 #define ROOT_SPACE 10			/* pixels */
 #define LBL_VOFFSET 4			/* pixels */
@@ -76,11 +76,8 @@ void set_label_char_width(double);
 void add_to_label_space(int);
 
 /* Returns the largest power of ten not greater than argument */
-
+// TODO: doesn't text_graph also use this?
 double largest_PoT_lte(double);
 
 void draw_scale_bar(int, double, double, double, char *);
 
-/* Pass this as a callback to destroy_tree */
-
-void destroy_svg_node_data(void *);

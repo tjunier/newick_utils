@@ -30,8 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdbool.h>
 
-enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
+/* Interface of svg_graph.c: functions used for drawing SVG trees. */
 
+enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
 // TODO: clarify the distinction between svg_graph.h and svg_graph_common.h
 
 /* Functions for displaying a tree as SVG. This is the visible interface for
@@ -48,7 +49,6 @@ void set_leaf_vskip(double);
 void set_whole_v_shift(int);
 void set_style(int);
 void set_URL_map_file(FILE *);
-//TODO: shouldn't radial radial-specific f()s go somewhere else?
 void set_label_angle_correction(double);
 void set_left_label_angle_correction(double);
 void set_scalebar_zero_at_root(bool);
@@ -77,3 +77,7 @@ enum display_status display_svg_tree(struct rooted_tree *, int align_leaves,
 /* Writes an SVG footer */
 
 void svg_footer();
+
+/* Pass this as a callback to destroy_tree */
+
+void destroy_svg_node_data(void *);

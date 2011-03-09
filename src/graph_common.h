@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/* These declarations are used by all modules involved in displaying trees. */
+
 enum display_status { DISPLAY_OK, DISPLAY_UNKNOWN_STYLE, DISPLAY_MEM_ERROR };
 enum inner_lbl_pos {INNER_LBL_LEAVES, INNER_LBL_MIDDLE, INNER_LBL_ROOT};
 
