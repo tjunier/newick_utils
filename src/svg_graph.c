@@ -476,7 +476,6 @@ static int set_group_numbers(struct rooted_tree *tree)
 	 * All of these nodes get the map element's number (cf above, in which
 	 * te LCA gets the number, which is then propagated to all descendants)
 	 * */
-	// TODO: think of making the label2node map a member of the tree structure.
 	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
 	if (NULL == map) return FAILURE;
 	for (elem = css_map->head; NULL != elem; elem = elem->next) {
@@ -549,8 +548,6 @@ static int set_ornaments(struct rooted_tree *tree)
 	 * contain a list of labels. Each label is matched by at least 1 node.
 	 * All of these nodes get the ornament. */
 
-	// TODO: think of making the label2node map a member of the tree
-	// structure.
 	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
 	if (NULL == map) return FAILURE;
 	for (elem = ornament_map->head; NULL != elem; elem = elem->next) {

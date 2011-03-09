@@ -1,3 +1,11 @@
+tree.c: think of adding a label->node map to the tree structure. The nodes
+could then directly be accessed by functions like get_node_by_label(struct
+rooted_tree *tree, char *label). This function would assume
+unicity of labels; there could be another that does not (and returns a list of
+matching nodes); finally there could be regexp matching. And of
+course, this would all be lazy: the map would be NULL at first, and only
+computed if needed.
+
 general: make all functions static unless needed otherwise
 
 general: check that all source files contain the BSD license.
