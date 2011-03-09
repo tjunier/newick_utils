@@ -63,8 +63,6 @@ const int Scale_bar_left_space = 10;
 const int NUDGE_DISTANCE = 3;	/* px */
 const int TEXT_ORNAMENTS_BASELINE_NUDGE = 3; /* px */
 
-// TODO: replace logical ints by booleans.
-
 /* If this is zero, the label's baseline is aligned on the branch. Use it to
  * nudge the labels a small angle. Unfortunately the correct amount will depend
  * on the graph's diameter and the label font size. */
