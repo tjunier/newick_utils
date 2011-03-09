@@ -63,8 +63,7 @@ const int Scale_bar_left_space = 10;
 const int NUDGE_DISTANCE = 3;	/* px */
 const int TEXT_ORNAMENTS_BASELINE_NUDGE = 3; /* px */
 
-// TODO: the svg_ prefix that many variables have is probably not really
-// necessary. Also, replace logical ints by booleans.
+// TODO: replace logical ints by booleans.
 
 /* If this is zero, the label's baseline is aligned on the branch. Use it to
  * nudge the labels a small angle. Unfortunately the correct amount will depend
@@ -332,7 +331,6 @@ static char *unwrap_snippet(xmlDocPtr doc)
 	/* so, allocate that much (cleared) */
 	char *tweaked_svg = calloc(buf_length, sizeof(char));
 	if (NULL == tweaked_svg) return NULL;
-	// TODO: the following 2 lines can be merged
 	xmlNodePtr cur = xmlDocGetRootElement(doc);
 	cur = cur->xmlChildrenNode;
 	while (NULL != cur) {
@@ -432,6 +430,9 @@ static char *transform_ornaments(const char *svg_ornaments, double angle_deg,
 
 /* Draws the arc for inner nodes, including root */
 
+/* NOTE: we keep 'large_arc_flag' as an int (even though it is semantically a
+ * boolean) because it gets printed as SVG and must be '0' or '1'. */
+
 static void draw_inner_node_arc(double top_angle,
 		double bottom_angle, double radius,
 		int group_nb, int large_arc_flag)
@@ -450,7 +451,7 @@ static void draw_inner_node_arc(double top_angle,
 }
 
 // TODO: should we really pass the node? Why can't we just pass the parent
-// data,or actually, the parent's depth since this is the only use of 'node' ? 
+// data, or actually, the parent's depth since this is the only use of 'node' ? 
 
 static void draw_radial_line(struct rnode *node, const double r_scale,
 		double mid_angle, double mid_x_pos,
@@ -491,7 +492,7 @@ static void draw_ornament (struct svg_data *node_data,
 }
 
 static void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
-		const double a_scale, int align_leaves, double dmax)
+		const double a_scale, bool align_leaves, double dmax)
 {
 	printf( "<g"
 	       	" style='stroke:black;fill:none;stroke-width:1;"
@@ -631,7 +632,7 @@ static void draw_label(struct rnode *node, double radius,
 /* Prints the node text (labels and lengths) in a <g> element, radial */
 
 static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
-		const double a_scale, int align_leaves, double dmax)
+		const double a_scale, bool align_leaves, double dmax)
 {
 	printf( "<g style='stroke:none'>");
 
@@ -726,7 +727,7 @@ static void params_as_svg_comment (struct h_data hd, double node_area_width,
 }
 
 void display_svg_tree_radial(struct rooted_tree *tree,
-		struct h_data hd, int align_leaves, int with_scale_bar,
+		struct h_data hd, bool align_leaves, int with_scale_bar,
 		char *branch_length_unit)
 {
 	double r_scale = -1;
