@@ -79,5 +79,5 @@ void add_to_label_space(int);
 // TODO: doesn't text_graph also use this?
 double largest_PoT_lte(double);
 
-void draw_scale_bar(int, double, double, double, char *);
+void draw_scale_bar(double, double, double, double, char *);
 

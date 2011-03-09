@@ -71,11 +71,10 @@ struct ornament_map_element {
 	struct llist *labels;
 };
 
-// TODO: #define as constants in svg_graph_common.h ?
 char *leaf_label_class = "leaf-label";
 char *inner_label_class = "inner-label";
 
-int init_done = FALSE;
+static int init_done = FALSE;
 
 /************************** external variables *****************************/
 
@@ -109,7 +108,6 @@ int label_space = 10;
  * much OO... I also provide setters for the nonstatic ones, so the interface
  * is more homogeneous. */
 
-// TODO: use a single width variable for SVG and text
 void set_width(int width) { graph_width = width; }
 void set_whole_v_shift(int shift) { whole_v_shift = shift; }
 void set_style(int style) { graph_style = style; }
@@ -132,9 +130,6 @@ static void svg_CSS_stylesheet()
 	struct list_elem *el;
 
 	printf ("<defs><style type='text/css'><![CDATA[\n");
-	/* The default clade style is specified in this file rather than in the
-	 * client code (TODO: try to get all defaults in the same place, or
-	 * explain why not), so we print the style only if not NULL */
 	if (NULL != plain_node_style)
 		printf (" .clade_0 {%s}\n", plain_node_style);
 	if (css_map) {
@@ -414,6 +409,262 @@ static struct hash *read_url_map()
  * to put it inside display_svg_tree(): it is kept separate because its job is
  * not directly to draw trees*/
 
+/* Attributes group numbers to nodes, based on the CSS style map (if one was
+ * supplied - see read_css_map() and svg_CSS_stylesheet() ). The group number
+ * will translate directly into 'class' attributes in SVG, which in turn will
+ * have a style defined according to the style map. */
+
+// NOTE: this could be made more efficient by having two separate maps, one for
+// CLADE elements and another for INDIVIDUAL elements. That way the list needs
+// not be traversed twice. But all in all it will likely not make a big
+// difference, so I'll keep it for later :-) 
+
+static int set_group_numbers(struct rooted_tree *tree)
+{
+	struct list_elem *elem;
+	struct css_map_element *css_el;
+
+	/* Iterate through the CLADE style map elements. Each one contains
+	 * (among others) a list of labels. Find the LCA of those labels (which
+	 * can be matched by >1 node), and set its number to that of the css
+	 * element. */
+
+	for (elem = css_map->head; NULL != elem; elem = elem->next) {
+		css_el = elem->data;
+		if (CLADE != css_el->group_type) continue;
+		struct llist *labels = css_el->labels;
+		struct rnode *lca = lca_from_labels_multi(tree, labels);
+		if (NULL == lca) {
+			enum error_codes err = get_last_error_code();
+			switch (err) {
+			case ERR_NOMEM:
+				return FAILURE;
+			case ERR_NO_MATCHING_NODES:
+				return SUCCESS;
+			default:
+				assert(0);	/* should not happen */
+			}
+		}
+
+		struct svg_data *lca_data = lca->data;
+		lca_data->group_nb = css_el->group_nb;
+	}
+
+
+	/* Now propagate the styles to the descendants */
+	struct llist *nodes_in_reverse_order;
+	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
+	if (NULL == nodes_in_reverse_order) return FAILURE;
+
+	elem = nodes_in_reverse_order->head->next;	/* skip root */
+	for (;  NULL != elem; elem = elem->next) {
+		struct rnode *node = elem->data;
+		struct svg_data *node_data = node->data;
+		struct rnode *parent = node->parent;
+		struct svg_data *parent_data = parent->data;
+		/* Inherit parent node's style (clade number) IFF 
+		    node has no style of its own */
+		if (UNSTYLED_CLADE == node_data->group_nb) {
+			node_data->group_nb = parent_data->group_nb;
+		} 
+				
+	}
+	destroy_llist(nodes_in_reverse_order);
+
+	/* Now iterate through the INDIVIDUAL style map elements. They also
+	 * contain a list of labels. Each label is matched by at least 1 node.
+	 * All of these nodes get the map element's number (cf above, in which
+	 * te LCA gets the number, which is then propagated to all descendants)
+	 * */
+	// TODO: think of making the label2node map a member of the tree structure.
+	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
+	if (NULL == map) return FAILURE;
+	for (elem = css_map->head; NULL != elem; elem = elem->next) {
+		css_el = elem->data;
+		if (INDIVIDUAL != css_el->group_type) continue;
+		struct llist *labels = css_el->labels;
+		struct llist *group_nodes = create_llist();
+		if (NULL == group_nodes) return FAILURE; 
+		/* Iterate over all labels of this element, adding the
+		 * corresponding nodes to 'group_nodes' */
+		struct list_elem *el;
+		for (el = labels->head; NULL != el; el = el->next) {
+			char *label = el->data;
+			struct llist *nodes_of_label;
+			nodes_of_label = hash_get(map, label);
+			if (NULL == nodes_of_label) {
+				fprintf (stderr, "WARNING: label '%s' "
+						"not found - ignored.\n",
+						label);
+				continue;
+			}
+			struct llist *copy = shallow_copy(nodes_of_label);
+			if (NULL == copy) return FAILURE;
+			append_list(group_nodes, copy);
+			free(copy); 	/* NOT destroy_llist(): the list
+					   elements are in group_nodes. */
+		}
+		/* Set the group number for all nodes of this group */
+		for (el = group_nodes->head; NULL != el; el = el->next)  {
+			struct rnode *node = el->data;
+			struct svg_data *node_data = node->data;
+			node_data->group_nb = css_el->group_nb;
+		}
+		destroy_llist(group_nodes);
+	}
+	destroy_label2node_list_map(map);
+
+	return SUCCESS;
+}
+
+/* Attributes ornaments to nodes, based on the ornament map (if one was
+ * supplied - see read_ornament_map()). The ornament will be printed directly
+ * at the node's position. */
+
+// NOTE: this could be made more efficient by having two separate maps, one for
+// CLADE elements and another for INDIVIDUAL elements. That way the list needs
+// not be traversed twice. But all in all it will likely not make a big
+// difference, so I'll keep it for later :-) 
+
+static int set_ornaments(struct rooted_tree *tree)
+{
+	struct list_elem *elem;
+	struct ornament_map_element *oel;
+
+	/* Iterate through the CLADE style map elements. Each one contains
+	 * (among others) a list of labels. Find the LCA of those labels (which
+	 * can be matched by >1 node), and set its ornament */
+
+	for (elem = ornament_map->head; NULL != elem; elem = elem->next) {
+		oel = elem->data;
+		if (CLADE != oel->group_type) continue;
+		struct llist *labels = oel->labels;
+		struct rnode *lca = lca_from_labels_multi(tree, labels);
+		if (NULL == lca) return FAILURE;
+		struct svg_data *lca_data = lca->data;
+		lca_data->ornament = strdup(oel->ornament);
+	}
+
+	/* Now iterate through the INDIVIDUAL style map elements. They also
+	 * contain a list of labels. Each label is matched by at least 1 node.
+	 * All of these nodes get the ornament. */
+
+	// TODO: think of making the label2node map a member of the tree
+	// structure.
+	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
+	if (NULL == map) return FAILURE;
+	for (elem = ornament_map->head; NULL != elem; elem = elem->next) {
+		oel = elem->data;
+		if (INDIVIDUAL != oel->group_type) continue;
+		struct llist *labels = oel->labels;
+		struct llist *group_nodes = create_llist();
+		if (NULL == group_nodes) return FAILURE;
+		/* Iterate over all labels of this element, adding the
+		 * corresponding nodes to 'group_nodes' */
+		struct list_elem *el;
+		for (el = labels->head; NULL != el; el = el->next) {
+			char *label = el->data;
+			struct llist *nodes_of_label;
+			nodes_of_label = hash_get(map, label);
+			if (NULL == nodes_of_label) {
+				fprintf (stderr, "WARNING: label '%s' "
+						"not found - ignored.\n",
+						label);
+				continue;
+			}
+			struct llist *copy = shallow_copy(nodes_of_label);
+			if (NULL == copy) return FAILURE;
+			append_list(group_nodes, copy);
+			free(copy); 	/* NOT destroy_llist(): the list
+					   elements are in group_nodes. */
+		}
+		/* Set the ornament for all nodes of this group */
+		for (el = group_nodes->head; NULL != el; el = el->next)  {
+			struct rnode *node = el->data;
+			struct svg_data *node_data = node->data;
+			node_data->ornament = strdup(oel->ornament);
+		}
+		destroy_llist(group_nodes);
+	}
+	destroy_label2node_list_map(map);
+
+	return SUCCESS;
+}
+
+/* Allocates and initializes an svg_data structure for each of the tree's
+ * nodes. The real data are set later through callbacks (see
+ * svg_set_node_top(), etc) */
+/* Returns FAILURE IFF there is any problem (malloc(), in this case) */
+
+static int svg_alloc_node_pos(struct rooted_tree *tree) 
+{
+	struct list_elem *le;
+	struct rnode *node;
+
+	for (le = tree->nodes_in_order->head; NULL != le; le = le->next) {
+		node = le->data;
+		struct svg_data *svgd = malloc(sizeof(struct svg_data));
+		if (NULL == svgd) return FAILURE;
+		svgd->top = svgd->bottom = svgd->depth = -1.0;
+		svgd->group_nb = UNSTYLED_CLADE;	
+		svgd->ornament = NULL;
+		node->data = svgd;
+	}
+	return SUCCESS;
+}
+
+static void svg_set_node_top (struct rnode *node, double top)
+{
+	((struct svg_data *) node->data)->top = top;
+}
+
+static void svg_set_node_bottom (struct rnode *node, double bottom)
+{
+	((struct svg_data *) node->data)->bottom = bottom;
+}
+
+static double svg_get_node_top (struct rnode *node)
+{
+	return ((struct svg_data *) node->data)->top;
+}
+
+static double svg_get_node_bottom (struct rnode *node)
+{
+	return ((struct svg_data *) node->data)->bottom;
+}
+
+static void svg_set_node_depth (struct rnode *node, double depth)
+{
+	((struct svg_data *) node->data)->depth = depth;
+}
+
+static double svg_get_node_depth (struct rnode *node)
+{
+	return ((struct svg_data *) node->data)->depth;
+}
+
+double largest_PoT_lte(double arg)
+{
+	double l10 = log(arg) / log(10);
+	double l10_fl = floor(l10);
+	return pow(10, l10_fl);
+}
+
+/* Draws a square grid, centered on the orgin. This is for debugging. Anyway
+ * some programs (like Eye of Gnome) just can't handle the grid. */
+
+void draw_grid()
+{
+	int i,j;
+
+	printf ("<g class='grid' style='stroke:grey'>");
+	for (i = -1000; i <= 1000; i += 100)
+		printf ("<path d='M %d -1000 v 2000'/>", i);
+	for (j = -1000; j <= 1000; j += 100)
+		printf ("<path d='M -1000 %d h 2000'/>", j);
+	printf ("</g>");
+}
+
 int svg_init()
 {
 	if (NULL != css_map_file) {
@@ -467,273 +718,11 @@ void svg_header(int nb_leaves, int with_scale_bar)
 	svg_CSS_stylesheet();
 }
 
-/* Passed to dump_llist() for labels */
-void dump_label (void *lbl) { puts((char *) lbl); }
-
-/* Attributes group numbers to nodes, based on the CSS style map (if one was
- * supplied - see read_css_map() and svg_CSS_stylesheet() ). The group number
- * will translate directly into 'class' attributes in SVG, which in turn will
- * have a style defined according to the style map. */
-
-// NOTE: this could be made more efficient by having two separate maps, one for
-// CLADE elements and another for INDIVIDUAL elements. That way the list needs
-// not be traversed twice. But all in all it will likely not make a big
-// difference, so I'll keep it for later :-) 
-
-int set_group_numbers(struct rooted_tree *tree)
-{
-	struct list_elem *elem;
-	struct css_map_element *css_el;
-
-	/* Iterate through the CLADE style map elements. Each one contains
-	 * (among others) a list of labels. Find the LCA of those labels (which
-	 * can be matched by >1 node), and set its number to that of the css
-	 * element. */
-
-	for (elem = css_map->head; NULL != elem; elem = elem->next) {
-		css_el = elem->data;
-		if (CLADE != css_el->group_type) continue;
-		struct llist *labels = css_el->labels;
-		struct rnode *lca = lca_from_labels_multi(tree, labels);
-		// TODO: lca_from_labels_multi() needs to distinguish NULL
-		// values due to a real, irrecoverable  problem (e.g., memory)
-		// from NULLs due to no labels found (which only prevents
-		// coloring but does not mean we have to abort).
-		// Use functions in error.h
-		if (NULL == lca) {
-			enum error_codes err = get_last_error_code();
-			switch (err) {
-			case ERR_NOMEM:
-				return FAILURE;
-			case ERR_NO_MATCHING_NODES:
-				return SUCCESS;
-			default:
-				assert(0);	/* should not happen */
-			}
-		}
-
-		struct svg_data *lca_data = lca->data;
-		lca_data->group_nb = css_el->group_nb;
-	}
-
-
-	/* Now propagate the styles to the descendants */
-	struct llist *nodes_in_reverse_order;
-	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
-	if (NULL == nodes_in_reverse_order) return FAILURE;
-	struct list_elem *el; /* TODO: can't I reuse elem from above? */
-	el = nodes_in_reverse_order->head->next;	/* skip root */
-	for (;  NULL != el; el = el->next) {
-		struct rnode *node = el->data;
-		struct svg_data *node_data = node->data;
-		struct rnode *parent = node->parent;
-		struct svg_data *parent_data = parent->data;
-		/* Inherit parent node's style (clade number) IFF 
-		    node has no style of its own */
-		if (UNSTYLED_CLADE == node_data->group_nb) {
-			node_data->group_nb = parent_data->group_nb;
-		} 
-				
-	}
-	destroy_llist(nodes_in_reverse_order);
-
-	/* Now iterate through the INDIVIDUAL style map elements. They also
-	 * contain a list of labels. Each label is matched by at least 1 node.
-	 * All of these nodes get the map element's number (cf above, in which
-	 * te LCA gets the number, which is then propagated to all descendants)
-	 * */
-	// TODO: think of making the label2node map a member of the tree structure.
-	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
-	if (NULL == map) return FAILURE;
-	for (elem = css_map->head; NULL != elem; elem = elem->next) {
-		css_el = elem->data;
-		if (INDIVIDUAL != css_el->group_type) continue;
-		struct llist *labels = css_el->labels;
-		struct llist *group_nodes = create_llist();
-		if (NULL == group_nodes) return FAILURE; 
-		/* Iterate over all labels of this element, adding the
-		 * corresponding nodes to 'group_nodes' */
-		for (el = labels->head; NULL != el; el = el->next) {
-			char *label = el->data;
-			struct llist *nodes_of_label;
-			nodes_of_label = hash_get(map, label);
-			if (NULL == nodes_of_label) {
-				fprintf (stderr, "WARNING: label '%s' "
-						"not found - ignored.\n",
-						label);
-				continue;
-			}
-			struct llist *copy = shallow_copy(nodes_of_label);
-			if (NULL == copy) return FAILURE;
-			append_list(group_nodes, copy);
-			free(copy); 	/* NOT destroy_llist(): the list
-					   elements are in group_nodes. */
-		}
-		/* Set the group number for all nodes of this group */
-		for (el = group_nodes->head; NULL != el; el = el->next)  {
-			struct rnode *node = el->data;
-			struct svg_data *node_data = node->data;
-			node_data->group_nb = css_el->group_nb;
-		}
-		destroy_llist(group_nodes);
-	}
-	destroy_label2node_list_map(map);
-
-	return SUCCESS;
-}
-
-/* Attributes ornaments to nodes, based on the ornament map (if one was
- * supplied - see read_ornament_map()). The ornament will be printed directly
- * at the node's position. */
-
-// NOTE: this could be made more efficient by having two separate maps, one for
-// CLADE elements and another for INDIVIDUAL elements. That way the list needs
-// not be traversed twice. But all in all it will likely not make a big
-// difference, so I'll keep it for later :-) 
-
-int set_ornaments(struct rooted_tree *tree)
-{
-	struct list_elem *elem;
-	struct ornament_map_element *oel;
-
-	/* Iterate through the CLADE style map elements. Each one contains
-	 * (among others) a list of labels. Find the LCA of those labels (which
-	 * can be matched by >1 node), and set its ornament */
-
-	for (elem = ornament_map->head; NULL != elem; elem = elem->next) {
-		oel = elem->data;
-		if (CLADE != oel->group_type) continue;
-		struct llist *labels = oel->labels;
-		struct rnode *lca = lca_from_labels_multi(tree, labels);
-		if (NULL == lca) return FAILURE;
-		struct svg_data *lca_data = lca->data;
-		lca_data->ornament = strdup(oel->ornament);
-	}
-
-	/* Now iterate through the INDIVIDUAL style map elements. They also
-	 * contain a list of labels. Each label is matched by at least 1 node.
-	 * All of these nodes get the ornament. */
-
-	// TODO: think of making the label2node map a member of the tree structure.
-	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
-	if (NULL == map) return FAILURE;
-	for (elem = ornament_map->head; NULL != elem; elem = elem->next) {
-		oel = elem->data;
-		if (INDIVIDUAL != oel->group_type) continue;
-		struct llist *labels = oel->labels;
-		struct llist *group_nodes = create_llist();
-		if (NULL == group_nodes) return FAILURE;
-		/* Iterate over all labels of this element, adding the
-		 * corresponding nodes to 'group_nodes' */
-		struct list_elem *el;
-		for (el = labels->head; NULL != el; el = el->next) {
-			char *label = el->data;
-			struct llist *nodes_of_label;
-			nodes_of_label = hash_get(map, label);
-			if (NULL == nodes_of_label) {
-				fprintf (stderr, "WARNING: label '%s' "
-						"not found - ignored.\n",
-						label);
-				continue;
-			}
-			struct llist *copy = shallow_copy(nodes_of_label);
-			if (NULL == copy) return FAILURE;
-			append_list(group_nodes, copy);
-			free(copy); 	/* NOT destroy_llist(): the list
-					   elements are in group_nodes. */
-		}
-		/* Set the ornament for all nodes of this group */
-		for (el = group_nodes->head; NULL != el; el = el->next)  {
-			struct rnode *node = el->data;
-			struct svg_data *node_data = node->data;
-			node_data->ornament = strdup(oel->ornament);
-		}
-		destroy_llist(group_nodes);
-	}
-	destroy_label2node_list_map(map);
-
-	return SUCCESS;
-}
-
-/* Allocates and initializes an svg_data structure for each of the tree's
- * nodes. The real data are set later through callbacks (see
- * svg_set_node_top(), etc) */
-/* Returns FAILURE IFF there is any problem (malloc(), in this case) */
-
-int svg_alloc_node_pos(struct rooted_tree *tree) 
-{
-	struct list_elem *le;
-	struct rnode *node;
-
-	for (le = tree->nodes_in_order->head; NULL != le; le = le->next) {
-		node = le->data;
-		struct svg_data *svgd = malloc(sizeof(struct svg_data));
-		if (NULL == svgd) return FAILURE;
-		svgd->top = svgd->bottom = svgd->depth = -1.0;
-		svgd->group_nb = UNSTYLED_CLADE;	
-		svgd->ornament = NULL;
-		node->data = svgd;
-	}
-	return SUCCESS;
-}
-
-void svg_set_node_top (struct rnode *node, double top)
-{
-	((struct svg_data *) node->data)->top = top;
-}
-
-void svg_set_node_bottom (struct rnode *node, double bottom)
-{
-	((struct svg_data *) node->data)->bottom = bottom;
-}
-
-double svg_get_node_top (struct rnode *node)
-{
-	return ((struct svg_data *) node->data)->top;
-}
-
-double svg_get_node_bottom (struct rnode *node)
-{
-	return ((struct svg_data *) node->data)->bottom;
-}
-
-void svg_set_node_depth (struct rnode *node, double depth)
-{
-	((struct svg_data *) node->data)->depth = depth;
-}
-
-double svg_get_node_depth (struct rnode *node)
-{
-	return ((struct svg_data *) node->data)->depth;
-}
-
-double largest_PoT_lte(double arg)
-{
-	double l10 = log(arg) / log(10);
-	double l10_fl = floor(l10);
-	return pow(10, l10_fl);
-}
-
-/* Draws a square grid, centered on the orgin. This is for debugging. Anyway
- * some programs (like Eye of Gnome) just can't handle the grid. */
-
-void draw_grid()
-{
-	int i,j;
-
-	printf ("<g class='grid' style='stroke:grey'>");
-	for (i = -1000; i <= 1000; i += 100)
-		printf ("<path d='M %d -1000 v 2000'/>", i);
-	for (j = -1000; j <= 1000; j += 100)
-		printf ("<path d='M -1000 %d h 2000'/>", j);
-	printf ("</g>");
-}
 
 /* Draws a scale bar below the tree. Uses a heuristic to manage horizontal
  * space */
 
-// TODO: first two args should both be double
-void draw_scale_bar(int hpos, double vpos,
+void draw_scale_bar(double hpos, double vpos,
 		double h_scale, double d_max, char *branch_length_unit)
 {
 	/* Finds the largest power of 10 that is smaller than d_max (which
@@ -747,7 +736,7 @@ void draw_scale_bar(int hpos, double vpos,
 	const double interval = tick_interval(d_max);	/* user units */
 	const int lbl_vspace = 2;			/* px */
 	const int lbl_hspace = 2;			/* px */
-	printf ("<g transform='translate(%d,%g)' style='stroke:black;stroke-width:1' >", hpos, vpos); 
+	printf ("<g transform='translate(%g,%g)' style='stroke:black;stroke-width:1' >", hpos, vpos); 
 	printf ("<path d='M 0 0 h %g'/>", h_scale * d_max);  
 
 	if (scalebar_zero_at_root) {
