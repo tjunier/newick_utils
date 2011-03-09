@@ -117,6 +117,70 @@ char *to_newick(struct rnode *node)
 	return result;
 }
 
+/* A helper function for to_newick_i(). Appends to 'result' strings
+ * representing a leaf. */
+
+static int append_leaf(struct llist *result, struct rnode *current)
+{
+	append_element(result, strdup(current->label));
+	if (show_addresses) 
+		append_element(result, masprintf("@%p", current));
+	if (strcmp("", current->edge_length_as_string) != 0) {
+		append_element(result, strdup(":"));
+		append_element(result,
+			strdup(current->edge_length_as_string));
+	}
+}
+
+/* A helper function for to_newick_i(). Appends to 'result' strings
+ * representing the end of an inner node. This always contains a ')', and may
+ * also contain a label and a length (plus the node's address, if
+ * show_addresses is true.) */
+/* Also, takes care of resetting the 'seen' member of the node. */
+
+static int append_inner_node_end(struct llist *result,
+		struct rnode *current)
+{
+	append_element(result, strdup(")"));
+	if (strcmp("", current->label) != 0)
+		append_element(result,
+			strdup(current->label));
+	if (show_addresses) 
+		append_element(
+			result,
+			masprintf("@%p",
+				current));
+	if (strcmp("",
+		current->edge_length_as_string) != 0) {
+		append_element(result,
+				strdup(":"));
+		append_element(result,
+				strdup(current->edge_length_as_string));
+	}
+	current->seen = 0;	/* reset */
+}
+
+/* A helper function for to_newick_i(). Appends to 'result' strings
+ * representing an inner node. */
+
+static int append_inner_node(struct rnode_iterator *it,
+		struct llist *result, struct rnode *current)
+{
+	/* inner node: behaviour depends on whether we've
+	 * already 'seen' this node or not. */
+	if (0 == current->seen) {
+		/* not seen: print '(' */
+		current->seen = 1;
+		append_element(result, strdup("("));
+	} else {
+		if (more_children_to_visit(it)) {
+			append_element(result, strdup(","));
+		}
+		else 
+			/* append ')' and possibly label and lenth */
+			append_inner_node_end(result, current);
+	}
+}
 struct llist *to_newick_i(struct rnode *node)
 {
 	struct rnode_iterator *it;
@@ -136,51 +200,10 @@ struct llist *to_newick_i(struct rnode *node)
 	// TODO: the append_element() calls below return values which are never
 	// checked. Fix this. This might warrant some refactoring
 	while ((current = rnode_iterator_next(it)) != NULL) {
-		if (is_leaf(current)) {
-			/* leaf: just print label */
-			append_element(result, strdup(current->label));
-			if (show_addresses) 
-				append_element(result, masprintf("@%p", current));
-			if (strcmp("", current->edge_length_as_string) != 0) {
-				append_element(result, strdup(":"));
-				append_element(result,
-					strdup(current->edge_length_as_string));
-			}
-		}
-		else {
-			/* inner node: behaviour depends on whether we've
-			 * already 'seen' this node or not. */
-			if (0 == current->seen) {
-				/* not seen: print '(' */
-				current->seen = 1;
-				append_element(result, strdup("("));
-			} else {
-				if (more_children_to_visit(it)) {
-					append_element(result, strdup(","));
-				}
-				else {
-					//printf(")%s", current->label);
-					append_element(result, strdup(")"));
-					if (strcmp("", current->label) != 0)
-						append_element(result,
-							strdup(current->label));
-					if (show_addresses) 
-						append_element(
-							result,
-							masprintf("@%p",
-								current));
-					if (strcmp("",
-						current->edge_length_as_string) != 0) {
-						//printf(":%s", current->edge_length_as_string);
-						append_element(result,
-								strdup(":"));
-						append_element(result,
-								strdup(current->edge_length_as_string));
-					}
-					current->seen = 0;	/* reset */
-				}
-			}
-		}
+		if (is_leaf(current)) 
+			append_leaf(result, current);
+		else 
+			append_inner_node(it, result, current);
 	}
 	//printf(";\n");
 	append_element(result, strdup(";"));
