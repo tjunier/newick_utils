@@ -43,7 +43,7 @@ struct rooted_tree;
 
 /* The following are for setting parameters for the SVG job. */
 
-void set_svg_width(int);
+void set_width(int);
 void set_leaf_vskip(double);
 void set_whole_v_shift(int);
 void set_style(int);

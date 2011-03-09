@@ -391,7 +391,7 @@ struct parameters get_params(int argc, char *argv[])
 
 void set_svg_parameters(struct parameters params)
 {
-	set_svg_width(params.width);
+	set_width(params.width);
 	set_leaf_vskip(params.leaf_vskip);
 	// TODO: not sure if this should be parameterized. If so, add an
 	// option; if not, use a constant and get rid of the setter.

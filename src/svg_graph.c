@@ -110,7 +110,7 @@ int label_space = 10;
  * is more homogeneous. */
 
 // TODO: use a single width variable for SVG and text
-void set_svg_width(int width) { graph_width = width; }
+void set_width(int width) { graph_width = width; }
 void set_whole_v_shift(int shift) { whole_v_shift = shift; }
 void set_style(int style) { graph_style = style; }
 void set_URL_map_file(FILE * map) { url_map_file = map; }
