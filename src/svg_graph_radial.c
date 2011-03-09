@@ -69,28 +69,28 @@ const int TEXT_ORNAMENTS_BASELINE_NUDGE = 3; /* px */
 /* If this is zero, the label's baseline is aligned on the branch. Use it to
  * nudge the labels a small angle. Unfortunately the correct amount will depend
  * on the graph's diameter and the label font size. */
-static double svg_label_angle_correction = 0.0;
+static double label_angle_correction = 0.0;
 
 /* The following applies to labels on the left side of the tree (because they
  * are subject to a 180° rotation, see draw_text_radial(). The default value
  * below was determined by trial and error. */
-static double svg_left_label_angle_correction = -0.0349; /* -2°, in radians */ 
+static double left_label_angle_correction = -0.0349; /* -2°, in radians */ 
 
-static int svg_root_length = ROOT_SPACE;
+static int root_length = ROOT_SPACE;
 
-void set_svg_label_angle_correction(double corr)
+void set_label_angle_correction(double corr)
 {
-	svg_label_angle_correction = corr;
+	label_angle_correction = corr;
 }
 
-void set_svg_left_label_angle_correction(double corr)
+void set_left_label_angle_correction(double corr)
 {
-	svg_left_label_angle_correction = corr;
+	left_label_angle_correction = corr;
 }
 
-void set_svg_root_length(int length)
+void set_root_length(int length)
 {
-	svg_root_length = length;
+	root_length = length;
 }
 
 /****************************************************************
@@ -395,7 +395,7 @@ char *xml_transform_ornaments(const char *ornaments, double angle_deg, double x,
 
 #endif	/* USE_LIBXML2 */
 
-static char *embed_transform_ornaments(const char *ornaments, double angle_deg,
+static char *embed_transform_ornaments(const char *svg_ornaments, double angle_deg,
 		double x, double y)
 {
 	char *result;
@@ -405,13 +405,13 @@ static char *embed_transform_ornaments(const char *ornaments, double angle_deg,
 			"<g style='text-anchor:end;vertical-align:super'"
 			" transform='rotate(%g,%g,%g)"
 			" translate(%.4f,%.4f)'>%s</g>",
-			angle_deg, x, y, x, y, ornaments);
+			angle_deg, x, y, x, y, svg_ornaments);
 	} else {
 		// left side
 		result = masprintf ("<g transform='rotate(180,%g,%g) "
 			"rotate(%g,%g,%g) "
 			"translate(%.4f,%.4f)'>%s</g>",
-			x, y, angle_deg, x, y, x, y, ornaments);
+			x, y, angle_deg, x, y, x, y, svg_ornaments);
 	}
 
 	return result;
@@ -420,60 +420,60 @@ static char *embed_transform_ornaments(const char *ornaments, double angle_deg,
 /* A dispatcher function, will call the XML-parsing transform function if
  * libXml is available, or the simpler string-embedding function if not. */
 
-static char *transform_ornaments(const char *ornaments, double angle_deg,
+static char *transform_ornaments(const char *svg_ornaments, double angle_deg,
 		double x, double y)
 {
 #if USE_LIBXML2
-	return xml_transform_ornaments(ornaments, angle_deg, x, y);
+	return xml_transform_ornaments(svg_ornaments, angle_deg, x, y);
 #else
-	return embed_transform_ornaments(ornaments, angle_deg, x, y);
+	return embed_transform_ornaments(svg_ornaments, angle_deg, x, y);
 #endif
 }
 
 /* Draws the arc for inner nodes, including root */
 
-static void draw_inner_node_arc(double svg_top_angle,
-		double svg_bottom_angle, double svg_radius,
+static void draw_inner_node_arc(double top_angle,
+		double bottom_angle, double radius,
 		int group_nb, int large_arc_flag)
 {
-	double svg_top_x_pos = svg_radius * cos(svg_top_angle);
-	double svg_top_y_pos = svg_radius * sin(svg_top_angle);
-	double svg_bot_x_pos = svg_radius * cos(svg_bottom_angle);
-	double svg_bot_y_pos = svg_radius * sin(svg_bottom_angle);
+	double top_x_pos = radius * cos(top_angle);
+	double top_y_pos = radius * sin(top_angle);
+	double bot_x_pos = radius * cos(bottom_angle);
+	double bot_y_pos = radius * sin(bottom_angle);
 	printf("<path class='clade_%d'"
 	       " d='M%.4f,%.4f A%4f,%4f 0 %d 1 %.4f %.4f'/>",
 		group_nb,
-		svg_top_x_pos, svg_top_y_pos,
-		svg_radius, svg_radius,
+		top_x_pos, top_y_pos,
+		radius, radius,
 		large_arc_flag,
-		svg_bot_x_pos, svg_bot_y_pos);
+		bot_x_pos, bot_y_pos);
 }
 
 // TODO: should we really pass the node? Why can't we just pass the parent
 // data,or actually, the parent's depth since this is the only use of 'node' ? 
 
 static void draw_radial_line(struct rnode *node, const double r_scale,
-		double svg_mid_angle, double svg_mid_x_pos,
-		double svg_mid_y_pos, int group_nb)
+		double mid_angle, double mid_x_pos,
+		double mid_y_pos, int group_nb)
 {
 	struct svg_data *parent_data = node->parent->data;
-	double svg_parent_radius = svg_root_length + (
+	double parent_radius = root_length + (
 		r_scale * parent_data->depth);
-	double svg_par_x_pos = svg_parent_radius * cos(svg_mid_angle);
-	double svg_par_y_pos = svg_parent_radius * sin(svg_mid_angle);
+	double par_x_pos = parent_radius * cos(mid_angle);
+	double par_y_pos = parent_radius * sin(mid_angle);
 	printf ("<line class='clade_%d' "
 		"x1='%.4f' y1='%.4f' x2='%.4f' y2='%.4f'/>",
 		group_nb,
-		svg_mid_x_pos, svg_mid_y_pos,
-		svg_par_x_pos, svg_par_y_pos);
+		mid_x_pos, mid_y_pos,
+		par_x_pos, par_y_pos);
 }
 
 /* Draws the ornament associated with node_data. Does NOT check for NULL --
  * this should be done by the caller. */
 
 static void draw_ornament (struct svg_data *node_data,
-		double svg_mid_angle, double svg_mid_x_pos,
-		double svg_mid_y_pos)
+		double mid_angle, double mid_x_pos,
+		double mid_y_pos)
 {
 	/* this styling is for text, so that users can omit styles in the map
 	 * file and still see the text. */
@@ -481,8 +481,8 @@ static void draw_ornament (struct svg_data *node_data,
 
 	char *transformed_ornaments = transform_ornaments(
 			node_data->ornament,
-			svg_mid_angle / (2*PI) * 360,
-			svg_mid_x_pos, svg_mid_y_pos);
+			mid_angle / (2*PI) * 360,
+			mid_x_pos, mid_y_pos);
 	// TODO: check for NULL!
 	printf("%s", transformed_ornaments);
 	free(transformed_ornaments);
@@ -508,37 +508,37 @@ static void draw_branches_radial (struct rooted_tree *tree, const double r_scale
 			node_data->depth = dmax;
 
 		int group_nb = node_data->group_nb;
-		double svg_radius = svg_root_length + (r_scale * node_data->depth);
-		double svg_top_angle = a_scale * node_data->top; 
-		double svg_bottom_angle = a_scale * node_data->bottom; 
-		double svg_mid_angle =
+		double radius = root_length + (r_scale * node_data->depth);
+		double top_angle = a_scale * node_data->top; 
+		double bottom_angle = a_scale * node_data->bottom; 
+		double mid_angle =
 			0.5 * a_scale * (node_data->top+node_data->bottom);
-		double svg_mid_x_pos = svg_radius * cos(svg_mid_angle);
-		double svg_mid_y_pos = svg_radius * sin(svg_mid_angle);
+		double mid_x_pos = radius * cos(mid_angle);
+		double mid_y_pos = radius * sin(mid_angle);
 		int large_arc_flag;
-		if (svg_bottom_angle - svg_top_angle > PI)
+		if (bottom_angle - top_angle > PI)
 			large_arc_flag = 1; /* keep 1 and 0: literal SVG flags */
 		else
 			large_arc_flag = 0;
 
 		/* draw node (arc), except for leaves */
 		if (! is_leaf(node)) {
-			draw_inner_node_arc(svg_top_angle, svg_bottom_angle,
-					svg_radius, group_nb, large_arc_flag);
+			draw_inner_node_arc(top_angle, bottom_angle,
+					radius, group_nb, large_arc_flag);
 		}
 		/* draw radial line */
 		if (is_root(node)) {
 			printf("<line x1='0' y1='0' x2='%.4f' y2='%.4f'/>",
-				svg_mid_x_pos, svg_mid_y_pos);
+				mid_x_pos, mid_y_pos);
 		} else {
-			draw_radial_line(node, r_scale, svg_mid_angle,
-					svg_mid_x_pos, svg_mid_y_pos,
+			draw_radial_line(node, r_scale, mid_angle,
+					mid_x_pos, mid_y_pos,
 					group_nb);
 		}
 		/* draw ornament, if any */ 
 		if (NULL != node_data->ornament)
-			draw_ornament(node_data, svg_mid_angle, svg_mid_x_pos,
-				svg_mid_y_pos);
+			draw_ornament(node_data, mid_angle, mid_x_pos,
+				mid_y_pos);
 	}
 	printf("</g>");
 }
@@ -567,7 +567,7 @@ static void place_label(const char *label, const double radius, double
 			x_pos, y_pos, label);
 	}
 	else {
-		mid_angle += svg_left_label_angle_correction;
+		mid_angle += left_label_angle_correction;
 		x_pos = radius * cos(mid_angle);
 		y_pos = radius * sin(mid_angle);
 		if (nudge) {
@@ -606,14 +606,14 @@ static void draw_label(struct rnode *node, double radius,
 				break;
 			case INNER_LBL_MIDDLE:
 				parent_data = node->parent->data;
-				parent_radius = svg_root_length + (
+				parent_radius = root_length + (
 					r_scale * parent_data->depth);
 				radius = 0.5 * (radius + parent_radius);
 				nudge = true;
 				break;
 			case INNER_LBL_ROOT:
 				parent_data = node->parent->data;
-				parent_radius = svg_root_length + (
+				parent_radius = root_length + (
 					r_scale * parent_data->depth);
 				radius = parent_radius;
 				nudge = true;
@@ -644,11 +644,11 @@ static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		if (align_leaves && is_leaf(node))
 			node_data->depth = dmax;
 
-		double radius = svg_root_length + (r_scale * node_data->depth);
+		double radius = root_length + (r_scale * node_data->depth);
 		double mid_angle =
 			0.5 * a_scale * (node_data->top+node_data->bottom);
 
-		mid_angle += svg_label_angle_correction;
+		mid_angle += label_angle_correction;
 
 		if (is_leaf(node))
 			radius += label_space;
@@ -684,8 +684,8 @@ static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 				printf("<text style='stroke:none;font-size:%s' "
 					"x='%4f' y='%4f'>%s</text>",
 					branch_length_font_size,
-					(svg_h_pos + svg_parent_h_pos) / 2.0,
-					edge_length_v_offset + svg_mid_pos,
+					(h_pos + parent_h_pos) / 2.0,
+					edge_length_v_offset + mid_pos,
 					node->parent_edge->length_as_string);
 			}
 		}
@@ -717,7 +717,7 @@ static void params_as_svg_comment (struct h_data hd, double node_area_width,
 		graph_width,
 	       	label_char_width,
 	       	hd.l_max,
-		svg_root_length,
+		root_length,
 	       	label_space,
 		hd.d_max,
 	       	label_char_width * hd.l_max,
@@ -736,10 +736,10 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 
-	/* TODO: why twice svg_root_length? */
+	/* TODO: why twice root_length? */
 	double node_area_width = 0.5 * graph_width
 			- label_char_width * hd.l_max
-			- svg_root_length - label_space;
+			- root_length - label_space;
 	r_scale = node_area_width / hd.d_max;
 
 	// params_as_svg_comment(hd, node_area_width, r_scale);

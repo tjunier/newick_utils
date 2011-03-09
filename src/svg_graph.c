@@ -98,7 +98,7 @@ static struct llist *ornament_map = NULL;
 int scale_bar_height = 30;	/* px */
 struct hash *url_map = NULL;
 int graph_width = -1;
-int svg_whole_v_shift = -1; 	/* Vertical translation of whole graph */
+int whole_v_shift = -1; 	/* Vertical translation of whole graph */
 double label_char_width = -1;
 enum inner_lbl_pos inner_label_pos = -1;
 bool scalebar_zero_at_root = true;
@@ -109,20 +109,21 @@ int label_space = 10;
  * much OO... I also provide setters for the nonstatic ones, so the interface
  * is more homogeneous. */
 
+// TODO: use a single width variable for SVG and text
 void set_svg_width(int width) { graph_width = width; }
-void set_svg_whole_v_shift(int shift) { svg_whole_v_shift = shift; }
-void set_svg_style(int style) { graph_style = style; }
-void set_svg_URL_map_file(FILE * map) { url_map_file = map; }
-void set_svg_CSS_map_file(FILE * map) { css_map_file = map; }
-void set_svg_ornament_map_file(FILE * map) { ornament_map_file = map; }
-void set_svg_leaf_label_style(char *style) { leaf_label_style = style; }
-void set_svg_inner_label_style(char *style) { inner_label_style = style; }
-void set_svg_inner_label_pos(enum inner_lbl_pos pos) { inner_label_pos = pos; }
-void set_svg_edge_label_style(char *style) { edge_label_style = style; }
-void set_svg_plain_node_style(char *style) { plain_node_style = style; }
-void set_svg_label_char_width(double width) { label_char_width = width; }
-void set_svg_scalebar_zero_at_root(bool at_root) { scalebar_zero_at_root = at_root; }
-void add_to_svg_label_space(int correction) { label_space += correction; }
+void set_whole_v_shift(int shift) { whole_v_shift = shift; }
+void set_style(int style) { graph_style = style; }
+void set_URL_map_file(FILE * map) { url_map_file = map; }
+void set_CSS_map_file(FILE * map) { css_map_file = map; }
+void set_ornament_map_file(FILE * map) { ornament_map_file = map; }
+void set_leaf_label_style(char *style) { leaf_label_style = style; }
+void set_inner_label_style(char *style) { inner_label_style = style; }
+void set_inner_label_pos(enum inner_lbl_pos pos) { inner_label_pos = pos; }
+void set_edge_label_style(char *style) { edge_label_style = style; }
+void set_plain_node_style(char *style) { plain_node_style = style; }
+void set_label_char_width(double width) { label_char_width = width; }
+void set_scalebar_zero_at_root(bool at_root) { scalebar_zero_at_root = at_root; }
+void add_to_label_space(int correction) { label_space += correction; }
 
 /************************** functions *****************************/
 

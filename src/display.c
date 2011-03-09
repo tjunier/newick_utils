@@ -392,28 +392,28 @@ struct parameters get_params(int argc, char *argv[])
 void set_svg_parameters(struct parameters params)
 {
 	set_svg_width(params.width);
-	set_svg_leaf_vskip(params.leaf_vskip);
+	set_leaf_vskip(params.leaf_vskip);
 	// TODO: not sure if this should be parameterized. If so, add an
 	// option; if not, use a constant and get rid of the setter.
-	set_svg_whole_v_shift(20);	/* pixels */
-	set_svg_label_angle_correction(params.label_angle_correction);
-	set_svg_left_label_angle_correction(params.left_label_angle_correction);
+	set_whole_v_shift(20);	/* pixels */
+	set_label_angle_correction(params.label_angle_correction);
+	set_left_label_angle_correction(params.left_label_angle_correction);
 	// TODO: this is not really an SVG param, it should be passed as an
 	// argument to display_svg_tree()
-	set_svg_style(params.svg_style);	/* radial vs orthogonal */
-	set_svg_URL_map_file(params.url_map);
+	set_style(params.svg_style);	/* radial vs orthogonal */
+	set_URL_map_file(params.url_map);
 	// TODO: refer to this as "clade CSS", as opposed to node label CSS
-	set_svg_CSS_map_file(params.css_map);
-	set_svg_ornament_map_file(params.ornament_map);
-	set_svg_leaf_label_style(params.leaf_label_style);
-	set_svg_inner_label_style(params.inner_label_style);
-	set_svg_inner_label_pos(params.inner_label_pos);
-	set_svg_edge_label_style(params.edge_label_style);
-	set_svg_plain_node_style(params.plain_node_style);
-	set_svg_root_length(params.root_length);
-	set_svg_label_char_width(params.label_char_width);
-	set_svg_scalebar_zero_at_root(params.scale_zero_at_root);
-	add_to_svg_label_space(params.label_space_correction);
+	set_CSS_map_file(params.css_map);
+	set_ornament_map_file(params.ornament_map);
+	set_leaf_label_style(params.leaf_label_style);
+	set_inner_label_style(params.inner_label_style);
+	set_inner_label_pos(params.inner_label_pos);
+	set_edge_label_style(params.edge_label_style);
+	set_plain_node_style(params.plain_node_style);
+	set_root_length(params.root_length);
+	set_label_char_width(params.label_char_width);
+	set_scalebar_zero_at_root(params.scale_zero_at_root);
+	add_to_label_space(params.label_space_correction);
 }
 
 /* Prints an XML comment containing the command line parameters, so that the

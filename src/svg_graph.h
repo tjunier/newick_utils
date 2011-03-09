@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
 
+// TODO: clarify the distinction between svg_graph.h and svg_graph_common.h
 
 /* Functions for displaying a tree as SVG. This is the visible interface for
  * client code such as display.c User should call any of the set_svg_*()
@@ -43,13 +44,14 @@ struct rooted_tree;
 /* The following are for setting parameters for the SVG job. */
 
 void set_svg_width(int);
-void set_svg_leaf_vskip(double);
-void set_svg_whole_v_shift(int);
-void set_svg_style(int);
-void set_svg_URL_map_file(FILE *);
-void set_svg_label_angle_correction(double);
-void set_svg_left_label_angle_correction(double);
-void set_svg_scalebar_zero_at_root(bool);
+void set_leaf_vskip(double);
+void set_whole_v_shift(int);
+void set_style(int);
+void set_URL_map_file(FILE *);
+//TODO: shouldn't radial radial-specific f()s go somewhere else?
+void set_label_angle_correction(double);
+void set_left_label_angle_correction(double);
+void set_scalebar_zero_at_root(bool);
 
 /* Call this before calling svg_header(), etc, but _after_ the set_svg*()
  * functions. It will launch the initializations liek reading the color map,
