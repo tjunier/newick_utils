@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Interface of svg_graph.c: functions used for drawing SVG trees. */
 
 enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
-// TODO: clarify the distinction between svg_graph.h and svg_graph_common.h
 
 /* Functions for displaying a tree as SVG. This is the visible interface for
  * client code such as display.c User should call any of the set_svg_*()

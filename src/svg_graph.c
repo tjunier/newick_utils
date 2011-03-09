@@ -127,7 +127,7 @@ void add_to_label_space(int correction) { label_space += correction; }
 
 /************************** functions *****************************/
 
-void svg_CSS_stylesheet()
+static void svg_CSS_stylesheet()
 {
 	struct list_elem *el;
 
@@ -150,36 +150,6 @@ void svg_CSS_stylesheet()
 	printf ("]]></style></defs>");
 }
 
-/* Prints the SVG header. The first argument is the tree's number of leaves,
- * needed to compute height for orthogonal trees; the second argument is a
- * boolean that is true IFF we show a scale bar. */
-
-void svg_header(int nb_leaves, int with_scale_bar)
-{
-	int height;
-
-	switch (graph_style) {
-		case SVG_ORTHOGONAL:
-			/* image fits in a rectangle, so height != width */
-			height = graph_height(nb_leaves, with_scale_bar);
-			break;
-		case SVG_RADIAL:
-			/* image fits in a square, so height == width */
-			height = graph_width;
-			break;
-		default:
-			assert(0);
-	}
-
-	printf( "<?xml version='1.0' standalone='no'?>"
-	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
-		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
-	printf( "<svg width='%d' height='%d' version='1.1' "
-		"xmlns='http://www.w3.org/2000/svg' "
-		"xmlns:xlink='http://www.w3.org/1999/xlink' >",
-		graph_width, height);
-	svg_CSS_stylesheet();
-}
 
 /* A helper function for read_css_map(). Given a 'type' string (read from the
  * CSS style file), returns the appropriate type as an integer, or UNKNOWN if
@@ -216,8 +186,7 @@ static int get_group_type(const char *type)
  * labels (if the type is CLADE) or to all individual nodes in the list (if the
  * style is INDIVIDUAL). */
 
-// return checked
-struct llist *read_css_map()
+static struct llist *read_css_map()
 {
 	/* Most errors are memory errors (but see below) */
 	set_last_error_code(ERR_NOMEM);
@@ -296,8 +265,7 @@ struct llist *read_css_map()
 /* Builds an ornament map structure. This is like the CSS map, but for
  * ornaments. Also returns NULL on error. */
 
-// return checked
-struct llist *read_ornament_map()
+static struct llist *read_ornament_map()
 {
 	/* As for read_css_map() */
 	set_last_error_code(ERR_NOMEM);
@@ -378,7 +346,7 @@ struct llist *read_ornament_map()
 
 /* Reads in the URL map (label -> URL), returns NULL on error. */
 
-struct hash *read_url_map()
+static struct hash *read_url_map()
 {
 	/* As for read_css_map() */
 	set_last_error_code(ERR_NOMEM);
@@ -466,6 +434,37 @@ int svg_init()
 	init_done = 1;
 
 	return SUCCESS;
+}
+
+/* Prints the SVG header. The first argument is the tree's number of leaves,
+ * needed to compute height for orthogonal trees; the second argument is a
+ * boolean that is true IFF we show a scale bar. */
+
+void svg_header(int nb_leaves, int with_scale_bar)
+{
+	int height;
+
+	switch (graph_style) {
+		case SVG_ORTHOGONAL:
+			/* image fits in a rectangle, so height != width */
+			height = graph_height(nb_leaves, with_scale_bar);
+			break;
+		case SVG_RADIAL:
+			/* image fits in a square, so height == width */
+			height = graph_width;
+			break;
+		default:
+			assert(0);
+	}
+
+	printf( "<?xml version='1.0' standalone='no'?>"
+	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
+		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
+	printf( "<svg width='%d' height='%d' version='1.1' "
+		"xmlns='http://www.w3.org/2000/svg' "
+		"xmlns:xlink='http://www.w3.org/1999/xlink' >",
+		graph_width, height);
+	svg_CSS_stylesheet();
 }
 
 /* Passed to dump_llist() for labels */
