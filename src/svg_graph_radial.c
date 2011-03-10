@@ -665,6 +665,8 @@ static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		if (0 != strcmp(node->label, ""))
 			draw_label(node, radius, mid_angle, r_scale);
 
+		// TODO: adapt nw_display SVG radial exp files (this may
+		// include changing some params so the graph remains readable).
 		/* draw edge length (except for root) */
 		if ((! is_root(node)) &&
 			(0 != strcmp("", node->edge_length_as_string))) {
