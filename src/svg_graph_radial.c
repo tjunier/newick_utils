@@ -627,6 +627,7 @@ static void draw_label(struct rnode *node, double radius,
 	if (url) printf("</a>");
 }
 
+
 /* Prints the node text (labels and lengths) in a <g> element, radial */
 
 static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
@@ -667,28 +668,17 @@ static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 		if (0 != strcmp(node->label, ""))
 			draw_label(node, radius, mid_angle, r_scale,
 					class, url);
-		/* TODO: add this when node labels work */
-		/*
+
 		if (! is_root(node)) {
-			struct rnode *parent = node->parent_edge->parent_node;
-			struct svg_data *parent_data = parent->data;
-			double svg_parent_h_pos = svg_root_length + (
-				h_scale * parent_data->depth);
-				*/
-			/* Print branch length IFF it is nonempty AND 
-			 * requested size is not 0 */
-			/*
-			if (0 != strcmp(branch_length_font_size, "0") &&
-			    0 != strcmp(node->parent_edge->length_as_string, "")) {
-				printf("<text style='stroke:none;font-size:%s' "
-					"x='%4f' y='%4f'>%s</text>",
-					branch_length_font_size,
-					(h_pos + parent_h_pos) / 2.0,
-					edge_length_v_offset + mid_pos,
-					node->parent_edge->length_as_string);
-			}
+			struct svg_data *parent_data = NULL;
+			double parent_radius = -1;
+			parent_data = node->parent->data;
+			parent_radius = root_length + (
+				r_scale * parent_data->depth);
+			radius = 0.5 * (radius + parent_radius);
+			place_label(node->edge_length_as_string, radius,
+					mid_angle, true, "edge-label");
 		}
-		*/
 	}
 	printf("</g>");
 }
@@ -735,7 +725,6 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 
 	if (0.0 == hd.d_max ) { hd.d_max = 1; } 	/* one-node trees */
 
-	/* TODO: why twice root_length? */
 	double node_area_width = 0.5 * graph_width
 			- label_char_width * hd.l_max
 			- root_length - label_space;
