@@ -80,16 +80,10 @@ fi
 # arguments>. The expected result is in a file named test_<prog name>_<case
 # name>.exp .
 
-shopt -s -o xtrace
 pass=TRUE
-# NOTE: this loop actually FAILS in Bash (and Sh) because the while is in a
-# pipeline and is executed as a separate process, so it has local copies of
-# 'pass' and can't pass data back to its parent.
-# In Bash one could do nifty things with process substitution and file
-# descriptor redirection (see http://ubuntuforums.org/showthread.php?t=312017),
-# but this has to run under plain sh, so we won't do it.
-
-grep -v '^#' < $args_file | while IFS=':' read name args ; do
+while IFS=':' read name args ; do
+	# if first word starts with '#', discard (comment)
+	echo $name | grep '^#' > /dev/null && continue
 	# setting IFS to '' preserves whitespace through shell word splitting
 	check_applies $name
 	if [ "$?" -eq "0" ] ; then
@@ -108,12 +102,10 @@ grep -v '^#' < $args_file | while IFS=':' read name args ; do
 	else
 		echo "FAIL"
 		pass=FALSE
-		echo $pass
 		break
 	fi
-done
+done < $args_file
 
-echo $pass
 if test $pass = FALSE ; then
 	exit 1
 else
