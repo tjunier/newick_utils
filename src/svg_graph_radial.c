@@ -588,9 +588,20 @@ static void place_label(const char *label, const double radius, double
 /* Draws a node label */
 
 static void draw_label(struct rnode *node, double radius,
-		double mid_angle, const double r_scale,
-		const char *class, const char *url)
+		double mid_angle, const double r_scale)
 {
+	char *class;
+	if (is_leaf(node)) {
+		radius += label_space;
+		class = leaf_label_class;
+	} else {
+		radius += INNER_LBL_SPACE;
+		class = inner_label_class;
+	}
+
+	char *url = NULL;
+	if (url_map) url = hash_get(url_map, node->label);
+
 	/* Will set this to true when the label must be drawn parallel to the
 	 * branch, rather than on the exact same line */
 	bool nudge = false;
@@ -650,30 +661,14 @@ static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 
 		mid_angle += label_angle_correction;
 
-		if (is_leaf(node))
-			radius += label_space;
-		else
-			radius += INNER_LBL_SPACE;
-
-		char *url = NULL;
-		if (url_map) url = hash_get(url_map, node->label);
-
-		char *class;
-		if (is_leaf(node))
-			class = leaf_label_class;
-		else
-			class = inner_label_class;
-
 		/* draw label IFF it is nonempty */
 		if (0 != strcmp(node->label, ""))
-			draw_label(node, radius, mid_angle, r_scale,
-					class, url);
+			draw_label(node, radius, mid_angle, r_scale);
 
+		/* draw edge length (except for root) */
 		if (! is_root(node)) {
-			struct svg_data *parent_data = NULL;
-			double parent_radius = -1;
-			parent_data = node->parent->data;
-			parent_radius = root_length + (
+			struct svg_data *parent_data = node->parent->data;
+			double parent_radius = root_length + (
 				r_scale * parent_data->depth);
 			radius = 0.5 * (radius + parent_radius);
 			place_label(node->edge_length_as_string, radius,
