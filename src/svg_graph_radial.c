@@ -666,7 +666,8 @@ static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 			draw_label(node, radius, mid_angle, r_scale);
 
 		/* draw edge length (except for root) */
-		if (! is_root(node)) {
+		if ((! is_root(node)) &&
+			(0 != strcmp("", node->edge_length_as_string))) {
 			struct svg_data *parent_data = node->parent->data;
 			double parent_radius = root_length + (
 				r_scale * parent_data->depth);
