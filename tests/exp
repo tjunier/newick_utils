@@ -1,0 +1,56 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="300" version="1.1">
+  <defs>
+    <style type="text/css"><![CDATA[
+ .leaf-label {font-size:medium;font-family:sans}
+ .inner-label {font-size:small;font-family:sans}
+ .edge-label {font-size:small;font-family:sans}
+]]></style>
+  </defs>
+  <!-- arguments: -sr catarrhini_wrong.nw  -->
+  <g transform="translate(150,150)">
+    <g style="stroke:black;fill:none;stroke-width:1;stroke-linecap:round">
+      <line class="clade_0" x1="36.0000" y1="0.0000" x2="10.0000" y2="0.0000"/>
+      <line class="clade_0" x1="29.7749" y1="20.2350" x2="10.6601" y2="7.2446"/>
+      <line class="clade_0" x1="13.2525" y1="33.4720" x2="5.8082" y2="14.6698"/>
+      <line class="clade_0" x1="-7.8532" y1="35.1330" x2="-4.0720" y2="18.2171"/>
+      <line class="clade_0" x1="-26.2429" y1="24.6437" x2="-15.7133" y2="14.7558"/>
+      <line class="clade_0" x1="-35.5568" y1="5.6316" x2="-29.8501" y2="4.7278"/>
+      <line class="clade_0" x1="-32.5738" y1="-15.3281" x2="-29.9598" y2="-14.0980"/>
+      <line class="clade_0" x1="-18.3255" y1="-30.9867" x2="-16.8549" y2="-28.5001"/>
+      <path class="clade_0" d="M-29.9598,-14.0980 A33.111111,33.111111 0 0 1 -16.8549 -28.5001"/>
+      <line class="clade_0" x1="-24.4900" y1="-22.2842" x2="-22.3533" y2="-20.3399"/>
+      <path class="clade_0" d="M-29.8501,4.7278 A30.222222,30.222222 0 0 1 -22.3533 -20.3399"/>
+      <line class="clade_0" x1="-28.9551" y1="-8.6594" x2="-26.1873" y2="-7.8317"/>
+      <line class="clade_0" x1="2.2605" y1="-35.9290" x2="1.7163" y2="-27.2794"/>
+      <path class="clade_0" d="M-26.1873,-7.8317 A27.333333,27.333333 0 0 1 1.7163 -27.2794"/>
+      <line class="clade_0" x1="-15.6289" y1="-22.4243" x2="-13.9770" y2="-20.0543"/>
+      <line class="clade_0" x1="22.0647" y1="-28.4456" x2="14.9822" y2="-19.3149"/>
+      <path class="clade_0" d="M-13.9770,-20.0543 A24.444444,24.444444 0 0 1 14.9822 -19.3149"/>
+      <line class="clade_0" x1="0.6239" y1="-24.4365" x2="0.5502" y2="-21.5485"/>
+      <path class="clade_0" d="M-15.7133,14.7558 A21.555556,21.555556 0 0 1 0.5502 -21.5485"/>
+      <line class="clade_0" x1="-19.6718" y1="-8.8125" x2="-17.0354" y2="-7.6315"/>
+      <path class="clade_0" d="M-4.0720,18.2171 A18.666667,18.666667 0 0 1 -17.0354 -7.6315"/>
+      <line class="clade_0" x1="-16.6859" y1="8.3682" x2="-14.1035" y2="7.0731"/>
+      <path class="clade_0" d="M5.8082,14.6698 A15.777778,15.777778 0 0 1 -14.1035 7.0731"/>
+      <line class="clade_0" x1="-5.6241" y1="14.7414" x2="-4.5943" y2="12.0422"/>
+      <path class="clade_0" d="M10.6601,7.2446 A12.888889,12.888889 0 0 1 -4.5943 12.0422"/>
+      <line class="clade_0" x1="3.8669" y1="12.2951" x2="3.0002" y2="9.5393"/>
+      <path class="clade_0" d="M10.0000,0.0000 A10.000000,10.000000 0 0 1 3.0002 9.5393"/>
+      <line x1="0" y1="0" x2="8.0623" y2="5.9160"/>
+    </g>
+    <g style="stroke:none">
+      <text class="leaf-label" transform="rotate(0,46,0)" x="46.0000" y="0.0000">Homo</text>
+      <text class="leaf-label" transform="rotate(34.2,38.0457,25.8558)" x="38.0457" y="25.8558">Pan</text>
+      <text class="leaf-label" transform="rotate(68.4,16.9337,42.7697)" x="16.9337" y="42.7697">Gorilla</text>
+      <text class="leaf-label" style="text-anchor:end;" transform="rotate(102.600000,-10.0346,44.8922) rotate(180,-10.0346,44.8922)" x="-10.0346" y="44.8922">Pongo</text>
+      <text class="leaf-label" style="text-anchor:end;" transform="rotate(136.800000,-33.5326,31.4892) rotate(180,-33.5326,31.4892)" x="-33.5326" y="31.4892">Hylobates</text>
+      <text class="leaf-label" style="text-anchor:end;" transform="rotate(171.000000,-45.4337,7.19599) rotate(180,-45.4337,7.19599)" x="-45.4337" y="7.1960">Cercopithecus</text>
+      <text class="leaf-label" style="text-anchor:end;" transform="rotate(205.200000,-41.622,-19.5858) rotate(180,-41.622,-19.5858)" x="-41.6220" y="-19.5858">Macaca</text>
+      <text class="leaf-label" style="text-anchor:end;" transform="rotate(239.400000,-23.4159,-39.5941) rotate(180,-23.4159,-39.5941)" x="-23.4159" y="-39.5941">Papio</text>
+      <text class="leaf-label" transform="rotate(273.6,2.88836,-45.9092)" x="2.8884" y="-45.9092">Simias</text>
+      <text class="leaf-label" transform="rotate(307.8,28.1937,-36.3471)" x="28.1937" y="-36.3471">Cebus</text>
+    </g>
+  </g>
+</svg>
