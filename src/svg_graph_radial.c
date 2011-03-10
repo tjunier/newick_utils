@@ -448,8 +448,11 @@ static void draw_inner_node_arc(double top_angle,
 		bot_x_pos, bot_y_pos);
 }
 
-// TODO: should we really pass the node? Why can't we just pass the parent
-// data, or actually, the parent's depth since this is the only use of 'node' ? 
+// Should we really pass the node? Why not just pass the parent data, or
+// actually, the parent's depth since this is the only use of 'node' ? OTOH
+// it doesn't do any harm (we're actually passing a pointer, so it doesn't use
+// up that much space), and if later we need other fields from the node, we
+// don't need to alter the function's signature.
 
 static void draw_radial_line(struct rnode *node, const double r_scale,
 		double mid_angle, double mid_x_pos,
