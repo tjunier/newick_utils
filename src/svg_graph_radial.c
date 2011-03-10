@@ -319,6 +319,9 @@ void apply_transforms(xmlDocPtr doc, double angle_deg, double x, double y)
 	}
 }
 
+/* unwraps the snippet out of its dummy doc, ready for embedding in the final
+ * SVG. Returns NULL in case of memory problem. */ 
+
 static char *unwrap_snippet(xmlDocPtr doc)
 {
 	/* this will give a size that is certain to be enough */
@@ -382,7 +385,8 @@ char *xml_transform_ornaments(const char *ornaments, double angle_deg, double x,
 	/* tweak according to element type */
 	apply_transforms(doc, angle_deg, x, y);
 
-	/* now print out the altered snipped, unwrapped.  */
+	/* now get the altered snipped, unwrapped (will be NULL if there was a
+	 * problem).  */
 	char *tweaked_svg = unwrap_snippet(doc);
 	xmlFreeDoc(doc);
 
@@ -390,6 +394,9 @@ char *xml_transform_ornaments(const char *ornaments, double angle_deg, double x,
 }
 
 #endif	/* USE_LIBXML2 */
+
+/* Embeds the ornaments in an SVG <g> tag, performing some crude transforms
+ * (rotation, etc). Returns an SVG snippet, or NULL in case of error. */
 
 static char *embed_transform_ornaments(const char *svg_ornaments, double angle_deg,
 		double x, double y)
@@ -414,7 +421,8 @@ static char *embed_transform_ornaments(const char *svg_ornaments, double angle_d
 }
 
 /* A dispatcher function, will call the XML-parsing transform function if
- * libXml is available, or the simpler string-embedding function if not. */
+ * libXml is available, or the simpler string-embedding function if not.
+ * Returns NULL in case of problem. */
 
 static char *transform_ornaments(const char *svg_ornaments, double angle_deg,
 		double x, double y)
@@ -485,8 +493,11 @@ static void draw_ornament (struct svg_data *node_data,
 			node_data->ornament,
 			mid_angle / (2*PI) * 360,
 			mid_x_pos, mid_y_pos);
-	// TODO: check for NULL!
-	printf("%s", transformed_ornaments);
+	// TODO: we should handle errors in these functions. In the end,
+	// display_svg_tree_radial() should return an error code if the drawing
+	// could not be performed.
+	if (NULL != transform_ornaments)
+		printf("%s", transformed_ornaments);
 	free(transformed_ornaments);
 
 	printf("</g>");
@@ -715,7 +726,9 @@ static void params_as_svg_comment (struct h_data hd, double node_area_width,
 		r_scale);
 }
 
-void display_svg_tree_radial(struct rooted_tree *tree,
+/* Draws a radial SVG tree. Returns SUCCESS iff there was no problem. */
+
+int display_svg_tree_radial(struct rooted_tree *tree,
 		struct h_data hd, bool align_leaves, int with_scale_bar,
 		char *branch_length_unit)
 {
@@ -754,11 +767,19 @@ void display_svg_tree_radial(struct rooted_tree *tree,
 			graph_width / 2.0); 
 	/* We draw all the tree's branches in an SVG group of their own, to
 	 * facilitate editing. */
-	draw_branches_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
+	if (! draw_branches_radial(
+		tree, r_scale, a_scale, align_leaves, hd.d_max))
+		return FAILURE;
 	/* likewise for text */
-	draw_text_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
+	if (! draw_text_radial(
+		tree, r_scale, a_scale, align_leaves, hd.d_max))
+		return FAILURE;
 	printf ("</g>");
 	if (with_scale_bar)
-		draw_scale_bar(Scale_bar_left_space, (double) graph_width,
-				r_scale, hd.d_max, branch_length_unit);
+		if (! draw_scale_bar(
+			Scale_bar_left_space, (double) graph_width,
+			r_scale, hd.d_max, branch_length_unit))
+			return FAILURE;
+
+	return SUCCESS;
 }
