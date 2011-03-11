@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "svg_graph_common.h"
 #include "math.h"
 #include "masprintf.h"
+#include "common.h"
 
 /* If USE_LIBXML2 is not defined, we explicitly define it to false. */
 #ifndef USE_LIBXML2	
@@ -124,7 +125,7 @@ static char * wrap_in_dummy_doc(const char *svg_snippet)
 
 /* changes the x-attribute's sign */
 
-static void change_x_sign(xmlNodePtr node)
+static int change_x_sign(xmlNodePtr node)
 {
 	xmlChar *x = (xmlChar *) "x";
 	xmlChar *x_value = xmlGetProp(node, x);
@@ -134,8 +135,11 @@ static void change_x_sign(xmlNodePtr node)
 		char *new_value = masprintf("%g", x_val);
 		xmlSetProp(node, x, (xmlChar *) new_value);
 		free(new_value);
-	}	
+	}
+	else
+		return FAILURE;
 	xmlFree(x_value);
+	return SUCCESS;
 }	
 
 /* nudges y-attribute above the baseline (for text) */
@@ -481,7 +485,7 @@ static void draw_radial_line(struct rnode *node, const double r_scale,
 /* Draws the ornament associated with node_data. Does NOT check for NULL --
  * this should be done by the caller. */
 
-static void draw_ornament (struct svg_data *node_data,
+static int draw_ornament (struct svg_data *node_data,
 		double mid_angle, double mid_x_pos,
 		double mid_y_pos)
 {
@@ -498,12 +502,17 @@ static void draw_ornament (struct svg_data *node_data,
 	// could not be performed.
 	if (NULL != transform_ornaments)
 		printf("%s", transformed_ornaments);
+	else 
+		return FAILURE;
 	free(transformed_ornaments);
 
 	printf("</g>");
+
+	return SUCCESS;
 }
 
-static void draw_branches_radial (struct rooted_tree *tree, const double r_scale,
+static void draw_branches_radial (
+		struct rooted_tree *tree, const double r_scale,
 		const double a_scale, bool align_leaves, double dmax)
 {
 	printf( "<g"
@@ -550,10 +559,13 @@ static void draw_branches_radial (struct rooted_tree *tree, const double r_scale
 		}
 		/* draw ornament, if any */ 
 		if (NULL != node_data->ornament)
-			draw_ornament(node_data, mid_angle, mid_x_pos,
-				mid_y_pos);
+			if (!draw_ornament(node_data, mid_angle, mid_x_pos,
+				mid_y_pos))
+				return FAILURE;
 	}
 	printf("</g>");
+
+	return SUCCESS;
 }
 
 /* lower-level label drawing */
@@ -767,19 +779,13 @@ int display_svg_tree_radial(struct rooted_tree *tree,
 			graph_width / 2.0); 
 	/* We draw all the tree's branches in an SVG group of their own, to
 	 * facilitate editing. */
-	if (! draw_branches_radial(
-		tree, r_scale, a_scale, align_leaves, hd.d_max))
-		return FAILURE;
+	draw_branches_radial(tree, r_scale, a_scale, align_leaves, hd.d_max);
 	/* likewise for text */
-	if (! draw_text_radial(
-		tree, r_scale, a_scale, align_leaves, hd.d_max))
-		return FAILURE;
+	draw_text_radial( tree, r_scale, a_scale, align_leaves, hd.d_max);
 	printf ("</g>");
 	if (with_scale_bar)
-		if (! draw_scale_bar(
-			Scale_bar_left_space, (double) graph_width,
-			r_scale, hd.d_max, branch_length_unit))
-			return FAILURE;
+		draw_scale_bar(Scale_bar_left_space, (double) graph_width,
+			r_scale, hd.d_max, branch_length_unit);
 
 	return SUCCESS;
 }
