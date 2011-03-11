@@ -1,3 +1,12 @@
+general: for now I don't check the return value of printf(). See if this would
+be useful. In fact it would be better to keep all the printf()s in a few
+defined places. The SVG code has printf()s all over the place, it would
+probably be better to do it like to_newick_i() does: by appending strings to a
+list, then printing the whole list. Only, we'd need to have the whole tree in
+memory, at least until we print it; OTOH we could rather easily print several
+trees in the same doc this way. Make a separate branch, or better yet,  allow
+for the two versions.
+
 tree.c: think of adding a label->node map to the tree structure. The nodes
 could then directly be accessed by functions like get_node_by_label(struct
 rooted_tree *tree, char *label). This function would assume
