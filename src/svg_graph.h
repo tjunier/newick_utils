@@ -66,11 +66,10 @@ void svg_header();
 /* Writes a tree into a <g> object. If 'align_leaves' is true, the leaves will
  * be aligned (use this for cladograms). If 'with_scale_bar' is true, a sclae
  * bar will be drawn. The string 'branch_length_unit' is used as a label in the
- * scale bar (e.g., "substitutions/site"). TODO: pass 'style', where 'style' is
- * either SVG_ORTHOGONAL or SVG_RADIAL. */
-/* Returns SUCCESS unless there was any problem. */
+ * scale bar (e.g., "substitutions/site"). */
 
-enum display_status display_svg_tree(struct rooted_tree *, int align_leaves,
+enum display_status display_svg_tree(struct rooted_tree *,
+		enum graph_style style, int align_leaves,
 		int with_scale_bar, char *branch_length_unit);
 
 /* Writes an SVG footer */
