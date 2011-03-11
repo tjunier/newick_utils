@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern enum inner_lbl_pos inner_label_pos;
 
 /* Prevents labels of single-child nodes from being crossed over by the child
- * branch. Also used when putting inner labels near root. TODO: change name*/
+ * branch. Also used when putting inner labels near root. */
 const int KNEE_NODE_V_NUDGE = 6;
 const int INNER_LBL_H_NUDGE = 2;
 
