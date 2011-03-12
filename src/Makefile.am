@@ -18,7 +18,7 @@ HDR = canvas.h concat.h enode.h error.h hash.h lca.h link.h list.h nodemap.h \
 	rnode_iterator.h simple_node_pos.h svg_graph.h text_graph.h \
 	to_newick.h tree.h tree_editor_rnode_data.h common.h order_tree.h \
 	tree_models.h xml_utils.h graph_common.h svg_graph_common.h \
-	svg_graph_radial.h svg_graph_ortho.h masprintf.h
+	svg_graph_radial.h svg_graph_ortho.h masprintf.h subtree.h
 
 NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
 	link.c tree.c nodemap.c hash.c rnode_iterator.c \
@@ -45,7 +45,7 @@ nw_display_SOURCES = display.c canvas.c text_graph.c \
 		svg_graph_ortho.c svg_graph_radial.c 
 nw_display_LDADD = @LEXLIB@ -lm libnw.la
 
-nw_clade_SOURCES = subtree.c
+nw_clade_SOURCES = clade.c subtree.c
 nw_clade_LDADD = @LEXLIB@ libnw.la
 
 nw_reroot_SOURCES = reroot.c

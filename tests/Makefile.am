@@ -6,6 +6,7 @@ TESTS = test_newick_scanner test_newick_parser test_rnode test_list \
 	test_nodemap test_to_newick test_tree test_node_set \
 	test_rnode_iterator test_tree_models test_xml_utils \
 	test_error test_order_tree test_graph_common \
+	test_subtree \
 	test_nw_reroot.sh test_nw_rename.sh test_nw_condense.sh \
 	test_nw_display.sh test_nw_indent.sh test_nw_support.sh \
 	test_nw_ed.sh test_nw_topology.sh test_nw_clade.sh \
@@ -20,7 +21,8 @@ check_PROGRAMS = test_rnode test_list test_link test_newick_scanner \
 		 test_enode test_rnode_iterator test_readline \
 		 test_tree_models test_xml_utils test_masprintf \
 		 test_error test_order_tree test_graph_common \
-		 test_newick_parser test_svg_graph_radial 
+		 test_newick_parser test_svg_graph_radial \
+		 test_subtree
 
 check_HEADERS = tree_stubs.h
 
@@ -116,6 +118,10 @@ test_svg_graph_radial_SOURCES = test_svg_graph_radial.c \
 	$(SRC)/rnode_iterator.c $(SRC)/svg_graph_ortho.c $(SRC)/error.c \
 	$(SRC)/readline.c $(SRC)/xml_utils.c $(SRC)/graph_common.c \
 	$(SRC)/node_pos_alloc.c $(SRC)/nodemap.c $(SRC)/lca.c $(SRC)/link.c
+
+test_subtree_SOURCES = test_subtree.c $(SRC)/subtree.c $(SRC)/rnode.c \
+	$(SRC)/list.c $(SRC)/hash.c $(SRC)/link.c $(SRC)/rnode_iterator.c \
+	$(SRC)/masprintf.c
 
 clean-local:
 	$(RM) *.out
