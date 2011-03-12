@@ -364,7 +364,6 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct list_elem *el;
 	enum unlink_rnode_status result;
 	struct rnode *root_child;
-	char *newick;
 
 	/* these two traversals fill the node data. */
 	reverse_parse_order_traversal(tree);
