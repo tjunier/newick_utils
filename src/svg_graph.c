@@ -83,7 +83,6 @@ static int init_done = FALSE;
  *   are only used here, the other ones have external linkage because they are
  *   used in other modules. */
 
-static int graph_style = -1;
 static FILE *url_map_file = NULL;
 static FILE *css_map_file = NULL;
 static FILE *ornament_map_file = NULL;
@@ -110,7 +109,6 @@ int label_space = 10;
 
 void set_width(int width) { graph_width = width; }
 void set_whole_v_shift(int shift) { whole_v_shift = shift; }
-void set_style(int style) { graph_style = style; }
 void set_URL_map_file(FILE * map) { url_map_file = map; }
 void set_CSS_map_file(FILE * map) { css_map_file = map; }
 void set_ornament_map_file(FILE * map) { ornament_map_file = map; }
@@ -688,11 +686,11 @@ int svg_init()
  * needed to compute height for orthogonal trees; the second argument is a
  * boolean that is true IFF we show a scale bar. */
 
-void svg_header(int nb_leaves, int with_scale_bar)
+void svg_header(int nb_leaves, int with_scale_bar, enum graph_style style)
 {
 	int height;
 
-	switch (graph_style) {
+	switch (style) {
 		case SVG_ORTHOGONAL:
 			/* image fits in a rectangle, so height != width */
 			height = graph_height(nb_leaves, with_scale_bar);
@@ -770,6 +768,7 @@ void draw_scale_bar(double hpos, double vpos,
 
 enum display_status display_svg_tree(
 		struct rooted_tree *tree,
+		enum graph_style style,
 		int align_leaves,
 		int with_scale_bar,
 		char *branch_length_unit)
@@ -796,10 +795,10 @@ enum display_status display_svg_tree(
 
  	prettify_labels(tree);
 
-	if (SVG_ORTHOGONAL == graph_style)
+	if (SVG_ORTHOGONAL == style)
 		display_svg_tree_orthogonal(tree, hd, align_leaves,
 				with_scale_bar, branch_length_unit);
-	else if (SVG_RADIAL == graph_style)
+	else if (SVG_RADIAL == style)
 		display_svg_tree_radial(tree, hd, align_leaves,
 				with_scale_bar, branch_length_unit);
 	else

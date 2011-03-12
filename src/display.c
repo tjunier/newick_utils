@@ -58,7 +58,7 @@ struct parameters {
 	char 	*edge_label_style;		/* CSS */
 	char 	*plain_node_style;		/* CSS */
 	double 	leaf_vskip;
-	int 	svg_style;			/* radial or orthogonal */
+	enum 	graph_style style;		/* radial or orthogonal */
 	char 	*branch_length_unit;
 	double 	label_angle_correction;
 	double 	left_label_angle_correction;
@@ -252,7 +252,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.edge_label_style = "font-size:small;font-family:sans";
 	params.plain_node_style = NULL;	/* svg_graph.c has default */
 	params.leaf_vskip = 40.0;
-	params.svg_style = SVG_ORTHOGONAL;
+	params.style = SVG_ORTHOGONAL;
 	params.branch_length_unit = "substitutions/site";
 	params.label_angle_correction = 0.0;
 	params.left_label_angle_correction = 0.0;
@@ -310,7 +310,7 @@ struct parameters get_params(int argc, char *argv[])
 			params.label_space_correction = atoi(optarg);
 			break;
 		case 'r':
-			params.svg_style = SVG_RADIAL;
+			params.style = SVG_RADIAL;
 			break;
 		case 'R':
 			params.root_length = atoi(optarg);
@@ -398,9 +398,6 @@ void set_svg_parameters(struct parameters params)
 	set_whole_v_shift(20);	/* pixels */
 	set_label_angle_correction(params.label_angle_correction);
 	set_left_label_angle_correction(params.left_label_angle_correction);
-	// TODO: this is not really an SVG param, it should be passed as an
-	// argument to display_svg_tree()
-	set_style(params.svg_style);	/* radial vs orthogonal */
 	set_URL_map_file(params.url_map);
 	// TODO: refer to this as "clade CSS", as opposed to node label CSS
 	set_CSS_map_file(params.css_map);
@@ -463,9 +460,9 @@ int main(int argc, char *argv[])
 		if (params.no_scale_bar) with_scale_bar = FALSE;
 
 		if (params.svg) {
-			svg_header(leaf_count(tree), with_scale_bar);
+			svg_header(leaf_count(tree), with_scale_bar, params.style);
 			svg_run_params_comment(argc, argv);
-			status = display_svg_tree(tree,
+			status = display_svg_tree(tree, params.style,
 					align_leaves, with_scale_bar,
 					params.branch_length_unit);
 			switch(status) {

@@ -508,7 +508,7 @@ static int draw_ornament (struct svg_data *node_data,
 	return SUCCESS;
 }
 
-static void draw_branches_radial (
+static int draw_branches_radial (
 		struct rooted_tree *tree, const double r_scale,
 		const double a_scale, bool align_leaves, double dmax)
 {
