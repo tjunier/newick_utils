@@ -21,3 +21,6 @@ ltmain.sh
 missing
 mkinstalldirs
 ylwrap
+Doxyfile
+html
+latex
