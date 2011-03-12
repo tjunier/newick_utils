@@ -175,7 +175,9 @@ int init_lbl2num(struct rooted_tree *tree)
 	return SUCCESS;
 }
 
-// TODO: shouldn't this call node_set_union() ?
+/* This could also be done with node_set_union(), but it's easier to write with
+ * 'result' as an accumulator. */
+
 node_set union_of_child_node_sets(struct rnode *node)
 {
 	node_set result = create_node_set(num_leaves);
