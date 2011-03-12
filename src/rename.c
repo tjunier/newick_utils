@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, rename_map, params);
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	struct llist *keys = hash_keys(rename_map);

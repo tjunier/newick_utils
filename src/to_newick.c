@@ -38,10 +38,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "rnode_iterator.h"
 #include "hash.h"
+#include "masprintf.h"
 
 static bool show_addresses = false;
 
-// TODO: make all functions static unless needed otherwise
+/* When show_addresses is true, the node's addresses appear in the Newick
+ * string, which can be quite handy for debugging. */
 
 void set_show_addresses(bool show) { show_addresses = show; }
 
@@ -118,6 +120,85 @@ char *to_newick(struct rnode *node)
 	return result;
 }
 
+/* A helper function for to_newick_i(). Appends to 'result' strings
+ * representing a leaf. */
+/* Return value indicates SUCCESS or FAILURE. */
+
+static int append_leaf(struct llist *result, struct rnode *current)
+{
+	append_element(result, strdup(current->label));
+	if (show_addresses) 
+		if (! append_element(result, masprintf("@%p", current)))
+			return FAILURE;
+	if (strcmp("", current->edge_length_as_string) != 0) {
+		if (! append_element(result, strdup(":")))
+			return FAILURE;
+		if (! append_element(result,
+			strdup(current->edge_length_as_string)))
+			return FAILURE;
+	}
+
+	return SUCCESS;
+}
+
+/* A helper function for to_newick_i(). Appends to 'result' strings
+ * representing the end of an inner node. This always contains a ')', and may
+ * also contain a label and a length (plus the node's address, if
+ * show_addresses is true.) */
+/* Also, takes care of resetting the 'seen' member of the node. */
+/* Return value indicates SUCCESS or FAILURE. */
+
+static int append_inner_node_end(struct llist *result,
+		struct rnode *current)
+{
+	if (! append_element(result, strdup(")")))
+		return FAILURE;
+	if (strcmp("", current->label) != 0)
+		if (! append_element(result, strdup(current->label)))
+			return FAILURE;
+	if (show_addresses) 
+		if (! append_element( result, masprintf("@%p", current)))
+			return FAILURE;
+	if (strcmp("", current->edge_length_as_string) != 0) {
+		if (! append_element(result, strdup(":")))
+			return FAILURE;
+		if (! append_element(result,
+				strdup(current->edge_length_as_string)))
+			return FAILURE;
+	}
+	current->seen = 0;	/* reset */
+
+	return SUCCESS;
+}
+
+/* A helper function for to_newick_i(). Appends to 'result' strings
+ * representing an inner node. */
+/* Return value indicates SUCCESS or FAILURE. */
+
+static int append_inner_node(struct rnode_iterator *it,
+		struct llist *result, struct rnode *current)
+{
+	/* inner node: behaviour depends on whether we've
+	 * already 'seen' this node or not. */
+	if (0 == current->seen) {
+		/* not seen: print '(' */
+		current->seen = 1;
+		if (! append_element(result, strdup("(")))
+			return FAILURE;
+	} else {
+		if (more_children_to_visit(it)) {
+			if (! append_element(result, strdup(",")))
+				return FAILURE;
+		}
+		else 
+			/* append ')' and possibly label and lenth */
+			if (! append_inner_node_end(result, current))
+				return FAILURE;
+	}
+
+	return SUCCESS;
+}
+
 struct llist *to_newick_i(struct rnode *node)
 {
 	struct rnode_iterator *it;
@@ -125,65 +206,26 @@ struct llist *to_newick_i(struct rnode *node)
 	struct llist *result = create_llist();
 
 	it = create_rnode_iterator(node);
-	if (NULL == it) {
-		// TODO: set error msg, or sthg
-		return NULL;
-	}
+	if (NULL == it) return NULL;
 	
 	it->root->seen = 1;
 
 	if (! is_leaf(it->root))
-		append_element(result, strdup("("));
+		if (! append_element(result, strdup("(")))
+			return NULL;
 
 	while ((current = rnode_iterator_next(it)) != NULL) {
 		if (is_leaf(current)) {
-			/* leaf: just print label */
-			append_element(result, strdup(current->label));
-			if (show_addresses) 
-				append_element(result, masprintf("@%p", current));
-			if (strcmp("", current->edge_length_as_string) != 0) {
-				append_element(result, strdup(":"));
-				append_element(result,
-					strdup(current->edge_length_as_string));
-			}
+			if (! append_leaf(result, current))
+				return NULL;
 		}
 		else {
-			/* inner node: behaviour depends on whether we've
-			 * already 'seen' this node or not. */
-			if (0 == current->seen) {
-				/* not seen: print '(' */
-				current->seen = 1;
-				append_element(result, strdup("("));
-			} else {
-				if (more_children_to_visit(it)) {
-					append_element(result, strdup(","));
-				}
-				else {
-					//printf(")%s", current->label);
-					append_element(result, strdup(")"));
-					if (strcmp("", current->label) != 0)
-						append_element(result,
-							strdup(current->label));
-					if (show_addresses) 
-						append_element(
-							result,
-							masprintf("@%p",
-								current));
-					if (strcmp("",
-						current->edge_length_as_string) != 0) {
-						//printf(":%s", current->edge_length_as_string);
-						append_element(result,
-								strdup(":"));
-						append_element(result,
-								strdup(current->edge_length_as_string));
-					}
-					current->seen = 0;	/* reset */
-				}
-			}
+			if (! append_inner_node(it, result, current))
+				return NULL;
 		}
 	}
-	//printf(";\n");
-	append_element(result, strdup(";"));
+	if (! append_element(result, strdup(";")))
+		return NULL;
 
 	destroy_rnode_iterator(it);
 

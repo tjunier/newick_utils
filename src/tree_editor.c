@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "parser.h"
 #include "to_newick.h"
 #include "address_parser.h"
+#include "address_parser_status.h"
 #include "tree_editor_rnode_data.h"
 #include "common.h"
 
@@ -400,10 +401,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		if (eval_enode(expression_root)) {
 			switch (params.action) {
 			case ACTION_SUBTREE:
-				// TODO: try to replace by dump_newick()
-				newick = to_newick(current);
-				printf("%s\n", newick);
-				free(newick);
+				dump_newick(current);
 				break;
 			case ACTION_SPLICE_OUT:
 				if (is_inner_node(current)) {
@@ -467,11 +465,21 @@ int main(int argc, char* argv[])
 	struct rooted_tree *tree;
 
 	address_scanner_set_input(params.address);
-	// TODO: have adsparse() set an error code to distinguish the various
-	// causes of NULL (e.g., syntax error and memory error)
 	adsparse(); /* sets 'expression_root' */ 
 	if (NULL == expression_root) {
-		fprintf (stderr, "Could not parse address.\n");
+		switch (address_parser_status) {
+			/* NOTE: for now the parser does not report parse
+			 * errors, but when (or if...) it does, it will use
+			 * this constant. */
+		case ADDRESS_PARSER_PARSE_ERROR:
+			fprintf (stderr, "Could not parse address.\n");
+			break;
+		case ADDRESS_PARSER_MALLOC_ERROR:
+			perror(NULL);
+			break;
+		default:
+			assert(0);	/* programmer error */
+		}
 		exit(EXIT_FAILURE);
 	}
 	address_scanner_clear_input();
@@ -481,7 +489,7 @@ int main(int argc, char* argv[])
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	return 0;

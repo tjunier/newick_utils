@@ -244,16 +244,6 @@ void compute_bipartitions(struct rooted_tree *tree)
 	}
 }
 
-void empty_data(struct rooted_tree *tree)
-{
-	struct list_elem *el;
-
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *current = (struct rnode *) el->data;
-		free(current->data);
-	}
-}
-
 int process_tree(struct rooted_tree *tree)
 {
 	if (NULL == lbl2num) { /* first tree */
@@ -263,8 +253,7 @@ int process_tree(struct rooted_tree *tree)
 		if (NULL == bipart_counts) return FAILURE;
 	}
 	compute_bipartitions(tree);
-	empty_data(tree);
-	destroy_tree(tree, DONT_FREE_NODE_DATA);
+	destroy_tree(tree, NULL);
 
 	return SUCCESS;
 }
@@ -404,7 +393,7 @@ int main(int argc, char *argv[])
 		printf ("%s\n", newick);
 		free(newick);
 		if (params.show_label_numbers) show_label_numbers();
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	fclose(params.target_tree_file);

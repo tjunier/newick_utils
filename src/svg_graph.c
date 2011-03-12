@@ -71,11 +71,10 @@ struct ornament_map_element {
 	struct llist *labels;
 };
 
-// TODO: #define as constants in svg_graph_common.h ?
 char *leaf_label_class = "leaf-label";
 char *inner_label_class = "inner-label";
 
-int init_done = FALSE;
+static int init_done = FALSE;
 
 /************************** external variables *****************************/
 
@@ -98,7 +97,7 @@ static struct llist *ornament_map = NULL;
 int scale_bar_height = 30;	/* px */
 struct hash *url_map = NULL;
 int graph_width = -1;
-int svg_whole_v_shift = -1; 	/* Vertical translation of whole graph */
+int whole_v_shift = -1; 	/* Vertical translation of whole graph */
 double label_char_width = -1;
 enum inner_lbl_pos inner_label_pos = -1;
 bool scalebar_zero_at_root = true;
@@ -109,31 +108,28 @@ int label_space = 10;
  * much OO... I also provide setters for the nonstatic ones, so the interface
  * is more homogeneous. */
 
-void set_svg_width(int width) { graph_width = width; }
-void set_svg_whole_v_shift(int shift) { svg_whole_v_shift = shift; }
-void set_svg_style(int style) { graph_style = style; }
-void set_svg_URL_map_file(FILE * map) { url_map_file = map; }
-void set_svg_CSS_map_file(FILE * map) { css_map_file = map; }
-void set_svg_ornament_map_file(FILE * map) { ornament_map_file = map; }
-void set_svg_leaf_label_style(char *style) { leaf_label_style = style; }
-void set_svg_inner_label_style(char *style) { inner_label_style = style; }
-void set_svg_inner_label_pos(enum inner_lbl_pos pos) { inner_label_pos = pos; }
-void set_svg_edge_label_style(char *style) { edge_label_style = style; }
-void set_svg_plain_node_style(char *style) { plain_node_style = style; }
-void set_svg_label_char_width(double width) { label_char_width = width; }
-void set_svg_scalebar_zero_at_root(bool at_root) { scalebar_zero_at_root = at_root; }
-void add_to_svg_label_space(int correction) { label_space += correction; }
+void set_width(int width) { graph_width = width; }
+void set_whole_v_shift(int shift) { whole_v_shift = shift; }
+void set_style(int style) { graph_style = style; }
+void set_URL_map_file(FILE * map) { url_map_file = map; }
+void set_CSS_map_file(FILE * map) { css_map_file = map; }
+void set_ornament_map_file(FILE * map) { ornament_map_file = map; }
+void set_leaf_label_style(char *style) { leaf_label_style = style; }
+void set_inner_label_style(char *style) { inner_label_style = style; }
+void set_inner_label_pos(enum inner_lbl_pos pos) { inner_label_pos = pos; }
+void set_edge_label_style(char *style) { edge_label_style = style; }
+void set_plain_node_style(char *style) { plain_node_style = style; }
+void set_label_char_width(double width) { label_char_width = width; }
+void set_scalebar_zero_at_root(bool at_root) { scalebar_zero_at_root = at_root; }
+void add_to_label_space(int correction) { label_space += correction; }
 
 /************************** functions *****************************/
 
-void svg_CSS_stylesheet()
+static void svg_CSS_stylesheet()
 {
 	struct list_elem *el;
 
 	printf ("<defs><style type='text/css'><![CDATA[\n");
-	/* The default clade style is specified in this file rather than in the
-	 * client code (TODO: try to get all defaults in the same place, or
-	 * explain why not), so we print the style only if not NULL */
 	if (NULL != plain_node_style)
 		printf (" .clade_0 {%s}\n", plain_node_style);
 	if (css_map) {
@@ -149,36 +145,6 @@ void svg_CSS_stylesheet()
 	printf ("]]></style></defs>");
 }
 
-/* Prints the SVG header. The first argument is the tree's number of leaves,
- * needed to compute height for orthogonal trees; the second argument is a
- * boolean that is true IFF we show a scale bar. */
-
-void svg_header(int nb_leaves, int with_scale_bar)
-{
-	int height;
-
-	switch (graph_style) {
-		case SVG_ORTHOGONAL:
-			/* image fits in a rectangle, so height != width */
-			height = graph_height(nb_leaves, with_scale_bar);
-			break;
-		case SVG_RADIAL:
-			/* image fits in a square, so height == width */
-			height = graph_width;
-			break;
-		default:
-			assert(0);
-	}
-
-	printf( "<?xml version='1.0' standalone='no'?>"
-	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
-		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
-	printf( "<svg width='%d' height='%d' version='1.1' "
-		"xmlns='http://www.w3.org/2000/svg' "
-		"xmlns:xlink='http://www.w3.org/1999/xlink' >",
-		graph_width, height);
-	svg_CSS_stylesheet();
-}
 
 /* A helper function for read_css_map(). Given a 'type' string (read from the
  * CSS style file), returns the appropriate type as an integer, or UNKNOWN if
@@ -215,8 +181,7 @@ static int get_group_type(const char *type)
  * labels (if the type is CLADE) or to all individual nodes in the list (if the
  * style is INDIVIDUAL). */
 
-// return checked
-struct llist *read_css_map()
+static struct llist *read_css_map()
 {
 	/* Most errors are memory errors (but see below) */
 	set_last_error_code(ERR_NOMEM);
@@ -295,8 +260,7 @@ struct llist *read_css_map()
 /* Builds an ornament map structure. This is like the CSS map, but for
  * ornaments. Also returns NULL on error. */
 
-// return checked
-struct llist *read_ornament_map()
+static struct llist *read_ornament_map()
 {
 	/* As for read_css_map() */
 	set_last_error_code(ERR_NOMEM);
@@ -377,7 +341,7 @@ struct llist *read_ornament_map()
 
 /* Reads in the URL map (label -> URL), returns NULL on error. */
 
-struct hash *read_url_map()
+static struct hash *read_url_map()
 {
 	/* As for read_css_map() */
 	set_last_error_code(ERR_NOMEM);
@@ -445,31 +409,6 @@ struct hash *read_url_map()
  * to put it inside display_svg_tree(): it is kept separate because its job is
  * not directly to draw trees*/
 
-int svg_init()
-{
-	if (NULL != css_map_file) {
-		css_map = read_css_map();
-		if (NULL == css_map)
-			return FAILURE;
-	}
-	if (NULL != ornament_map_file) {
-		ornament_map = read_ornament_map();
-		if (NULL == ornament_map)
-			return FAILURE;
-	}
-	if (NULL != url_map_file) {
-		url_map = read_url_map();
-		if (NULL == url_map)
-			return FAILURE;
-	}
-	init_done = 1;
-
-	return SUCCESS;
-}
-
-/* Passed to dump_llist() for labels */
-void dump_label (void *lbl) { puts((char *) lbl); }
-
 /* Attributes group numbers to nodes, based on the CSS style map (if one was
  * supplied - see read_css_map() and svg_CSS_stylesheet() ). The group number
  * will translate directly into 'class' attributes in SVG, which in turn will
@@ -480,7 +419,7 @@ void dump_label (void *lbl) { puts((char *) lbl); }
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
-int set_group_numbers(struct rooted_tree *tree)
+static int set_group_numbers(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
 	struct css_map_element *css_el;
@@ -495,11 +434,6 @@ int set_group_numbers(struct rooted_tree *tree)
 		if (CLADE != css_el->group_type) continue;
 		struct llist *labels = css_el->labels;
 		struct rnode *lca = lca_from_labels_multi(tree, labels);
-		// TODO: lca_from_labels_multi() needs to distinguish NULL
-		// values due to a real, irrecoverable  problem (e.g., memory)
-		// from NULLs due to no labels found (which only prevents
-		// coloring but does not mean we have to abort).
-		// Use functions in error.h
 		if (NULL == lca) {
 			enum error_codes err = get_last_error_code();
 			switch (err) {
@@ -521,10 +455,10 @@ int set_group_numbers(struct rooted_tree *tree)
 	struct llist *nodes_in_reverse_order;
 	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
 	if (NULL == nodes_in_reverse_order) return FAILURE;
-	struct list_elem *el; /* TODO: can't I reuse elem from above? */
-	el = nodes_in_reverse_order->head->next;	/* skip root */
-	for (;  NULL != el; el = el->next) {
-		struct rnode *node = el->data;
+
+	elem = nodes_in_reverse_order->head->next;	/* skip root */
+	for (;  NULL != elem; elem = elem->next) {
+		struct rnode *node = elem->data;
 		struct svg_data *node_data = node->data;
 		struct rnode *parent = node->parent;
 		struct svg_data *parent_data = parent->data;
@@ -542,7 +476,6 @@ int set_group_numbers(struct rooted_tree *tree)
 	 * All of these nodes get the map element's number (cf above, in which
 	 * te LCA gets the number, which is then propagated to all descendants)
 	 * */
-	// TODO: think of making the label2node map a member of the tree structure.
 	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
 	if (NULL == map) return FAILURE;
 	for (elem = css_map->head; NULL != elem; elem = elem->next) {
@@ -553,6 +486,7 @@ int set_group_numbers(struct rooted_tree *tree)
 		if (NULL == group_nodes) return FAILURE; 
 		/* Iterate over all labels of this element, adding the
 		 * corresponding nodes to 'group_nodes' */
+		struct list_elem *el;
 		for (el = labels->head; NULL != el; el = el->next) {
 			char *label = el->data;
 			struct llist *nodes_of_label;
@@ -591,7 +525,7 @@ int set_group_numbers(struct rooted_tree *tree)
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
-int set_ornaments(struct rooted_tree *tree)
+static int set_ornaments(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
 	struct ornament_map_element *oel;
@@ -614,7 +548,6 @@ int set_ornaments(struct rooted_tree *tree)
 	 * contain a list of labels. Each label is matched by at least 1 node.
 	 * All of these nodes get the ornament. */
 
-	// TODO: think of making the label2node map a member of the tree structure.
 	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
 	if (NULL == map) return FAILURE;
 	for (elem = ornament_map->head; NULL != elem; elem = elem->next) {
@@ -660,7 +593,7 @@ int set_ornaments(struct rooted_tree *tree)
  * svg_set_node_top(), etc) */
 /* Returns FAILURE IFF there is any problem (malloc(), in this case) */
 
-int svg_alloc_node_pos(struct rooted_tree *tree) 
+static int svg_alloc_node_pos(struct rooted_tree *tree) 
 {
 	struct list_elem *le;
 	struct rnode *node;
@@ -677,32 +610,32 @@ int svg_alloc_node_pos(struct rooted_tree *tree)
 	return SUCCESS;
 }
 
-void svg_set_node_top (struct rnode *node, double top)
+static void svg_set_node_top (struct rnode *node, double top)
 {
 	((struct svg_data *) node->data)->top = top;
 }
 
-void svg_set_node_bottom (struct rnode *node, double bottom)
+static void svg_set_node_bottom (struct rnode *node, double bottom)
 {
 	((struct svg_data *) node->data)->bottom = bottom;
 }
 
-double svg_get_node_top (struct rnode *node)
+static double svg_get_node_top (struct rnode *node)
 {
 	return ((struct svg_data *) node->data)->top;
 }
 
-double svg_get_node_bottom (struct rnode *node)
+static double svg_get_node_bottom (struct rnode *node)
 {
 	return ((struct svg_data *) node->data)->bottom;
 }
 
-void svg_set_node_depth (struct rnode *node, double depth)
+static void svg_set_node_depth (struct rnode *node, double depth)
 {
 	((struct svg_data *) node->data)->depth = depth;
 }
 
-double svg_get_node_depth (struct rnode *node)
+static double svg_get_node_depth (struct rnode *node)
 {
 	return ((struct svg_data *) node->data)->depth;
 }
@@ -729,11 +662,64 @@ void draw_grid()
 	printf ("</g>");
 }
 
+int svg_init()
+{
+	if (NULL != css_map_file) {
+		css_map = read_css_map();
+		if (NULL == css_map)
+			return FAILURE;
+	}
+	if (NULL != ornament_map_file) {
+		ornament_map = read_ornament_map();
+		if (NULL == ornament_map)
+			return FAILURE;
+	}
+	if (NULL != url_map_file) {
+		url_map = read_url_map();
+		if (NULL == url_map)
+			return FAILURE;
+	}
+	init_done = 1;
+
+	return SUCCESS;
+}
+
+/* Prints the SVG header. The first argument is the tree's number of leaves,
+ * needed to compute height for orthogonal trees; the second argument is a
+ * boolean that is true IFF we show a scale bar. */
+
+void svg_header(int nb_leaves, int with_scale_bar)
+{
+	int height;
+
+	switch (graph_style) {
+		case SVG_ORTHOGONAL:
+			/* image fits in a rectangle, so height != width */
+			height = graph_height(nb_leaves, with_scale_bar);
+			break;
+		case SVG_RADIAL:
+			/* image fits in a square, so height == width */
+			height = graph_width;
+			break;
+		default:
+			assert(0);
+	}
+
+	printf( "<?xml version='1.0' standalone='no'?>"
+	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
+		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
+	printf( "<svg width='%d' height='%d' version='1.1' "
+		"xmlns='http://www.w3.org/2000/svg' "
+		"xmlns:xlink='http://www.w3.org/1999/xlink' >",
+		graph_width, height);
+	svg_CSS_stylesheet();
+}
+
+
 /* Draws a scale bar below the tree. Uses a heuristic to manage horizontal
  * space */
 
-// TODO: first two args should both be double
-void draw_scale_bar(int hpos, double vpos,
+void draw_scale_bar(double hpos, double vpos,
 		double h_scale, double d_max, char *branch_length_unit)
 {
 	/* Finds the largest power of 10 that is smaller than d_max (which
@@ -747,7 +733,7 @@ void draw_scale_bar(int hpos, double vpos,
 	const double interval = tick_interval(d_max);	/* user units */
 	const int lbl_vspace = 2;			/* px */
 	const int lbl_hspace = 2;			/* px */
-	printf ("<g transform='translate(%d,%g)' style='stroke:black;stroke-width:1' >", hpos, vpos); 
+	printf ("<g transform='translate(%g,%g)' style='stroke:black;stroke-width:1' >", hpos, vpos); 
 	printf ("<path d='M 0 0 h %g'/>", h_scale * d_max);  
 
 	if (scalebar_zero_at_root) {
@@ -824,9 +810,9 @@ enum display_status display_svg_tree(
 
 void svg_footer() { printf ("</svg>\n"); }
 
-void destroy_svg_node_data (struct rnode *node)
+void destroy_svg_node_data (void *node_data)
 {
-	struct svg_data *data = node->data;
+	struct svg_data *data = (struct svg_data*) node_data;
 	if (NULL != data) {
 		if (NULL != data->ornament)
 			free(data->ornament);

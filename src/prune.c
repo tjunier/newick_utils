@@ -254,9 +254,9 @@ int main(int argc, char *argv[])
 			process_tree(tree, params.labels);
 		}
 		dump_newick(tree->root);
-		/* NOTE: the tree was modified, but no nodes were added so it
-		 * should be possible to use destroy_tree() */
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+		/* NOTE: the tree was modified, but no nodes were added so 
+		 * we can use destroy_tree() */
+		destroy_tree(tree, NULL);
 	}
 
 	destroy_llist(params.labels);

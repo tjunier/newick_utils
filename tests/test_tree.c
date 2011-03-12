@@ -139,57 +139,6 @@ int test_get_leaf_labels()
 
 }
 
-int test_get_labels()
-{
-	const char *test_name = "test_get_labels";
-	struct rooted_tree tree = tree_7();	/* ((A:1,:1.0)f:2.0,(C:1,(D:1,E:1):2)h:3)i; */
-	struct llist *labels = get_labels(&tree);
-	struct list_elem *el = labels->head;
-	if (strcmp("A", (char *) el->data) != 0) {
-		printf ("%s: expected label 'A', got '%s'.\n", test_name, (char *) el->data);
-		return 1;
-	}
-	el = el->next;
-	if (strcmp("f", (char *) el->data) != 0) {
-		printf ("%s: expected label 'f', got '%s'.\n", test_name, (char *) el->data);
-		return 1;
-	}
-	el = el->next;
-	if (strcmp("C", (char *) el->data) != 0) {
-		printf ("%s: expected label 'C', got '%s'.\n", test_name, (char *) el->data);
-		return 1;
-	}
-	el = el->next;
-	if (strcmp("D", (char *) el->data) != 0) {
-		printf ("%s: expected label 'D', got '%s'.\n", test_name, (char *) el->data);
-		return 1;
-	}
-	el = el->next;
-	if (strcmp("E", (char *) el->data) != 0) {
-		printf ("%s: expected label 'E', got '%s'.\n", test_name, (char *) el->data);
-		return 1;
-	}
-	el = el->next;
-	if (strcmp("h", (char *) el->data) != 0) {
-		printf ("%s: expected label 'h', got '%s'.\n", test_name, (char *) el->data);
-		return 1;
-	}
-	el = el->next;
-	if (strcmp("i", (char *) el->data) != 0) {
-		printf ("%s: expected label 'i', got '%s'.\n", test_name, (char *) el->data);
-		return 1;
-	}
-	el = el->next;
-	if (NULL != el) {
-		printf ("%s: expected end of list.\n", test_name);
-		return 1;
-	}
-
-	printf ("%s: ok.\n", test_name);
-	return 0;
-
-}
-
 int test_get_type()
 {
 	const char *test_name = "test_get_tree_type()";
@@ -367,80 +316,6 @@ int test_nodes_from_regexp()
 	return 0;
 }
 
-int test_clone_subtree()
-{
-	const char *test_name = "test_clone_subtree";
-	/* ((HRV_A1:1,HRV_A2:1.0)HRV_A:2.0,(HRV_C:1,(HRV_B1:1,HRV_B2:1)HRV_B:2):3)HRV; */
-	struct rooted_tree tree = tree_8();
-	struct rooted_tree *clone = clone_subtree(tree.root);
-
-	char *orig_newick = to_newick(tree.root);
-	char *clone_newick = to_newick(clone->root);
-
-	struct list_elem *orig_el, *clone_el;
-	struct rnode *orig_node, *clone_node;
-
-	if (strcmp(orig_newick, clone_newick) != 0) {
-		printf ("%s: Newick strings are different ('%s' != '%s').\n",
-				test_name, orig_newick, clone_newick);
-		return 1;
-	}
-
-	/* Check all nodes */
-	for (orig_el = tree.nodes_in_order->head,
-			clone_el = clone->nodes_in_order->head;
-			NULL != orig_el;
-			orig_el = orig_el->next, clone_el = clone_el->next) {
-		orig_node = orig_el->data;
-		clone_node = clone_el->data;
-		if (orig_node == clone_node) {
-			printf ("%s: nodes %p and %p are the same object.\n",
-					test_name, orig_node, clone_node);
-			return 1;
-		}
-		if (strcmp(orig_node->label, clone_node->label) != 0) {
-			printf ("%s: nodes have different labels ('%s'"
-					" vs '%s')\n",
-				test_name, orig_node->label, clone_node->label);
-			return 1;
-		}
-		if (NULL == orig_node->parent) {
-			if (NULL != clone_node->parent) {
-				printf ("%s: original's parent is NULL,"
-					" but clone's is not (%p).\n",
-					test_name, clone_node->parent);
-				return 1;
-			}
-		}
-		else {
-			if (orig_node->parent == clone_node->parent) {
-				printf ("%s: parent edges are non-NULL yet "
-					"identical (%p, %p).\n", test_name,
-					orig_node->parent,
-					clone_node->parent);
-				return 1;
-			}
-			if (strcmp(orig_node->edge_length_as_string,
-				   clone_node->edge_length_as_string)
-				!= 0) {
-				printf ("%s: parent edges have different "
-					"lengths (%s, %s)\n", test_name,
-					orig_node->edge_length_as_string,
-					clone_node->edge_length_as_string);
-				return 1;
-			}
-		}
-	}
-	if (NULL != clone_el) {
-		printf ("%s: clone's children list is not terminated.\n",
-				test_name);
-		return 1;
-	}
-
-	printf ("%s: ok.\n", test_name);
-	return 0;
-}
-
 int main()
 {
 	int failures = 0;
@@ -450,12 +325,10 @@ int main()
 	failures += test_collapse_pure_clades();
 	failures += test_leaf_count();
 	failures += test_get_leaf_labels();
-	failures += test_get_labels();
 	failures += test_get_type();
 	failures += test_is_cladogram();
 	failures += test_nodes_from_labels();
 	failures += test_nodes_from_regexp();
-	failures += test_clone_subtree();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

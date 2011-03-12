@@ -81,7 +81,9 @@ fi
 # name>.exp .
 
 pass=TRUE
-grep -v '^#' < $args_file | while IFS=':' read name args ; do
+while IFS=':' read name args ; do
+	# if first word starts with '#', discard (comment)
+	echo $name | grep '^#' > /dev/null && continue
 	# setting IFS to '' preserves whitespace through shell word splitting
 	check_applies $name
 	if [ "$?" -eq "0" ] ; then
@@ -102,7 +104,7 @@ grep -v '^#' < $args_file | while IFS=':' read name args ; do
 		pass=FALSE
 		break
 	fi
-done
+done < $args_file
 
 if test $pass = FALSE ; then
 	exit 1

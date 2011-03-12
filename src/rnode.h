@@ -64,8 +64,7 @@ struct rnode {
 struct rnode *create_rnode(char *label, char *length_as_string);
 
 /* Destroys the rnode, including the parent edge (if any). If free_data is not
- * NULL, it is called to free the node's data TODO: this should be used in
- destroy_tree_cb - check.*/
+ * NULL, it is called to free the node's data */
 
 void destroy_rnode(struct rnode *node, void (*free_data)(void*));
 

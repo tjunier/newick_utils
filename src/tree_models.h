@@ -49,8 +49,8 @@ int time_limited_tree(double branch_termination_rate, double duration);
  * 'alt_random' parameter is used (if > 0) for testing the function by
  * supplying a known "random" value */
  /* If the function fails for some reason (e.g. no RAM left), it returns -1 */
+/* NOTE: we keep this function public so it can be tested (directly) */
 
-// TODO: why is this function public?
 double tlt_grow_node(struct rnode *, double branch_termination_rate,
 		double alt_random);
 

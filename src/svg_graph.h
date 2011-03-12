@@ -30,8 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdbool.h>
 
-enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
+/* Interface of svg_graph.c: functions used for drawing SVG trees. */
 
+enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
 
 /* Functions for displaying a tree as SVG. This is the visible interface for
  * client code such as display.c User should call any of the set_svg_*()
@@ -42,14 +43,14 @@ struct rooted_tree;
 
 /* The following are for setting parameters for the SVG job. */
 
-void set_svg_width(int);
-void set_svg_leaf_vskip(double);
-void set_svg_whole_v_shift(int);
-void set_svg_style(int);
-void set_svg_URL_map_file(FILE *);
-void set_svg_label_angle_correction(double);
-void set_svg_left_label_angle_correction(double);
-void set_svg_scalebar_zero_at_root(bool);
+void set_width(int);
+void set_leaf_vskip(double);
+void set_whole_v_shift(int);
+void set_style(int);
+void set_URL_map_file(FILE *);
+void set_label_angle_correction(double);
+void set_left_label_angle_correction(double);
+void set_scalebar_zero_at_root(bool);
 
 /* Call this before calling svg_header(), etc, but _after_ the set_svg*()
  * functions. It will launch the initializations liek reading the color map,
@@ -65,13 +66,16 @@ void svg_header();
 /* Writes a tree into a <g> object. If 'align_leaves' is true, the leaves will
  * be aligned (use this for cladograms). If 'with_scale_bar' is true, a sclae
  * bar will be drawn. The string 'branch_length_unit' is used as a label in the
- * scale bar (e.g., "substitutions/site"). TODO: pass 'style', where 'style' is
- * either SVG_ORTHOGONAL or SVG_RADIAL. */
-/* Returns SUCCESS unless there was any problem. */
+ * scale bar (e.g., "substitutions/site"). */
 
-enum display_status display_svg_tree(struct rooted_tree *, int align_leaves,
+enum display_status display_svg_tree(struct rooted_tree *,
+		enum graph_style style, int align_leaves,
 		int with_scale_bar, char *branch_length_unit);
 
 /* Writes an SVG footer */
 
 void svg_footer();
+
+/* Pass this as a callback to destroy_tree */
+
+void destroy_svg_node_data(void *);

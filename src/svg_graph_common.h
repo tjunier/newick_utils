@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/* Declarations used by all SVG modules, but not intended for client code. */
+/* Declarations used by SVG code, but not restricted to a single module. */
 
 #define ROOT_SPACE 10			/* pixels */
 #define LBL_VOFFSET 4			/* pixels */
@@ -41,7 +41,7 @@ extern struct hash *url_map;
 extern char *leaf_label_class;
 extern char *inner_label_class;
 extern int graph_width;
-extern int svg_whole_v_shift; 
+extern int whole_v_shift; 
 extern double label_char_width;
 extern int scale_bar_height;
 extern int label_space;
@@ -64,23 +64,20 @@ enum inner_lbl_pos;
 
 /* The following are setters, their function should be obvious */
 
-void set_svg_CSS_map_file(FILE *);
-void set_svg_ornament_map_file(FILE *);
-void set_svg_leaf_label_style(char *);
-void set_svg_inner_label_style(char *);
-void set_svg_inner_label_pos(enum inner_lbl_pos);
-void set_svg_edge_label_style(char *);
-void set_svg_plain_node_style(char *);
-void set_svg_root_length(int);
-void set_svg_label_char_width(double);
-void add_to_svg_label_space(int);
+void set_CSS_map_file(FILE *);
+void set_ornament_map_file(FILE *);
+void set_leaf_label_style(char *);
+void set_inner_label_style(char *);
+void set_inner_label_pos(enum inner_lbl_pos);
+void set_edge_label_style(char *);
+void set_plain_node_style(char *);
+void set_root_length(int);
+void set_label_char_width(double);
+void add_to_label_space(int);
 
 /* Returns the largest power of ten not greater than argument */
-
+// TODO: doesn't text_graph also use this?
 double largest_PoT_lte(double);
 
-void draw_scale_bar(int, double, double, double, char *);
+void draw_scale_bar(double, double, double, double, char *);
 
-/* Pass this as a callback to destroy_tree_cb */
-
-void destroy_svg_node_data(struct rnode *);
