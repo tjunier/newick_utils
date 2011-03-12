@@ -38,6 +38,9 @@ struct rooted_tree;
 
 enum ns_return {NS_OK, NS_DUP_LABEL, NS_EMPTY_LABEL, NS_MEM_ERROR};
 
+/* I rarely use typedefs, but in this case I think it makes f() signatures
+ * easier to read. */
+
 typedef char* node_set;
 
 /* Creates a node_set for 'node_count' nodes. */
