@@ -48,7 +48,10 @@ extern int label_space;
 
 /* rnode data for SVG trees */
 
-// TODO: URLs should be passed through the node, too.
+/* URLs could be passed through the node, too; but AFAIK clickable trees are
+ * relatively rarely used, so if we add a member to this structure it will most
+ * often not be used. And even then, it is not clear that all nodes in the tree
+ * will have URLs. So the current map-based approach seems best here. */
 
 struct svg_data {
 	double top;
@@ -76,7 +79,7 @@ void set_label_char_width(double);
 void add_to_label_space(int);
 
 /* Returns the largest power of ten not greater than argument */
-// TODO: doesn't text_graph also use this?
+
 double largest_PoT_lte(double);
 
 void draw_scale_bar(double, double, double, double, char *);
