@@ -229,7 +229,8 @@ struct parameters get_params(int argc, char *argv[])
 }
 
 // TODO: 
-//  o this f() should be a library f()
+//  o this f() should be a library f() -- refactor as follows: app code (this file) becomes clade.c (more consistent with binary being called nw_clade, anyway); new lib file subtree.c, with header subtree.h (currently only is_monophyletic()), finally add a test_subtree program.
+//
 //  o it should return codes for: yes, no, error
 int is_monophyletic(struct llist *descendants, struct rnode *subtree_root)
 {
