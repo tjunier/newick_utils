@@ -276,7 +276,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 
 	if (NULL != subtree_root) {
 		if ((! params.check_monophyly) ||
-		    (is_monophyletic(descendants, subtree_root))) {
+		    (MONOPH_TRUE == is_monophyletic(descendants, subtree_root))) {
 			/* monophyly of input labels is verified or not
 			 * requested */
 			char *newick;
