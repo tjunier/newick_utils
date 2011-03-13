@@ -24,7 +24,7 @@ int test_is_monophyletic()
 	add_child(node_e, node_a);
 	add_child(node_e, node_d);
 
-	append_element(descendants, node_a);
+	append_element(descendants, node_c);
 
 	// TODO: test w/ empty list
 
