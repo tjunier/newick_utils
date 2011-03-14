@@ -18,6 +18,8 @@ matching nodes); finally there could be regexp matching. And of
 course, this would all be lazy: the map would be NULL at first, and only
 computed if needed.
 
+general: use (i.e., check) the parser status values defined in parser.h
+
 general: make all functions static unless needed otherwise
 
 general: check that all source files contain the BSD license.
