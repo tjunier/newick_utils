@@ -652,7 +652,6 @@ static SCM scm_set_current_node_label(SCM label)
  * (begin, begin-tree, end, end-tree) or something else. The lists are returned
  * as an alist keyed by this symbol (or by 'within-tree'). */ 
 
-// TODO: only the within-tree code list should keep the clauses. The other ones are not needed. Do e.g. (cons (cadr test) start-code) instead of (const test start-code) , etc. */
 static SCM define_partition_code()
 {
 	return scm_c_eval_string(
@@ -823,8 +822,6 @@ static void process_tree(struct rooted_tree *tree, SCM test_list,
 	struct list_elem *el;
 
 	/* these two traversals fill the node data. */
-	// TODO: would gain time by only performing those traversals that are
-	// needed
 	reverse_parse_order_traversal(tree);
 	parse_order_traversal(tree);
 
