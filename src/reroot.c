@@ -276,27 +276,44 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 {
 	struct llist *result = create_llist();
 	if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
+	struct hash *excluded_lbl_hash = create_hash(excluded_labels->count);
+	if (NULL == excluded_lbl_hash) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *el;
 
+	/* Make a hash with all excluded labels. */
+	for (el = excluded_labels->head; NULL != el; el = el->next)  {
+		if (! hash_set(excluded_lbl_hash, 
+					(char *) el->data,
+					(void *) "member")) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+	}
+
 	/* add nodes to result iff i) node is a leaf, ii) node's label is not
-	 * among 'excluded_labels' */ 
+	 * among 'excluded_lbl_hash' */ 
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = (struct rnode *) el->data;
 		if (is_leaf(current)) {
-			/* Can't use llist_index_of(), because it compares the
-			 * addresses of the 'data' members of elements. Instead
-			 * we must check string equality, which is why we use
-			 * llist_index_of_f(), and pass it string_eq(). */
-			if (llist_index_of_f(excluded_labels, string_eq,
-						current->label) == -1) 
+			bool add = false;
+			if (strcmp ("", current->label) == 0)
+				add = true;	
+			else  {
+				if (NULL == hash_get(excluded_lbl_hash,
+						current->label))
+					add = true;
+			}
+			if (add) {
 				if (! append_element(result, current)) {
 					perror(NULL);
 					exit(EXIT_FAILURE);
 				}
+			}
 			
 		}
 	}
 
+	destroy_hash(excluded_lbl_hash);
 	return result;
 }
 
