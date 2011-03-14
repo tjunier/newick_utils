@@ -91,7 +91,6 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	tree->root = new_root;
         destroy_llist(tree->nodes_in_order);
 	tree->nodes_in_order = get_nodes_in_order(tree->root);
-	reset_current_child_elem(tree);
 
 	return SUCCESS;
 }

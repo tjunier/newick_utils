@@ -254,7 +254,6 @@ void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 
 	destroy_llist(target_tree->nodes_in_order);
 	target_tree->nodes_in_order = get_nodes_in_order(target_tree->root);
-	reset_current_child_elem(target_tree);
 }
 
 void prune_empty_labels(struct rooted_tree *target_tree)

@@ -184,13 +184,3 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	SHOW;
 	return iter->current;
 }
-
-void reset_current_child_elem(struct rooted_tree *tree)
-{
-	struct list_elem *el;
-
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *current = el->data;
-		current->current_child = NULL;
-	}
-}
