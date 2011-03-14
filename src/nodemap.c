@@ -84,7 +84,8 @@ struct hash * create_label2node_list_map(struct llist *node_list)
 	return map;
 }
 
-// TODO: check why we can't just use destroy_hash().
+/* NOTE: we can't just destroy this hash, because its elements are lists and
+ * most therefore be destroyed with destroy_llist() rather than just free(). */
 
 void destroy_label2node_list_map(struct hash *map)
 {

@@ -529,17 +529,23 @@ int test_children_array()
 
 	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 	struct rooted_tree tree = tree_3();
-	struct hash *map = get_leaf_label_map_from_node(tree.root);
+	struct hash *map = create_label2node_map(tree.nodes_in_order);
 	
 	struct rnode** kids;
 	struct rnode *node_g = hash_get(map, "g");
+	struct rnode *node_D = hash_get(map, "D");
+	struct rnode *node_E = hash_get(map, "E");
 
 	kids = children_array(node_g);
 
-	if ((sizeof kids) != (3 * sizeof (struct rnode *))) {
-		printf ("%s: kids array has size %lu, expected %lu.\n",
-				test_name, sizeof kids, 
-				sizeof (struct rnode *));
+	if (kids[0] != node_D) {
+		printf ("%s: expected D as first child, got %s\n",
+				((struct rnode* )kids[0])->label);
+		return 1;
+	}
+	if (kids[1] != node_E) {
+		printf ("%s: expected E as second child, got %s\n",
+				((struct rnode* )kids[1])->label);
 		return 1;
 	}
 
