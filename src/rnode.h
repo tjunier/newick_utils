@@ -52,7 +52,7 @@ struct rnode {
 
 	/* enables traversing by rnode_iterator_next() */
 	struct rnode *current_child;
-	int seen;	// TODO: check if we could use a boolean.
+	bool seen;	
 };
 
 /* allocates a rnode and returns a pointer to it, or exits. If 'label' is NULL

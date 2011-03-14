@@ -540,11 +540,13 @@ int test_children_array()
 
 	if (kids[0] != node_D) {
 		printf ("%s: expected D as first child, got %s\n",
+				test_name,
 				((struct rnode* )kids[0])->label);
 		return 1;
 	}
 	if (kids[1] != node_E) {
 		printf ("%s: expected E as second child, got %s\n",
+				test_name,
 				((struct rnode* )kids[1])->label);
 		return 1;
 	}
