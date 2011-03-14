@@ -83,9 +83,6 @@ void nwserror(char *s)
 
 %%
 
-// TODO: check the parser's behaviour if create_rnode(), append_element(), etc
-// fail
-
 tree: /* empty */	{
 		root = NULL;
 		newick_parser_status = PARSER_STATUS_EMPTY;

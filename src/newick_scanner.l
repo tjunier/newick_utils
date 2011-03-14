@@ -64,8 +64,7 @@ char * space2underscore(char * s)
 YY_BUFFER_STATE string_buf_state;
 YY_BUFFER_STATE file_buf_state;
 
-/* The following two functions are used when lexing from a string. TODO: They
- * might be better named 'newick_lexer_*_input()', in fact. */
+/* The following two functions are used when lexing from a string. */
 
 void newick_scanner_set_string_input(char *input)
 {
