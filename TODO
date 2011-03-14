@@ -1,3 +1,6 @@
+general: check that the apps' get_params() functions set the nwsin external via
+set_parser_input_filename() rather than manually.
+
 rnode_iterator: add 'status' field to struct rnode_iterator, and use it so hold
 reason for NULL (end or error). Client code should of course check this.
 
