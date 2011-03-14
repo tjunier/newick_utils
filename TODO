@@ -1,3 +1,6 @@
+rnode_iterator: add 'status' field to struct rnode_iterator, and use it so hold
+reason for NULL (end or error). Client code should of course check this.
+
 general: for now I don't check the return value of printf(). See if this would
 be useful. In fact it would be better to keep all the printf()s in a few
 defined places. The SVG code has printf()s all over the place, it would
