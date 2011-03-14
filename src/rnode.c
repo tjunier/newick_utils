@@ -157,43 +157,19 @@ void dump_rnode(void *arg)
 	printf ("  data    = %p\n", node->data);
 }
 
-/* If something fails, we just return. */
-// TODO: consider just computing the nodes_in_order list and free()ing as
-// usual; if not possible then add as an example (in rnode_iterator.[ch]) of
-// when this is not possible
 void free_descendants(struct rnode *node)
 {
-	const int HASH_SIZE = 1000; 	/* pretty arbitrary */
-	struct hash *to_free = create_hash(HASH_SIZE);
-	if (NULL == to_free) return;	
-	struct rnode_iterator *it = create_rnode_iterator(node);
-	if (NULL == it) return;
-	struct rnode *current;
-
-	/* Iterates through the tree nodes, "remembering" nodes seen for the
-	 * first time */
-	while (NULL != (current = rnode_iterator_next(it))) {
-		char *node_hash_key = make_hash_key(current);
-		if (NULL == hash_get(to_free, node_hash_key))
-			if (! hash_set(to_free, node_hash_key, current))
-				return; 
-                free(node_hash_key);
-	}
-
-	// Frees all nodes "seen" above - which must be all the descendants of
-	// 'node'.
-	struct llist *keys = hash_keys(to_free);
-	if (NULL == keys) return;
-       	struct list_elem *el;
-	for (el = keys->head; NULL != el; el = el->next) {
-		char *key = el->data;
-		current = hash_get(to_free, key);
+	struct llist *nodes_in_order = get_nodes_in_order(node);
+	/* If something fails when freeing, we just return. */
+	if (NULL == nodes_in_order) return;
+	struct list_elem *el;
+	for (el = nodes_in_order->head;
+		el != nodes_in_order->tail; /* skip last element ('node') */
+		el = el->next) {
+		struct rnode *current = el->data;
 		destroy_rnode(current, NULL);
-	}	
-
-        destroy_llist(keys);
-        destroy_hash(to_free);
-	destroy_rnode_iterator(it);
+	}
+	destroy_llist(nodes_in_order);
 }
 
 struct rnode** children_array(struct rnode *node)
@@ -213,9 +189,7 @@ struct rnode** children_array(struct rnode *node)
 	return array;
 }
 
-/* Computes the list by doing a tree traversal, then reversing it, printing out
- * each node the first time it sees it. */
-/* see note above about the 'seen' member of struct rnode */
+/* Computes the list by doing a tree traversal, then reversing it. */
 
 struct llist *get_nodes_in_order(struct rnode *root)
 {
