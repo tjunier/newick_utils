@@ -228,24 +228,6 @@ static int get_properties(struct rooted_tree *tree,
 	return SUCCESS;
 }
 
-// TODO: is this f() ever used?
-#ifdef dummy
-static void write_info (struct tree_properties *props)
-{
-	/* for now there is only one output format, but we could add more */
-	// later: switch on the format, or pass output function ptr */
-	printf("Type\t\t#nodes\t#leaves\t#dichot\t#l-lbl\t#i-lbl\n");
-	printf("%s\t%d\t%d\t%d\t%d\t%d\n",
-			type_string(props->type),
-			props->num_nodes,
-			props->num_leaves,
-			props->num_dichotomies,
-			props->num_leaf_labels,
-			props->num_inner_labels
-			);
-}
-#endif
-
 static void process_tree(struct rooted_tree *tree,
 		void(* output_function)(struct tree_properties *))
 {
