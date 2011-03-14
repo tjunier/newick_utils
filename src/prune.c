@@ -194,8 +194,7 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 }
 
 /* Produces a new list with all labels in the tree that are NOT in 'labels'. */
-// TODO: should in fact implement a Complement function for lists (preserving order
-// in at least one of the lists)
+
 struct llist *reverse_labels(struct rooted_tree *tree, struct llist *labels)
 {
 	struct llist *rev_labels = create_llist();
