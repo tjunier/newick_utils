@@ -174,29 +174,6 @@ struct parameters get_params(int argc, char *argv[])
 /* Counts the number of descendants of the tree, using the data pointer of each
  * node. */
 
-/* TODO: may not be needed */
-/*
-static void count_descendants(struct rooted_tree *tree)
-{
-	struct list_elem *el;
-
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *current = el->data;
-		el->data = malloc(sizeof(int));
-		if (NULL == el->data) { perror(NULL); exit(EXIT_FAILURE); }
-		if (is_leaf(current)) {
-			*((int *) el->data) = 1;	
-		} else {
-			struct rnode *kid = current->first_child;
-			int desc_count = 0;
-			for (; NULL != kid; kid = kid->next_sibling)
-				desc_count += *((int *) kid->data);
-			*((int *) current->data) = desc_count;
-		}
-	}
-}
-*/
-
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
@@ -204,7 +181,6 @@ int main(int argc, char *argv[])
 	int (*comparator)(const void*,const void*);
 	int (*sort_field_setter)(struct rnode *);
 
-	// TODO: parametrize order flags
 	switch(params.criterion) {
 	case ORDER_ALNUM_LBL:
 		comparator = lbl_comparator;
