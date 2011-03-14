@@ -61,10 +61,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG 0
 #endif
 
-// TODO: remove this when debugging done
-
-void dump_rnode_address (void *rnode) { printf("%p ", rnode); }
-
 void newick_scanner_set_string_input(char *);
 void newick_scanner_clear_string_input();
 void newick_scanner_set_file_input(FILE *);
@@ -201,8 +197,8 @@ struct rooted_tree *get_ordered_pattern_tree(char *pattern)
 	return pattern_tree;
 }
 
-/* We only consider leaf labels. This might change if keeping internal labels
- * proves useful. */
+/* Removes inner labels, since match operates on leaf labels only (this might
+ * change if operating on internal labels proves useful). */
 
 void remove_inner_node_labels(struct rooted_tree *target_tree)
 {
@@ -216,6 +212,8 @@ void remove_inner_node_labels(struct rooted_tree *target_tree)
 		// passed to free().
 		current->label = strdup("");
 	}
+	/* The tree topology was not changed, so no need to recompute the node
+	 * list */
 }
 
 /* Removes all nodes in target tree whose labels are not found in the 'kept'
@@ -232,15 +230,15 @@ void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 		if (is_root(current)) continue;
 		if (NULL == hash_get(kept, current->label)) {
 			/* not in 'kept': remove */
+			struct rnode *unlink_root;
 			enum unlink_rnode_status result = unlink_rnode(current);
 			switch(result) {
 			case UNLINK_RNODE_DONE:
 				break;
 			case UNLINK_RNODE_ROOT_CHILD:
-				/* TODO: shouldn't we do this?
-				unlink_rnode_root_child->parent = NULL;
-				target_tree->root = unlink_rnode_root_child;
-				*/
+				unlink_root = get_unlink_rnode_root_child(); 
+				unlink_root->parent = NULL;
+				target_tree->root = unlink_root;
 				break;
 			case UNLINK_RNODE_ERROR:
 				fprintf (stderr, "Memory error - "
@@ -252,6 +250,7 @@ void prune_extra_labels(struct rooted_tree *target_tree, struct hash *kept)
 		}
 	}
 
+	/* Topology may have been altered: recompute nodes_in_order. */
 	destroy_llist(target_tree->nodes_in_order);
 	target_tree->nodes_in_order = get_nodes_in_order(target_tree->root);
 }
@@ -268,16 +267,17 @@ void prune_empty_labels(struct rooted_tree *target_tree)
 		 * */
 		if (is_leaf(current) && ! is_root(current)) {
 			if (0 == strcmp("", label)) {
+				struct rnode *unlink_root;
 				enum unlink_rnode_status result =
 					unlink_rnode(current);
 				switch(result) {
 				case UNLINK_RNODE_DONE:
 					break;
 				case UNLINK_RNODE_ROOT_CHILD:
-					/* TODO: shouldn't we do this?
-					unlink_rnode_root_child->parent = NULL;
-					target_tree->root = unlink_rnode_root_child;
-					*/
+					unlink_root =
+						get_unlink_rnode_root_child(); 
+					unlink_root->parent = NULL;
+					target_tree->root = unlink_root;
 					break;
 				case UNLINK_RNODE_ERROR:
 					perror(NULL);
@@ -288,6 +288,10 @@ void prune_empty_labels(struct rooted_tree *target_tree)
 			}
 		}
 	}
+
+	/* Topology may have been altered: recompute nodes_in_order. */
+	destroy_llist(target_tree->nodes_in_order);
+	target_tree->nodes_in_order = get_nodes_in_order(target_tree->root);
 }
 
 void remove_branch_lengths(struct rooted_tree *target_tree)
@@ -300,26 +304,19 @@ void remove_branch_lengths(struct rooted_tree *target_tree)
 			free(current->edge_length_as_string);
 			// We need to allocate dynamically, since this will
 			// later be passed to free():
-			// WRONG! cur_edge->length_as_string = ""
+			// cur_edge->length_as_string = "" *WRONG!*
 			current->edge_length_as_string = strdup("");
 		}
 	}
+	/* The tree topology was not changed, so no need to recompute
+	 * nodes_in_order */
 }
 
 void remove_knee_nodes(struct rooted_tree *tree)
 {
-	/* tree was modified -> can't use its ordered node list */
-	// TODO: wouldn't it be better to call get_nodes_in_order() atthe end
-	// of the previous step, thus guaranteeing that the nodes are ok? I
-	// think it would. Let's do a programming-by-contract style of thing:
-	// each function called by process_tree() below expects a coherent tree
-	// and guarantees that the tree is in a coherent state when it returns.
-
-	struct llist *nodes_in_order = get_nodes_in_order(tree->root);
-	if (NULL == nodes_in_order) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *el;
 
-	for (el = nodes_in_order->head; NULL != el; el = el->next) {
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = el->data;
 		if (is_inner_node(current))
 			if (1 == children_count(current)) { 
@@ -331,13 +328,14 @@ void remove_knee_nodes(struct rooted_tree *tree)
 				 * This is taken care of later in main(). */
 			}
 	}
-	destroy_llist(nodes_in_order);
 
 	/* If the root has only one child, make that child the new root */
 	if (1 == children_count(tree->root)) 
 		tree->root = tree->root->first_child;
 
-	nodes_in_order = get_nodes_in_order(tree->root);
+	/* Topology may have been altered: recompute nodes_in_order. */
+	struct llist *nodes_in_order = get_nodes_in_order(tree->root);
+	if (NULL == nodes_in_order) { perror(NULL); exit(EXIT_FAILURE); }
 	destroy_llist(tree->nodes_in_order);
 	tree->nodes_in_order = nodes_in_order;
 }
@@ -347,10 +345,10 @@ void process_tree(struct rooted_tree *tree, struct hash *pattern_labels,
 {
 	/* NOTE: whenever I alter the tree structure, I rebuild nodes_in_order
 	 * as soon as possible. Then I no longer need to guard against this
-	 * list being invalid. WARNING: I did this just enough to make all
-	 * tests pass, NOT systemytically after each tree-function call. It may
-	 * be necessary to do it more thoroughly later on.
-	 * Indeed, see TODO in remove_knee_nodes() above. */
+	 * list being invalid. */
+
+	/* In this case I stick with the old, recursive to_newick, because it
+	 * directly returns a char* */
 	char *original_newick = to_newick(tree->root);
 	remove_inner_node_labels(tree);
 	prune_extra_labels(tree, pattern_labels);
@@ -358,6 +356,13 @@ void process_tree(struct rooted_tree *tree, struct hash *pattern_labels,
 	remove_knee_nodes(tree);
 	remove_branch_lengths(tree);	
 	if (! order_tree_lbl(tree)) { perror(NULL); exit(EXIT_FAILURE); }
+	/* Ordering does not change topology, but it does change node
+	 * oridering, hence nodes_in_order must be recomputed. */
+	struct llist *nodes_in_order = get_nodes_in_order(tree->root);
+	if (NULL == nodes_in_order) { perror(NULL); exit(EXIT_FAILURE); }
+	destroy_llist(tree->nodes_in_order);
+	tree->nodes_in_order = nodes_in_order;
+
 	char *processed_newick = to_newick(tree->root);
 	int match = (0 == strcmp(processed_newick, pattern_newick));
 	match = params.reverse ? !match : match;
@@ -377,7 +382,6 @@ int main(int argc, char *argv[])
 
 	pattern_tree = get_ordered_pattern_tree(params.pattern);
 	pattern_newick = to_newick(pattern_tree->root);
-	// printf ("%s\n", pattern_newick);
 	pattern_labels = create_label2node_map(pattern_tree->nodes_in_order);
 
 	/* get_ordered_pattern_tree() causes a tree to be read from a string,
