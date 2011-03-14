@@ -63,7 +63,7 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	 * e.g. with neighbor-joining. The reference variable here is
 	 * length_as_string, which will be an empty string ("") if the length
 	 * is not defined (as in cladograms). */
-	node->edge_length = -1;	// TODO: check that this is used.
+	node->edge_length = -1;	
 	node->current_child = NULL;
 	node->seen = 0;
 

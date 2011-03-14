@@ -40,7 +40,9 @@ struct rnode {
 	 * Therefore we store it as a string, with "" indicating an undefined
 	 * length. This is how Newick does it anyway. */
 	char *edge_length_as_string;	
-	double edge_length; /* TODO: check if we use this. */
+	/* edge_length is used when we need the numerical value of the length
+	 * (which is not very frequent, but does happen). */
+	double edge_length;
 	char *label;
 	void *data;	/* app-dependent data for this node */
 
