@@ -81,20 +81,6 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *);
 
 bool more_children_to_visit (struct rnode_iterator *);
 
-/* TODO: these are client functions, they may belong elsewhere */
-
-/* Returns the list of nodes that descend from the argument node, in parse
- * order. Together with the argument node, this can be used to create a struct
- * rooted_tree. */
-/* Returns NULL in case of malloc() problems. */
-
-struct llist *get_nodes_in_order(struct rnode *);
-
-/* Returns a label->rnode map of all leaves that descend from 'root' */
-/* Returns NULL in case of malloc() problems. */
-
-struct hash *get_leaf_label_map_from_node(struct rnode *root);
-
 /* Resets all 'current_child_elem' pointers in 'tree's nodes to NULL. */
 // TODO: now that rnode_iterator_next() resets the nodes' current_child_elem
 // after exiting to the parent, we probably don't need this f() anymore. Check.

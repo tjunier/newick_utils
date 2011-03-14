@@ -115,3 +115,15 @@ void free_descendants(struct rnode *node);
 /* Returns an array of pointers to all children, in order. */
 // TODO: write test
 struct rnode** children_array(struct rnode *node);
+
+/* Returns the list of nodes that descend from the argument node, in parse
+ * order. Together with the argument node, this can be used to create a struct
+ * rooted_tree. */
+/* Returns NULL in case of malloc() problems. */
+
+struct llist *get_nodes_in_order(struct rnode *);
+
+/* Returns a label->rnode map of all leaves that descend from 'root' */
+/* Returns NULL in case of malloc() problems. */
+
+struct hash *get_leaf_label_map_from_node(struct rnode *root);

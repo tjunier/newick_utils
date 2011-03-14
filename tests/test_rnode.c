@@ -7,6 +7,7 @@
 #include "nodemap.h"
 #include "tree_stubs.h"
 #include "link.h"
+#include "list.h"
 
 int test_create_rnode()
 {
@@ -343,6 +344,222 @@ int test_all_children_have_same_label()
 	return 0;
 }
 
+int test_get_nodes_in_order()
+{
+	const char *test_name = "test_get_nodes_in_order";
+
+	/* (A:3,B:3,(C:2,(D:1,E:1)f:1)g:1)h; */
+	struct rooted_tree tree = tree_5();
+	/* What is being tested here is the get_nodes_in_order() function,
+	 * which computes the ordered nodes list from a root node (the usual
+	 * way is to compute it while parsing Newick) */
+	struct llist *nodes_in_order = get_nodes_in_order(tree.root);
+
+	struct list_elem *elem = nodes_in_order->head;
+	struct rnode *node = (struct rnode *)elem->data;
+	if (strcmp("A", node->label)) {
+		printf ("%s: expected node A, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("B", node->label)) {
+		printf ("%s: expected node B, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("C", node->label)) {
+		printf ("%s: expected node C, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("D", node->label)) {
+		printf ("%s: expected node D, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("E", node->label)) {
+		printf ("%s: expected node E, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("f", node->label)) {
+		printf ("%s: expected node f, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("g", node->label)) {
+		printf ("%s: expected node g, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("h", node->label)) {
+		printf ("%s: expected node h, got %s.\n", test_name, node->label);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_get_nodes_in_order_linear()
+{
+	const char *test_name = "test_get_nodes_in_order_linear";
+
+	/* (((((Homo_sapiens)Homo)Hominini)Homininae)Hominidae)Hominoidea; */
+	struct rooted_tree tree = tree_10();
+	struct llist *nodes_in_order = get_nodes_in_order(tree.root);
+	struct list_elem *elem = nodes_in_order->head;
+
+	struct rnode *node = (struct rnode *)elem->data;
+	if (strcmp("Homo_sapiens", node->label)) {
+		printf ("%s: expected node Homo_sapiens, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Homo", node->label)) {
+		printf ("%s: expected node Homo, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Hominini", node->label)) {
+		printf ("%s: expected node Hominini, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Homininae", node->label)) {
+		printf ("%s: expected node Homininae, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Hominidae", node->label)) {
+		printf ("%s: expected node Hominidae, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Hominoidea", node->label)) {
+		printf ("%s: expected node Hominoidea, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	if (NULL != elem) {
+		printf ("%s: list is not terminated.\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_get_nodes_in_order_part_linear()
+{
+	const char *test_name = "test_get_nodes_in_order_part_linear";
+
+	/* ((((Gorilla,(Pan,Homo)Hominini)Homininae)Hominidae)Hominoidea); */
+	struct rooted_tree tree = tree_11();
+	struct llist *nodes_in_order = get_nodes_in_order(tree.root);
+	struct list_elem *elem = nodes_in_order->head;
+
+	struct rnode *node = (struct rnode *)elem->data;
+	if (strcmp("Gorilla", node->label)) {
+		printf ("%s: expected node Gorilla, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Pan", node->label)) {
+		printf ("%s: expected node Pan, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Homo", node->label)) {
+		printf ("%s: expected node Homo, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Hominini", node->label)) {
+		printf ("%s: expected node Hominini, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Homininae", node->label)) {
+		printf ("%s: expected node Homininae, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Hominidae", node->label)) {
+		printf ("%s: expected node Hominidae, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	node = (struct rnode *) elem->data;
+	if (strcmp("Hominoidea", node->label)) {
+		printf ("%s: expected node Hominoidea, got %s.\n", test_name, node->label);
+		return 1;
+	}
+	elem = elem->next;
+	if (NULL != elem) {
+		printf ("%s: list is not terminated.\n", test_name);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_get_leaf_label_map_from_node()
+{
+
+	const char *test_name = "test_get_leaf_label_map_from_node";
+
+	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
+	struct rooted_tree tree = tree_3();
+	struct hash *map = get_leaf_label_map_from_node(tree.root);
+
+	if (5 != map->count) {
+		printf ("%s: expected hash count of 5, got %d.\n", test_name, map->count);
+		return 1;
+	}
+	if (NULL == hash_get(map, "A")) {
+		printf ("%s: leaf A not found in map.\n", test_name);
+		return 1;
+	}
+	if (NULL == hash_get(map, "B")) {
+		printf ("%s: leaf B not found in map.\n", test_name);
+		return 1;
+	}
+	if (NULL == hash_get(map, "C")) {
+		printf ("%s: leaf C not found in map.\n", test_name);
+		return 1;
+	}
+	if (NULL == hash_get(map, "D")) {
+		printf ("%s: leaf D not found in map.\n", test_name);
+		return 1;
+	}
+	if (NULL == hash_get(map, "E")) {
+		printf ("%s: leaf E not found in map.\n", test_name);
+		return 1;
+	}
+
+	printf ("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -354,6 +571,10 @@ int main()
 	failures += test_create_rnode_emptylength();
 	failures += test_all_children_are_leaves();
 	failures += test_all_children_have_same_label();
+	failures += test_get_leaf_label_map_from_node();
+	failures += test_get_nodes_in_order();
+	failures += test_get_nodes_in_order_linear();
+	failures += test_get_nodes_in_order_part_linear();
 	failures += test_create_many();
 	if (0 == failures) {
 		printf("All tests ok.\n");

@@ -212,3 +212,92 @@ struct rnode** children_array(struct rnode *node)
 
 	return array;
 }
+
+/* Computes the list by doing a tree traversal, then reversing it, printing out
+ * each node the first time it sees it. */
+/* see note above about the 'seen' member of struct rnode */
+
+struct llist *get_nodes_in_order(struct rnode *root)
+{
+	struct rnode_iterator *it = create_rnode_iterator(root);
+	if (NULL == it) return NULL;
+	struct rnode *current;
+	struct llist *traversal = create_llist();
+	if (NULL == traversal) return NULL;
+	struct llist *reverse_traversal;
+	struct llist *nodes_in_reverse_order = create_llist();
+	if (NULL == nodes_in_reverse_order) return NULL;
+	struct llist *nodes_in_order;
+
+	/* Iterates over the whole tree - note that a node is visited more than
+	 * once, except leaves. */
+	while ((current = rnode_iterator_next(it)) != NULL) {
+		current->seen = 0;
+		if (! append_element (traversal, current)) return NULL;
+	}
+
+	destroy_rnode_iterator(it);
+
+	reverse_traversal = llist_reverse(traversal);
+	if (NULL == reverse_traversal) return NULL;
+	destroy_llist(traversal);
+
+	/* This keeps only the first 'visit' through any node */
+	struct list_elem *el;
+	for (el = reverse_traversal->head; NULL != el; el = el->next) {
+		current = el->data;
+		/* Nodes will have been seen by the iterator above, hence they
+		 * start with a 'seen' value of 1. */
+		if (current->seen == 0) {
+			/* Not seen yet? add to list, and mark as seen (hash) */
+			if (! append_element
+					(nodes_in_reverse_order, current))
+				return NULL;
+			current->seen = 1;
+		}
+	}
+
+	destroy_llist(reverse_traversal);
+	nodes_in_order = llist_reverse(nodes_in_reverse_order);
+	if (NULL == nodes_in_order) return NULL;
+	destroy_llist(nodes_in_reverse_order);
+
+	/* remove the 'seen' marks */
+	for (el = nodes_in_order->head; NULL != el; el = el->next) {
+		current = el->data;
+		current->seen = 0;
+	}
+	return nodes_in_order;
+}
+
+/* Returns a label->node map of (labeled) leaves */
+/* Nodes' 'seen' member must be zero - see note above about the 'seen' member
+ * of struct rnode. NOTE: this function is meant to work on any node, not just
+ * a tree's root (e.g. in is_monophyletic()). So don't be tempted to rewrite it
+ * to use tree->nodes_in_order. */
+
+static const int INIT_HASH_SIZE = 1000;
+
+struct hash *get_leaf_label_map_from_node(struct rnode *root)
+{
+	struct rnode_iterator *it = create_rnode_iterator(root);
+	if (NULL == it) return NULL;
+	struct rnode *current;
+	struct hash *result = create_hash(INIT_HASH_SIZE);
+	if (NULL == result) return NULL;
+
+	while ((current = rnode_iterator_next(it)) != NULL) {
+		if (is_leaf(current)) {
+			if (strcmp("", current->label) != 0) {
+				if (! hash_set(result,
+					current->label, current)) 
+						return NULL;
+			}
+		}
+	}
+
+	destroy_rnode_iterator(it);
+
+	return result;
+}
+

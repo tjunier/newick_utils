@@ -82,8 +82,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * pushing all the node's children, then removing the node. But I'm not sure it
  * would be faster than using 'seen' flags. */
 
-static const int INIT_HASH_SIZE = 1000;
-
 /* see note above about the 'seen' member of struct rnode */
 
 struct rnode_iterator *create_rnode_iterator(struct rnode *root)
@@ -126,17 +124,18 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	 * in the target tree). The single node is in this case both a leaf (no
 	 * children) and the root (no parent). Hence the double test below. */
 
-	/* Case 0: we're on a leaf, but not the root (see Case 0). We return
-	 * the parent node. */
+	/* Case 1: we're on a leaf */
 	if (is_leaf(iter->current)) {
 		if (iter->current == iter->root) {
+			/* The (very) special case of a root leaf. The only
+			 * case when a leaf is visited twice. we use
+			 * current_child in a different way here - this is a
+			 * leaf, so it obviously has no children.
+			 * current_child_elem is set to the current node the
+			 * first time, and reset to NULL the second time. This
+			 * allows the iterator to return a leaf when and only
+			 * when it starts on a leaf. */
 			struct rnode dummy;
-			/* we use current_child in a different
-			 * way here - this is a leaf, so it obviously has no
-			 * children. current_child_elem is set to the current
-			 * node the first time, and reset to NULL the second
-			 * time. This allows the iterator to return a leaf when
-			 * and only when it starts on a leaf. */
 			if (NULL == iter->current->current_child) {
 				iter->current->current_child = &dummy;
 					SHOW;
@@ -147,36 +146,23 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 				return NULL;
 			}
 		} else {
+			/* we're not on the iterator's root, so we return the
+			 * leaf's parent. */
 			iter->current = iter->current->parent;
 			SHOW;
 			return iter->current;
 		}
 	}
 
-	
-	/* Case 1: on a leaf which is also the root */
-	// TODO: this case may in fact be handled by the next one. Check tests
-	// with this if clause commented out.
-	 /*
-	if (is_leaf(iter->current)) {
-		iter->current = iter->current->parent;
-		SHOW;
-		return iter->current;
-	}
-	*/
-
 	/* Case 2: we're on an inner node, possibly the root. In any case, the
 	 * node has children. We see if we visited them all (in which case we
 	 * go to the parent) or not (in which case we go to the first unvisited
-	 * child).
-	 * Variable current_child points to a node's currently visited
+	 * child).  Variable current_child points to a node's currently visited
 	 * child.*/
 	if (iter->current->current_child
 	    == iter->current->last_child) {	/* seen all children */
 		iter->current->current_child = NULL; /* reset */
 		if (iter->root == iter->current) {
-			// TODO: should we not set a value to indicate the
-			// reason for NULL (as NULL can also signal an error)?
 			SHOW_END;
 			return NULL;	/* done iterating */
 		} else {
@@ -197,91 +183,6 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 	iter->current = iter->current->current_child;	
 	SHOW;
 	return iter->current;
-}
-
-/* Computes the list by doing a tree traversal, then reversing it, printing out
- * each node the first time it sees it. */
-/* see note above about the 'seen' member of struct rnode */
-
-struct llist *get_nodes_in_order(struct rnode *root)
-{
-	struct rnode_iterator *it = create_rnode_iterator(root);
-	if (NULL == it) return NULL;
-	struct rnode *current;
-	struct llist *traversal = create_llist();
-	if (NULL == traversal) return NULL;
-	struct llist *reverse_traversal;
-	struct llist *nodes_in_reverse_order = create_llist();
-	if (NULL == nodes_in_reverse_order) return NULL;
-	struct llist *nodes_in_order;
-
-	/* Iterates over the whole tree - note that a node is visited more than
-	 * once, except leaves. */
-	while ((current = rnode_iterator_next(it)) != NULL) {
-		current->seen = 0;
-		if (! append_element (traversal, current)) return NULL;
-	}
-
-	destroy_rnode_iterator(it);
-
-	reverse_traversal = llist_reverse(traversal);
-	if (NULL == reverse_traversal) return NULL;
-	destroy_llist(traversal);
-
-	/* This keeps only the first 'visit' through any node */
-	struct list_elem *el;
-	for (el = reverse_traversal->head; NULL != el; el = el->next) {
-		current = el->data;
-		/* Nodes will have been seen by the iterator above, hence they
-		 * start with a 'seen' value of 1. */
-		if (current->seen == 0) {
-			/* Not seen yet? add to list, and mark as seen (hash) */
-			if (! append_element
-					(nodes_in_reverse_order, current))
-				return NULL;
-			current->seen = 1;
-		}
-	}
-
-	destroy_llist(reverse_traversal);
-	nodes_in_order = llist_reverse(nodes_in_reverse_order);
-	if (NULL == nodes_in_order) return NULL;
-	destroy_llist(nodes_in_reverse_order);
-
-	/* remove the 'seen' marks */
-	for (el = nodes_in_order->head; NULL != el; el = el->next) {
-		current = el->data;
-		current->seen = 0;
-	}
-	return nodes_in_order;
-}
-
-/* Returns a label->node map of (labeled) leaves */
-/* Nodes' 'seen' member must be zero - see note above about the 'seen' member of struct rnode */
-// TODO: this function should use the tree's nodes_in_order list. If invalid or
-// NULL, it should be computed by calling get_nodes_in_order() on the root. 
-
-struct hash *get_leaf_label_map_from_node(struct rnode *root)
-{
-	struct rnode_iterator *it = create_rnode_iterator(root);
-	if (NULL == it) return NULL;
-	struct rnode *current;
-	struct hash *result = create_hash(INIT_HASH_SIZE);
-	if (NULL == result) return NULL;
-
-	while ((current = rnode_iterator_next(it)) != NULL) {
-		if (is_leaf(current)) {
-			if (strcmp("", current->label) != 0) {
-				if (! hash_set(result,
-					current->label, current)) 
-						return NULL;
-			}
-		}
-	}
-
-	destroy_rnode_iterator(it);
-
-	return result;
 }
 
 void reset_current_child_elem(struct rooted_tree *tree)
