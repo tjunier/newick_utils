@@ -303,8 +303,10 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 void try_ingroup(struct rooted_tree *tree, struct parameters params)
 {
 	/* we will try to insert the root above the ingroup - for this we'll
-	 * need all leaves that are NOT in the outgroup. */
-	// TODO: why just leaves?
+	 * need all leaves that are NOT in the outgroup. We don't need the
+	 * inner nodes, though, since tha leaves are sufficient for determining
+	 * the ingroup's LCA. This also works if some leaf labels are empty
+	 * (see test case 'nolbl_ingrp' in test_nw_reroot_args) */
 	struct llist *ingroup_leaves;
 	ingroup_leaves = get_ingroup_leaves(tree, params.labels);
 	enum reroot_status result = reroot(tree, ingroup_leaves);
