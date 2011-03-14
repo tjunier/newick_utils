@@ -335,8 +335,6 @@ class Tree(object):
 		meant to do only what is strictly necessary - in this case, reroot the
 		tree and print it.  Bottom line: don't use the tree for anything else
 		than printing.'''
-		# TODO: add a C funtion that updates the tree to it becomes useable for
-		# everything, and call it here after rerooting.
 		libnw.reroot_tree(self.tree, node.rnode)
 
 	def __compute_label2nodes(self):
