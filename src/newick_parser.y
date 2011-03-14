@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "list.h"
 #include "link.h"
-#include "to_newick.h" // TODO: needed?
 #include "parser.h"
 
 /* in the (admittedly artificial) case of trees with lots of nesting on the
