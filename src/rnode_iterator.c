@@ -103,7 +103,6 @@ void destroy_rnode_iterator (struct rnode_iterator *it)
 }
 
 /* Returns true IFF there are more children to visit on the current node. */
-// TODO: is this f() ever used?
 
 bool more_children_to_visit (struct rnode_iterator *iter)
 {
