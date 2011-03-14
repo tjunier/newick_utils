@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h> 	//TODO: rm when debugged
 
 #include "rnode.h"
 #include "tree.h"
@@ -41,10 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "link.h"
 #include "common.h"
 #include "order_tree.h"
-
-// TODO: use a setter to set the sort field of inner nodes (after their
-// children have been sorted); also provide convenience wrappers like the old
-// functions order_tree_lbl(), etc.
 
 int order_tree(struct rooted_tree *tree,
 		int (*comparator)(const void*,const void*),
