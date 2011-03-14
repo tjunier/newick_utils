@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 #include "hash.h"
 #include "rnode.h"
-#include "rnode_iterator.h"
+#include "nodemap.h"
 #include "subtree.h"
 
 enum monophyly is_monophyletic(struct llist *descendants, struct rnode *subtree_root)

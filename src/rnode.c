@@ -269,35 +269,3 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	}
 	return nodes_in_order;
 }
-
-/* Returns a label->node map of (labeled) leaves */
-/* Nodes' 'seen' member must be zero - see note above about the 'seen' member
- * of struct rnode. NOTE: this function is meant to work on any node, not just
- * a tree's root (e.g. in is_monophyletic()). So don't be tempted to rewrite it
- * to use tree->nodes_in_order. */
-
-static const int INIT_HASH_SIZE = 1000;
-
-struct hash *get_leaf_label_map_from_node(struct rnode *root)
-{
-	struct rnode_iterator *it = create_rnode_iterator(root);
-	if (NULL == it) return NULL;
-	struct rnode *current;
-	struct hash *result = create_hash(INIT_HASH_SIZE);
-	if (NULL == result) return NULL;
-
-	while ((current = rnode_iterator_next(it)) != NULL) {
-		if (is_leaf(current)) {
-			if (strcmp("", current->label) != 0) {
-				if (! hash_set(result,
-					current->label, current)) 
-						return NULL;
-			}
-		}
-	}
-
-	destroy_rnode_iterator(it);
-
-	return result;
-}
-

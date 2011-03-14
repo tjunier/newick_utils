@@ -60,8 +60,8 @@ test_lca_SOURCES = test_lca.c $(SRC)/lca.c $(SRC)/list.c $(SRC)/nodemap.c \
 	$(SRC)/error.c
 
 test_nodemap_SOURCES = test_nodemap.c $(SRC)/nodemap.c \
-	$(SRC)/rnode.c $(SRC)/list.c $(SRC)/hash.c \
-	$(SRC)/rnode_iterator.c $(SRC)/masprintf.c
+	$(SRC)/rnode.c $(SRC)/list.c $(SRC)/hash.c $(SRC)/link.c \
+	$(SRC)/rnode_iterator.c $(SRC)/masprintf.c tree_stubs.c
 
 test_to_newick_SOURCES = test_to_newick.c $(SRC)/to_newick.c \
 	$(SRC)/rnode.c $(SRC)/link.c $(SRC)/concat.c \
@@ -121,7 +121,7 @@ test_svg_graph_radial_SOURCES = test_svg_graph_radial.c \
 
 test_subtree_SOURCES = test_subtree.c $(SRC)/subtree.c $(SRC)/rnode.c \
 	$(SRC)/list.c $(SRC)/hash.c $(SRC)/link.c $(SRC)/rnode_iterator.c \
-	$(SRC)/masprintf.c
+	$(SRC)/masprintf.c $(SRC)/nodemap.c
 
 clean-local:
 	$(RM) *.out

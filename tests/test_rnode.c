@@ -522,37 +522,24 @@ int test_get_nodes_in_order_part_linear()
 	return 0;
 }
 
-int test_get_leaf_label_map_from_node()
+int test_children_array()
 {
 
-	const char *test_name = "test_get_leaf_label_map_from_node";
+	const char *test_name = __func__;
 
 	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
 	struct rooted_tree tree = tree_3();
 	struct hash *map = get_leaf_label_map_from_node(tree.root);
+	
+	struct rnode** kids;
+	struct rnode *node_g = hash_get(map, "g");
 
-	if (5 != map->count) {
-		printf ("%s: expected hash count of 5, got %d.\n", test_name, map->count);
-		return 1;
-	}
-	if (NULL == hash_get(map, "A")) {
-		printf ("%s: leaf A not found in map.\n", test_name);
-		return 1;
-	}
-	if (NULL == hash_get(map, "B")) {
-		printf ("%s: leaf B not found in map.\n", test_name);
-		return 1;
-	}
-	if (NULL == hash_get(map, "C")) {
-		printf ("%s: leaf C not found in map.\n", test_name);
-		return 1;
-	}
-	if (NULL == hash_get(map, "D")) {
-		printf ("%s: leaf D not found in map.\n", test_name);
-		return 1;
-	}
-	if (NULL == hash_get(map, "E")) {
-		printf ("%s: leaf E not found in map.\n", test_name);
+	kids = children_array(node_g);
+
+	if ((sizeof kids) != (3 * sizeof (struct rnode *))) {
+		printf ("%s: kids array has size %lu, expected %lu.\n",
+				test_name, sizeof kids, 
+				sizeof (struct rnode *));
 		return 1;
 	}
 
@@ -571,11 +558,11 @@ int main()
 	failures += test_create_rnode_emptylength();
 	failures += test_all_children_are_leaves();
 	failures += test_all_children_have_same_label();
-	failures += test_get_leaf_label_map_from_node();
 	failures += test_get_nodes_in_order();
 	failures += test_get_nodes_in_order_linear();
 	failures += test_get_nodes_in_order_part_linear();
 	failures += test_create_many();
+	failures += test_children_array();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

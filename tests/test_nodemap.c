@@ -5,6 +5,8 @@
 #include "rnode.h"
 #include "list.h"
 #include "hash.h"
+#include "tree.h"
+#include "tree_stubs.h"
 
 int test_create_label2node_map()
 {
@@ -210,12 +212,51 @@ int test_create_label2node_list_map()
 	return 0;
 }
 
+int test_get_leaf_label_map_from_node()
+{
+
+	const char *test_name = "test_get_leaf_label_map_from_node";
+
+	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
+	struct rooted_tree tree = tree_3();
+	struct hash *map = get_leaf_label_map_from_node(tree.root);
+
+	if (5 != map->count) {
+		printf ("%s: expected hash count of 5, got %d.\n", test_name, map->count);
+		return 1;
+	}
+	if (NULL == hash_get(map, "A")) {
+		printf ("%s: leaf A not found in map.\n", test_name);
+		return 1;
+	}
+	if (NULL == hash_get(map, "B")) {
+		printf ("%s: leaf B not found in map.\n", test_name);
+		return 1;
+	}
+	if (NULL == hash_get(map, "C")) {
+		printf ("%s: leaf C not found in map.\n", test_name);
+		return 1;
+	}
+	if (NULL == hash_get(map, "D")) {
+		printf ("%s: leaf D not found in map.\n", test_name);
+		return 1;
+	}
+	if (NULL == hash_get(map, "E")) {
+		printf ("%s: leaf E not found in map.\n", test_name);
+		return 1;
+	}
+
+	printf ("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
 	printf("Starting nodemap test...\n");
 	failures += test_create_label2node_map();
 	failures += test_create_label2node_list_map();
+	failures += test_get_leaf_label_map_from_node();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
