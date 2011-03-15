@@ -271,7 +271,6 @@ int insert_child(struct rnode *parent, struct rnode *insert, int index)
 	return SUCCESS;
 }
 
-// TODO: return value should differentiate between mem error and child-is-root
 int swap_nodes(struct rnode *node)
 {
 	assert(NULL != node->parent);
