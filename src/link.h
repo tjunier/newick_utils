@@ -90,8 +90,9 @@ enum remove_child_status remove_child(struct rnode *child);
 
 int insert_child(struct rnode *parent, struct rnode *insert, int index);
 
-/* Swaps 'node' and its parent, i.e, parent becomes a child of 'node' */
-/* Returns FAILURE in case of problem (memory) */
+/* Swaps 'node' and its parent which must be the root, i.e, parent becomes a
+ * child of 'node', which itself becomes the new root. */
+/* Returns FAILURE in case of memory problem. Assumes that parent is root. */
 
 int swap_nodes(struct rnode *node);
 

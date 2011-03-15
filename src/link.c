@@ -212,7 +212,7 @@ int remove_child(struct rnode *child)
 	struct rnode *previous;
 	int n;
 
-	child->parent = NULL;	// TODO: Is this a good idea?
+	child->parent = NULL;
 
 	/* Easy special case: parent has exactly one child. */
 	if (1 == parent->child_count) {
@@ -240,7 +240,7 @@ int remove_child(struct rnode *child)
 	previous->next_sibling = previous->next_sibling->next_sibling;
 
 	parent->child_count --;
-	return n;	// TODO: is this ever used?
+	return n;	
 }
 
 int insert_child(struct rnode *parent, struct rnode *insert, int index)
