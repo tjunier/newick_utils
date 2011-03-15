@@ -33,11 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <assert.h>
 
-// TODO: Check this!
-#ifndef RNODE_DEF
 #include "rnode.h"
-#endif
-
 #include "list.h"
 #include "link.h"
 #include "masprintf.h"
