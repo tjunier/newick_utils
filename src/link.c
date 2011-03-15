@@ -97,7 +97,7 @@ int insert_node_above(struct rnode *this, char *label)
 	if (NULL == new) return FAILURE;
 	free(this->edge_length_as_string);
 	this->edge_length_as_string = strdup(new_edge_length);
-	replace_child(parent, this, new);
+	replace_child(this, new);
 	this->next_sibling = NULL;
 	/* link new node to this node */
 	add_child(new, this);
@@ -107,9 +107,7 @@ int insert_node_above(struct rnode *this, char *label)
 	return SUCCESS;
 }
 	
-// TODO: 'node' argument is unneeded, as it can be derived from old->parent.
-
-void replace_child (struct rnode *pop, struct rnode *old, struct rnode *new)
+void replace_child (struct rnode *old, struct rnode *new)
 {
 	/* To replace the old rnode by the new one, we need a pointer to the
 	 * node _before_ the old node (so as to be able to change its

@@ -322,18 +322,6 @@ int test_nodes_from_regexp()
 
 int main()
 {
-	struct rlimit data_limits, time_limits;
-	getrlimit(RLIMIT_DATA, &data_limits);
-	printf ("curr data limit: %d\n", (int) data_limits.rlim_cur);
-	data_limits.rlim_cur = 0;
-	data_limits.rlim_max = 0;
-	time_limits.rlim_cur = 1;
-	time_limits.rlim_max = 1;
-	setrlimit(RLIMIT_DATA, &data_limits);
-	setrlimit(RLIMIT_CPU, &time_limits);
-	getrlimit(RLIMIT_DATA, &data_limits);
-	printf ("curr data limit: %d\n", (int) data_limits.rlim_cur);
-
 	int failures = 0;
 	printf("Starting tree test...\n");
 	failures += test_reroot();

@@ -178,7 +178,7 @@ int test_bug1()
 	
 	struct rnode *new_child = create_rnode("new", "");
 
-	replace_child(parent, child_3, new_child);
+	replace_child(child_3, new_child);
 
 	char *exp = "(child_1,child_2,new,child_4)parent;";
 	if (0 != strcmp(exp, to_newick(parent))) {

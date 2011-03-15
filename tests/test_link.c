@@ -355,7 +355,7 @@ int test_replace_child()
 	
 	struct rnode *new_child = create_rnode("new", "");
 
-	replace_child (parent, child_3, new_child);
+	replace_child (child_3, new_child);
 
 	char *exp = "(child_1,child_2,new,child_4)parent;";
 	if (0 != strcmp(exp, to_newick(parent))) {
@@ -391,7 +391,7 @@ int test_replace_child_wlen()
 	
 	struct rnode *new_child = create_rnode("new", "2.3");
 
-	replace_child(parent, child_3, new_child);
+	replace_child(child_3, new_child);
 
 	char *exp = "(child_1:1,child_2:2.5,new:2.3,child_4:4.0)parent;";
 	if (0 != strcmp(exp, to_newick(parent))) {

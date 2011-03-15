@@ -62,7 +62,7 @@ int insert_node_above(struct rnode *node, char *label);
 
 /* Replaces child node 'old' by 'new'. Does nothing if 'old' is not found. */
 
-void replace_child(struct rnode *node, struct rnode *old, struct rnode *new);
+void replace_child(struct rnode *old, struct rnode *new);
 
 /* Splices out node 'node' (which must be inner). Children are linked directly
  * to 'node''s parent. New edges have edges such that the children nodes'
