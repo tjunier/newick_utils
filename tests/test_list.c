@@ -1821,7 +1821,7 @@ int test_delete_last()
 
 	/* check list2 */
 	if (1 != list2->count) {
-		printf ("%s: expected count of 2, got %d.\n", 
+		printf ("%s: expected count of 1, got %d.\n", 
 				test_name, list2->count);
 		return 1;
 	}
@@ -1882,20 +1882,44 @@ int test_delete_last_few()
 	}
 
 	/* check list2 */
-	if (1 != list2->count) {
-		printf ("%s: expected count of 2, got %d.\n", 
+	if (5 != list2->count) {
+		printf ("%s: expected count of 5, got %d.\n", 
 				test_name, list2->count);
 		return 1;
 	}
 	el = list2->head;
-	if (strcmp("omega", (char *) el->data) != 0) {
-		printf ("%s: expected 'omega' at head, got '%s'.\n", test_name,
+	if (strcmp("ichi", (char *) el->data) != 0) {
+		printf ("%s: expected 'ichi' at head, got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("ni", (char *) el->data) != 0) {
+		printf ("%s: expected 'ni', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("san", (char *) el->data) != 0) {
+		printf ("%s: expected 'san', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("shi", (char *) el->data) != 0) {
+		printf ("%s: expected 'shi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("go", (char *) el->data) != 0) {
+		printf ("%s: expected 'go', got '%s'.\n", test_name,
 				(char *) el->data);
 		return 1;
 	}
 	el = list2->tail;
-	if (strcmp("omega", (char *) el->data) != 0) {
-		printf ("%s: expected 'omega' at tail, got '%s'.\n", test_name,
+	if (strcmp("go", (char *) el->data) != 0) {
+		printf ("%s: expected 'go' at tail, got '%s'.\n", test_name,
 				(char *) el->data);
 		return 1;
 	}

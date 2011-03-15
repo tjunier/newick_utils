@@ -228,11 +228,6 @@ void insert_after(struct llist *target, int pos, struct llist *insert)
 	}
 }
 
-// TODO: consider the case when target->count == 1, pos == -1 and length == 1
-// -- IOW, remove the last element in the list. AFAICT the target's count and
-// head are Ok (count is 0 and head is NULL), but tail is not NULL, when it
-// should be. Add a test.
-
 struct llist *delete_after(struct llist *target, int pos, int length)
 {
 	struct llist *result;
