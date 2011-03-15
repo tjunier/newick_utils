@@ -215,9 +215,7 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 
 int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 {
-	struct rnode *outgroup_root;
-
-	outgroup_root = lca(tree, outgroup_nodes);
+	struct rnode *outgroup_root = lca_from_nodes(tree, outgroup_nodes);
 	if (NULL == outgroup_root) { perror(NULL); exit(EXIT_FAILURE); }
 
 	if (tree->root == outgroup_root) {
