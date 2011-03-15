@@ -1,6 +1,11 @@
 general: check that the apps' get_params() functions set the nwsin external via
 set_parser_input_filename() rather than manually.
 
+general: for integer-valued functions that can have more than two status codes
+(i.e., not just SUCCESS and FAILURE), generalize the enum mechanism and
+consider putting the enum declaration close to the function declaration in the
+.h file.
+
 rnode_iterator: add 'status' field to struct rnode_iterator, and use it so hold
 reason for NULL (end or error). Client code should of course check this.
 
