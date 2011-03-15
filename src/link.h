@@ -29,9 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* Functions for creating and manipulating trees at the node level. */
 
-// TODO: use an enum for these?
-#define RM_CHILD_IS_ROOT (-1)
-#define RM_CHILD_MEM_ERROR (-2)
+/* remove_child() returns negative values on error (and only then). We start
+ * at -10, that should allow for enough kinds of errors... */
+enum remove_child_status {  RM_CHILD_IS_ROOT = -10, RM_CHILD_MEM_ERROR };
 
 /* NOTE: Tree properties such as 'nodes_in_order' will generally be invalidated
  * by these methods. You will need either to recompute them, or to avoid
@@ -80,7 +80,7 @@ int splice_out_rnode(struct rnode *node);
  * attempt to leave the tree in a coherent state, see unlink_rnode() for this.
  * */
 
-int remove_child(struct rnode *child);
+enum remove_child_status remove_child(struct rnode *child);
 
 /* Inserts 'insert' into 'parent's children list, at the specified index. Sets
  * the child's parent. An index of 0 means insertion before the first child, an
