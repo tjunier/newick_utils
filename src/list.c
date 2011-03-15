@@ -250,6 +250,8 @@ struct llist *delete_after(struct llist *target, int pos, int length)
 		result->tail = elem;
 		elem = elem->next;	/* new head of target */
 		target->head = elem;
+		if (result->tail == target->tail)
+			target->tail = NULL;
 		result->tail->next = NULL;
 		/* target's tail does not change */
 	} else if ((pos >= 0) && (pos < target->count - length -1)) {
