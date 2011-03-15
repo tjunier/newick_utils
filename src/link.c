@@ -95,12 +95,12 @@ int insert_node_above(struct rnode *this, char *label)
 	/* create new node */
 	new = create_rnode(label, new_edge_length);
 	if (NULL == new) return FAILURE;
-	/* link new node to this node */
-	add_child(new, this);
 	free(this->edge_length_as_string);
 	this->edge_length_as_string = strdup(new_edge_length);
 	replace_child(parent, this, new);
 	this->next_sibling = NULL;
+	/* link new node to this node */
+	add_child(new, this);
 
 	free(new_edge_length);
 
@@ -109,17 +109,18 @@ int insert_node_above(struct rnode *this, char *label)
 	
 // TODO: 'node' argument is unneeded, as it can be derived from old->parent.
 
-void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
+void replace_child (struct rnode *pop, struct rnode *old, struct rnode *new)
 {
-	/* To replace the old node by the new one, we need a pointer to the
+	/* To replace the old rnode by the new one, we need a pointer to the
 	 * node _before_ the old node (so as to be able to change its
 	 * next_sibling member). We therefore start "ahead" of the list, using
 	 * a dummy first child. */
 
 	struct rnode dummy_first;	/* NOT a pointer! */
 	struct rnode *current;
+	struct rnode *dad = old->parent;
 
-	dummy_first.next_sibling = node->first_child;
+	dummy_first.next_sibling = dad->first_child;
 
 	for (current = &dummy_first; NULL != current->next_sibling;
 			current = current->next_sibling) 
@@ -128,11 +129,11 @@ void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
 
 	current->next_sibling = new;
 	new->next_sibling = old->next_sibling; 
-	if (node->first_child == old) 
-		node->first_child = new;
-	if (node->last_child == old)
-		node->last_child = new;
-	new->parent = node;
+	if (dad->first_child == old) 
+		dad->first_child = new;
+	if (dad->last_child == old)
+		dad->last_child = new;
+	new->parent = dad;
 }
 
 char *add_len_strings(char *ls1, char *ls2)
