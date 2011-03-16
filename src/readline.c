@@ -90,6 +90,7 @@ char * read_line(FILE *file)
 	}
 
 	/* suppress compiler warnings */
+	// TODO: there are still warnings...
 	char *unused = fgets(line, len+1, file);
 
 	/* consumes newline (otherwise gets stuck here...) */
