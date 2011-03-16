@@ -89,9 +89,11 @@ char * read_line(FILE *file)
 		return NULL;
 	}
 
-	/* suppress compiler warnings */
-	// TODO: there are still warnings...
+	/* I just need to read the line, but to suppress compiler warnings I
+	 * need to use the returned value... or at least, too look like I'm
+	 * using it. Hopefully the compiler isn't too smart. */
 	char *unused = fgets(line, len+1, file);
+	unused = unused;	/* an incredibly useful statement */
 
 	/* consumes newline (otherwise gets stuck here...) */
 	fgetc(file);
