@@ -45,7 +45,6 @@ struct rooted_tree;
 
 void set_width(int);
 void set_leaf_vskip(double);
-void set_whole_v_shift(int);
 void set_style(int);
 void set_URL_map_file(FILE *);
 void set_label_angle_correction(double);

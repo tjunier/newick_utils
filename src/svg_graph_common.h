@@ -41,7 +41,6 @@ extern struct hash *url_map;
 extern char *leaf_label_class;
 extern char *inner_label_class;
 extern int graph_width;
-extern int whole_v_shift; 
 extern double label_char_width;
 extern int scale_bar_height;
 extern int label_space;

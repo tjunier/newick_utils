@@ -96,7 +96,6 @@ static struct llist *ornament_map = NULL;
 int scale_bar_height = 30;	/* px */
 struct hash *url_map = NULL;
 int graph_width = -1;
-int whole_v_shift = -1; 	/* Vertical translation of whole graph */
 double label_char_width = -1;
 enum inner_lbl_pos inner_label_pos = -1;
 bool scalebar_zero_at_root = true;
@@ -108,7 +107,6 @@ int label_space = 10;
  * is more homogeneous. */
 
 void set_width(int width) { graph_width = width; }
-void set_whole_v_shift(int shift) { whole_v_shift = shift; }
 void set_URL_map_file(FILE * map) { url_map_file = map; }
 void set_CSS_map_file(FILE * map) { css_map_file = map; }
 void set_ornament_map_file(FILE * map) { ornament_map_file = map; }

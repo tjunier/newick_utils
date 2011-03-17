@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "svg_graph_common.h"
 
 extern enum inner_lbl_pos inner_label_pos;
+static const int whole_v_shift = 20; 	/* Vertical translation of whole graph */
 
 /* Prevents labels of single-child nodes from being crossed over by the child
  * branch. Also used when putting inner labels near root. */
