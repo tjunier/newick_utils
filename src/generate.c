@@ -86,7 +86,9 @@ void help(char *argv[])
 "       Only for time-limited trees.\n"
 "    -p <float>: sets the probability of a node having (2) children.\n"
 "       Only for geometric trees. WARNING: if > 0.5, the tree will\n"
-"       probably grow 'forever'.\n"
+"       probably grow 'forever'. On the other hand, low values will\n"
+"       result in most trees having only a root, as the probability\n"
+"       that the root has no children is 1-p, like for every other node.\n"
 "    -s <int>: sets the pseudorandom number generator's seed\n"
 "       (default: 0.1)\n"
 "\n"
@@ -112,7 +114,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.prob_node_has_children = 0.1;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "d:ghl:s:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "d:ghl:p:s:")) != -1) {
 		switch (opt_char) {
 		case 'd':
 			params.duration = atof(optarg);	
