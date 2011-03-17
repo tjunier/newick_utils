@@ -39,7 +39,9 @@ int geometric_tree(double prob_node_has_children);
 
 /* A more complicated model where each branch's length is exponentially
  * distributed (up to a duration threshold).  Returns 0 (FAILURE) IFF there is
- * any problem (which will be memory allocation errors) . */
+ * any problem (which will be memory allocation errors). The 1st parameter is
+ * the exponential distribution's rate parameter, which is the inverse of the
+ * mean. */
 
 int time_limited_tree(double branch_termination_rate, double duration);
 
