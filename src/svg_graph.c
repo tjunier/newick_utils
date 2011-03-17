@@ -84,7 +84,7 @@ static int init_done = FALSE;
  *   used in other modules. */
 
 static FILE *url_map_file = NULL;
-static FILE *css_map_file = NULL;
+static FILE *clade_css_map_file = NULL;
 static FILE *ornament_map_file = NULL;
 static char *leaf_label_style = NULL;
 static char *inner_label_style = NULL;
@@ -108,7 +108,7 @@ int label_space = 10;
 
 void set_width(int width) { graph_width = width; }
 void set_URL_map_file(FILE * map) { url_map_file = map; }
-void set_CSS_map_file(FILE * map) { css_map_file = map; }
+void set_clade_CSS_map_file(FILE * map) { clade_css_map_file = map; }
 void set_ornament_map_file(FILE * map) { ornament_map_file = map; }
 void set_leaf_label_style(char *style) { leaf_label_style = style; }
 void set_inner_label_style(char *style) { inner_label_style = style; }
@@ -186,7 +186,7 @@ static struct llist *read_css_map()
 
 	char *line;
 	int i = 1;
-	while ((line = read_line(css_map_file)) != NULL) {
+	while ((line = read_line(clade_css_map_file)) != NULL) {
 		/* Skip comments and lines that are empty or all whitespace */
 		if ('#' == line[0] || is_all_whitespace(line)) {
 			free(line);
@@ -241,7 +241,7 @@ static struct llist *read_css_map()
 		free(type);
 	}
 
-	fclose(css_map_file);
+	fclose(clade_css_map_file);
 
 	switch (read_line_status) {
 		case READLINE_EOF:
@@ -660,7 +660,7 @@ void draw_grid()
 
 int svg_init()
 {
-	if (NULL != css_map_file) {
+	if (NULL != clade_css_map_file) {
 		css_map = read_css_map();
 		if (NULL == css_map)
 			return FAILURE;

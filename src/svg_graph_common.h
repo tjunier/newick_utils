@@ -66,7 +66,7 @@ enum inner_lbl_pos;
 
 /* The following are setters, their function should be obvious */
 
-void set_CSS_map_file(FILE *);
+void set_clade_CSS_map_file(FILE *);
 void set_ornament_map_file(FILE *);
 void set_leaf_label_style(char *);
 void set_inner_label_style(char *);

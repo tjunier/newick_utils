@@ -401,8 +401,7 @@ void set_svg_parameters(struct parameters params)
 	set_label_angle_correction(params.label_angle_correction);
 	set_left_label_angle_correction(params.left_label_angle_correction);
 	set_URL_map_file(params.url_map);
-	// TODO: refer to this as "clade CSS", as opposed to node label CSS
-	set_CSS_map_file(params.css_map);
+	set_clade_CSS_map_file(params.css_map);
 	set_ornament_map_file(params.ornament_map);
 	set_leaf_label_style(params.leaf_label_style);
 	set_inner_label_style(params.inner_label_style);
