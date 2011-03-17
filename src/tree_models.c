@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* functions for tree models */
 
-#define _GNU_SOURCE // TODO: check if this is necessary.
+//#define _GNU_SOURCE // TODO: check if this is necessary.
 
 #include <stdlib.h>
 #include <stdio.h>
