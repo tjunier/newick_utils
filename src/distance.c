@@ -54,7 +54,7 @@ enum {ALL_NODES, ALL_LABELS, ALL_LEAF_LABELS, ARGV_LABELS, ALL_INNER_NODES,
 	ALL_LEAVES};
 
 struct parameters {
-	int distance_type;	// TODO: rename to 'method'
+	int distance_method;	
 	int selection;
 	struct llist *labels;
 	char separator;
@@ -173,7 +173,7 @@ int get_selection()
 /* Returns the distance type (root, LCA, or matrix) based on the first characer
  * of 'optarg' */
 
-int get_distance_type()
+int get_distance_method()
 {
 	switch (tolower(optarg[0])) {
 	case 'l': /* lca, l, etc */
@@ -198,7 +198,7 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	params.distance_type = FROM_ROOT;
+	params.distance_method = FROM_ROOT;
 	params.selection = ALL_LEAF_LABELS;
 	params.separator = '\n';
 	params.show_header = FALSE;
@@ -214,7 +214,7 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'm':
-			params.distance_type = get_distance_type();
+			params.distance_method = get_distance_method();
 			break;
 		case 'n':
 			params.show_header = TRUE;
@@ -260,7 +260,7 @@ struct parameters get_params(int argc, char *argv[])
 	}
 
 	if (alternative_format) {
-		if (MATRIX == params.distance_type)
+		if (MATRIX == params.distance_method)
 			params.matrix_shape = TRIANGLE;
 		else
 			params.list_orientation = HORIZONTAL;
@@ -617,7 +617,7 @@ int main(int argc, char *argv[])
 			selected_nodes = get_selected_nodes(tree,
 					params.selection);
 		}
-		switch (params.distance_type) {
+		switch (params.distance_method) {
 		case FROM_ROOT:
 			print_distance_list(tree->root, selected_nodes,
 				params.list_orientation, params.show_header);
@@ -664,7 +664,7 @@ int main(int argc, char *argv[])
 		default:
 			fprintf (stderr,
 				"ERROR: invalid distance type '%d'.\n",
-				params.distance_type);
+				params.distance_method);
 			exit(EXIT_FAILURE);
 		}
 
