@@ -152,8 +152,6 @@ int main(int argc, char *argv[])
 	struct parameters params = get_params(argc, argv);
 	srand(params.seed);
 
-	// TODO: offer geometric trees as well, and don't forget to check the
-	// return value of geometric_tree().
 	int result;
 	switch (params.tree_model) {
 	case GEOMETRIC_TREE:
