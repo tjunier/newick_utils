@@ -142,8 +142,6 @@ int main(int argc, char *argv[])
 			dump_newick(tree->root);
 			destroy_tree(tree, NULL);
 		}
-		// TODO: almost no other program checks parser status... what
-		// gives?
 		else switch (newick_parser_status) {
 			case PARSER_STATUS_EMPTY:	/* EOF, etc. */
 				/* goto is ok to break "twice" */
