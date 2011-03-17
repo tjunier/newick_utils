@@ -767,8 +767,8 @@ void draw_scale_bar(double hpos, double vpos,
 enum display_status display_svg_tree(
 		struct rooted_tree *tree,
 		enum graph_style style,
-		int align_leaves,
-		int with_scale_bar,
+		bool align_leaves,
+		bool with_scale_bar,
 		char *branch_length_unit)
 {	
 	assert(init_done);

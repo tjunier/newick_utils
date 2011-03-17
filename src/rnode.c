@@ -96,17 +96,17 @@ inline int children_count(struct rnode *node)
 	return node->child_count;
 }
 
-int is_leaf(struct rnode *node)
+bool is_leaf(struct rnode *node)
 {
 	return 0 == node->child_count;
 }
 
-int is_root(struct rnode *node)
+bool is_root(struct rnode *node)
 {
 	return (NULL == node->parent);
 }
 
-int is_inner_node(struct rnode *node)
+bool is_inner_node(struct rnode *node)
 {
 	return 	(!is_leaf(node) && !is_root(node));
 }

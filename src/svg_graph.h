@@ -68,7 +68,7 @@ void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style);
  * scale bar (e.g., "substitutions/site"). */
 
 enum display_status display_svg_tree(struct rooted_tree *,
-		enum graph_style style, int align_leaves,
+		enum graph_style style, bool align_leaves,
 		bool with_scale_bar, char *branch_length_unit);
 
 /* Writes an SVG footer */
