@@ -64,7 +64,7 @@ struct enode *create_enode_constant(float value);
 /* Creates an operator enode, of type 'operator', with operands 'left' and
  * 'right'. */
 
-struct enode *create_enode_op(int type, struct enode *left,
+struct enode *create_enode_op(enum enode_type type, struct enode *left,
 		struct enode *right);
 
 /* Creates a node that negates the argument */
@@ -73,7 +73,7 @@ struct enode *create_enode_not(struct enode *node);
 
 /* Creates a node for a function */
 
-struct enode *create_enode_func(int type);
+struct enode *create_enode_func(enum enode_type type);
 
 /* Sets the current tree node, i.e. the one on which the functions will
  * operate. I *could* set 'current_node' directly, but then * it would have to
