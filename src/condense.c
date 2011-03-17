@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "parser.h"
 #include "to_newick.h"
-#include "stdbool.h"
 
 enum actions { PURE_CLADES, STAIR_NODES }; /* not sure we'll keep stair nodes */
 

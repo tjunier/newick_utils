@@ -63,9 +63,9 @@ enum order { POST_ORDER, PRE_ORDER };
 
 struct parameters {
 	char *scheme_expr;	// a (test action) pair
-	int show_tree;
+	bool show_tree;
 	int order;
-	int stop_clade_at_first_match;
+	bool stop_clade_at_first_match;
 };
 
 void help(char *argv[])

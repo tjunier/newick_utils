@@ -47,20 +47,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "node_pos_alloc.h"
 #include "common.h"
 
-enum {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
-enum {HORIZONTAL, VERTICAL};
-enum {SQUARE, TRIANGLE};
-enum {ALL_NODES, ALL_LABELS, ALL_LEAF_LABELS, ARGV_LABELS, ALL_INNER_NODES,
+enum distance_methods {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
+enum orientations {HORIZONTAL, VERTICAL};
+enum shapes {SQUARE, TRIANGLE};
+enum selections {ALL_NODES, ALL_LABELS, ALL_LEAF_LABELS, ARGV_LABELS, ALL_INNER_NODES,
 	ALL_LEAVES};
 
 struct parameters {
-	int distance_method;	
-	int selection;
+	enum distance_methods distance_method;	
+	enum selections selection;
 	struct llist *labels;
 	char separator;
-	int show_header;
-	int list_orientation;
-	int matrix_shape;
+	bool show_header;
+	enum orientations list_orientation;
+	enum shapes matrix_shape;
 };
 
 void help(char *argv[])

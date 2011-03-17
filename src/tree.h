@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include <regex.h>
+#include <stdbool.h>
 
 struct rnode;
 struct llist;
@@ -82,7 +83,7 @@ struct llist *get_labels(struct rooted_tree *);
  * Likewise, a tree with all branch lengths set to zero isn't a cladogram
  * either (exactly what it is, I don't know :-) ) */
 
-int is_cladogram(struct rooted_tree *tree);
+bool is_cladogram(struct rooted_tree *tree);
 
 /* Takes a list of labels and returns the corresponding nodes, in the same
  * order */

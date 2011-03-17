@@ -60,7 +60,7 @@ int svg_init();
 
 /* Writes an SVG header */
 
-void svg_header(int nb_leaves, int with_scale_bar, enum graph_style style);
+void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style);
 
 /* Writes a tree into a <g> object. If 'align_leaves' is true, the leaves will
  * be aligned (use this for cladograms). If 'with_scale_bar' is true, a sclae
@@ -69,7 +69,7 @@ void svg_header(int nb_leaves, int with_scale_bar, enum graph_style style);
 
 enum display_status display_svg_tree(struct rooted_tree *,
 		enum graph_style style, int align_leaves,
-		int with_scale_bar, char *branch_length_unit);
+		bool with_scale_bar, char *branch_length_unit);
 
 /* Writes an SVG footer */
 

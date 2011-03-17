@@ -43,9 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 
 struct parameters {
-	int show_inner_labels;
-	int show_leaf_labels;
-	int show_branch_lengths;
+	bool show_inner_labels;
+	bool show_leaf_labels;
+	bool show_branch_lengths;
 };
 
 void help(char *argv[])

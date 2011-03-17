@@ -140,7 +140,7 @@ struct parameters get_params(int argc, char *argv[])
 
 	/* check arguments */
 	int nargs = argc - optind; /* non-option arguments */
-	int args_ok = true;
+	bool args_ok = true;
 	switch (nargs) {
 	case 0:
 		args_ok = false;
@@ -261,7 +261,7 @@ enum deroot_status deroot(struct rooted_tree *tree)
 /* Returns true IFF arguments (cast to char*) are equal - IOW, the negation
  * of strcmp(). See llist_index_of() in list.h */
 
-int string_eq(void *list_data, void *target)
+bool string_eq(void *list_data, void *target)
 {
 	return (strcmp((char *) list_data, (char *) target) == 0);
 }

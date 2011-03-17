@@ -37,5 +37,5 @@ enum inner_lbl_pos;
  * (surprise!) - useful for cladograms.  */
 
 enum display_status display_tree(struct rooted_tree *,
-		int width, int align_leaves, enum inner_lbl_pos,
+		int width, bool align_leaves, enum inner_lbl_pos,
 		bool with_scalebar, char *units, bool scale_zero_at_root);

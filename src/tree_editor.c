@@ -60,9 +60,9 @@ struct enode *expression_root;
 struct parameters {
 	char * address;
 	int action;
-	int show_tree;
+	bool show_tree;
 	int order;
-	int stop_clade_at_first_match;
+	bool stop_clade_at_first_match;
 };
 
 void help(char *argv[])

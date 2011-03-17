@@ -74,7 +74,7 @@ struct ornament_map_element {
 char *leaf_label_class = "leaf-label";
 char *inner_label_class = "inner-label";
 
-static int init_done = false;
+static bool init_done = false;
 
 /************************** external variables *****************************/
 
@@ -684,7 +684,7 @@ int svg_init()
  * needed to compute height for orthogonal trees; the second argument is a
  * boolean that is true IFF we show a scale bar. */
 
-void svg_header(int nb_leaves, int with_scale_bar, enum graph_style style)
+void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style)
 {
 	int height;
 

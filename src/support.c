@@ -56,8 +56,8 @@ static int num_leaves;
 struct parameters {
 	FILE * target_tree_file;
 	FILE * rep_trees_file;
-	int show_label_numbers;
-	int use_percent;
+	bool show_label_numbers;
+	bool use_percent;
 };
 
 void help(char* argv[])

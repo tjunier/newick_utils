@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <sys/types.h>
 #include <regex.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "link.h"
@@ -166,7 +167,7 @@ struct llist *get_leaf_labels(struct rooted_tree *tree)
 	return labels;
 }
 
-int is_cladogram(struct rooted_tree *tree)
+bool is_cladogram(struct rooted_tree *tree)
 {
 	return TREE_TYPE_CLADOGRAM == get_tree_type(tree);
 }

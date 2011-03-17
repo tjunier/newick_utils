@@ -59,7 +59,7 @@ static int running_number()
 
 /* Determines if a node is to have children, based on a pseudorandom number */
 
-static int geo_has_children(double prob_node_has_children)
+static bool geo_has_children(double prob_node_has_children)
 {
 	double rn = (double) rand() / RAND_MAX;
 

@@ -76,17 +76,17 @@ int children_count(struct rnode *node);
 
 /* returns true IFF node is a leaf */
 
-int is_leaf(struct rnode *node);
+bool is_leaf(struct rnode *node);
 
 /* returns true IFF node is root, which is defined to be one of i) node has
  * NULL parent edge, or ii) node has a parent edge, but this has a NULL parent
  * node. */
 
-int is_root(struct rnode *node);
+bool is_root(struct rnode *node);
 
 /* Returns true IFF node is neither a leaf nor the root */
 
-int is_inner_node(struct rnode *node);
+bool is_inner_node(struct rnode *node);
 
 /* Returns true IFF i) node is not a leaf, and ii) all its children are leaves.
  * */
@@ -106,7 +106,7 @@ void dump_rnode(void *arg);
 
 /* Returns true IFF node is a "stair" node */
 
-int is_stair_node(struct rnode *node);
+bool is_stair_node(struct rnode *node);
 
 /* Frees a node and all its descendants. Use this when you cannot use
  * destroy_tree(), e.g. when the tree structure has been altered. */ 

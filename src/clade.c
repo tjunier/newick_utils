@@ -48,16 +48,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "link.h"
 #include "subtree.h"
 
-enum {EXACT, REGEXP};
+enum modes {EXACT, REGEXP};
 
 struct parameters {
 	struct llist *labels;
-	int check_monophyly;
-	int siblings;
-	int mode;
+	bool check_monophyly;
+	bool siblings;
+	enum modes mode;
 	char * regexp_string;
 	regex_t *regexp;
-	int context;
+	int context;	/* how many levels above LCA */
 };
 
 void help(char *argv[])

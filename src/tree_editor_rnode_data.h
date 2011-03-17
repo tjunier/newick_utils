@@ -47,5 +47,5 @@ struct rnode_data {
 	bool  is_depth_defined;	/* false if depth is undefined */
 	int nb_ancestors;	/* root has 0 */
 	int nb_descendants;	/* direct (children) and indirect */
-	int stop_mark;	/* to stop processing of a clade, see option -o */
+	bool stop_mark;	/* to stop processing of a clade, see option -o */
 };

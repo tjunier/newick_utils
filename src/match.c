@@ -37,12 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include <stdbool.h>
 
-/*
-#include <assert.h>
-#include <math.h>
-
-#include "node_set.h"
-*/
 #include "parser.h"
 #include "to_newick.h"
 #include "tree.h"
@@ -69,7 +63,7 @@ void newick_scanner_set_file_input(FILE *);
 struct parameters {
 	char *pattern;
 	FILE *target_trees;
-	int reverse;
+	bool reverse;
 };
 
 void help(char* argv[])
