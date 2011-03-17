@@ -234,7 +234,7 @@ enum inner_lbl_pos get_inner_label_pos(char *optarg)
 		case 'r':
 			return INNER_LBL_ROOT;
 	}
-	return -1;	// TODO: handle invalid chars
+	return -1;
 }
 
 struct parameters get_params(int argc, char *argv[])
@@ -265,6 +265,7 @@ struct parameters get_params(int argc, char *argv[])
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
 	const int DEFAULT_WIDTH_CHARS = 80;
+	int pos;
 	
 	/* parse options and switches */
 	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:n:o:rR:sStu:U:v:w:W:")) != -1) {
@@ -294,7 +295,12 @@ struct parameters get_params(int argc, char *argv[])
 			params.inner_label_style = optarg;
 			break;
 		case 'I':
-			params.inner_label_pos = get_inner_label_pos(optarg);
+			pos = get_inner_label_pos(optarg);
+			if (pos < 0)
+				fprintf(stderr, "WARNING: invalid arg '%s' "
+					"to -I - using default.\n", optarg);
+			else
+				params.inner_label_pos = pos;
 			break;
 		case 'l':
 			params.leaf_label_style = optarg;
