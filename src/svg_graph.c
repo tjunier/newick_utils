@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include <assert.h>
 #include <ctype.h>
-//#include <stdbool.h>
+#include <stdbool.h>
 
 #include "common.h"
 #include "graph_common.h"
@@ -74,7 +74,7 @@ struct ornament_map_element {
 char *leaf_label_class = "leaf-label";
 char *inner_label_class = "inner-label";
 
-static int init_done = FALSE;
+static int init_done = false;
 
 /************************** external variables *****************************/
 

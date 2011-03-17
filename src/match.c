@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#include <stdbool.h>
 
 /*
 #include <assert.h>
@@ -128,7 +129,7 @@ struct parameters get_params(int argc, char *argv[])
 	char opt_char;
 
 
-	params.reverse = FALSE;
+	params.reverse = false;
 
 	/* parse options and switches */
 	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
@@ -138,7 +139,7 @@ struct parameters get_params(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 		/* we keep this for debugging, but not documented */
 		case 'v':
-			params.reverse = TRUE;
+			params.reverse = true;
 			break;
 		}
 	}

@@ -201,7 +201,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.distance_method = FROM_ROOT;
 	params.selection = ALL_LEAF_LABELS;
 	params.separator = '\n';
-	params.show_header = FALSE;
+	params.show_header = false;
 	params.list_orientation = VERTICAL;
 	params.matrix_shape = SQUARE;
 
@@ -217,7 +217,7 @@ struct parameters get_params(int argc, char *argv[])
 			params.distance_method = get_distance_method();
 			break;
 		case 'n':
-			params.show_header = TRUE;
+			params.show_header = true;
 			break;
 		case 's':
 			params.selection = get_selection();

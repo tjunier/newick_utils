@@ -519,7 +519,7 @@ static void process_tree(struct rooted_tree *tree, SCM address,
 			/* see -o switch */
 			if (params.stop_clade_at_first_match)
 				((struct rnode_data *)
-				 current_node->data)->stop_mark = TRUE;
+				 current_node->data)->stop_mark = true;
 		}
 
 	} /* loop over all nodes */

@@ -29,12 +29,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* functions for tree models */
 
-#define _GNU_SOURCE
+#define _GNU_SOURCE // TODO: check if this is necessary.
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "list.h"
 #include "rnode.h"
@@ -63,9 +64,9 @@ static int geo_has_children(double prob_node_has_children)
 	double rn = (double) rand() / RAND_MAX;
 
 	if (rn <= prob_node_has_children)
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 }
 
 /* Visits a leaf: probabilistically adds children to the leaf, and adds those

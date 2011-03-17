@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -110,8 +111,8 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 	char opt_char;
 
-	params.show_label_numbers = FALSE;
-	params.use_percent = FALSE;
+	params.show_label_numbers = false;
+	params.use_percent = false;
 
 	/* parse options and switches */
 	while ((opt_char = getopt(argc, argv, "hlp")) != -1) {
@@ -121,10 +122,10 @@ struct parameters get_params(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 		/* we keep this for debugging, but not documented */
 		case 'l':
-			params.show_label_numbers = TRUE;
+			params.show_label_numbers = true;
 			break;
 		case 'p':
-			params.use_percent = TRUE;
+			params.use_percent = true;
 			break;
 		}
 	}

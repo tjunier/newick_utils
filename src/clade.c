@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <sys/types.h>
 #include <regex.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -156,8 +157,8 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	params.check_monophyly = FALSE;
-	params.siblings = FALSE;
+	params.check_monophyly = false;
+	params.siblings = false;
 	params.mode = EXACT;
 	params.context = 0;
 
@@ -171,13 +172,13 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'm':
-			params.check_monophyly = TRUE;
+			params.check_monophyly = true;
 			break;
 		case 'r':
 			params.mode = REGEXP;
 			break;
 		case 's':
-			params.siblings = TRUE;
+			params.siblings = true;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);

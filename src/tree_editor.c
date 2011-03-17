@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "enode.h"
 #include "rnode.h"
@@ -216,9 +217,9 @@ struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
-	params.show_tree = TRUE;
+	params.show_tree = true;
 	params.order = POST_ORDER;
-	params.stop_clade_at_first_match = FALSE;
+	params.stop_clade_at_first_match = false;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "hnor")) != -1) {
@@ -227,10 +228,10 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'n':
-			params.show_tree = FALSE;
+			params.show_tree = false;
 			break;
 		case 'o':
-			params.stop_clade_at_first_match = TRUE;
+			params.stop_clade_at_first_match = true;
 			params.order = PRE_ORDER;
 			break;
 		case 'r':
@@ -318,7 +319,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 	if (NULL == rndata) { perror(NULL); exit (EXIT_FAILURE); }
 	rndata->nb_ancestors = 0;
 	rndata->depth = 0;
-	rndata->stop_mark = FALSE;
+	rndata->stop_mark = false;
 	node->data = rndata;
 
 	/* WARNING: don't forget to set values for the root's data, above. The
@@ -333,7 +334,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 		rndata->depth = parent_data->depth +
 			atof(node->edge_length_as_string);
 
-		rndata->stop_mark = FALSE;
+		rndata->stop_mark = false;
 		node->data = rndata;
 	}
 
@@ -388,7 +389,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			if (((struct rnode_data *) current->parent->data)->stop_mark) {
 				/* Stop-mark the current node and continue */ 
 				((struct rnode_data *)
-				current->data)->stop_mark = TRUE;
+				current->data)->stop_mark = true;
 				continue;
 			}
 		} 
@@ -448,7 +449,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			 * since this node matches -  we set the stop mark on
 			 * this node */
 			if (params.stop_clade_at_first_match)
-				((struct rnode_data *) current->data)->stop_mark = TRUE;
+				((struct rnode_data *) current->data)->stop_mark = true;
 		} /* matching node */	
 	}
 

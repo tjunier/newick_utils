@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "common.h"
 
@@ -95,7 +96,7 @@ void help(char *argv[])
 void get_params(int argc, char* argv[])
 {
 	int c;
-	int compact = FALSE;
+	bool compact = false;
 
 	eol = "\n";
 	indent_string = "  ";
@@ -103,7 +104,7 @@ void get_params(int argc, char* argv[])
 	while ((c = getopt (argc, argv, "cht:")) != -1) {
 		switch (c) {
 		case 'c':
-			 compact = TRUE;
+			 compact = true;
 			 break;
 		case 'h':
 			help(argv);
@@ -113,7 +114,7 @@ void get_params(int argc, char* argv[])
 			 break;
 		}
 	}
-	if (TRUE == compact) {
+	if (true == compact) {
 		eol = "";
 		indent_string = "";
 	}
