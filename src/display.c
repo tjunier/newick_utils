@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "common.h"
 #include "list.h"
@@ -45,11 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "svg_graph_common.h"
 #include "error.h"
 
-// TODO: switch the logical ints to bools (stdbool.h)
-
 struct parameters {
 	int 	width;
-	int 	svg;
+	bool 	svg;
 	FILE 	*css_map;	
 	FILE 	*url_map;
 	FILE 	*ornament_map;			/* SVG */
@@ -64,7 +63,7 @@ struct parameters {
 	double 	left_label_angle_correction;
 	int 	root_length;
 	double 	label_char_width;	/* for estimating label length */
-	int 	no_scale_bar;		/* suppresses scale bar if true */
+	bool 	no_scale_bar;		/* suppresses scale bar if true */
 	enum 	inner_lbl_pos inner_label_pos;	/* where to put the label */
 	bool	scale_zero_at_root;	/* if false, at max depth */
 	int	label_space_correction;	/* between a node and its label */
@@ -243,7 +242,7 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	params.width =	-1;
-	params.svg = FALSE;
+	params.svg = false;
 	params.css_map = NULL;
 	params.ornament_map = NULL;
 	params.url_map = NULL;
@@ -258,7 +257,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.left_label_angle_correction = 0.0;
 	params.root_length = ROOT_SPACE;
 	params.label_char_width = 8.0;
-	params.no_scale_bar = FALSE;
+	params.no_scale_bar = false;
 	params.inner_label_pos = INNER_LBL_LEAVES;
 	params.scale_zero_at_root = true;
 	params.label_space_correction = 0;	/* px */
@@ -316,10 +315,10 @@ struct parameters get_params(int argc, char *argv[])
 			params.root_length = atoi(optarg);
 			break;
 		case 's':
-			params.svg = TRUE;
+			params.svg = true;
 			break;
 		case 'S':
-			params.no_scale_bar = TRUE;
+			params.no_scale_bar = true;
 			break;
 		case 't':
 			params.scale_zero_at_root = false;
@@ -433,8 +432,8 @@ int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;
 	struct parameters params;
-	int align_leaves;
-	int with_scale_bar;
+	bool align_leaves;
+	bool with_scale_bar;
 	enum display_status status; 
 	/* Stays NULL for text, but not for SVG */
 	void (*node_destroyer)(void *) = NULL;
@@ -457,7 +456,7 @@ int main(int argc, char *argv[])
 		 * up  'align_leaves' which has the same value. */
 		with_scale_bar = !align_leaves;
 		/* User can also suppress scale bar */
-		if (params.no_scale_bar) with_scale_bar = FALSE;
+		if (params.no_scale_bar) with_scale_bar = false;
 
 		if (params.svg) {
 			svg_header(leaf_count(tree), with_scale_bar, params.style);
