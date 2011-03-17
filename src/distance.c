@@ -589,8 +589,8 @@ int main(int argc, char *argv[])
 	struct h_data depths;	
 	params = get_params(argc, argv);
 
-	/* TODO: could take the switch out of the loop, since the distance type
-	 * is fixed for the program's lifetime. OTOH the code is easier to
+	/* I could take the switch out of the loop, since the distance type
+	 * is fixed for the process's lifetime. OTOH the code is easier to
 	 * understand this way, and it's unlikely the switch has a visible
 	 * impact on performance. */
 
