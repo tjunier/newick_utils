@@ -287,9 +287,12 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				for (el=sibs->head;NULL!=el;el=el->next) {
 					struct rnode *sib;
 					sib = el->data;
+					/*
 					newick = to_newick(sib);
 					printf ("%s\n", newick);
 					free(newick);
+					*/
+					dump_newick(sib);
 				}
 				destroy_llist(sibs);
 			} else {
