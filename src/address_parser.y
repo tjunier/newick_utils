@@ -74,7 +74,6 @@ void adserror(char *s)
 
 /* I use the words 'term' and 'factor' by analogy with arithmetic operators */
 
-// TODO: test the parser's behaviour when the create_enode_*() functions fail.
 expression: /* empty */ { expression_root = NULL; }
 	| term { expression_root = $1; }
 	| expression OP_OR term {
