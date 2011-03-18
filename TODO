@@ -34,6 +34,8 @@ general: check that all source files contain the BSD license.
 
 general: identify obsolete f() and replace by newer versions.
 
+nw_sched: would be nice to merge with new_rnode, as this would open up the possibility of a 'next-sib' function.
+
 nw_reroot: if the outgroup-to-be is already the outgroup, the tree should not change (both because there is no need (PLOS), and also because it saves time). Try e.g. rerooting '(((Dog,Cat),Cow),Jay);' on Jay: should be an invariant.
 
 nw_match: try to implement the whole thing using iterators rather than comparing Newick strings.
@@ -533,6 +535,9 @@ left, while right-side texts are anchored at the right, so giving (say) x=10
 will shift some rootward and the others leafward. One needs, I'm afraid, to
 tweak the <text> elements themselves and change the sign of x='...' attributes
 for one side of the tree.
+
+[done ] nw_sched: define a SMOB for trees. Access the nodes_in_order as a
+Scheme list (what else?), then... car and cdr! 
 
 tests for nw_sched: test undefinedness of b, d, etc. -- all variables that may
 be undefined.
