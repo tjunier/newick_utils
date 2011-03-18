@@ -268,15 +268,11 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		if (! is_root(subtree_root))
 			subtree_root = subtree_root->parent;
 
-	// TODO: could not replace to_newick() by dump_newick() due to side
-	// effects. Investigate.
-
 	if (NULL != subtree_root) {
 		if ((! params.check_monophyly) ||
 		    (MONOPH_TRUE == is_monophyletic(descendants, subtree_root))) {
 			/* monophyly of input labels is verified or not
 			 * requested */
-			char *newick;
 			if (params.siblings) {
 				struct llist *sibs = siblings(subtree_root);
 				if (NULL == sibs) {
@@ -285,22 +281,13 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				}
 				struct list_elem *el;
 				for (el=sibs->head;NULL!=el;el=el->next) {
-					struct rnode *sib;
-					sib = el->data;
-					/*
-					newick = to_newick(sib);
-					printf ("%s\n", newick);
-					free(newick);
-					*/
-					dump_newick(sib);
+					dump_newick(el->data);
 				}
 				destroy_llist(sibs);
 			} else {
 				/* normal operation: print clade defined by
 				 * labels. */
-				newick = to_newick(subtree_root);
-				printf ("%s\n", newick);
-				free(newick);
+				dump_newick(subtree_root);
 			}
 		}
 	} else {
