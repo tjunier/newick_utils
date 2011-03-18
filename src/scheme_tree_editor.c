@@ -481,8 +481,10 @@ static void process_tree(struct rooted_tree *tree, SCM address,
 	struct list_elem *el;
 
 	/* these two traversals fill the node data. */
-	// TODO: would gain time by only performing those traversals that are
-	// needed
+	/* We would gain time by only performing those traversals that are
+	 * needed, but for this we'd need to scan the user code to see which
+	 * functions/variables are used (in fact this might be relatively
+	 * simple in Scheme) */
 	reverse_parse_order_traversal(tree);
 	parse_order_traversal(tree);
 
