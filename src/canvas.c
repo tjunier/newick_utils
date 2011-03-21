@@ -34,6 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "canvas.h"
 
+struct canvas {
+	int width;
+	int height;
+	char **lines;
+	};
+
 struct canvas *create_canvas(int width, int height)
 {
 	struct canvas *cp;

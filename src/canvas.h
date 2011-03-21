@@ -28,38 +28,58 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-struct canvas {
-	int width;
-	int height;
-	char **lines;
-	};
 
-/* Creates a canvas of w chars by h lines. Positions on the canvas start at 0
- * (i.e., C-style).  Returns NULL iff canvas can't be allocated. */
+/**
+ * \file canvas.h Functions for creating and using text canvases.
+ */
+
+struct canvas;	/* keep the actual structure private */
+
+/**
+ * Creates a canvas of w chars by h lines. Positions on the canvas start at 0
+ * (i.e., C-style).  Returns a (pointer to a) canvas, or NULL iff canvas can't
+ * be allocated. Once no longer needed, the canvas should be freed with
+ * destroy_canvas().
+ * \param w the number of columns
+ * \param l the number of lines (rows)
+ * \return a pointer to a struct canvas
+ */ 
 
 struct canvas *create_canvas(int w, int l);
 
-/* Prints the canvas lines */
+/** Draws a horizontal line on the canvas. The line is on line \a line, and
+ * goes from column \a start to column \a end (inclusive). The line is made
+ * of '\c -', except if there already is a '\c |', in which case a '\c +' is
+ * written instead. 
+ * \param[out] 	canvas 	the canvas to draw on
+ * \param 	line	the line to draw at
+ * \param	start	the first column
+ * \param	end	the last column */
 
-void print(struct canvas*);
+void canvas_draw_hline(struct canvas canvas*, int line, int start, int end);
 
-/* Draws a horizontal line on the canvas, on line 'line', from column 'start'
- * to column 'end'. The line is made of '-', except if there already is a '|',
- * in which case a '+' is written. */
-
-void canvas_draw_hline(struct canvas*, int line, int start, int end);
-
-/* Draws a vertical line on the canvas, on column 'col', form line 'start' to
- * line 'end'. The line is made of '|', except if there already is a '-',
- * in which case a '+' is written.  */
+/** Draws a vertical line on the canvas.
+ * The line is on column \a col form line \start to
+ * line \a end. The line is made of '\c |', except if there already is a
+ * '\c -', in which case a '\c +' is written.
+ * \param[out]	canvas 	the canvas to draw on
+ * \param	col	the column to draw at
+ * \param	start	the first line
+ * \param	end	the last line */
 
 void canvas_draw_vline(struct canvas*, int col, int start, int end);
 
-/* Writes the string, starting at (col, line) */
+/** Writes a text string.
+ * \param[out]	canvas	the canvas to write the string on
+ * \param	col	the colum of the first character in the string
+ * \param	line	the line the string is written at
+ * \param	text	the string to write (NULL-terminated) */
 
 void canvas_write(struct canvas*, int col, int line, char *text);
 
-/* Dumps the canvas onto stdout */
+/** Dumps the canvas to standard output. Use this function after filling the
+ * canvas' contents with the draw and write functions.
+ * \param[out]	canvas * the canvas to dump. */
 
 void canvas_dump(struct canvas*);
 
@@ -67,6 +87,6 @@ void canvas_dump(struct canvas*);
 
 void canvas_inspect(struct canvas* canvasp);
 
-/* Releases all memory used by the canvas. Don't use it after this! */
+/** Releases all memory held by the canvas. Don't use it after this! */
 
 void destroy_canvas(struct canvas*);
