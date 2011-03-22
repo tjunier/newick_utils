@@ -95,8 +95,8 @@ nw_duration_LDADD = libnw.la
 nw_stats_SOURCES = stats.c
 nw_stats_LDADD = libnw.la
 
-nw_sched_SOURCES = scheme_tree_editor.c
-nw_sched_LDADD =  libnw.la -lguile
+nw_sched_SOURCES = scheme_tree_editor.c rnode_smob.c
+nw_sched_LDADD = libnw.la -lguile -lpthread
 
 # disabled for release
 #nw_toy_SOURCES = toy.c
