@@ -83,7 +83,7 @@ void canvas_write(struct canvas*, int col, int line, char *text);
 
 void canvas_dump(struct canvas*);
 
-/* (Debugging) like canvas_dump(), but more info */
+/** (Debugging function) like canvas_dump(), but prints line numbers. */
 
 void canvas_inspect(struct canvas* canvasp);
 
