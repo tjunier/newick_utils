@@ -1,11 +1,16 @@
-\section{Bootscanning}
+\section{Finding Recombination Breakpoints}
 \label{sct_bootscanning}
 
 Bootscanning is a technique for finding recombination breakpoints in a
-sequence. It involves aligning the sequence of interest (called \emph{query} or
-\emph{reference}) with related sequences (including the putative recombinant's
-parents) and computing phylogenies locally over the alignment. Recombination is
-expected to cause changes in topology.  The tasks involved are shown below:
+sequence. The original procedure \cite{Salminen_1995} uses the bootstrap value
+of competing topologies as a criterion, the procedure shown below uses the
+patristic distance (\ie, distance along the tree) according to the most likely
+tree, and is thus not strictly speaking a bootscan but a distance
+plot.\footnote{Thanks to Heiko Schmidt for pointing this out.} It involves
+aligning the sequence of interest (called \emph{query} or \emph{reference})
+with related sequences (including the putative recombinant's parents) and
+computing phylogenies locally over the alignment.  Recombination is expected to
+cause changes in topology.  The tasks involved are shown below:
 \begin{enumerate}
 \item align the sequences $\rightarrow$ multiple alignment
 \item slice the multiple alignment $\rightarrow$ slices
