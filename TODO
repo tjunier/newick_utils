@@ -1,3 +1,5 @@
+nw_distance: add new kind of selection: user-specified labels.
+
 general: check that the apps' get_params() functions set the nwsin external via
 set_parser_input_filename() rather than manually.
 
