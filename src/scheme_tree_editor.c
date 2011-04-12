@@ -305,7 +305,8 @@ static struct parameters get_params(int argc, char *argv[])
 	}
 
 	/* check arguments */
-	if (2 >= (argc - optind))	{
+	if (2 >= (argc - optind) &&
+	    argc > 1)	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
 			extern FILE *nwsin;
