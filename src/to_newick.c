@@ -209,9 +209,10 @@ struct llist *to_newick_i(struct rnode *node)
 	it = create_rnode_iterator(node);
 	if (NULL == it) return NULL;
 	
-	it->root->seen = 1;
+	struct rnode *it_root = get_rnode_iterator_root(it);
+	it_root->seen = 1;
 
-	if (! is_leaf(it->root))
+	if (! is_leaf(it_root))
 		if (! append_element(result, strdup("(")))
 			return NULL;
 

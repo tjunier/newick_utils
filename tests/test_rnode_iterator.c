@@ -36,6 +36,11 @@ int test_iterator()
 	struct rnode_iterator *it = create_rnode_iterator(tree.root);
 	struct rnode *next;
 
+	if (get_rnode_iterator_root(it) != tree.root) {
+		printf("%s: root should be %p, not %p.\n", test_name,
+				tree.root, get_rnode_iterator_root(it));
+		return 1;
+	}
 	next = rnode_iterator_next(it);
 	if (NULL == next) {
 		printf ("%s: next node should not be NULL\n", test_name);

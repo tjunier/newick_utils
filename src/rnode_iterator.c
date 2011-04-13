@@ -82,6 +82,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * pushing all the node's children, then removing the node. But I'm not sure it
  * would be faster than using 'seen' flags. */
 
+
+struct rnode_iterator
+{
+	struct rnode *root;	/**< starting point */
+	struct rnode *current;	/**< currently visited node */
+};
+
 /* see note above about the 'seen' member of struct rnode */
 
 struct rnode_iterator *create_rnode_iterator(struct rnode *root)
@@ -93,6 +100,11 @@ struct rnode_iterator *create_rnode_iterator(struct rnode *root)
 	iter->root = iter->current = root;
 
 	return iter;
+}
+
+struct rnode *get_rnode_iterator_root(struct rnode_iterator* it)
+{
+	return it->root;
 }
 
 void destroy_rnode_iterator (struct rnode_iterator *it)
