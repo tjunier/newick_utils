@@ -38,13 +38,6 @@ enum next_status { NEXT_TOKEN_END, NEXT_TOKEN_ERROR };
 
 extern enum next_status next_token_status;
 
-struct word_tokenizer {
-	char *string;
-	char *word_start;
-	char *word_stop;
-	size_t string_len;
-};
-
 /* Returns a line from a file, as a pointer to an allocated buffer. Returns
  * NULL if EOF or error (the external variable 'read_line_status' will be set
  * so that callers can tell EOF from errors). The buffer should be free()d when

@@ -53,11 +53,11 @@ extern int label_space;
  * will have URLs. So the current map-based approach seems best here. */
 
 struct svg_data {
-	double top;
-	double bottom;
-	double depth;
-	int group_nb;	/* For attributing styles */
-	char *ornament;	/* SVG decorations */
+	double top;	/**< top of node (ortho) or leftmost angle (radial) */
+	double bottom;	/**< bottom of node (ortho) or rightmost most angle (radial) */
+	double depth;	/**< depth in tree */
+	int group_nb;	/**< For attributing styles */
+	char *ornament;	/**< SVG decorations */
 	/* ... other node properties ... */
 };
 
