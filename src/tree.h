@@ -38,10 +38,12 @@ extern const int DONT_FREE_NODE_DATA;
 
 enum tree_type {TREE_TYPE_UNKNOWN, TREE_TYPE_CLADOGRAM, TREE_TYPE_PHYLOGRAM, TREE_TYPE_NEITHER};
 
+// TODO: would probably be a good idea to make this private and use accessors.
+
 struct rooted_tree {
-	struct rnode *root;
-	struct llist *nodes_in_order;
-	enum tree_type type;
+	struct rnode *root;		/**< tree's root */
+	struct llist *nodes_in_order;	/**< llist of nodes, in postorder */
+	enum tree_type type;		/**< see enum tree_type */
 };
 
 /* Reroots the tree in such a way that 'outgroup' and descendants are one of

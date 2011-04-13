@@ -47,9 +47,9 @@ struct rooted_tree;
  * data should use another struct. */
 
 struct simple_node_pos {
-	double top;
-	double bottom;
-	double depth;
+	double top;	/**< node's top position on graph */
+	double bottom;	/**< node's bottom position on graph */
+	double depth;	/**< node's depth in graph */
 };
 
 /* Allocates a simple_node_pos structure for each node. */

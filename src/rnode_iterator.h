@@ -55,17 +55,20 @@ struct rnode;
 struct llist;
 struct rooted_tree;
 
-struct rnode_iterator
-{
-	struct rnode *root;	/* starting point */
-	struct rnode *current;
-};
-
+struct rnode_iterator;
 
 /* Creates an iterator. You can then pass it to the functions below. */
 /* Returns NULL in case of problems (which will be with allocation) */
 
 struct rnode_iterator *create_rnode_iterator(struct rnode *root);
+
+/** Gets the iterators's root 
+ *
+ * \param it the iterator
+ * \return its root
+ */
+
+struct rnode *get_rnode_iterator_root(struct rnode_iterator*);
 
 /* Destroys the iterator, freeing allocated memory */
 

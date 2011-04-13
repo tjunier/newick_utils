@@ -37,6 +37,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum read_status read_line_status;
 enum next_status next_token_status;
 
+struct word_tokenizer {
+	char *string;
+	char *word_start;
+	char *word_stop;
+	size_t string_len;
+};
+
 char * read_line(FILE *file)
 {
 	char *line;
