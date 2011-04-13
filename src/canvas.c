@@ -32,7 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 
-#include "canvas.h"
+struct canvas {
+	int width;
+	int height;
+	char **lines;
+	};
 
 struct canvas *create_canvas(int width, int height)
 {
@@ -58,6 +62,17 @@ struct canvas *create_canvas(int width, int height)
 	}
 
 	return cp;
+}
+
+/* I use getters so I can keep the structure private */
+
+int get_canvas_width(struct canvas *canvas) { return canvas->width; }
+
+int get_canvas_height(struct canvas *canvas) { return canvas->height; }
+
+char* _get_canvas_line(struct canvas *canvas, int num)
+{
+	return canvas->lines[num];
 }
 
 void canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col)

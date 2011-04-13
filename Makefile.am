@@ -23,6 +23,12 @@ doc/nwutils_tutorial.pdf:
 PLATFORM = $(shell uname -s)-$(shell uname -m)
 EXTRA = enabled
 
+api-doc:
+	doxygen
+
+api-doc-latex: api-doc
+	$(MAKE) -C latex
+
 show:
 	echo $(PLATFORM)
 
