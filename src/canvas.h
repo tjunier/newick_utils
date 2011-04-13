@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \file canvas.h Functions for creating and using text canvases.
  */
 
-struct canvas;	/* keep the actual structure private */
-
 /**
  * Creates a canvas of w chars by h lines. Positions on the canvas start at 0
  * (i.e., C-style).  Returns a (pointer to a) canvas, or NULL iff canvas can't
@@ -47,16 +45,33 @@ struct canvas;	/* keep the actual structure private */
 
 struct canvas *create_canvas(int w, int l);
 
-/** Draws a horizontal line on the canvas. The line is on line \a line, and
- * goes from column \a start to column \a end (inclusive). The line is made
- * of '\c -', except if there already is a '\c |', in which case a '\c +' is
- * written instead. 
- * \param[out] 	canvas 	the canvas to draw on
- * \param 	line	the line to draw at
- * \param	start	the first column
- * \param	end	the last column */
+/** Returns the canvas' width in columns
+ *
+ * \param	canvas	a pointer to the canvas
+ * \return	its width
+ */
 
-void canvas_draw_hline(struct canvas canvas*, int line, int start, int end);
+int get_canvas_width(struct canvas *canvas);
+
+/** Returns the canvas' height in rows
+ *
+ * \param	canvas	a pointer to the canvas
+ * \return	its height
+ */
+
+int get_canvas_height(struct canvas *canvas);
+
+/** Returns one line from the canvas. Meant to be used in tests, mostly (hence
+ * the _ prefix). The line is NOT copied, so do not call free on this unless
+ * you know what you're
+ * doing!
+ *
+ * \param	canvas	a pointer to the canvas
+ * \param	num	what line number to get
+ * \return	the line
+ */
+
+char* _get_canvas_line(struct canvas *canvas, int num);
 
 /** Draws a vertical line on the canvas.
  * The line is on column \a col form line \start to
@@ -67,7 +82,18 @@ void canvas_draw_hline(struct canvas canvas*, int line, int start, int end);
  * \param	start	the first line
  * \param	end	the last line */
 
-void canvas_draw_vline(struct canvas*, int col, int start, int end);
+void canvas_draw_vline(struct canvas* canvas, int col, int start, int end);
+
+/** Draws a horizontal line on the canvas. The line is on line \a line, and
+ * goes from column \a start to column \a end (inclusive). The line is made
+ * of '\c -', except if there already is a '\c |', in which case a '\c +' is
+ * written instead. 
+ * \param[out] 	canvas 	the canvas to draw on
+ * \param 	line	the line to draw at
+ * \param	start	the first column
+ * \param	end	the last column */
+
+void canvas_draw_hline(struct canvas* canvas , int line, int start, int end);
 
 /** Writes a text string.
  * \param[out]	canvas	the canvas to write the string on

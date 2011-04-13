@@ -105,7 +105,7 @@ INLINE_INHERITED_MEMB  = NO
 # path before files name in the file list and in the header files. If set
 # to NO the shortest path that makes the file name unique will be used.
 
-FULL_PATH_NAMES        = YES
+FULL_PATH_NAMES        = NO
 
 # If the FULL_PATH_NAMES tag is set to YES then the STRIP_FROM_PATH tag
 # can be used to strip a user-defined part of the path. Stripping is
@@ -261,7 +261,7 @@ DISTRIBUTE_GROUP_DOC   = NO
 # NO to prevent subgrouping. Alternatively, this can be done per class using
 # the \nosubgrouping command.
 
-SUBGROUPING            = YES
+SUBGROUPING            = NO
 
 # When TYPEDEF_HIDES_STRUCT is enabled, a typedef of a struct, union, or enum
 # is documented as struct, union, or enum with the name of the typedef. So
@@ -314,7 +314,7 @@ EXTRACT_STATIC         = NO
 # defined locally in source files will be included in the documentation.
 # If set to NO only classes defined in header files are included.
 
-EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_CLASSES  = NO
 
 # This flag is only useful for Objective-C code. When set to YES local
 # methods, which are defined in the implementation section but not in
@@ -500,7 +500,7 @@ SHOW_FILES             = YES
 # This will remove the Namespaces entry from the Quick Index
 # and from the Folder Tree View (if specified). The default is YES.
 
-SHOW_NAMESPACES        = YES
+SHOW_NAMESPACES        = NO
 
 # The FILE_VERSION_FILTER tag can be used to specify a program or script that
 # doxygen should invoke to get the current version for each file (typically from
@@ -624,7 +624,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = *.py
+EXCLUDE_PATTERNS       = *.py *parser.[ch] *scanner.[ch]
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
