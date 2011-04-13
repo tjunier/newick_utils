@@ -41,11 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * number to signal undefined depths, because some tree-building algorithms
  * (like NJ) may produce negative lengths. */
 
+// TODO: there may be more than one structure called rnode_data; this is not a
+// problem if only one is ever #included (per program), but it may be cleaner
+// to explicitly distinguish. Then again, using the same name may serve as a
+// crude polymorphism.
+
 struct rnode_data {
-	float support;	/* normally derived from label */
-	float depth;	/* from root; normally root's depth == 0 */
-	bool  is_depth_defined;	/* false if depth is undefined */
-	int nb_ancestors;	/* root has 0 */
-	int nb_descendants;	/* direct (children) and indirect */
-	bool stop_mark;	/* to stop processing of a clade, see option -o */
+	float support;		/**< normally derived from label */
+	float depth;		/**< from root; normally root's depth == 0 */
+	bool is_depth_defined;	/**< false if depth is undefined */
+	int nb_ancestors;	/**< root has 0 */
+	int nb_descendants;	/**< direct (children) and indirect */
+	bool stop_mark;		/**< to stop processing of a clade, see option -o */
 };

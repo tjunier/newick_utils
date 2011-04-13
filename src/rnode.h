@@ -34,26 +34,31 @@ struct rnode;
 
 struct rnode {
 
-	/* When we speak of 'the' edge of a node, we mean the edge that leads
-	 * to its parent. Its value is numeric, and it can be zero or even
-	 * negative (NJ trees), it can also be undefined (cladograms).
-	 * Therefore we store it as a string, with "" indicating an undefined
-	 * length. This is how Newick does it anyway. */
+	char *label;	/**< The node's label. May be "", but is never NULL. */
+	/** The length of edge that leads to the parent (if any). Its value is
+	 * numeric, and it can be zero or even negative (NJ trees), it can also
+	 * be undefined (cladograms).  Therefore we store it as a string, with
+	 * "" indicating an undefined length. This is how Newick does it
+	 * anyway. */
 	char *edge_length_as_string;	
-	/* edge_length is used when we need the numerical value of the length
+	/** Used when we need the numerical value of the length
 	 * (which is not very frequent, but does happen). */
 	double edge_length;
-	char *label;
-	void *data;	/* app-dependent data for this node */
+	/** App-specific data. Any application-specific data (height, depth,
+	 * etc) can be put into a structure which is pointed to by this
+	 * member. See e.g. struct svg_data in svg_graph_common.h. */
+	void *data;	
 
-	struct rnode *parent;		/* NULL iff root */
-	struct rnode *next_sibling;
-	int child_count;		/* 0 iff leaf */
-	struct rnode *first_child;	/* NULL iff leaf */
-	struct rnode *last_child;	/* NULL iff leaf */
+	struct rnode *parent;		/**< NULL iff root */
+	/** NULL in leaves and root , normally not NULL otherwise */
+	struct rnode *next_sibling;	
+	int child_count;		/**< 0 iff leaf */
+	struct rnode *first_child;	/**< NULL iff leaf */
+	struct rnode *last_child;	/**< NULL iff leaf */
 
-	/* enables traversing by rnode_iterator_next() */
+	/** Used by rnode_iterator to find next node to visit. */
 	struct rnode *current_child;
+	/** Used by rnode_iterator to mark visited nodes. */
 	bool seen;	
 };
 
