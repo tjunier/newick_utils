@@ -38,7 +38,7 @@ general: identify obsolete f() and replace by newer versions.
 
 nw_sched: would be nice to merge with new_rnode, as this would open up the possibility of a 'next-sib' function.
 
-nw_reroot: if the outgroup-to-be is already the outgroup, the tree should not change (both because there is no need (PLOS), and also because it saves time). Try e.g. rerooting '(((Dog,Cat),Cow),Jay);' on Jay: should be an invariant.
+nw_reroot: if the outgroup-to-be is already the outgroup, the tree should not change (both because there is no need (PoLS), and also because it saves time). Try e.g. rerooting '(((Dog,Cat),Cow),Jay);' on Jay: should be an invariant.
 
 nw_match: try to implement the whole thing using iterators rather than comparing Newick strings.
 
@@ -541,12 +541,13 @@ for one side of the tree.
 [done ] nw_sched: define a SMOB for trees. Access the nodes_in_order as a
 Scheme list (what else?), then... car and cdr! 
 
+[done] nw_sched: implement lbl!
+
+[done] nw_sched: check help page, and sync w/ tutorial; add examples incl.
+implementation of other nutils (nw_topology, nw_label, nw_trim?); 
+
 tests for nw_sched: test undefinedness of b, d, etc. -- all variables that may
 be undefined.
-
-nw_sched: implement lbl!
-
-nw_shed: check help page, and sync w/ tutorial; add examples incl. implementation of other nutils (nw_topology, nw_label, nw_trim?)
 
 new rnode: some TODO items list tests to write. Write them. Now.
 
@@ -555,3 +556,6 @@ nw_display: add CSS to labels (in CSS map)
 nw_display: add branch lengths to radial trees.
 
 nw_rename: add example to -h about 3-arg form; also discuss in tutorial.
+
+nw_scheme: sync man, help w/ actual code; add example of numbering inner nodes
+(EK question).
