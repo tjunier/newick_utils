@@ -39,15 +39,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * FAILURE will often be caused by insufficient memory in a called function. 
  */
 
+/* Note: we could also make these two structures private and use only
+ * accessors. But they are so pervasive that it would entail many additional
+ * function calls, which may impact performance. Check before deciding. */
+
 struct list_elem {
-	struct list_elem *next;
-	void *data;
+	struct list_elem *next;	/**< next element (NULL at end of list) */
+	void *data;		/**< arbitrary data */
 };
 
 struct llist {
-	struct list_elem *head;
+	struct list_elem *head;	/**< first element, NULL in an empty list. */
+	/** last element, equal to head if list has 0 or 1 element (NULL in the
+	 * first case) */
 	struct list_elem *tail;
-	int count;
+	int count;		/**< number of elements in list (0: empty) */
 };
 
 /* allocates a llist and returns a pointer to it.
