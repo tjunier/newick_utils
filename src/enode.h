@@ -51,10 +51,10 @@ enum enode_type {
 };
 
 struct enode {
-	enum enode_type type;
-	struct enode *left;
-	struct enode *right;
-	float value;
+	enum enode_type type;	/**< see enum enode_type **/
+	struct enode *left;	/**< left child (or NULL) */
+	struct enode *right;	/**< right child (or NULL) */
+	float value;		/**< numeric value (not always used) */
 };
 
 /* Creates an enode of type ENODE_CONSTANT, with value 'value'. */
