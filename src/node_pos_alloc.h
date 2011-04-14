@@ -36,9 +36,9 @@ struct rnode;
 /* used for returning max depth and max label length */
 
 struct h_data {
-	int l_max; 	/* lenth of longest label */
-	double d_max; 	/* depth of deepest leaf */
-	int status;	/* used to indicate errors */
+	int l_max; 	/**< lenth of longest label */
+	double d_max; 	/**< depth of deepest leaf */
+	int status;	/**< used to indicate errors */
 };
 
 /* The following functions set the value of the node's positions. This is done
