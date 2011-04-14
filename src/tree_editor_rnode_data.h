@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // to explicitly distinguish. Then again, using the same name may serve as a
 // crude polymorphism.
 
+/** This node data structure is used for storing the following info about nodes. */
+
 struct rnode_data {
 	float support;		/**< normally derived from label */
 	float depth;		/**< from root; normally root's depth == 0 */
