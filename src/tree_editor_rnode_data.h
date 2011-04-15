@@ -28,7 +28,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/** \file
+ * \deprecated - see \c nw_scheme */
+
 #include <stdbool.h>
+
+/** \cond -- this is obsolete, so don't show. */
 
 /* This is a structure that can hold many node properties. It is used e.g. in
  * the tree editor, when the properties that will actually be used are not known
@@ -41,13 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * number to signal undefined depths, because some tree-building algorithms
  * (like NJ) may produce negative lengths. */
 
-// TODO: there may be more than one structure called rnode_data; this is not a
-// problem if only one is ever #included (per program), but it may be cleaner
-// to explicitly distinguish. Then again, using the same name may serve as a
-// crude polymorphism.
-
-/** This node data structure is used for storing the following info about nodes. */
-
 struct rnode_data {
 	float support;		/**< normally derived from label */
 	float depth;		/**< from root; normally root's depth == 0 */
@@ -56,3 +54,5 @@ struct rnode_data {
 	int nb_descendants;	/**< direct (children) and indirect */
 	bool stop_mark;		/**< to stop processing of a clade, see option -o */
 };
+
+/** \endcond */
