@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  \brief An expression node for \c nw_ed
  *  \deprecated \c nw_ed has been replaced by \c nw_sched. */
 
+/** \cond */
 struct rnode;
 
 /** The type of node. */
@@ -95,3 +96,5 @@ void enode_eval_set_current_rnode(struct rnode *);
  * \deprecated */
 
 float eval_enode(struct enode *expr);
+
+/** \endcond */

@@ -27,10 +27,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-/* Utility functions for XML */
+/** \file
+ * Utility functions for XML */
 
-/* Returns a string with a version of the argument string with &, <, >, etc
- * replaced by &amp;, &lt;, etc. Argument is not modified; space is allocated,
- * or NULL is returned if no space could be allocated.  * */
+/** Escapes XML character entities.
+ * \arg str a string
+ * \return a string with a version of the
+ * argument string with &, <, >, etc replaced by &amp;, &lt;, etc. Argument is
+ * not modified; space is allocated, or NULL is returned if no space could be
+ * allocated.  * */
 
-char *escape_predefined_character_entities(const char*);
+char *escape_predefined_character_entities(const char* str);
