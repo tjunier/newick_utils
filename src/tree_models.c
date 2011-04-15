@@ -127,7 +127,7 @@ int geometric_tree(double prob_node_has_children)
 /******************************************************************/
 /* Time-limited model */
 
-double reciprocal_exponential_CDF(double x, double k)
+double _reciprocal_exponential_CDF(double x, double k)
 {
 	return - (log(1 - x)/k);
 }
@@ -150,7 +150,7 @@ double random_lt_1()
  * The function returns the remaining time (threshold - randomly drawn length)
  * If the function fails for some reason (e.g. no RAM left), it returns -1 */
 
-double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
+double _tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 		double alt_random)
 {
 	double rn;
@@ -160,7 +160,7 @@ double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
        	else
 	       rn = alt_random;
 
-	double length = reciprocal_exponential_CDF(rn, 
+	double length = _reciprocal_exponential_CDF(rn, 
 			branch_termination_rate);
 
 	/* The remaining time is the node's alloted time minus the branch
@@ -259,7 +259,7 @@ int time_limited_tree(double branch_termination_rate, double duration)
 
 	while (0 != leaves_queue->count) {
 		struct rnode *current = shift(leaves_queue);
-		double remaining_time = tlt_grow_node(current,
+		double remaining_time = _tlt_grow_node(current,
 				branch_termination_rate, UNUSED); 
 		/* length is set by tlt_grow_node(), NULL means error */
 		if (NULL == current->edge_length_as_string)
