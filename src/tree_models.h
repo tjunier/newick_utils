@@ -27,14 +27,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-/* Different models of tree generation */
+
+/** \file
+ * Different models of tree generation */
 
 struct rnode;
 
-/* A pretty simple model where each node has a fixed probability of having 2
- * children. If set to > 0.5, the expected number of leaves is infnite and the
- * program will probably not stop of its own. */
-/* Returns FAILURE if there was a problem (most probably malloc()) */
+/** Geometric model.  A pretty simple model where each node has a fixed
+ * probability of having 2 children. If set to > 0.5, the expected number of
+ * leaves is infnite and the program will probably not stop of its own. 
+ \arg \c prob_node_has_children the probability of node having (2) children
+ \return FAILURE if there was a problem (most probably malloc()) */
+
 int geometric_tree(double prob_node_has_children);
 
 /* A more complicated model where each branch's length is exponentially
@@ -56,7 +60,12 @@ int time_limited_tree(double branch_termination_rate, double duration);
 double tlt_grow_node(struct rnode *, double branch_termination_rate,
 		double alt_random);
 
-/* The reciprocal of an exponential CDF with parameter k, used for sampling a
- * value from an exponential PDF using a random number 0 <= x < 1. */
+/** The reciprocal of an exponential CDF with parameter k, used for sampling a
+ * value from an exponential PDF using a (uniformly distributed) random number
+ * 0 <= x < 1.
+ * \arg \c k parameter to the exponential CDF
+ * \arg \c x the random number used to draw from the CDF
+ * \return a random value from an exponential distribution
+ * \todo This kind of function has a name in statistics...*/
 
 double reciprocal_exponential_CDF(double x, double k);
