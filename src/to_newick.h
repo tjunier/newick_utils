@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode;
 
-/* Returns a Newick representation of the tree rooted at \c root. This is
+/** Returns a Newick representation of the tree rooted at \c root. This is
  * often, but doesn't have to be, the \c root member of a struct rooted_tree.
  * Memory is allocated, don't forget to free() it. Returns NULL in case of
  * failure (which will be a memory allocation problem). WARNING: the current
@@ -46,7 +46,7 @@ struct rnode;
 
 char *to_newick(struct rnode* root);
 
-/* Debugging function. If passed 'true', causes to_newick_i() to append the
+/** Debugging function. If passed 'true', causes to_newick_i() to append the
  * address of each node to their labels. This is a debuging instruction rather
  * than a parameter, therefore it is not passed as a function argument. 
  * \par \c show whether or not to show addresses.
@@ -54,7 +54,7 @@ char *to_newick(struct rnode* root);
 
 void set_show_addresses(bool show);
 
-/* Represents a tree as a list of strings. Like to_newick(), but returns a list
+/** Represents a tree as a list of strings. Like to_newick(), but returns a list
  * of strings instead of a single string. Concatenating the strings in list
  * order results in the Newick representation of the tree. The function does
  * not do this, because it would involve repeated calls to concat(), which are
@@ -68,6 +68,8 @@ void set_show_addresses(bool show);
 
 struct llist *to_newick_i(struct rnode *root);
 
-/* Dumps the newick rooted at 'root' to stdout, using to_newick_i() */
+/** Dumps the newick rooted at \c root to stdout. This function calls
+ * to_newick_i() to get a representation of the tree as a list of strings,
+ * which it prints. It is therefore iterative (and hence fast). */
 
 void dump_newick(struct rnode* root);
