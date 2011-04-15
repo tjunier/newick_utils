@@ -29,7 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /** \file
- * \deprecated - see \c nw_scheme */
+ * Data structure for \c nw_ed.
+ * \deprecated - see \c nw_sched */
 
 #include <stdbool.h>
 
