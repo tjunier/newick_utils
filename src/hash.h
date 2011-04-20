@@ -39,6 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct llist;
 
+/**  \todo this might be made private. */
+
+/** A simple hash table. The number of bins is fixed at the time the structure
+ * is created. */
+
 struct hash {
 	struct llist **bins;	/**< the bins */
 	int size;	/**< the number of bins */

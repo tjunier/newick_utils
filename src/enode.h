@@ -27,7 +27,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+/** \file
+ *  \brief An expression node for \c nw_ed
+ *  \deprecated \c nw_ed has been replaced by \c nw_sched. */
+
+/** \cond */
 struct rnode;
+
+/** The type of node. */
 
 enum enode_type {
 	ENODE_CONSTANT,
@@ -51,10 +59,10 @@ enum enode_type {
 };
 
 struct enode {
-	enum enode_type type;
-	struct enode *left;
-	struct enode *right;
-	float value;
+	enum enode_type type;	/**< see enum enode_type **/
+	struct enode *left;	/**< left child (or NULL) */
+	struct enode *right;	/**< right child (or NULL) */
+	float value;		/**< numeric value (not always used) */
 };
 
 /* Creates an enode of type ENODE_CONSTANT, with value 'value'. */
@@ -75,14 +83,18 @@ struct enode *create_enode_not(struct enode *node);
 
 struct enode *create_enode_func(enum enode_type type);
 
-/* Sets the current tree node, i.e. the one on which the functions will
+/** Sets the current tree node, i.e. the one on which the functions will
  * operate. I *could* set 'current_node' directly, but then * it would have to
  * be non-static. I prefer to keep it visible only here. Maybe * I did too much
- * OO. */
+ * OO.s
+ * \deprecated */
 
 void enode_eval_set_current_rnode(struct rnode *);
 
-/* Evaluates an enode. If the enode is an operator, evaluates its operands
- * first.*/
+/** Evaluates an enode. If the enode is an operator, evaluates its operands
+ * first.
+ * \deprecated */
 
 float eval_enode(struct enode *expr);
+
+/** \endcond */

@@ -74,7 +74,7 @@ int get_canvas_height(struct canvas *canvas);
 char* _get_canvas_line(struct canvas *canvas, int num);
 
 /** Draws a vertical line on the canvas.
- * The line is on column \a col form line \start to
+ * The line is on column \a col form line \a start to
  * line \a end. The line is made of '\c |', except if there already is a
  * '\c -', in which case a '\c +' is written.
  * \param[out]	canvas 	the canvas to draw on
@@ -101,13 +101,13 @@ void canvas_draw_hline(struct canvas* canvas , int line, int start, int end);
  * \param	line	the line the string is written at
  * \param	text	the string to write (NULL-terminated) */
 
-void canvas_write(struct canvas*, int col, int line, char *text);
+void canvas_write(struct canvas* canvas, int col, int line, char *text);
 
 /** Dumps the canvas to standard output. Use this function after filling the
  * canvas' contents with the draw and write functions.
  * \param[out]	canvas * the canvas to dump. */
 
-void canvas_dump(struct canvas*);
+void canvas_dump(struct canvas* canvas);
 
 /** (Debugging function) like canvas_dump(), but prints line numbers. */
 

@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode;
 
+/** A node in a rooted tree. One of the basic building blocks of the whole
+ * package. */
+
 struct rnode {
 
 	char *label;	/**< The node's label. May be "", but is never NULL. */

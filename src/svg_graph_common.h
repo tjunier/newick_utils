@@ -52,6 +52,9 @@ extern int label_space;
  * often not be used. And even then, it is not clear that all nodes in the tree
  * will have URLs. So the current map-based approach seems best here. */
 
+/** A structure for node data pertaining to SVG. Structs of this type are
+ * pointed to by struct rnode's \a data member. */
+
 struct svg_data {
 	double top;	/**< top of node (ortho) or leftmost angle (radial) */
 	double bottom;	/**< bottom of node (ortho) or rightmost most angle (radial) */
