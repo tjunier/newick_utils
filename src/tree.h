@@ -38,7 +38,10 @@ extern const int DONT_FREE_NODE_DATA;
 
 enum tree_type {TREE_TYPE_UNKNOWN, TREE_TYPE_CLADOGRAM, TREE_TYPE_PHYLOGRAM, TREE_TYPE_NEITHER};
 
-// TODO: would probably be a good idea to make this private and use accessors.
+
+/** The struct used for rooted trees. 
+ \todo: would probably be a good idea to make this private and use accessors.
+ */
 
 struct rooted_tree {
 	struct rnode *root;		/**< tree's root */

@@ -33,18 +33,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct rnode;
 struct rooted_tree;
 
-/* Used for storing the node's vertical and horizontal position - independent
- * of final use (dispaly, distance computations, etc). "top" and "bottom" are
- * understood as if the tree were displayed vertically: Vertical position is
- * measured in leaf order or fractions thereof (for inner nodes), "depth" is
- * measured in edge length. 
+/** A very simple node position structure. Used for storing the node's vertical
+ * and horizontal position - independent of final use (dispaly, distance
+ * computations, etc). \a top and \a bottom are understood as if the tree were
+ * displayed vertically: Vertical position is measured in leaf order or
+ * fractions thereof (for inner nodes), \a depth is measured in edge length.
  * Function alloc_node_pos() should be used to allocate a struct node_pos for
  * each node of a tree, then functions set_node_depth_cb() and
  * set_node_vpos_cb() (see node_pos_alloc.h) should be used to compute and fill
- * in the structures' data.
- * Applications that only need to store nodes' positions should use this
- * structure. Other apps (like SVG display) who need to store other per-node
- * data should use another struct. */
+ * in the structures' data.  Applications that only need to store nodes'
+ * positions should use this structure. Other apps (like SVG display) who need
+ * to store other per-node data should use another struct. */
 
 struct simple_node_pos {
 	double top;	/**< node's top position on graph */

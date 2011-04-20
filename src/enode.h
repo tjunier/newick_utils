@@ -37,6 +37,8 @@ struct rnode;
 
 /** The type of node. */
 
+/** Various types of struct enode. \deprecated */
+
 enum enode_type {
 	ENODE_CONSTANT,
 	ENODE_GT,
@@ -58,6 +60,8 @@ enum enode_type {
 	ENODE_IS_ROOT
 };
 
+/** A node for an \c nw_ed expression. \deprecated */
+
 struct enode {
 	enum enode_type type;	/**< see enum enode_type **/
 	struct enode *left;	/**< left child (or NULL) */
@@ -65,21 +69,24 @@ struct enode {
 	float value;		/**< numeric value (not always used) */
 };
 
-/* Creates an enode of type ENODE_CONSTANT, with value 'value'. */
+/** Creates an enode of type ENODE_CONSTANT, with value 'value'.
+ * \deprecated */
 
 struct enode *create_enode_constant(float value);
 
-/* Creates an operator enode, of type 'operator', with operands 'left' and
- * 'right'. */
+/** Creates an operator enode, of type 'operator', with operands 'left' and
+ * 'right'. \deprecated */
 
 struct enode *create_enode_op(enum enode_type type, struct enode *left,
 		struct enode *right);
 
-/* Creates a node that negates the argument */
+/** Creates a node that negates the argument
+ * \deprecated */
 
 struct enode *create_enode_not(struct enode *node);
 
-/* Creates a node for a function */
+/** Creates a node for a function 
+ * \deprecated */
 
 struct enode *create_enode_func(enum enode_type type);
 
