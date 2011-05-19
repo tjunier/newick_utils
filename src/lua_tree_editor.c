@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+// TODO: See if this is also true with Lua.
 /* NOTE: This program uses libguile. When checking for memory leaks with
  * Valgrind, I get error messages that seem to point to problems in libguile
  * rather than my own code. To see this, do e.g.:
@@ -45,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <libguile.h>
+#include <lua.h>
 
 #include "rnode.h"
 #include "link.h"
@@ -56,7 +57,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree_editor_rnode_data.h"
 #include "common.h"
 #include "masprintf.h"
-#include "rnode_smob.h"
 
 struct rnode *current_node;
 
@@ -64,11 +64,11 @@ enum order { POST_ORDER, PRE_ORDER };
 enum mult_values { MULT_UNSPECIFIED, MULT_SINGLE, MULT_MULTIPLE };
 
 struct parameters {
-	bool scheme_on_CLI;	
-	/* this can be either literal Scheme code on the command line, or the
-	 * name of a file that contains Scheme code. This is governed by
-	 * scheme_on_CLI. */
-	char *scheme_test_list;	
+	bool lua_on_CLI;	
+	/* this can be either literal Lua code on the command line, or the
+	 * name of a file that contains Lua code. This is governed by
+	 * lua_on_CLI. */
+	char *lua_test_list;	
 	bool show_tree;
 	int order;
 	bool stop_clade_at_first_match;
@@ -262,8 +262,8 @@ static struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
-	params.scheme_on_CLI = true;
-	params.scheme_test_list = NULL;
+	params.lua_on_CLI = true;
+	params.lua_test_list = NULL;
 	params.show_tree = true;
 	params.order = POST_ORDER;
 	params.stop_clade_at_first_match = false;
@@ -275,8 +275,8 @@ static struct parameters get_params(int argc, char *argv[])
 	while ((opt_char = getopt(argc, argv, "f:hnm:or")) != -1) {
 		switch (opt_char) {
 		case 'f':
-			params.scheme_on_CLI = false;
-			params.scheme_test_list = optarg;
+			params.lua_on_CLI = false;
+			params.lua_test_list = optarg;
 			params.single = false;
 			break;
 		case 'h':
@@ -317,7 +317,7 @@ static struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 		if (2 == (argc - optind))
-			params.scheme_test_list = argv[optind+1];
+			params.lua_test_list = argv[optind+1];
 	} else {
 		fprintf(stderr, "Usage: %s [-hnro] <filename|-> "
 				"<Scheme expression>\n",
@@ -336,7 +336,7 @@ static struct parameters get_params(int argc, char *argv[])
 		params.single = false;
 		break;
 	case MULT_UNSPECIFIED:
-		params.single = params.scheme_on_CLI;
+		params.single = params.lua_on_CLI;
 		break;
 	default:
 		assert(0);
@@ -516,301 +516,6 @@ static void set_predefined_variables(struct rnode *node)
 		scm_c_define("r", SCM_BOOL_F);
 }
 
-/* Makes C functions available to Scheme */
-
-static SCM scm_dump_subclade()
-{
-	dump_newick(current_node);
-	return SCM_UNDEFINED;
-}
-
-static SCM scm_unlink_node()
-{
-	if (is_root(current_node)) {
-		fprintf (stderr, "Warning: tried to delete root\n");
-		return SCM_UNSPECIFIED;
-
-	}
-	enum unlink_rnode_status result = unlink_rnode(current_node);
-	switch(result) {
-	case UNLINK_RNODE_DONE:
-	case UNLINK_RNODE_ROOT_CHILD:
-		break;
-	case UNLINK_RNODE_ERROR:
-		fprintf (stderr, "Memory error - unlink aborted.\n");
-		break;
-	default:
-		assert(0); /* programmer error */
-	}
-
-	return SCM_UNSPECIFIED;
-}
-
-static SCM scm_splice_out_node() 	/* "open" */
-{
-	if (is_inner_node(current_node)) {
-		if (! splice_out_rnode(current_node)) {
-			perror("Memory error - node not spliced out.");
-		}
-	} else {
-		fprintf (stderr, "Warning: tried to splice out non-inner node ('%s')\n", current_node->label);
-	}
-
-	return SCM_UNSPECIFIED;
-}
-
-/* Returns the current node as a 'node' record */
-
-static SCM scm_get_current_node()
-{
-	SCM current = rnode_smob(current_node); 
-
-	return current;
-}
-
-static SCM scm_get_label(SCM node)
-{
-	return rnode_smob_label(node, SCM_UNDEFINED);
-}
-
-static SCM scm_set_label(SCM node, SCM label)
-{
-	return rnode_smob_label(node, label);
-}
-
-/* Sets the current node's parent edge length. Argument must be a number or a
- * string. */
-
-static SCM scm_set_length(SCM edge_length)
-{
-	size_t buffer_length;	/* storage for length as string */
-
-	/* If edge_length is a string, we first try to convert it to a number.
-	 * If this fails, the edge length is undefined. */
-	if (scm_is_string(edge_length)) {
-		edge_length = scm_string_to_number(edge_length, SCM_UNDEFINED);
-		if (scm_is_false(edge_length))
-			edge_length = SCM_UNDEFINED;
-	} else if (! scm_is_number(edge_length)) {
-		/* edge_length should be a number. If not, edge length is
-		 * undefined */
-		edge_length = SCM_UNDEFINED;
-	}
-		
-	/* edge_length is now a number, or undefined. In the latter case, we
-	 * set the node's edge length to "" (i.e., unspecified) */
-
-	if (SCM_UNDEFINED == edge_length) {
-		free(current_node->edge_length_as_string);
-		current_node->edge_length_as_string = strdup("");
-		return SCM_UNSPECIFIED;
-	}
-
-	/* edge_length is a number. We convert it to a string, and set the edge
-	 * length to this value. */
-
-	SCM edge_length_as_scm_string = scm_number_to_string(edge_length,
-			SCM_UNDEFINED);
-	buffer_length = scm_c_string_length(edge_length_as_scm_string);
-	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	scm_to_locale_stringbuf(edge_length_as_scm_string, buffer, buffer_length);
-	buffer[buffer_length] = '\0';
-
-	/* Set the allocated buffer as the current node's length-as-string */
-	free(current_node->edge_length_as_string);
-	current_node->edge_length_as_string = buffer;
-
-	return SCM_UNSPECIFIED;
-}
-
-/* Sets the current node's label. Argument must be a string or a number (to be
- * able to set support values), if numeric it will be converted to a string
- * using format. */
-
-static SCM scm_set_current_node_label(SCM label)
-{
-	size_t buffer_length;	/* storage for label */
-
-	if (scm_is_number (label))
-		label = scm_number_to_string(label, SCM_UNDEFINED);	
-
-	buffer_length = scm_c_string_length(label);
-	char *buffer = calloc(buffer_length + 1, 'c');	/* +1: '\0' */
-	scm_to_locale_stringbuf(label, buffer, buffer_length);
-	buffer[buffer_length] = '\0';
-
-	/* Set the allocated buffer as the current node's length-as-string */
-	free(current_node->label);
-	current_node->label = buffer;
-
-	return SCM_UNSPECIFIED;
-}
-
-/* Constructs a Scheme function that partitions a list of tests (of the form
- * (test1 ... testn), where each test is of the form (clause action)) according
- * to when the test is to be evaluated. This is derived from the clause. The
- * clause can be either a symbol that specifies when to do the evaluation
- * (begin, begin-tree, end, end-tree) or something else. The lists are returned
- * as an alist keyed by this symbol (or by 'within-tree'). */ 
-
-static SCM define_partition_code()
-{
-	return scm_c_eval_string(
-"  (lambda (lst)"
-"    (let ((start-code    		#f)"
-"          (start-tree-code	  	#f)"
-"          (within-tree-test-list  	'())"
-"          (end-tree-code          	#f)"
-"          (end-code     		#f))"
-"      (for-each (lambda (test)"
-"                 (let ((address (car test))"
-"                       (action  (cadr test)))"
-"                  (cond"
-"                    ((eq? address 'start)"
-"                     (set! start-code action))"
-"                    ((eq? address 'start-tree)"
-"                     (set! start-tree-code action))"
-"                    ((eq? address 'end)"
-"                     (set! end-code action))"
-"                    ((eq? address 'end-tree)"
-"                     (set! end-tree-code action))"
-"                    (else"
-"                     (set! within-tree-test-list"
-"                           (cons test within-tree-test-list))))))"
-""
-"                lst)"
-"	(list   (list 'start	   start-code)"
-"		(list 'start-tree  start-tree-code)"
-"		(list 'within-tree (reverse within-tree-test-list))"
-"		(list 'end-tree    end-tree-code)"
-"		(list 'end 	   end-code))))"
-			);
-}
-
-/* Gets the list of tests for phase 'phase', where 'phase' can be "begin",
- * "begin-tree", "within-tree", "end-tree" or "end". */
-
-SCM get_test_list_for_phase(const char *phase, SCM code_phase__alist)
-{
-	return scm_car(scm_assq_ref(code_phase__alist,
-			scm_from_locale_symbol(phase)));
-}
-
-/* Returns a Scheme function for evaluating a list of tests. A test is a
-(clause action) pair. Iff the clause is #t, the action gets evaluated. The
-function returns #t iff at least one test is #t. */
-
-static SCM define_test_list_eval()
-{
-	return scm_c_eval_string(
-"(lambda (lst)"
-"	(letrec ((eval-tests (lambda (L)"
-"		(if (null? L)"
-"      #f"
-"      (let* ((test (car L))"
-"             (clause (car test))"
-"             (action (cadr test)))"
-"        (if (primitive-eval clause)"
-"            (begin (primitive-eval action) (or (eval-tests (cdr L)) #t))"
-"            (or (eval-tests (cdr L)) #f )))))))"
-"	(eval-tests lst)))"
-	);
-}
-
-/* Evaluates "phase code", i.e. user-supplied Scheme code that must be run at a
- * particular moment in the run (start, start-tree, end-tree, or end).  'start'
- * is like BEGIN in awk, etc.  */
-
-static SCM run_phase_code(SCM code_phase_alist, const char *phase)
-{
-	SCM phase_code = scm_car(
-			scm_assq_ref(code_phase_alist, 
-				scm_from_locale_symbol(phase)));
-	//scm_write_line(phase_code, scm_current_output_port());
-	scm_primitive_eval(phase_code);
-
-	return SCM_UNDEFINED;
-}
-
-static void scheme_preamble()
-{
-
-	/* Aliases and simple functions */
-
-	scm_c_eval_string("(define & and)");	
-	scm_c_eval_string("(define | or)");	
-	scm_c_eval_string("(define ! not)");	
-	scm_c_eval_string("(define def? defined?)");	
-	scm_c_eval_string("(define (p obj) (display obj) (newline))");
-
-	/* Variables used outside the tree processing loop */
-	scm_c_eval_string("(define begin-tree #f)");
-	scm_c_eval_string("(define end-tree #f)");
-
-	/* Load some extra modules */
-
-	scm_c_eval_string("(use-modules (ice-9 format))");
-	/* this one is mostly useful for debugging */
-	scm_c_eval_string("(use-modules (ice-9 pretty-print))");
-	scm_c_eval_string("(use-modules (ice-9 rdelim))");
-}
-
-static void register_C_functions()
-{
-	/* Current node as implicit argument */
-	scm_c_define_gsubr("s", 0, 0, 0, scm_dump_subclade);
-	scm_c_define_gsubr("dump-subclade", 0, 0, 0, scm_dump_subclade);
-	scm_c_define_gsubr("u", 0, 0, 0, scm_unlink_node);
-	scm_c_define_gsubr("unlink-node", 0, 0, 0, scm_unlink_node);
-	scm_c_define_gsubr("o", 0, 0, 0, scm_splice_out_node);
-	scm_c_define_gsubr("splice-out-node", 0, 0, 0, scm_splice_out_node);
-	scm_c_define_gsubr("L!", 1, 0, 0, scm_set_length);
-	scm_c_define_gsubr("set-length!", 1, 0, 0, scm_set_length);
-	scm_c_define_gsubr("lbl!", 1, 0, 0, scm_set_current_node_label);
-	scm_c_define_gsubr("set-label!", 1, 0, 0, scm_set_current_node_label);
-	/* rnode SMOB as argument */
-	scm_c_define_gsubr("lab", 1, 0, 0, scm_get_label);
-	scm_c_define_gsubr("lab!", 2, 0, 0, scm_set_label);
-	scm_c_define_gsubr("par", 1, 0, 0, rnode_smob_parent);
-	scm_c_define_gsubr("parent", 1, 0, 0, rnode_smob_parent);
-	scm_c_define_gsubr("fc", 1, 0, 0, rnode_smob_first_child);
-	scm_c_define_gsubr("first-child", 1, 0, 0, rnode_smob_first_child);
-	scm_c_define_gsubr("lc", 1, 0, 0, rnode_smob_last_child);
-	scm_c_define_gsubr("last-child", 1, 0, 0, rnode_smob_last_child);
-	scm_c_define_gsubr("nc", 1, 0, 0, rnode_smob_children_count);
-	scm_c_define_gsubr("children-count", 1, 0, 0, rnode_smob_children_count);
-	scm_c_define_gsubr("st", 1, 0, 0, rnode_smob_dump_subclade);
-	scm_c_define_gsubr("subtree", 1, 0, 0, rnode_smob_dump_subclade);
-	scm_c_define_gsubr("kids", 1, 0, 0, rnode_smob_children_list);
-	scm_c_define_gsubr("children-list", 1, 0, 0, rnode_smob_children_list);
-}
-
-static SCM get_user_code(struct parameters params)
-{
-	SCM in_port;
-	if (params.scheme_on_CLI) {
-		SCM test_string =
-			scm_from_locale_string(params.scheme_test_list);
-		in_port = scm_open_input_string(test_string);
-	} else {
-		SCM fname_string =
-			scm_from_locale_string(params.scheme_test_list);
-		SCM mode_string = scm_from_locale_string("r");
-		in_port = scm_open_file(fname_string, mode_string);
-	}
-
-	/* If a single test was passed, wrap it into a list. */
-	SCM test_list;
-	if (params.single)
-		test_list = scm_cons(scm_read(in_port), SCM_EOL);
-	else 
-		test_list = scm_read(in_port);
-
-	//scm_write_line(test_list, scm_current_output_port ());
-
-	return test_list;
-}
-
 
 
 /* 'test_list' is the Scheme list of tests (i.e., (clause action) pairs) and
@@ -869,30 +574,10 @@ static void process_tree(struct rooted_tree *tree, SCM test_list,
 		destroy_llist(nodes);
 }
 
-static void inner_main(void *closure, int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
-
-	init_scm_rnode();
-	closure = closure;	// suppresses gcc warnings about unused param
-	init_scm_rnode();
-
-	scheme_preamble();
-	
-	SCM test_list_eval = define_test_list_eval();
-	SCM partition_code = define_partition_code();
-
-	SCM user_code = get_user_code(params);
-	SCM code_phase_alist = scm_call_1(partition_code, user_code);
-	// scm_write_line(code_phase_alist, scm_current_output_port ());
-
-
-	register_C_functions();
-	SCM within_tree_tests = scm_car(
-			scm_assq_ref(code_phase_alist, 
-				scm_from_locale_symbol("within-tree")));
-	// scm_write_line(within_tree_tests, scm_current_output_port ());
 
 	run_phase_code(code_phase_alist, "start");
 	while (NULL != (tree = parse_tree())) {
@@ -905,10 +590,7 @@ static void inner_main(void *closure, int argc, char* argv[])
 		run_phase_code(code_phase_alist, "end-tree");
 	}
 	run_phase_code(code_phase_alist, "end");
+
+	exit(EXIT_SUCCESS);
 }
 
-int main(int argc, char* argv[])
-{
-       	scm_boot_guile (argc, argv, inner_main, 0);
-       	return 0; /* never reached */
-}
