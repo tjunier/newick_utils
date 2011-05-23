@@ -94,7 +94,7 @@ AS_IF([test "x$with_lua" = xyes],
 		AM_CPPFLAGS="$AM_CPPFLAGS $CPPFLAGS"
 	 	AC_CHECK_HEADERS([lua.h], [], [with_lua=no_hdr])
 		AM_CPPFLAGS="$OLD_AM_CPPFLAGS"
-		AC_CHECK_LIB([lua-5.1], [lua_open], [], [with_lua=no_lib])
+		AC_CHECK_LIB([lua5.1], [luaL_openlibs], [], [with_lua=no_lib])
 	]
 )
 
@@ -129,6 +129,23 @@ AS_CASE([x$with_guile],
 )
 # This is accessible in Makefile.in's
 AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile = xyes])
+
+AS_CASE([x$with_lua],
+		[xyes],
+			[
+			 	# This goes into config.h
+			 	AC_DEFINE([CHECK_NW_LUAED], 1, [Check nw_luaed])
+			],
+		[xno],
+			[AC_MSG_NOTICE([Lua disabled by user.])],
+		[xno_hdr],
+			[AC_MSG_NOTICE([Lua disabled due to missing header.])],
+		[xno_lib],
+			[AC_MSG_NOTICE([liblua missing (disabled).])],
+		[AC_MSG_NOTICE([Invalid argument --with-lua=$with_lua])]
+)
+# This is accessible in Makefile.in's
+AM_CONDITIONAL([WANT_NW_LUAED], [test x$with_lua = xyes])
 
 
 # Checks for typedefs, structures, and compiler characteristics.
