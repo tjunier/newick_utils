@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([Newick Utils],[1.5.1],[thomas.junier@.unige.ch])
+AC_INIT([Newick Utils],[1.6],[thomas.junier@.unige.ch])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src])
@@ -30,6 +30,17 @@ AC_ARG_WITH([guile],
 	],
 	[], # default: do nothing
 	[with_guile=yes]	# not passed: set to yes (default)
+)
+
+# Lua
+
+AC_ARG_WITH([lua],
+	[
+	 	AS_HELP_STRING([--with-lua],
+			[Use Lua (enables nw_luaed) @<:@default=yes@:>@])
+	],
+	[], # default: do nothing
+	[with_lua=yes]	# not passed: set to yes (default)
 )
 
 # Checks for programs.
@@ -73,6 +84,12 @@ AS_IF([test "x$with_guile" = xyes],
 		AC_CHECK_HEADERS([libguile.h], [], [with_guile=no_hdr])
 		#AS_IF([test "x$with_guile_libdir" != xno], [LDFLAGS="$LDFLAGS -L$with_guile_libdir"])
 		AC_CHECK_LIB([guile], [scm_with_guile], [], [with_guile=no_lib])
+	]
+)
+
+AS_IF([test "x$with_lua" = xyes],
+	[
+	 	AC_CHECK_HEADERS([lua.h], [], [with_lua=no_hdr])
 	]
 )
 
