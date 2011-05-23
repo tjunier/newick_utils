@@ -452,77 +452,77 @@ static void parse_order_traversal(struct rooted_tree *tree)
 
 static void set_predefined_variables(struct rnode *node)
 {
+	/*
 	SCM label = scm_from_locale_string(node->label);
 	SCM edge_length_as_scm_string  = scm_from_locale_string(
 			node->edge_length_as_string);
 	scm_c_define("lbl", label);
 
+		*/
 	/* N: current node */
-	SCM node_smob = rnode_smob(node);
-	scm_c_define("N", node_smob);
+	//SCM node_smob = rnode_smob(node);
+	//scm_c_define("N", node_smob);
 
 	/* b: returns node label, as a bootstrap support value (or undefined if
 	this can't be done) */
-	if (is_leaf(node))
-		scm_c_define("b", SCM_UNDEFINED);
-	else {
-		SCM support_value = scm_string_to_number(label, SCM_UNDEFINED);
-		if (SCM_BOOL_F == support_value)
-			scm_c_define("b", SCM_UNDEFINED);
-		else
-			scm_c_define("b", support_value);
-	}
+	//if (is_leaf(node))
+		//scm_c_define("b", SCM_UNDEFINED);
+	//else {
+		//SCM support_value = scm_string_to_number(label, SCM_UNDEFINED);
+		//if (SCM_BOOL_F == support_value)
+			//scm_c_define("b", SCM_UNDEFINED);
+		//else
+			//scm_c_define("b", support_value);
+	//}
 
 	/* i: true IFF node is inner (not leaf, not root) */
-	if (is_inner_node(node))
-		scm_c_define("i", SCM_BOOL_T);
-	else
-		scm_c_define("i", SCM_BOOL_F);
+	//if (is_inner_node(node))
+		//scm_c_define("i", SCM_BOOL_T);
+	//else
+		//scm_c_define("i", SCM_BOOL_F);
 
 	/* l: true IFF node is a leaf */
-	if (is_leaf(node))
-		scm_c_define("l", SCM_BOOL_T);
-	else
-		scm_c_define("l", SCM_BOOL_F);
+	//if (is_leaf(node))
+		//scm_c_define("l", SCM_BOOL_T);
+	//else
+		//scm_c_define("l", SCM_BOOL_F);
 
 	/* L: parent edge's length */
-	if (strcmp ("", node->edge_length_as_string) == 0) 
-		scm_c_define("L", SCM_UNDEFINED);
-	else	
-		scm_c_define("L", scm_string_to_number(
-				edge_length_as_scm_string, SCM_UNDEFINED));
+	//if (strcmp ("", node->edge_length_as_string) == 0) 
+		//scm_c_define("L", SCM_UNDEFINED);
+	//else	
+		//scm_c_define("L", scm_string_to_number(
+				//edge_length_as_scm_string, SCM_UNDEFINED));
 
 	/* c: number of children */
-	scm_c_define("c", scm_from_int(current_node->child_count));
+	//scm_c_define("c", scm_from_int(current_node->child_count));
 	
-	struct rnode_data *data = current_node->data;
+	//struct rnode_data *data = current_node->data;
 
 	/* d: depth */
-	if (data->is_depth_defined)
-		scm_c_define("d", scm_from_double(data->depth));
-	else
-		scm_c_define("d", SCM_UNDEFINED);
+	//if (data->is_depth_defined)
+		//scm_c_define("d", scm_from_double(data->depth));
+	//else
+		//scm_c_define("d", SCM_UNDEFINED);
 
 	/* a: number of ancestors */
-	scm_c_define("a", scm_from_int(data->nb_ancestors));
+	//scm_c_define("a", scm_from_int(data->nb_ancestors));
 
 	/* D: number of descendants */
-	scm_c_define("D", scm_from_int(data->nb_descendants));
+	//scm_c_define("D", scm_from_int(data->nb_descendants));
 
 	/* r: true iff node is root */
+	/*
 	if (is_root(node))
 		scm_c_define("r", SCM_BOOL_T);
 	else
 		scm_c_define("r", SCM_BOOL_F);
+		*/
 }
 
 
 
-/* 'test_list' is the Scheme list of tests (i.e., (clause action) pairs) and
- * 'test_list_eval' is the Scheme function that evaluates them. */
-
-static void process_tree(struct rooted_tree *tree, SCM test_list,
-		SCM test_list_eval, struct parameters params)
+static void process_tree(struct rooted_tree *tree, struct parameters params)
 {
 	struct llist *nodes;
 	struct list_elem *el;
@@ -557,9 +557,9 @@ static void process_tree(struct rooted_tree *tree, SCM test_list,
 		} 
 
 		set_predefined_variables(current_node);
-		SCM is_match = scm_call_1(test_list_eval, test_list);
+		bool is_match = true;
 
-		if (! scm_is_false(is_match)) {
+		if (is_match) {
 			/* see -o switch */
 			if (params.stop_clade_at_first_match)
 				((struct rnode_data *)
@@ -579,17 +579,17 @@ int main(int argc, char* argv[])
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
 
-	run_phase_code(code_phase_alist, "start");
+	// run_phase_code(code_phase_alist, "start");
 	while (NULL != (tree = parse_tree())) {
-		run_phase_code(code_phase_alist, "start-tree");
-		process_tree(tree, within_tree_tests, test_list_eval, params);
+		//run_phase_code(code_phase_alist, "start-tree");
+		process_tree(tree, params);
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
 		destroy_tree(tree, NULL);
-		run_phase_code(code_phase_alist, "end-tree");
+		//run_phase_code(code_phase_alist, "end-tree");
 	}
-	run_phase_code(code_phase_alist, "end");
+	//run_phase_code(code_phase_alist, "end");
 
 	exit(EXIT_SUCCESS);
 }
