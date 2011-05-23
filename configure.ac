@@ -70,6 +70,7 @@ AS_IF([test "x$with_libxml" = xyes],
 	[
 		AC_CHECK_LIB([xml2], [xmlParseMemory], [], [with_libxml=no_lib])
 		# Try to get xml2-config to tell us where the headers are.
+		# TODO: DON'T touch CPPFLAGS! Use AM_CPPFLAGS instead
 		AS_IF([xml2-config --version > /dev/null],
 			[CPPFLAGS="$(xml2-config --cflags) $CPPFLAGS "]
 		)
@@ -89,7 +90,11 @@ AS_IF([test "x$with_guile" = xyes],
 
 AS_IF([test "x$with_lua" = xyes],
 	[
+	 	OLD_AM_CPPFLAGS="$AM_CPPFLAGS"
+		AM_CPPFLAGS="$AM_CPPFLAGS $CPPFLAGS"
 	 	AC_CHECK_HEADERS([lua.h], [], [with_lua=no_hdr])
+		AM_CPPFLAGS="$OLD_AM_CPPFLAGS"
+		AC_CHECK_LIB([lua-5.1], [lua_open], [], [with_lua=no_lib])
 	]
 )
 
