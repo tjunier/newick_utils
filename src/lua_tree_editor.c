@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <libguile.h>
+#include <lua.h>
 
 #include "rnode.h"
 #include "link.h"
@@ -56,7 +56,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree_editor_rnode_data.h"
 #include "common.h"
 #include "masprintf.h"
-#include "rnode_smob.h"
 
 struct rnode *current_node;
 
