@@ -63,7 +63,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct rnode *current_node;
 
 enum order { POST_ORDER, PRE_ORDER };
-enum mult_values { MULT_UNSPECIFIED, MULT_SINGLE, MULT_MULTIPLE };
 
 struct parameters {
 	bool lua_on_CLI;	
@@ -307,8 +306,7 @@ static struct parameters get_params(int argc, char *argv[])
 	}
 
 	/* check arguments */
-	if (2 >= (argc - optind) &&
-	    argc > 1)	{
+	if (3 >= (argc - optind) && argc > 1)	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
 			extern FILE *nwsin;
@@ -318,30 +316,15 @@ static struct parameters get_params(int argc, char *argv[])
 			}
 			nwsin = fin;
 		}
-		if (2 == (argc - optind))
-			params.lua_test_list = argv[optind+1];
+		if (3 == (argc - optind)) {
+			params.lua_condition = argv[optind+1];
+			params.lua_action = argv[optind+2];
+		}
 	} else {
 		fprintf(stderr, "Usage: %s [-hnro] <filename|-> "
 				"<Scheme expression>\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
-	}
-
-	/* How many tests? If multiplicity was explicitly set (option -m), then
-	 * honor this.  Otherwise look at where the Scheme code comes from: if
-	 * CL, assume single; if from a file, assume multiple. */
-	switch (mult) {
-	case MULT_SINGLE:
-		params.single = true;
-		break;
-	case MULT_MULTIPLE:
-		params.single = false;
-		break;
-	case MULT_UNSPECIFIED:
-		params.single = params.lua_on_CLI;
-		break;
-	default:
-		assert(0);
 	}
 
 	return params;
@@ -452,8 +435,11 @@ static void parse_order_traversal(struct rooted_tree *tree)
  * variables, e.g. (< 2 a) instead of (< 2 (a)) to check that the current node
  * has fewer than two ancestors. On the command line, this is handy. */
 
-static void set_predefined_variables(struct rnode *node)
+static void set_predefined_variables(struct rnode *node, lua_State *L)
 {
+	lua_pushnumber(L, 2.1);
+	lua_setglobal(L, "n");
+
 	/*
 	SCM label = scm_from_locale_string(node->label);
 	SCM edge_length_as_scm_string  = scm_from_locale_string(
@@ -522,9 +508,8 @@ static void set_predefined_variables(struct rnode *node)
 		*/
 }
 
-
-
-static void process_tree(struct rooted_tree *tree, struct parameters params)
+static void process_tree(struct rooted_tree *tree, lua_State *L,
+		struct parameters params)
 {
 	struct llist *nodes;
 	struct list_elem *el;
@@ -558,8 +543,12 @@ static void process_tree(struct rooted_tree *tree, struct parameters params)
 			}
 		} 
 
-		set_predefined_variables(current_node);
-		bool is_match = true;
+		set_predefined_variables(current_node, L);
+		const char *lua_code = "print (n)";
+		const int code_len = strlen(lua_code);
+		int error = luaL_loadbuffer(L, lua_code, code_len, "lua code")
+			|| lua_pcall(L, 0, 0, 0);
+		bool is_match = true; // TODO: call Lua condition, etc.
 
 		if (is_match) {
 			/* see -o switch */
@@ -593,7 +582,7 @@ int main(int argc, char* argv[])
 	// run_phase_code(code_phase_alist, "start");
 	while (NULL != (tree = parse_tree())) {
 		//run_phase_code(code_phase_alist, "start-tree");
-		process_tree(tree, params);
+		process_tree(tree, L, params);
 		if (params.show_tree) {
 			dump_newick(tree->root); // TODO: faster f()?
 		}
@@ -604,4 +593,3 @@ int main(int argc, char* argv[])
 
 	exit(EXIT_SUCCESS);
 }
-
