@@ -65,11 +65,9 @@ struct rnode *current_node;
 enum order { POST_ORDER, PRE_ORDER };
 
 struct parameters {
-	bool lua_on_CLI;	
-	/* this can be either literal Lua code on the command line, or the
-	 * name of a file that contains Lua code. This is governed by
-	 * lua_on_CLI. */
-	char *lua_test_list;	
+	char *lua_action;	
+	char *lua_condition;	
+	char *lua_filename;
 	bool show_tree;
 	int order;
 	bool stop_clade_at_first_match;
@@ -263,32 +261,24 @@ static struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
-	params.lua_on_CLI = true;
-	params.lua_test_list = NULL;
+	params.lua_condition = NULL;
+	params.lua_action = NULL;
+	params.lua_filename = NULL;
 	params.show_tree = true;
 	params.order = POST_ORDER;
 	params.stop_clade_at_first_match = false;
 	params.single = true;
 
-	enum mult_values mult = MULT_UNSPECIFIED;
-
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "f:hnm:or")) != -1) {
+	while ((opt_char = getopt(argc, argv, "f:hnor")) != -1) {
 		switch (opt_char) {
 		case 'f':
-			params.lua_on_CLI = false;
-			params.lua_test_list = optarg;
+			params.lua_filename = optarg;
 			params.single = false;
 			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
-		case 'm':
-			if (strcmp("1", optarg) == 0)
-				mult = MULT_SINGLE;
-			else
-				mult = MULT_MULTIPLE;
-			break;
 		case 'n':
 			params.show_tree = false;
 			break;
@@ -544,10 +534,9 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		} 
 
 		set_predefined_variables(current_node, L);
-		const char *lua_code = "print (n)";
-		const int code_len = strlen(lua_code);
-		int error = luaL_loadbuffer(L, lua_code, code_len, "lua code")
-			|| lua_pcall(L, 0, 0, 0);
+		lua_getfield(L, LUA_GLOBALSINDEX, "condition");
+		lua_call(L, 0, 1);
+
 		bool is_match = true; // TODO: call Lua condition, etc.
 
 		if (is_match) {
@@ -565,6 +554,20 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		destroy_llist(nodes);
 }
 
+void load_lua_condition(lua_State *L, struct parameters params)
+{
+	int lua_condition_len = strlen(params.lua_condition);
+	int error = luaL_loadbuffer(L, params.lua_condition,
+			lua_condition_len, "condition");
+	if (error) {
+		const char *msg = lua_tostring(L, -1);
+		lua_pop(L, 1);
+		printf("%s\n", msg);
+		exit(EXIT_FAILURE);
+	}
+	lua_setfield(L, LUA_GLOBALSINDEX, "condition");
+}
+
 int main(int argc, char* argv[])
 {
 	struct parameters params = get_params(argc, argv);
@@ -580,6 +583,8 @@ int main(int argc, char* argv[])
 		lua_pcall(L, 0, 0, 0);
 
 	// run_phase_code(code_phase_alist, "start");
+
+	load_lua_condition(L, params);
 	while (NULL != (tree = parse_tree())) {
 		//run_phase_code(code_phase_alist, "start-tree");
 		process_tree(tree, L, params);
