@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include <stdbool.h>
 #include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 
 #include "rnode.h"
 #include "link.h"
@@ -79,12 +81,12 @@ void help(char *argv[])
 {
 	printf (
 "Performs actions on nodes that match some condition, using an\n"
-"embedded Scheme interpreter (GNU Guile)\n"
+"embedded Lua interpreter. TODO: Update this help page!\n"
 "\n"
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hnor] <newick trees filename|-> <Scheme expression>\n"
+"%s [-hnor] <newick trees filename|-> <Lua expression>\n"
 "\n"
 "NOTE: this program is still very experimental and will probably change!\n"
 "\n"
@@ -94,7 +96,7 @@ void help(char *argv[])
 "First argument is the name of a file that contains Newick trees, or '-' (in\n"
 "which case trees are read from standard input).\n"
 "\n"
-"Second argument is a Scheme S-expression with two parts. The first part is\n"
+"Second argument is a Lua expression with two parts. The first part is\n"
 "evaluated on each node in turn. If it evaluates to #t, then (and only then)\n"
 "the second part is evaluated. The first part is typically used to select\n"
 "nodes and is called the Selector, and the second part is used to perform\n"
@@ -106,7 +108,7 @@ void help(char *argv[])
 "has '#t' as a selector and '(s)' as action. This selector is always true, so\n"
 "the action (s) (print out the subtree rooted at the current node) is\n"
 "performed for every node.\n"
-"The program provides specalized Scheme functions and variables for working\n"
+"The program provides specalized Lua functions and variables for working\n"
 "with nodes (see below).\n"
 "\n"
 "Output\n"
@@ -579,12 +581,21 @@ int main(int argc, char* argv[])
 	struct parameters params = get_params(argc, argv);
 	struct rooted_tree *tree;
 
+	/* Initializes Lua */
+	lua_State *L = lua_open();   
+	luaL_openlibs(L);
+
+	const char *lua_code = "print (\"Hello, Newick!\")";
+	const int code_len = strlen(lua_code);
+	int error = luaL_loadbuffer(L, lua_code, code_len, "lua code") ||
+		lua_pcall(L, 0, 0, 0);
+
 	// run_phase_code(code_phase_alist, "start");
 	while (NULL != (tree = parse_tree())) {
 		//run_phase_code(code_phase_alist, "start-tree");
 		process_tree(tree, params);
 		if (params.show_tree) {
-			dump_newick(tree->root);
+			dump_newick(tree->root); // TODO: faster f()?
 		}
 		destroy_tree(tree, NULL);
 		//run_phase_code(code_phase_alist, "end-tree");
