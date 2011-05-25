@@ -95,11 +95,12 @@ nw_duration_LDADD = libnw.la
 nw_stats_SOURCES = stats.c
 nw_stats_LDADD = libnw.la
 
+# TODO: see if lguile and lpthread are not already specified (due to autoconf)
 nw_sched_SOURCES = scheme_tree_editor.c rnode_smob.c
 nw_sched_LDADD = libnw.la -lguile -lpthread
 
 nw_luaed_SOURCES = lua_tree_editor.c 
-nw_luaed_LDADD = libnw.la -llua-5.1
+nw_luaed_LDADD = libnw.la 
 
 # Removes automatically generated C code (Lex & YACC)
 #
