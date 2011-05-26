@@ -60,6 +60,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "masprintf.h"
 
+const char *CONDITION = "condition";
+const char *ACTION = "action";
+
 struct rnode *current_node;
 
 enum order { POST_ORDER, PRE_ORDER };
@@ -296,7 +299,7 @@ static struct parameters get_params(int argc, char *argv[])
 	}
 
 	/* check arguments */
-	if (3 >= (argc - optind) && argc > 1)	{
+	if (3 == (argc - optind))	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
 			extern FILE *nwsin;
@@ -306,10 +309,8 @@ static struct parameters get_params(int argc, char *argv[])
 			}
 			nwsin = fin;
 		}
-		if (3 == (argc - optind)) {
-			params.lua_condition = argv[optind+1];
-			params.lua_action = argv[optind+2];
-		}
+		params.lua_condition = argv[optind+1];
+		params.lua_action = argv[optind+2];
 	} else {
 		fprintf(stderr, "Usage: %s [-hnro] <filename|-> "
 				"<Scheme expression>\n",
@@ -534,12 +535,19 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		} 
 
 		set_predefined_variables(current_node, L);
-		lua_getfield(L, LUA_GLOBALSINDEX, "condition");
+		lua_getfield(L, LUA_GLOBALSINDEX, CONDITION);
 		lua_call(L, 0, 1);
-
-		bool is_match = true; // TODO: call Lua condition, etc.
-
-		if (is_match) {
+		if (lua_isboolean(L, -1) != 1) {
+			fprintf(stderr, "WARNING: condition does not evaluate "
+					"to a boolean.\n");
+			lua_pop(L, 1);
+			continue;
+		}
+		int match = lua_toboolean(L, -1);
+		lua_pop(L, 1);
+		if (match) {
+			lua_getfield(L, LUA_GLOBALSINDEX, ACTION);
+			lua_call(L, 0, 0);
 			/* see -o switch */
 			if (params.stop_clade_at_first_match)
 				((struct rnode_data *)
@@ -554,18 +562,30 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		destroy_llist(nodes);
 }
 
-void load_lua_condition(lua_State *L, struct parameters params)
+void load_lua_condition(lua_State *L, char *lua_condition)
 {
-	int lua_condition_len = strlen(params.lua_condition);
-	int error = luaL_loadbuffer(L, params.lua_condition,
-			lua_condition_len, "condition");
+	const char *lua_condition_chunk = masprintf("return (%s)", 
+			lua_condition);
+	int error = luaL_loadstring(L, lua_condition_chunk);
 	if (error) {
 		const char *msg = lua_tostring(L, -1);
 		lua_pop(L, 1);
 		printf("%s\n", msg);
 		exit(EXIT_FAILURE);
 	}
-	lua_setfield(L, LUA_GLOBALSINDEX, "condition");
+	lua_setfield(L, LUA_GLOBALSINDEX, CONDITION);
+}
+
+void load_lua_action(lua_State *L, char *lua_action)
+{
+	int error = luaL_loadstring(L, lua_action);
+	if (error) {
+		const char *msg = lua_tostring(L, -1);
+		lua_pop(L, 1);
+		printf("%s\n", msg);
+		exit(EXIT_FAILURE);
+	}
+	lua_setfield(L, LUA_GLOBALSINDEX, ACTION);
 }
 
 int main(int argc, char* argv[])
@@ -584,7 +604,9 @@ int main(int argc, char* argv[])
 
 	// run_phase_code(code_phase_alist, "start");
 
-	load_lua_condition(L, params);
+	load_lua_condition(L, params.lua_condition);
+	load_lua_action(L, params.lua_action);
+
 	while (NULL != (tree = parse_tree())) {
 		//run_phase_code(code_phase_alist, "start-tree");
 		process_tree(tree, L, params);
