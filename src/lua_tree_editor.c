@@ -566,7 +566,9 @@ void load_lua_condition(lua_State *L, char *lua_condition)
 {
 	const char *lua_condition_chunk = masprintf("return (%s)", 
 			lua_condition);
-	int error = luaL_loadstring(L, lua_condition_chunk);
+	int error = luaL_loadbuffer(L, lua_condition_chunk,
+			strlen(lua_condition_chunk), CONDITION);
+	free(lua_condition_chunk);
 	if (error) {
 		const char *msg = lua_tostring(L, -1);
 		lua_pop(L, 1);
@@ -578,7 +580,7 @@ void load_lua_condition(lua_State *L, char *lua_condition)
 
 void load_lua_action(lua_State *L, char *lua_action)
 {
-	int error = luaL_loadstring(L, lua_action);
+	int error = luaL_loadbuffer(L, lua_action, strlen(lua_action), ACTION);
 	if (error) {
 		const char *msg = lua_tostring(L, -1);
 		lua_pop(L, 1);
