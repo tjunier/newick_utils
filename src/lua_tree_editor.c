@@ -428,50 +428,56 @@ static void parse_order_traversal(struct rooted_tree *tree)
 
 static void set_predefined_variables(struct rnode *node, lua_State *L)
 {
-	lua_pushnumber(L, 2.1);
-	lua_setglobal(L, "n");
-
-	/*
-	SCM label = scm_from_locale_string(node->label);
-	SCM edge_length_as_scm_string  = scm_from_locale_string(
-			node->edge_length_as_string);
-	scm_c_define("lbl", label);
-
-		*/
+	int initial_lua_stack_size = lua_gettop(L);
 	/* N: current node */
 	//SCM node_smob = rnode_smob(node);
 	//scm_c_define("N", node_smob);
 
-	/* b: returns node label, as a bootstrap support value (or undefined if
+	lua_pushstring(L, node->label);
+	lua_setglobal(L, "lbl");
+
+	/* b: returns node label, as a bootstrap support value (or nil if
 	this can't be done) */
-	//if (is_leaf(node))
-		//scm_c_define("b", SCM_UNDEFINED);
-	//else {
-		//SCM support_value = scm_string_to_number(label, SCM_UNDEFINED);
-		//if (SCM_BOOL_F == support_value)
-			//scm_c_define("b", SCM_UNDEFINED);
-		//else
-			//scm_c_define("b", support_value);
-	//}
+	if (is_leaf(node)) {
+		lua_pushnil(L);
+	} else {
+		lua_pushstring(L, node->label);
+		if (lua_isnumber(L, -1)) {
+			lua_Number b = lua_tonumber(L, -1);
+			lua_pop(L, 1);
+			lua_pushnumber(L, b);
+		} else {
+			lua_pop(L, 1);
+			lua_pushnil(L);
+		}
+	}
+	lua_setglobal(L, "b");
 
 	/* i: true IFF node is inner (not leaf, not root) */
-	//if (is_inner_node(node))
-		//scm_c_define("i", SCM_BOOL_T);
-	//else
-		//scm_c_define("i", SCM_BOOL_F);
-
-	/* l: true IFF node is a leaf */
-	//if (is_leaf(node))
-		//scm_c_define("l", SCM_BOOL_T);
-	//else
-		//scm_c_define("l", SCM_BOOL_F);
+	if (is_inner_node(node))
+		lua_pushboolean(L, true);
+	else
+		lua_pushboolean(L, false);
+	lua_setglobal(L, "i");
 
 	/* L: parent edge's length */
-	//if (strcmp ("", node->edge_length_as_string) == 0) 
-		//scm_c_define("L", SCM_UNDEFINED);
-	//else	
-		//scm_c_define("L", scm_string_to_number(
-				//edge_length_as_scm_string, SCM_UNDEFINED));
+	if (strcmp ("", node->edge_length_as_string) == 0) {
+		lua_pushnil(L);
+	} else {
+		/* edge_length_as_string represents a number */
+		lua_pushstring(L, node->edge_length_as_string);
+		lua_Number len = lua_tonumber(L, -1);
+		lua_pop(L, 1);
+		lua_pushnumber(L, len);
+	}
+	lua_setglobal(L, "L");
+
+	/* l: true IFF node is a leaf */
+	if (is_leaf(node))
+		lua_pushboolean(L, true);
+	else
+		lua_pushboolean(L, false);
+	lua_setglobal(L, "l");
 
 	/* c: number of children */
 	//scm_c_define("c", scm_from_int(current_node->child_count));
@@ -497,6 +503,9 @@ static void set_predefined_variables(struct rnode *node, lua_State *L)
 	else
 		scm_c_define("r", SCM_BOOL_F);
 		*/
+
+	/* sanity check */
+	assert(lua_gettop(L) == initial_lua_stack_size);
 }
 
 static void process_tree(struct rooted_tree *tree, lua_State *L,
@@ -598,11 +607,6 @@ int main(int argc, char* argv[])
 	/* Initializes Lua */
 	lua_State *L = lua_open();   
 	luaL_openlibs(L);
-
-	const char *lua_code = "print (\"Hello, Newick!\")";
-	const int code_len = strlen(lua_code);
-	int error = luaL_loadbuffer(L, lua_code, code_len, "lua code") ||
-		lua_pcall(L, 0, 0, 0);
 
 	// run_phase_code(code_phase_alist, "start");
 
