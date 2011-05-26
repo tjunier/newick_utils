@@ -573,7 +573,7 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 
 void load_lua_condition(lua_State *L, char *lua_condition)
 {
-	const char *lua_condition_chunk = masprintf("return (%s)", 
+	char *lua_condition_chunk = masprintf("return (%s)", 
 			lua_condition);
 	int error = luaL_loadbuffer(L, lua_condition_chunk,
 			strlen(lua_condition_chunk), CONDITION);

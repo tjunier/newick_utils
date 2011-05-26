@@ -1,0 +1,29 @@
+b_s:-n HRV.bs.nw '((& i (= b 13)) (s))'
+b_d:HRV.bs.nw '((& i (= b 13)) (u))'
+ib_o:HRV.bs.nw '((& i (< b 11)) (o))'
+top:top.nw '(i (o))'
+nr_1s:-n -r catarrhini.nw '(#t (s))'
+no:-no catarrhini.nw '((> d 10) (s))'
+n_l:-n catarrhini.nw '(#t (p lbl))'
+multi: -no forest_ind.nw '((>= a 4) (s))'
+d_s:-n catarrhini.nw '((= D 2) (s))'
+c_s:-n falc_families.nw '((> c 2) (s))'
+const_1: -n catarrhini.nw '(#t (s))'
+const_0: -n catarrhini.nw '(#f (s))'
+set_len: catarrhini.nw "((def? 'L) (L! (* 2 L)))"
+to_cg: catarrhini.nw '(#t (L! ""))'
+fmt: HRV.nw "((def? 'L) (L! (format #f \\"~,2f\\" L)))"
+def_d: -n part_def.nw "((def? 'd) (p lbl))" 
+undef_d: -n part_def.nw "((! (def? 'd)) (p lbl))"
+set_lbl: catarrhini.nw '(#t (lbl! ""))'
+parpar: -n catarrhini.nw '((> a 1) (p (lab (par (par N)))))'
+# finds the outgroup (child of root with fewer children),
+# assuming root has 2 children
+og1: -n pecora.nw '(r (let ((c1 (first-child N)) (c2 (last-child N))) (if (< (children-count c1) (children-count c2)) (subtree c1) (subtree c2))))'
+og1short: -n pecora.nw '(r (let ((c1 (fc N)) (c2 (lc N))) (if (< (nc c1) (nc c2)) (st c1) (st c2))))'
+ogmult: -n edged_root.nw '(r (let ((c1 (fc N)) (c2 (lc N))) (if (< (nc c1) (nc c2)) (st c1) (st c2))))'
+# And e.g. this gets the ingroup:
+ig: -n pecora.nw '(r (st (if (> (nc (fc N)) (nc (lc N))) (fc N) (lc N))))'
+kids1: -n pecora.nw '((not l) (begin (p (lab N)) (map (lambda (k) (p (nc k))) (kids N)))))'
+file_1: -n -f edges.scm catarrhini.nw
+file_2: -n -f edges_num.scm catarrhini.nw
