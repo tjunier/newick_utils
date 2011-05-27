@@ -571,6 +571,17 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		destroy_llist(nodes);
 }
 
+static int l_square (lua_State *L) {
+	double d = lua_tonumber(L, 1);  /* get argument */
+	lua_pushnumber(L, d*d);  /* push result */
+	return 1;  /* number of results */
+}
+
+static int l_print_subclade_at_current_node (lua_State *L) {
+	dump_newick(current_node);	
+	return 0;
+}
+	
 void load_lua_condition(lua_State *L, char *lua_condition)
 {
 	char *lua_condition_chunk = masprintf("return (%s)", 
@@ -607,6 +618,12 @@ int main(int argc, char* argv[])
 	/* Initializes Lua */
 	lua_State *L = lua_open();   
 	luaL_openlibs(L);
+
+	lua_pushcfunction(L, l_square);
+	lua_setglobal(L, "mysquare");
+	lua_pushcfunction(L, l_print_subclade_at_current_node);
+	lua_setglobal(L, "s");
+
 
 	// run_phase_code(code_phase_alist, "start");
 
