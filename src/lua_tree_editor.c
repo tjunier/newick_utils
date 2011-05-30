@@ -80,6 +80,7 @@ struct parameters {
 struct lua_rnode {
 	struct rnode *orig;
 	char *label;
+	double length;
 };
 
 static void help(char *argv[])
@@ -616,7 +617,46 @@ static void load_lua_action(lua_State *L, char *lua_action)
 }
 
 
-static int clone_rnode(lua_state *L)
+static int lua_get_current_node(lua_State *L)
+{
+	struct lua_rnode *lua_current = lua_newuserdata(L,
+			sizeof (struct lua_rnode));
+	// TODO: shouldn't we check for NULL?
+	lua_current->orig = current_node;
+	lua_current->label = "new lua node";
+	lua_current->length = 3.4;
+	return 1;
+}
+
+static int lua_set_node_length(lua_State *L)
+{
+	struct lua_rnode *lnode = (struct lua_rnode *) lua_touserdata(L, 1);
+	luaL_argcheck(L, NULL != lnode, 1, "expected node");
+	double length = luaL_checknumber(L, 2);
+	lnode->length = length;
+	return 0;
+}
+
+static int lua_get_node_length(lua_State *L)
+{
+	struct lua_rnode *lnode = (struct lua_rnode *) lua_touserdata(L, 1);
+	luaL_argcheck(L, NULL != lnode, 1, "expected node");
+	lua_pushnumber(L, lnode->length);
+	return 1;
+}
+
+static const struct luaL_reg lnodelib [] = {
+	{"current", lua_get_current_node},
+	{"set_length", lua_set_node_length},
+	{"get_length", lua_get_node_length},
+	{NULL, NULL}
+};
+
+static int luaopen_lnode (lua_State *L) 
+{
+	luaL_openlib(L, "lnode", lnodelib, 0);
+	return 1;
+}
 
 int main(int argc, char* argv[])
 {
@@ -637,6 +677,7 @@ int main(int argc, char* argv[])
 
 	load_lua_condition(L, params.lua_condition);
 	load_lua_action(L, params.lua_action);
+	luaopen_lnode(L);
 
 	while (NULL != (tree = parse_tree())) {
 		//run_phase_code(code_phase_alist, "start-tree");
