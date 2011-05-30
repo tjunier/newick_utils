@@ -425,6 +425,17 @@ static void parse_order_traversal(struct rooted_tree *tree)
 	}
 }
 
+static int lua_set_current_node(lua_State *L)
+{
+	struct lua_rnode *lua_current = lua_newuserdata(L,
+			sizeof (struct lua_rnode));
+	// TODO: shouldn't we check for NULL?
+	lua_current->orig = current_node;
+	lua_current->label = "new lua node";
+	lua_current->length = 3.4;
+	return 1;
+}
+
 /* Sets the value of the predefined variables (i, l, a, etc), according to the
  * node passed as argument. This is normally the current node, while visiting
  * the tree. Using variables rather than functions makes for shorter Scheme
@@ -435,9 +446,10 @@ static void parse_order_traversal(struct rooted_tree *tree)
 static void set_predefined_variables(struct rnode *node, lua_State *L)
 {
 	int initial_lua_stack_size = lua_gettop(L);
+
 	/* N: current node */
-	//SCM node_smob = rnode_smob(node);
-	//scm_c_define("N", node_smob);
+	lua_set_current_node(L);
+	lua_setglobal(L, "N");
 
 	lua_pushstring(L, node->label);
 	lua_setglobal(L, "lbl");
@@ -577,12 +589,6 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		destroy_llist(nodes);
 }
 
-static int l_square (lua_State *L) {
-	double d = lua_tonumber(L, 1);  /* get argument */
-	lua_pushnumber(L, d*d);  /* push result */
-	return 1;  /* number of results */
-}
-
 static int l_print_subclade_at_current_node (lua_State *L) {
 	dump_newick(current_node);	
 	return 0;
@@ -616,18 +622,6 @@ static void load_lua_action(lua_State *L, char *lua_action)
 	lua_setfield(L, LUA_GLOBALSINDEX, ACTION);
 }
 
-
-static int lua_get_current_node(lua_State *L)
-{
-	struct lua_rnode *lua_current = lua_newuserdata(L,
-			sizeof (struct lua_rnode));
-	// TODO: shouldn't we check for NULL?
-	lua_current->orig = current_node;
-	lua_current->label = "new lua node";
-	lua_current->length = 3.4;
-	return 1;
-}
-
 static int lua_set_node_length(lua_State *L)
 {
 	struct lua_rnode *lnode = (struct lua_rnode *) lua_touserdata(L, 1);
@@ -646,7 +640,6 @@ static int lua_get_node_length(lua_State *L)
 }
 
 static const struct luaL_reg lnodelib [] = {
-	{"current", lua_get_current_node},
 	{"set_length", lua_set_node_length},
 	{"get_length", lua_get_node_length},
 	{NULL, NULL}
@@ -667,8 +660,6 @@ int main(int argc, char* argv[])
 	lua_State *L = lua_open();   
 	luaL_openlibs(L);
 
-	lua_pushcfunction(L, l_square);
-	lua_setglobal(L, "mysquare");
 	lua_pushcfunction(L, l_print_subclade_at_current_node);
 	lua_setglobal(L, "s");
 
