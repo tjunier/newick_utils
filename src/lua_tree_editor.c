@@ -77,7 +77,12 @@ struct parameters {
 	bool single;
 };
 
-void help(char *argv[])
+struct lua_rnode {
+	struct rnode *orig;
+	char *label;
+};
+
+static void help(char *argv[])
 {
 	printf (
 "Performs actions on nodes that match some condition, using an\n"
@@ -582,7 +587,7 @@ static int l_print_subclade_at_current_node (lua_State *L) {
 	return 0;
 }
 	
-void load_lua_condition(lua_State *L, char *lua_condition)
+static void load_lua_condition(lua_State *L, char *lua_condition)
 {
 	char *lua_condition_chunk = masprintf("return (%s)", 
 			lua_condition);
@@ -598,7 +603,7 @@ void load_lua_condition(lua_State *L, char *lua_condition)
 	lua_setfield(L, LUA_GLOBALSINDEX, CONDITION);
 }
 
-void load_lua_action(lua_State *L, char *lua_action)
+static void load_lua_action(lua_State *L, char *lua_action)
 {
 	int error = luaL_loadbuffer(L, lua_action, strlen(lua_action), ACTION);
 	if (error) {
@@ -609,6 +614,9 @@ void load_lua_action(lua_State *L, char *lua_action)
 	}
 	lua_setfield(L, LUA_GLOBALSINDEX, ACTION);
 }
+
+
+static int clone_rnode(lua_state *L)
 
 int main(int argc, char* argv[])
 {
