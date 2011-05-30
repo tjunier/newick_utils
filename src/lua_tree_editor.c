@@ -429,6 +429,10 @@ static int lua_set_current_node(lua_State *L)
 {
 	struct lua_rnode *lua_current = lua_newuserdata(L,
 			sizeof (struct lua_rnode));
+
+	luaL_getmetatable(L, "LRnode");
+	lua_setmetatable(L, -2);
+
 	// TODO: shouldn't we check for NULL?
 	lua_current->orig = current_node;
 	lua_current->label = "new lua node";
@@ -622,10 +626,18 @@ static void load_lua_action(lua_State *L, char *lua_action)
 	lua_setfield(L, LUA_GLOBALSINDEX, ACTION);
 }
 
+/* Checks that 1st arg passed to a Lua function is an lnode. */
+
+static struct lnode *check_lnode(lua_State *L)
+{
+	void *ud = luaL_checkudata(L, 1, "LRnode");
+	luaL_argcheck(L, NULL != ud, 1, "expected node");
+	return (struct lnode *) ud;
+}
+
 static int lua_set_node_length(lua_State *L)
 {
-	struct lua_rnode *lnode = (struct lua_rnode *) lua_touserdata(L, 1);
-	luaL_argcheck(L, NULL != lnode, 1, "expected node");
+	struct lua_rnode *lnode = check_lnode(L);
 	double length = luaL_checknumber(L, 2);
 	lnode->length = length;
 	return 0;
@@ -633,8 +645,7 @@ static int lua_set_node_length(lua_State *L)
 
 static int lua_get_node_length(lua_State *L)
 {
-	struct lua_rnode *lnode = (struct lua_rnode *) lua_touserdata(L, 1);
-	luaL_argcheck(L, NULL != lnode, 1, "expected node");
+	struct lua_rnode *lnode = check_lnode(L);
 	lua_pushnumber(L, lnode->length);
 	return 1;
 }
@@ -647,6 +658,7 @@ static const struct luaL_reg lnodelib [] = {
 
 static int luaopen_lnode (lua_State *L) 
 {
+	luaL_newmetatable(L, "LRnode");
 	luaL_openlib(L, "lnode", lnodelib, 0);
 	return 1;
 }
