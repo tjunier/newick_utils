@@ -628,7 +628,7 @@ static void load_lua_action(lua_State *L, char *lua_action)
 
 /* Checks that 1st arg passed to a Lua function is an lnode. */
 
-static struct lnode *check_lnode(lua_State *L)
+static struct lua_rnode *check_lnode(lua_State *L)
 {
 	void *ud = luaL_checkudata(L, 1, "LRnode");
 	luaL_argcheck(L, NULL != ud, 1, "expected node");
@@ -650,16 +650,26 @@ static int lua_get_node_length(lua_State *L)
 	return 1;
 }
 
-static const struct luaL_reg lnodelib [] = {
+/* Methods for Lua node */
+static const struct luaL_reg lnodelib_m [] = {
 	{"set_length", lua_set_node_length},
 	{"get_length", lua_get_node_length},
 	{NULL, NULL}
 };
 
+/* Cf http://www.lua.org/pil/28.3.html */
+
 static int luaopen_lnode (lua_State *L) 
 {
 	luaL_newmetatable(L, "LRnode");
-	luaL_openlib(L, "lnode", lnodelib, 0);
+
+	lua_pushstring(L, "__index");
+	lua_pushvalue(L, -2);
+	lua_settable(L, -3);
+
+	luaL_openlib(L, NULL, lnodelib_m, 0);
+	/* any lnode functions (as opposed to methods) would go here */
+	/* luaL_openlib(L, "lnode", lnodelib_f, 0); */
 	return 1;
 }
 
