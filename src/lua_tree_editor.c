@@ -632,10 +632,10 @@ static struct lua_rnode *check_lnode(lua_State *L)
 {
 	void *ud = luaL_checkudata(L, 1, "LRnode");
 	luaL_argcheck(L, NULL != ud, 1, "expected node");
-	return (struct lnode *) ud;
+	return (struct lua_rnode *) ud;
 }
 
-static int lua_set_node_length(lua_State *L)
+static int lua_node_set(lua_State *L)
 {
 	struct lua_rnode *lnode = check_lnode(L);
 	double length = luaL_checknumber(L, 2);
@@ -643,17 +643,25 @@ static int lua_set_node_length(lua_State *L)
 	return 0;
 }
 
-static int lua_get_node_length(lua_State *L)
+static int lua_node_get(lua_State *L)
 {
 	struct lua_rnode *lnode = check_lnode(L);
+	const char *field = luaL_checkstring(L, 2);
+	luaL_argcheck(L, NULL != field, 2, "expected string");
+
+	if (strcmp("lbl", field) == 0) {
+		lua_pushstring(L, lnode->label);
+	}
 	lua_pushnumber(L, lnode->length);
 	return 1;
 }
 
-/* Methods for Lua node */
-static const struct luaL_reg lnodelib_m [] = {
-	{"set_length", lua_set_node_length},
-	{"get_length", lua_get_node_length},
+// TODO: implement __tostring for lua_rnode
+
+/* Functions for Lua node */
+static const struct luaL_reg lnodelib_f [] = {
+	{"set", lua_node_set},
+	{"get", lua_node_get},
 	{NULL, NULL}
 };
 
@@ -662,15 +670,19 @@ static const struct luaL_reg lnodelib_m [] = {
 static int luaopen_lnode (lua_State *L) 
 {
 	luaL_newmetatable(L, "LRnode");
+	luaL_openlib(L, "lnode", lnodelib_f, 0);
 
 	lua_pushstring(L, "__index");
-	lua_pushvalue(L, -2);
-	lua_settable(L, -3);
+	lua_pushstring(L, "get");
+	lua_gettable(L, 2);	/* get lnode.get */
+	lua_settable(L, 1);	/* mt.__index = lnode.get */
 
-	luaL_openlib(L, NULL, lnodelib_m, 0);
-	/* any lnode functions (as opposed to methods) would go here */
-	/* luaL_openlib(L, "lnode", lnodelib_f, 0); */
-	return 1;
+	lua_pushstring(L, "__newindex");
+	lua_pushstring(L, "set");
+	lua_gettable(L, 2);	/* get lnode.set */
+	lua_settable(L, 1);	/* mt.__index = lnode.set */
+
+	return 0;
 }
 
 int main(int argc, char* argv[])
