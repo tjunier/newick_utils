@@ -63,11 +63,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const char *CONDITION = "condition";
 const char *ACTION = "action";
 
-struct rnode *current_node;
-
 enum order { POST_ORDER, PRE_ORDER };
 
-enum node_field { UNKNOWN_FIELD, NODE_LABEL, NODE_LENGTH, NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT };
+enum node_field { UNKNOWN_FIELD, NODE_LABEL, NODE_SUPPORT, NODE_LENGTH, NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT };
 
 struct parameters {
 	char *lua_action;	
@@ -427,7 +425,7 @@ static void parse_order_traversal(struct rooted_tree *tree)
 	}
 }
 
-static int lua_set_current_node(lua_State *L)
+static int lua_set_current_node(lua_State *L, struct rnode *current)
 {
 	struct lua_rnode *lua_current = lua_newuserdata(L,
 			sizeof (struct lua_rnode));
@@ -436,7 +434,7 @@ static int lua_set_current_node(lua_State *L)
 	lua_setmetatable(L, -2);
 
 	// TODO: shouldn't we check for NULL?
-	lua_current->orig = current_node;
+	lua_current->orig = current;
 	lua_current->label = "new lua node";
 	lua_current->length = 3.4;
 	return 1;
@@ -454,7 +452,7 @@ static void set_predefined_variables(struct rnode *node, lua_State *L)
 	int initial_lua_stack_size = lua_gettop(L);
 
 	/* N: current node */
-	lua_set_current_node(L);
+	lua_set_current_node(L, node);
 	lua_setglobal(L, "N");
 
 	lua_pushstring(L, node->label);
@@ -637,8 +635,13 @@ static struct lua_rnode *check_lnode(lua_State *L)
 	return (struct lua_rnode *) ud;
 }
 
-static enum node_field string2field (const char *fld_str)
+static enum node_field field_string2code (const char *fld_str)
 {
+	if (strcmp("lbl", fld_str) == 0) return NODE_LABEL;
+	if (strcmp("b", fld_str) == 0) return NODE_SUPPORT;
+	if (strcmp("len", fld_str) == 0) return NODE_LENGTH;
+
+	return UNKNOWN_FIELD;
 }
 
 static int lua_node_set(lua_State *L)
@@ -654,12 +657,21 @@ static int lua_node_get(lua_State *L)
 	struct lua_rnode *lnode = check_lnode(L);
 	const char *field = luaL_checkstring(L, 2);
 	luaL_argcheck(L, NULL != field, 2, "expected string");
+	enum node_field field_code = field_string2code(field);
 
-	if (strcmp("lbl", field) == 0) {
+	switch (field_code) {
+	case NODE_LABEL:
 		lua_pushstring(L, lnode->label);
+		return 1;
+	case NODE_LENGTH:
+		lua_pushnumber(L, lnode->length);
+		return 1;
+	case UNKNOWN_FIELD:
+		lua_pushnil(L);
+		return luaL_error(L, "error: '%s' is not a node field.", field);
+	default:
+		assert(0); /* programmer error */
 	}
-	lua_pushnumber(L, lnode->length);
-	return 1;
 }
 
 // TODO: implement __tostring for lua_rnode
