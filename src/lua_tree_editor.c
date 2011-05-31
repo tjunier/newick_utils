@@ -78,9 +78,7 @@ struct parameters {
 };
 
 struct lua_rnode {
-	struct rnode *orig;
-	char *label;
-	double length;
+	struct rnode *orig;	/* Just keep a ptr to the original rnode */
 };
 
 static void help(char *argv[])
@@ -435,8 +433,6 @@ static int lua_set_current_node(lua_State *L, struct rnode *current)
 
 	// TODO: shouldn't we check for NULL?
 	lua_current->orig = current;
-	lua_current->label = "new lua node";
-	lua_current->length = 3.4;
 	return 1;
 }
 
@@ -552,7 +548,7 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 
 	/* Main loop: Iterate over all nodes */
 	for (el = nodes->head; NULL != el; el = el -> next) {
-		current_node = (struct rnode *) el->data;
+		struct rnode *current_node = (struct rnode *) el->data;
 
 		/* Check for stop mark in parent (see option -o) */
 		if (! is_root(current_node)) { 	/* root has no parent... */
@@ -594,6 +590,7 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 }
 
 static int l_print_subclade_at_current_node (lua_State *L) {
+	// TODO: get ptr via 'N' global
 	dump_newick(current_node);	
 	return 0;
 }
@@ -661,10 +658,10 @@ static int lua_node_get(lua_State *L)
 
 	switch (field_code) {
 	case NODE_LABEL:
-		lua_pushstring(L, lnode->label);
+		lua_pushstring(L, lnode->orig->label);
 		return 1;
 	case NODE_LENGTH:
-		lua_pushnumber(L, lnode->length);
+		lua_pushnumber(L, atof(lnode->orig->length_as_string));
 		return 1;
 	case UNKNOWN_FIELD:
 		lua_pushnil(L);
