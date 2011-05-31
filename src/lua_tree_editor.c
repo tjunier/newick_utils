@@ -67,6 +67,8 @@ struct rnode *current_node;
 
 enum order { POST_ORDER, PRE_ORDER };
 
+enum node_field { UNKNOWN_FIELD, NODE_LABEL, NODE_LENGTH, NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT };
+
 struct parameters {
 	char *lua_action;	
 	char *lua_condition;	
@@ -633,6 +635,10 @@ static struct lua_rnode *check_lnode(lua_State *L)
 	void *ud = luaL_checkudata(L, 1, "LRnode");
 	luaL_argcheck(L, NULL != ud, 1, "expected node");
 	return (struct lua_rnode *) ud;
+}
+
+static enum node_field string2field (const char *fld_str)
+{
 }
 
 static int lua_node_set(lua_State *L)
