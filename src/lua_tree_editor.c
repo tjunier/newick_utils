@@ -590,8 +590,11 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 }
 
 static int l_print_subclade_at_current_node (lua_State *L) {
-	// TODO: get ptr via 'N' global
-	dump_newick(current_node);	
+	int num_args =  lua_gettop(L);	
+	// 0 arg: use current node (lua_getglobal(L, "N"))
+	// 1 arg: use arg
+	struct rnode *node;
+	dump_newick(node);	
 	return 0;
 }
 	
@@ -644,8 +647,6 @@ static enum node_field field_string2code (const char *fld_str)
 static int lua_node_set(lua_State *L)
 {
 	struct lua_rnode *lnode = check_lnode(L);
-	double length = luaL_checknumber(L, 2);
-	lnode->length = length;
 	return 0;
 }
 
@@ -661,7 +662,7 @@ static int lua_node_get(lua_State *L)
 		lua_pushstring(L, lnode->orig->label);
 		return 1;
 	case NODE_LENGTH:
-		lua_pushnumber(L, atof(lnode->orig->length_as_string));
+		lua_pushnumber(L, atof(lnode->orig->edge_length_as_string));
 		return 1;
 	case UNKNOWN_FIELD:
 		lua_pushnil(L);
