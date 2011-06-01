@@ -599,14 +599,19 @@ static struct lua_rnode *check_lnode(lua_State *L)
 	return (struct lua_rnode *) ud;
 }
 
-static int l_print_subclade_at_current_node (lua_State *L) {
-	int num_args =  lua_gettop(L);	
+/* Returns the node on which to work. This is for functions that use the
+ * current node (N) as an implicit argument IFF no argument is passed. */
+
+static struct lua_rnode *get_lua_rnode_arg(lua_State *L)
+{
 	struct lua_rnode *lnode = NULL;
-	switch(num_args) {
+	int num_args = lua_gettop(L);
+	switch (num_args) {
 	case 0:
 		lua_getglobal(L, "N");
 		lnode = lua_touserdata(L, -1);
-		if (NULL == lnode) luaL_error(L, "N is not a node");
+		if (NULL == lnode)
+			luaL_error(L, "N is not a node");
 		break;
 	case 1:
 		lnode = check_lnode(L);
@@ -614,17 +619,51 @@ static int l_print_subclade_at_current_node (lua_State *L) {
 	default:
 		luaL_error(L, "too many arguments to s()");
 	}
-		
-	dump_newick(lnode->orig);	
+
+	return lnode;
+}
+
+static int lua_print_subclade(lua_State * L)
+{
+	struct lua_rnode *lnode = get_lua_rnode_arg(L);
+	dump_newick(lnode->orig);
 	return 0;
 }
-	
-static void load_lua_condition(lua_State *L, char *lua_condition)
+
+
+static int lua_unlink (lua_State * L)
 {
-	char *lua_condition_chunk = masprintf("return (%s)", 
-			lua_condition);
+	int num_args = lua_gettop(L);
+	struct lua_rnode *lnode = get_lua_rnode_arg(L);
+	struct rnode *node = lnode->orig;
+
+	if (is_root(node)) {
+		// TODO: unify error handling (Lua? C?)
+		fprintf (stderr, "Warning: tried to delete root\n");
+
+	}
+	enum unlink_rnode_status result = unlink_rnode(node);
+	switch(result) {
+	case UNLINK_RNODE_DONE:
+	case UNLINK_RNODE_ROOT_CHILD:
+		break;
+	case UNLINK_RNODE_ERROR:
+		fprintf (stderr, "Memory error - unlink aborted.\n");
+		break;
+	default:
+		assert(0); /* programmer error */
+	}
+
+	return 0;
+}
+
+static void load_lua_condition(lua_State * L, char *lua_condition)
+{
+	char *lua_condition_chunk = masprintf("return (%s)",
+					      lua_condition);
 	int error = luaL_loadbuffer(L, lua_condition_chunk,
-			strlen(lua_condition_chunk), CONDITION);
+				    strlen(lua_condition_chunk),
+				    CONDITION);
 	free(lua_condition_chunk);
 	if (error) {
 		const char *msg = lua_tostring(L, -1);
@@ -722,8 +761,10 @@ int main(int argc, char* argv[])
 	lua_State *L = lua_open();   
 	luaL_openlibs(L);
 
-	lua_pushcfunction(L, l_print_subclade_at_current_node);
+	lua_pushcfunction(L, lua_print_subclade);
 	lua_setglobal(L, "s");
+	lua_pushcfunction(L, lua_unlink);
+	lua_setglobal(L, "u");
 
 
 	// run_phase_code(code_phase_alist, "start");
