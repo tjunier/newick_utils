@@ -589,12 +589,33 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		destroy_llist(nodes);
 }
 
+
+/* Checks that 1st arg passed to a Lua function is an lnode. */
+
+static struct lua_rnode *check_lnode(lua_State *L)
+{
+	void *ud = luaL_checkudata(L, 1, "LRnode");
+	luaL_argcheck(L, NULL != ud, 1, "expected node");
+	return (struct lua_rnode *) ud;
+}
+
 static int l_print_subclade_at_current_node (lua_State *L) {
 	int num_args =  lua_gettop(L);	
-	// 0 arg: use current node (lua_getglobal(L, "N"))
-	// 1 arg: use arg
-	struct rnode *node;
-	dump_newick(node);	
+	struct lua_rnode *lnode = NULL;
+	switch(num_args) {
+	case 0:
+		lua_getglobal(L, "N");
+		lnode = lua_touserdata(L, -1);
+		if (NULL == lnode) luaL_error(L, "N is not a node");
+		break;
+	case 1:
+		lnode = check_lnode(L);
+		break;
+	default:
+		luaL_error(L, "too many arguments to s()");
+	}
+		
+	dump_newick(lnode->orig);	
 	return 0;
 }
 	
@@ -624,15 +645,6 @@ static void load_lua_action(lua_State *L, char *lua_action)
 		exit(EXIT_FAILURE);
 	}
 	lua_setfield(L, LUA_GLOBALSINDEX, ACTION);
-}
-
-/* Checks that 1st arg passed to a Lua function is an lnode. */
-
-static struct lua_rnode *check_lnode(lua_State *L)
-{
-	void *ud = luaL_checkudata(L, 1, "LRnode");
-	luaL_argcheck(L, NULL != ud, 1, "expected node");
-	return (struct lua_rnode *) ud;
 }
 
 static enum node_field field_string2code (const char *fld_str)
