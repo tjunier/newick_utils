@@ -1,6 +1,6 @@
 b_s:-n HRV.bs.nw 'i and (b == 13)' 's()'
 b_d:HRV.bs.nw 'i and (b == 13)' 'u()'
-# ib_o:HRV.bs.nw '((& i (< b 11)) (o))'
+ib_o:HRV.bs.nw 'i and (b < 11)' 'o()'
 # top:top.nw '(i (o))'
 # nr_1s:-n -r catarrhini.nw '(#t (s))'
 # no:-no catarrhini.nw '((> d 10) (s))'

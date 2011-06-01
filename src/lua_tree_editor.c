@@ -630,8 +630,23 @@ static int lua_print_subclade(lua_State * L)
 	return 0;
 }
 
+static int lua_open_node(lua_State *L)
+{
+	struct lua_rnode *lnode = get_lua_rnode_arg(L);
+	struct rnode *node = lnode->orig;
+	// TODO: unify error handling (see below)
+	if (is_inner_node(node)) {
+		if (! splice_out_rnode(node)) {
+			perror("Memory error - node not spliced out.");
+		}
+	} else {
+		fprintf (stderr, "Warning: tried to splice out non-inner node ('%s')\n", node->label);
+	}
 
-static int lua_unlink (lua_State * L)
+	return 0;
+}
+
+static int lua_unlink_node (lua_State * L)
 {
 	int num_args = lua_gettop(L);
 	struct lua_rnode *lnode = get_lua_rnode_arg(L);
@@ -763,8 +778,10 @@ int main(int argc, char* argv[])
 
 	lua_pushcfunction(L, lua_print_subclade);
 	lua_setglobal(L, "s");
-	lua_pushcfunction(L, lua_unlink);
+	lua_pushcfunction(L, lua_unlink_node);
 	lua_setglobal(L, "u");
+	lua_pushcfunction(L, lua_open_node);
+	lua_setglobal(L, "o");
 
 
 	// run_phase_code(code_phase_alist, "start");
