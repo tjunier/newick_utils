@@ -1,3 +1,10 @@
+general: look at public structures such as struct hash and see if it would be
+ok to make them private -- this means replacing direct access (st->member) by
+accessor function calls (get_member(st)). The tradeoff is: accessors enable
+hiding the detail of the structure, which is a Good Thing; but they add
+overhead WRT direct access. The question is thus: does that overhead
+significantly impact performance?
+
 nw_distance: add new kind of selection: user-specified labels.
 
 general: check that the apps' get_params() functions set the nwsin external via

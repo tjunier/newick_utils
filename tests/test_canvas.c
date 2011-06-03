@@ -41,12 +41,12 @@ int test_getters()
 
 	if (width != get_canvas_width(cp)) {
 		printf("%s: expected width of %d, got %d.\n",
-				width, get_canvas_width(cp));
+				test_name, width, get_canvas_width(cp));
 		return 1;
 	}
 	if (height != get_canvas_height(cp)) {
 		printf("%s: expected height of %d, got %d.\n",
-				height, get_canvas_height(cp));
+				test_name, height, get_canvas_height(cp));
 		return 1;
 	}
 

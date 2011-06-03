@@ -27,36 +27,59 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-/* Different models of tree generation */
+
+/** \file
+ * Different models of tree generation */
 
 struct rnode;
 
-/* A pretty simple model where each node has a fixed probability of having 2
- * children. If set to > 0.5, the expected number of leaves is infnite and the
- * program will probably not stop of its own. */
-/* Returns FAILURE if there was a problem (most probably malloc()) */
+/** Prints a random tree grown using a geometric model. A pretty simple model
+ * where each node has a fixed probability of having 2 children. If set to >
+ * 0.5, the expected number of leaves is infnite and the program will probably
+ * not stop of its own. 
+ \arg \c prob_node_has_children the probability of node having (2) children
+ \return FAILURE if there was a problem (most probably malloc()) 
+ \todo: should return the tree instead of directly dumping it.
+ */
+
 int geometric_tree(double prob_node_has_children);
 
-/* A more complicated model where each branch's length is exponentially
- * distributed (up to a duration threshold).  Returns 0 (FAILURE) IFF there is
- * any problem (which will be memory allocation errors). The 1st parameter is
- * the exponential distribution's rate parameter, which is the inverse of the
- * mean. */
+/** Prints a random time-limited tree. A more complicated model (WRT
+ * geometric_tree())  where each branch's length is exponentially distributed
+ * (up to a duration threshold).  The 1st parameter is the
+ * exponential distribution's rate parameter, which is the inverse of the mean. 
+ * \arg \c branch_termination_rate see text
+ * \arg \c duration see text
+ * \return FAILURE (0) IFF there is any problem (which will be memory
+ * allocation errors). 
+ \todo: should return the tree instead of directly dumping it.  */
 
 int time_limited_tree(double branch_termination_rate, double duration);
 
-/* Attributes length to the parent edge (exponentially distributed with
+/** \cond -- The following functions are public only so they can be tested;
+ * they should not be used outside tree_models.c (hence the leading _ in their
+ * names). */
+
+/**  Attributes length to the parent edge (exponentially distributed with
  * parameter 'branch_termination_rate'), capped by duration threshold stored in
  * node's data pointer. Returns the remaining time (which can be negative) The
  * 'alt_random' parameter is used (if > 0) for testing the function by
- * supplying a known "random" value */
- /* If the function fails for some reason (e.g. no RAM left), it returns -1 */
-/* NOTE: we keep this function public so it can be tested (directly) */
+ * supplying a known "random" value.
+ * If the function fails for some reason (e.g. no RAM left), it returns -1. 
+ * Note: we only keep this function public so it can be tested, hence the
+ * leading  _. */
 
-double tlt_grow_node(struct rnode *, double branch_termination_rate,
+double _tlt_grow_node(struct rnode *, double branch_termination_rate,
 		double alt_random);
 
-/* The reciprocal of an exponential CDF with parameter k, used for sampling a
- * value from an exponential PDF using a random number 0 <= x < 1. */
 
-double reciprocal_exponential_CDF(double x, double k);
+/** The reciprocal (i.e., quantile function) of an exponential CDF with
+ * parameter k, used for sampling a value from an exponential PDF using a
+ * (uniformly distributed) random number 0 <= x < 1.
+ * \arg \c k parameter to the exponential CDF
+ * \arg \c x the random number used to draw from the CDF
+ * \return a random value from an exponential distribution */
+
+double _reciprocal_exponential_CDF(double x, double k);
+
+/** \endcond */
