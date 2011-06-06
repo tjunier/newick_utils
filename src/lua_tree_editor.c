@@ -500,13 +500,14 @@ static void set_predefined_variables(struct rnode *node, lua_State *L)
 	/* c: number of children */
 	//scm_c_define("c", scm_from_int(current_node->child_count));
 	
-	//struct rnode_data *data = current_node->data;
+	struct rnode_data *data = node->data;
 
 	/* d: depth */
-	//if (data->is_depth_defined)
-		//scm_c_define("d", scm_from_double(data->depth));
-	//else
-		//scm_c_define("d", SCM_UNDEFINED);
+	if (data->is_depth_defined) 
+		lua_pushnumber(L, data->depth);
+	else
+		lua_pushnil(L);
+	lua_setglobal(L, "d");
 
 	/* a: number of ancestors */
 	//scm_c_define("a", scm_from_int(data->nb_ancestors));
