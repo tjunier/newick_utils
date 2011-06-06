@@ -510,7 +510,8 @@ static void set_predefined_variables(struct rnode *node, lua_State *L)
 	lua_setglobal(L, "d");
 
 	/* a: number of ancestors */
-	//scm_c_define("a", scm_from_int(data->nb_ancestors));
+	lua_pushinteger(L, (lua_Integer) data->nb_ancestors);
+	lua_setglobal(L, "a");
 
 	/* D: number of descendants */
 	//scm_c_define("D", scm_from_int(data->nb_descendants));
