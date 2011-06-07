@@ -729,10 +729,9 @@ static int lua_node_set(lua_State *L)
 		return 1;
 	case NODE_LENGTH:
 		if (lua_isnumber(L, 3)) {
-			double len = lua_tonumber(L, 3);
+			char *len_s = lua_tostring(L, 3);
 			free(lnode->orig->edge_length_as_string);
-			lnode->orig->edge_length_as_string = masprintf("%g",
-					len);
+			lnode->orig->edge_length_as_string = strdup(len_s);
 			return 0;
 		} else if (lua_isstring(L, 3)) {
 			/* already checked for numbers, so this is a
