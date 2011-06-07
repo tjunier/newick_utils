@@ -718,6 +718,32 @@ static enum node_field field_string2code (const char *fld_str)
 static int lua_node_set(lua_State *L)
 {
 	struct lua_rnode *lnode = check_lnode(L);
+	const char *field = luaL_checkstring(L, 2);
+	luaL_argcheck(L, NULL != field, 2, "expected string");
+	enum node_field field_code = field_string2code(field);
+
+	fprintf(stderr, "setting field '%s' (# %d).\n", field, field_code);
+
+	switch (field_code) {
+	case NODE_LABEL:
+		lua_pushstring(L, lnode->orig->label);
+		return 1;
+	case NODE_LENGTH:
+		if (lua_isnumber(L, 3)) {
+			double len = lua_tonumber(L, 3);
+			free(lnode->orig->edge_length_as_string);
+			lnode->orig->edge_length_as_string = masprintf("%g",
+					len);
+			return 0;
+		}
+		luaL_error(L, "error: '%s' is not numeric", field);
+	case UNKNOWN_FIELD:
+		lua_pushnil(L);
+		return luaL_error(L, "error: '%s' is not a node field.", field);
+	default:
+		assert(0); /* programmer error */
+	}
+
 	return 0;
 }
 
