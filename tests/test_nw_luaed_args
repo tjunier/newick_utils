@@ -12,7 +12,7 @@ d_s:-n catarrhini.nw 'D == 2' 's()'
 c_s:-n falc_families.nw 'c > 2' 's()'
 set_len: catarrhini.nw "L ~= nil" "N.len = 2 * L"
 to_cg: catarrhini.nw true 'N.len = ""'
-# fmt: HRV.nw "((def? 'L) (L! (format #f \\"~,2f\\" L)))"
+fmt: HRV.nw "L ~= nil" 'N.len = string.format("%.2f", L)'
 # def_d: -n part_def.nw "((def? 'd) (p lbl))" 
 # undef_d: -n part_def.nw "((! (def? 'd)) (p lbl))"
 # set_lbl: catarrhini.nw '(#t (lbl! ""))'
