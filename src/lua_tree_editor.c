@@ -712,6 +712,7 @@ static enum node_field field_string2code (const char *fld_str)
 	if (strcmp("b", fld_str) == 0) return NODE_SUPPORT;
 	if (strcmp("len", fld_str) == 0) return NODE_LENGTH;
 	if (strcmp("L", fld_str) == 0) return NODE_LENGTH;
+	if (strcmp("par", fld_str) == 0) return NODE_PARENT;
 
 	return UNKNOWN_FIELD;
 }
@@ -725,27 +726,31 @@ static int lua_node_set(lua_State *L)
 
 	switch (field_code) {
 	case NODE_LABEL:
-		lua_pushstring(L, lnode->orig->label);
-		return 1;
+		luaL_argcheck(L, lua_isstring(L, 3), 3, "expected a string");
+		const char *label = lua_tostring(L, 3);
+		free(lnode->orig->label);
+		lnode->orig->label = strdup(label);
+		return 0;
 	case NODE_LENGTH:
 		if (lua_isnumber(L, 3)) {
-			char *len_s = lua_tostring(L, 3);
+			const char *len_s = lua_tostring(L, 3);
 			free(lnode->orig->edge_length_as_string);
 			lnode->orig->edge_length_as_string = strdup(len_s);
 			return 0;
 		} else if (lua_isstring(L, 3)) {
 			/* already checked for numbers, so this is a
 			 * "non-numeric" string */
-			char *len_s = lua_tostring(L, 3);
-			if ('\0' != *len_s)
-				luaL_error(L,
-					"error: length can only be set"
-					" to a number or the empty string.");
+			const char *len_s = lua_tostring(L, 3);
+			luaL_argcheck(L, '\0' == *len_s, 3,
+				"expected a number, a number-convertible "
+				"string, or the empty string.");
 			free(lnode->orig->edge_length_as_string);
 			lnode->orig->edge_length_as_string = strdup("");
 			return 0;
 		} else {
-			luaL_error(L, "error: attempt to set lengh to invalid arg.");
+			luaL_error(L, false, 3,
+				"expected a number, a number-convertible "
+				"string, or the empty string.");
 		}
 	case UNKNOWN_FIELD:
 		lua_pushnil(L);
@@ -763,6 +768,7 @@ static int lua_node_get(lua_State *L)
 	const char *field = luaL_checkstring(L, 2);
 	luaL_argcheck(L, NULL != field, 2, "expected string");
 	enum node_field field_code = field_string2code(field);
+	struct lua_rnode *lua_result = NULL;
 
 	switch (field_code) {
 	case NODE_LABEL:
@@ -770,6 +776,14 @@ static int lua_node_get(lua_State *L)
 		return 1;
 	case NODE_LENGTH:
 		lua_pushnumber(L, atof(lnode->orig->edge_length_as_string));
+		return 1;
+	case NODE_PARENT:
+		lua_result = lua_newuserdata(L, sizeof (struct lua_rnode));
+		luaL_getmetatable(L, "LRnode");
+		lua_setmetatable(L, -2);
+
+		// TODO: shouldn't we check for NULL?
+		lua_result->orig = lnode->orig->parent;
 		return 1;
 	case UNKNOWN_FIELD:
 		lua_pushnil(L);
