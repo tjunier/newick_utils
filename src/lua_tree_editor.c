@@ -711,6 +711,7 @@ static enum node_field field_string2code (const char *fld_str)
 	if (strcmp("lbl", fld_str) == 0) return NODE_LABEL;
 	if (strcmp("b", fld_str) == 0) return NODE_SUPPORT;
 	if (strcmp("len", fld_str) == 0) return NODE_LENGTH;
+	if (strcmp("L", fld_str) == 0) return NODE_LENGTH;
 
 	return UNKNOWN_FIELD;
 }
@@ -721,8 +722,6 @@ static int lua_node_set(lua_State *L)
 	const char *field = luaL_checkstring(L, 2);
 	luaL_argcheck(L, NULL != field, 2, "expected string");
 	enum node_field field_code = field_string2code(field);
-
-	fprintf(stderr, "setting field '%s' (# %d).\n", field, field_code);
 
 	switch (field_code) {
 	case NODE_LABEL:
