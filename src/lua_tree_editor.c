@@ -498,7 +498,8 @@ static void set_predefined_variables(struct rnode *node, lua_State *L)
 	lua_setglobal(L, "l");
 
 	/* c: number of children */
-	//scm_c_define("c", scm_from_int(current_node->child_count));
+	lua_pushinteger(L, (lua_Integer) node->child_count);
+	lua_setglobal(L, "c");
 	
 	struct rnode_data *data = node->data;
 
@@ -515,6 +516,8 @@ static void set_predefined_variables(struct rnode *node, lua_State *L)
 
 	/* D: number of descendants */
 	//scm_c_define("D", scm_from_int(data->nb_descendants));
+	lua_pushinteger(L, (lua_Integer) data->nb_descendants);
+	lua_setglobal(L, "D");
 
 	/* r: true iff node is root */
 	/*
