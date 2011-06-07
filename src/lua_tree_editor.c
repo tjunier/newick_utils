@@ -734,8 +734,20 @@ static int lua_node_set(lua_State *L)
 			lnode->orig->edge_length_as_string = masprintf("%g",
 					len);
 			return 0;
+		} else if (lua_isstring(L, 3)) {
+			/* already checked for numbers, so this is a
+			 * "non-numeric" string */
+			char *len_s = lua_tostring(L, 3);
+			if ('\0' != *len_s)
+				luaL_error(L,
+					"error: length can only be set"
+					" to a number or the empty string.");
+			free(lnode->orig->edge_length_as_string);
+			lnode->orig->edge_length_as_string = strdup("");
+			return 0;
+		} else {
+			luaL_error(L, "error: attempt to set lengh to invalid arg.");
 		}
-		luaL_error(L, "error: '%s' is not numeric", field);
 	case UNKNOWN_FIELD:
 		lua_pushnil(L);
 		return luaL_error(L, "error: '%s' is not a node field.", field);
