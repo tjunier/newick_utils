@@ -788,12 +788,12 @@ static void push_kids(lua_State *L, struct rnode *orig)
 	int index = 0;
 	for(; NULL != current_kid; current_kid = current_kid->next_sibling) {
 		index++;
-		char *index_s = masprintf("%d", index);
+		lua_pushinteger(L, index);
 		push_new_lnode(L, current_kid); 
-		/* now we have the table at -2 and the value on top (-1) */
-		printf("setting table[%s]\n", index_s);
-		lua_setfield(L, -2, index_s);
-		free(index_s);
+		/* now we have the table at -3, the key (index) at -2  and the
+		 * value on top (-1) */
+		printf("setting table[%d]\n", index);
+		lua_settable(L, -3);
 	}
 }
 
