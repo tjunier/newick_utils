@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/* does not do any syntactic analysis */
+/* this program is purely lexical */
 %option noyywrap
 
 %{
