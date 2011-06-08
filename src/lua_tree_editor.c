@@ -792,7 +792,6 @@ static void push_kids(lua_State *L, struct rnode *orig)
 		push_new_lnode(L, current_kid); 
 		/* now we have the table at -3, the key (index) at -2  and the
 		 * value on top (-1) */
-		printf("setting table[%d]\n", index);
 		lua_settable(L, -3);
 	}
 }

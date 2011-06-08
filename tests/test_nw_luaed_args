@@ -24,7 +24,7 @@ og1short: -n pecora.nw r "c1 = N.fc; c2 = N.lc; if c1.c < c2.c then s(c1) else s
 ogmult: -n edged_root.nw r "c1 = N.fc; c2 = N.lc; if c1.c < c2.c then s(c1) else s(c2) end"
 # And e.g. this gets the ingroup:
 ig: -n pecora.nw r 'if N.fc.c > N.lc.c then s(N.fc) else s(N.lc) end'
-kids1: -n pecora.nw 'not l' 'print(N.lab)) (map (lambda (k) (p (nc k))) (kids N)))))'
-kids1: -n pecora.nw '((not l) (begin (p (lab N)) (map (lambda (k) (p (nc k))) (kids N)))))'
+kids1: -n pecora.nw 'not l' 'print(N.lbl); for i,v in ipairs(N.kids) do print(v.c) end'
+#kids1: -n pecora.nw '((not l) (begin (p (lab N)) (map (lambda (k) (p (nc k))) (kids N)))))'
 # file_1: -n -f edges.scm catarrhini.nw
 # file_2: -n -f edges_num.scm catarrhini.nw
