@@ -19,9 +19,8 @@ set_lbl: catarrhini.nw true 'N.lbl = ""'
 parpar: -n catarrhini.nw 'a > 1' 'print(N.par.par.lbl)'
 # finds the outgroup (child of root with fewer children),
 # assuming root has 2 children
-# og1: -n pecora.nw '(r (let ((c1 (first-child N)) (c2 (last-child N))) (if (< (children-count c1) (children-count c2)) (subtree c1) (subtree c2))))'
 og1: -rn pecora.nw r "c1 = N.first_child; c2 = N.last_child; if c1.children_count < c2.children_count then s(c1) else s(c2) end"
-# og1short: -n pecora.nw '(r (let ((c1 (fc N)) (c2 (lc N))) (if (< (nc c1) (nc c2)) (st c1) (st c2))))'
+og1short: -n pecora.nw r "c1 = N.fc; c2 = N.lc; if c1.c < c2.c then s(c1) else s(c2) end"
 # ogmult: -n edged_root.nw '(r (let ((c1 (fc N)) (c2 (lc N))) (if (< (nc c1) (nc c2)) (st c1) (st c2))))'
 # # And e.g. this gets the ingroup:
 # ig: -n pecora.nw '(r (st (if (> (nc (fc N)) (nc (lc N))) (fc N) (lc N))))'
