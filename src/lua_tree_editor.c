@@ -67,7 +67,7 @@ enum order { POST_ORDER, PRE_ORDER };
 
 enum node_field { UNKNOWN_FIELD, NODE_LABEL, NODE_SUPPORT, NODE_LENGTH,
 	NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT,
-	NODE_FIRST_CHILD, NODE_LAST_CHILD, NODE_CHILD_COUNT};
+	NODE_FIRST_CHILD, NODE_CHILDREN, NODE_LAST_CHILD, NODE_CHILD_COUNT};
 
 struct parameters {
 	char *lua_action;	
@@ -721,6 +721,7 @@ static enum node_field field_string2code (const char *fld_str)
 	if (strcmp("last_child", fld_str) == 0) return NODE_LAST_CHILD;
 	if (strcmp("c", fld_str) == 0) return NODE_CHILD_COUNT;
 	if (strcmp("children_count", fld_str) == 0) return NODE_CHILD_COUNT;
+	if (strcmp("kids", fld_str) == 0) return NODE_CHILDREN;
 
 	return UNKNOWN_FIELD;
 }
@@ -780,6 +781,22 @@ static void push_new_lnode(lua_State *L, struct rnode *orig)
 	lua_result->orig = orig;
 }
 
+static void push_kids(lua_State *L, struct rnode *orig)
+{
+	struct rnode *current_kid = orig->first_child;
+	lua_createtable(L, orig->child_count, 0);
+	int index = 0;
+	for(; NULL != current_kid; current_kid = current_kid->next_sibling) {
+		index++;
+		char *index_s = masprintf("%d", index);
+		push_new_lnode(L, current_kid); 
+		/* now we have the table at -2 and the value on top (-1) */
+		printf("setting table[%s]\n", index_s);
+		lua_setfield(L, -2, index_s);
+		free(index_s);
+	}
+}
+
 static int lua_node_get(lua_State *L)
 {
 	struct lua_rnode *lnode = check_lnode(L);
@@ -807,6 +824,9 @@ static int lua_node_get(lua_State *L)
 		return 1;
 	case NODE_CHILD_COUNT:
 		lua_pushinteger(L, orig->child_count);
+		return 1;
+	case NODE_CHILDREN:
+		push_kids(L, orig);
 		return 1;
 	case UNKNOWN_FIELD:
 		lua_pushnil(L);
