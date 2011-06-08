@@ -78,7 +78,7 @@ fi
 
 # Each test case in on one line. Line structure is <case name>:<prog
 # arguments>. The expected result is in a file named test_<prog name>_<case
-# name>.exp .
+# name>.exp Lines starting with '#' are ignored.
 
 pass=TRUE
 while IFS=':' read name args ; do
