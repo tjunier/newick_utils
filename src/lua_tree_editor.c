@@ -65,7 +65,9 @@ const char *ACTION = "action";
 
 enum order { POST_ORDER, PRE_ORDER };
 
-enum node_field { UNKNOWN_FIELD, NODE_LABEL, NODE_SUPPORT, NODE_LENGTH, NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT };
+enum node_field { UNKNOWN_FIELD, NODE_LABEL, NODE_SUPPORT, NODE_LENGTH,
+	NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT,
+	NODE_FIRST_CHILD, NODE_LAST_CHILD, NODE_CHILD_COUNT};
 
 struct parameters {
 	char *lua_action;	
@@ -436,6 +438,7 @@ static int lua_set_current_node(lua_State *L, struct rnode *current)
 	return 1;
 }
 
+
 /* Sets the value of the predefined variables (i, l, a, etc), according to the
  * node passed as argument. This is normally the current node, while visiting
  * the tree. Using variables rather than functions makes for shorter Scheme
@@ -520,12 +523,11 @@ static void set_predefined_variables(struct rnode *node, lua_State *L)
 	lua_setglobal(L, "D");
 
 	/* r: true iff node is root */
-	/*
 	if (is_root(node))
-		scm_c_define("r", SCM_BOOL_T);
+		lua_pushboolean(L, true);
 	else
-		scm_c_define("r", SCM_BOOL_F);
-		*/
+		lua_pushboolean(L, false);
+	lua_setglobal(L, "r");
 
 	/* sanity check */
 	assert(lua_gettop(L) == initial_lua_stack_size);
@@ -713,6 +715,12 @@ static enum node_field field_string2code (const char *fld_str)
 	if (strcmp("len", fld_str) == 0) return NODE_LENGTH;
 	if (strcmp("L", fld_str) == 0) return NODE_LENGTH;
 	if (strcmp("par", fld_str) == 0) return NODE_PARENT;
+	if (strcmp("fc", fld_str) == 0) return NODE_FIRST_CHILD;
+	if (strcmp("first_child", fld_str) == 0) return NODE_FIRST_CHILD;
+	if (strcmp("lc", fld_str) == 0) return NODE_LAST_CHILD;
+	if (strcmp("last_child", fld_str) == 0) return NODE_LAST_CHILD;
+	if (strcmp("c", fld_str) == 0) return NODE_CHILD_COUNT;
+	if (strcmp("children_count", fld_str) == 0) return NODE_CHILD_COUNT;
 
 	return UNKNOWN_FIELD;
 }
@@ -762,28 +770,43 @@ static int lua_node_set(lua_State *L)
 	return 0;
 }
 
+static void push_new_lnode(lua_State *L, struct rnode *orig)
+{
+	struct lua_rnode *lua_result = lua_newuserdata(
+			L, sizeof (struct lua_rnode));
+	luaL_getmetatable(L, "LRnode");
+	lua_setmetatable(L, -2);
+	// TODO: shouldn't we check for NULL?
+	lua_result->orig = orig;
+}
+
 static int lua_node_get(lua_State *L)
 {
 	struct lua_rnode *lnode = check_lnode(L);
 	const char *field = luaL_checkstring(L, 2);
 	luaL_argcheck(L, NULL != field, 2, "expected string");
 	enum node_field field_code = field_string2code(field);
-	struct lua_rnode *lua_result = NULL;
+	//struct lua_rnode *lua_result = NULL;
+	struct rnode *orig = lnode->orig;
 
 	switch (field_code) {
 	case NODE_LABEL:
-		lua_pushstring(L, lnode->orig->label);
+		lua_pushstring(L, orig->label);
 		return 1;
 	case NODE_LENGTH:
-		lua_pushnumber(L, atof(lnode->orig->edge_length_as_string));
+		lua_pushnumber(L, atof(orig->edge_length_as_string));
 		return 1;
 	case NODE_PARENT:
-		lua_result = lua_newuserdata(L, sizeof (struct lua_rnode));
-		luaL_getmetatable(L, "LRnode");
-		lua_setmetatable(L, -2);
-
-		// TODO: shouldn't we check for NULL?
-		lua_result->orig = lnode->orig->parent;
+		push_new_lnode(L, orig->parent);
+		return 1;
+	case NODE_FIRST_CHILD:
+		push_new_lnode(L, orig->first_child);
+		return 1;
+	case NODE_LAST_CHILD:
+		push_new_lnode(L, orig->last_child);
+		return 1;
+	case NODE_CHILD_COUNT:
+		lua_pushinteger(L, orig->child_count);
 		return 1;
 	case UNKNOWN_FIELD:
 		lua_pushnil(L);
