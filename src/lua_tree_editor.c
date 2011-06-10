@@ -910,10 +910,10 @@ static int luaopen_lnode (lua_State *L)
 static void run_user_hook(lua_State *L, const char *phase)
 {
 	lua_getfield(L, LUA_GLOBALSINDEX, phase);
-	if (lua_isnil(L, -1))
-		lua_pop(L, 1);
-	else
+	if (lua_isfunction(L, -1))
 		lua_call(L, 0, 0);
+	else 
+		lua_pop(L, 1);
 }
 
 int main(int argc, char* argv[])
