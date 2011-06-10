@@ -62,6 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const char *CONDITION = "condition";
 const char *ACTION = "action";
+const char *STOP_AT_1ST_MATCH = "stop";
 
 enum order { POST_ORDER, PRE_ORDER };
 
@@ -569,25 +570,8 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		} 
 
 		set_predefined_variables(current_node, L);
-		lua_getfield(L, LUA_GLOBALSINDEX, CONDITION);
-		lua_call(L, 0, 1);
-		if (lua_isboolean(L, -1) != 1) {
-			fprintf(stderr, "WARNING: condition does not evaluate "
-					"to a boolean.\n");
-			lua_pop(L, 1);
-			continue;
-		}
-		int match = lua_toboolean(L, -1);
-		lua_pop(L, 1);
-		if (match) {
-			lua_getfield(L, LUA_GLOBALSINDEX, ACTION);
-			lua_call(L, 0, 0);
-			/* see -o switch */
-			if (params.stop_clade_at_first_match)
-				((struct rnode_data *)
-				 current_node->data)->stop_mark = true;
-		}
-
+		lua_getfield(L, LUA_GLOBALSINDEX, "node");
+		lua_call(L, 0, 0);
 	} /* loop over all nodes */
 
 	/* If order is PRE_ORDER, the list of nodes is an inverted copy, so we
@@ -835,6 +819,39 @@ static int lua_node_get(lua_State *L)
 	}
 }
 
+/* Processes the current node according to the condtion and action given on the
+ * command line. */
+
+static int lua_cli_process_node(lua_State *L)
+{
+	lua_getglobal(L, "N");
+	struct lua_rnode *lnode = lua_touserdata(L, -1);
+	if (NULL == lnode)
+		luaL_error(L, "N is not a node");
+
+	lua_getfield(L, LUA_GLOBALSINDEX, CONDITION);
+	lua_call(L, 0, 1);
+	if (lua_isboolean(L, -1) != 1) {
+		fprintf(stderr, "WARNING: condition does not evaluate "
+				"to a boolean.\n");
+		lua_pop(L, 1);
+		return 0;
+	}
+	int match = lua_toboolean(L, -1);
+	lua_pop(L, 1);
+	if (match) {
+		lua_getfield(L, LUA_GLOBALSINDEX, ACTION);
+		lua_call(L, 0, 0);
+		/* see -o switch */
+		lua_getfield(L, LUA_GLOBALSINDEX, STOP_AT_1ST_MATCH);
+		int stop_clade_at_first_match = lua_toboolean(L, -1);
+		lua_pop(L, 1);
+		if (stop_clade_at_first_match)
+			((struct rnode_data *) lnode->orig->data)->stop_mark = true;
+	}
+	return 0;
+}
+
 // TODO: implement __tostring for lua_rnode
 
 /* Functions for Lua node */
@@ -879,6 +896,10 @@ int main(int argc, char* argv[])
 	lua_setglobal(L, "u");
 	lua_pushcfunction(L, lua_open_node);
 	lua_setglobal(L, "o");
+	lua_pushcfunction(L, lua_cli_process_node);
+	lua_setglobal(L, "node");
+	lua_pushboolean(L, params.stop_clade_at_first_match);
+	lua_setglobal(L, STOP_AT_1ST_MATCH);
 
 
 	// run_phase_code(code_phase_alist, "start");
