@@ -711,9 +711,8 @@ static void run_user_hooks_file(lua_State * L, char *user_hooks_filename)
 {
 	int error = luaL_dofile(L, user_hooks_filename);
 	if (error) {
-		const char *msg = lua_tostring(L, -1);
-		lua_pop(L, 1);
-		printf("%s\n", msg);
+		fprintf(stderr, "error running user hooks file '%s'\n",
+				user_hooks_filename);
 		exit(EXIT_FAILURE);
 	}
 }
