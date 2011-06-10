@@ -63,6 +63,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const char *CONDITION = "condition";
 const char *ACTION = "action";
 const char *STOP_AT_1ST_MATCH = "stop";
+const char *START = "start";
+const char *START_TREE = "start_tree";
+const char *NODE = "node";
+const char *STOP_TREE = "stop_tree";
+const char *STOP = "stop";
 
 enum order { POST_ORDER, PRE_ORDER };
 
@@ -73,7 +78,7 @@ enum node_field { UNKNOWN_FIELD, NODE_LABEL, NODE_SUPPORT, NODE_LENGTH,
 struct parameters {
 	char *lua_action;	
 	char *lua_condition;	
-	char *lua_filename;
+	char *user_hooks_filename;
 	bool show_tree;
 	int order;
 	bool stop_clade_at_first_match;
@@ -273,7 +278,7 @@ static struct parameters get_params(int argc, char *argv[])
 
 	params.lua_condition = NULL;
 	params.lua_action = NULL;
-	params.lua_filename = NULL;
+	params.user_hooks_filename = NULL;
 	params.show_tree = true;
 	params.order = POST_ORDER;
 	params.stop_clade_at_first_match = false;
@@ -283,8 +288,8 @@ static struct parameters get_params(int argc, char *argv[])
 	while ((opt_char = getopt(argc, argv, "f:hnor")) != -1) {
 		switch (opt_char) {
 		case 'f':
-			params.lua_filename = optarg;
-			params.single = false;
+			params.user_hooks_filename = optarg;
+			params.single = false; // TODO: still needed?
 			break;
 		case 'h':
 			help(argv);
@@ -305,7 +310,7 @@ static struct parameters get_params(int argc, char *argv[])
 		}
 	}
 
-	/* check arguments */
+	/* check arguments */ // TODO: refactor
 	if (3 == (argc - optind))	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
@@ -318,6 +323,16 @@ static struct parameters get_params(int argc, char *argv[])
 		}
 		params.lua_condition = argv[optind+1];
 		params.lua_action = argv[optind+2];
+	} else if (1 == (argc - optind)) {
+		if (0 != strcmp("-", argv[optind])) {
+			FILE *fin = fopen(argv[optind], "r");
+			extern FILE *nwsin;
+			if (NULL == fin) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
+			nwsin = fin;
+		}
 	} else {
 		fprintf(stderr, "Usage: %s [-hnro] <filename|-> "
 				"<Scheme expression>\n",
@@ -570,7 +585,7 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		} 
 
 		set_predefined_variables(current_node, L);
-		lua_getfield(L, LUA_GLOBALSINDEX, "node");
+		lua_getfield(L, LUA_GLOBALSINDEX, NODE);
 		lua_call(L, 0, 0);
 	} /* loop over all nodes */
 
@@ -690,6 +705,17 @@ static void load_lua_action(lua_State *L, char *lua_action)
 		exit(EXIT_FAILURE);
 	}
 	lua_setfield(L, LUA_GLOBALSINDEX, ACTION);
+}
+
+static void run_user_hooks_file(lua_State * L, char *user_hooks_filename)
+{
+	int error = luaL_dofile(L, user_hooks_filename);
+	if (error) {
+		const char *msg = lua_tostring(L, -1);
+		lua_pop(L, 1);
+		printf("%s\n", msg);
+		exit(EXIT_FAILURE);
+	}
 }
 
 static enum node_field field_string2code (const char *fld_str)
@@ -881,6 +907,15 @@ static int luaopen_lnode (lua_State *L)
 	return 0;
 }
 
+static void run_user_hook(lua_State *L, const char *phase)
+{
+	lua_getfield(L, LUA_GLOBALSINDEX, phase);
+	if (lua_isnil(L, -1))
+		lua_pop(L, 1);
+	else
+		lua_call(L, 0, 0);
+}
+
 int main(int argc, char* argv[])
 {
 	struct parameters params = get_params(argc, argv);
@@ -896,28 +931,33 @@ int main(int argc, char* argv[])
 	lua_setglobal(L, "u");
 	lua_pushcfunction(L, lua_open_node);
 	lua_setglobal(L, "o");
-	lua_pushcfunction(L, lua_cli_process_node);
-	lua_setglobal(L, "node");
 	lua_pushboolean(L, params.stop_clade_at_first_match);
 	lua_setglobal(L, STOP_AT_1ST_MATCH);
 
 
-	// run_phase_code(code_phase_alist, "start");
-
-	load_lua_condition(L, params.lua_condition);
-	load_lua_action(L, params.lua_action);
 	luaopen_lnode(L);
 
+	if (NULL != params.user_hooks_filename) {
+		run_user_hooks_file(L, params.user_hooks_filename);
+	} else {
+		lua_pushcfunction(L, lua_cli_process_node);
+		lua_setglobal(L, NODE);
+		load_lua_condition(L, params.lua_condition);
+		load_lua_action(L, params.lua_action);
+	}
+
+
+	run_user_hook(L, START);
 	while (NULL != (tree = parse_tree())) {
-		//run_phase_code(code_phase_alist, "start-tree");
+		run_user_hook(L, START_TREE);
 		process_tree(tree, L, params);
 		if (params.show_tree) {
-			dump_newick(tree->root); // TODO: faster f()?
+			dump_newick(tree->root);
 		}
+		run_user_hook(L, STOP_TREE);
 		destroy_tree(tree, NULL);
-		//run_phase_code(code_phase_alist, "end-tree");
 	}
-	//run_phase_code(code_phase_alist, "end");
+	run_user_hook(L, STOP);
 
 	exit(EXIT_SUCCESS);
 }
