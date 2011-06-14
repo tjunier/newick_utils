@@ -96,6 +96,8 @@ void newick_scanner_set_file_input(FILE *input)
 	nwslval.sval = (char *) strdup(yytext);
 	return LABEL;
  }
+/* NOTE: it seems that some (older?) versions of Flex don't recognize the '{-}'
+ * (set difference) operator. For now, I don't attempt to support these. */
 [[:graph:]]{-}[();,:'\[\]]+	{
 	/* printable characters except ();,:'[] */
 	nwslval.sval = (char *) strdup(yytext);
