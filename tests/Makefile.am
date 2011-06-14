@@ -13,7 +13,8 @@ TESTS = test_newick_scanner test_newick_parser test_rnode test_list \
 	test_nw_distance.sh test_nw_labels.sh test_nw_prune.sh \
 	test_nw_order.sh test_nw_match.sh test_nw_trim.sh \
 	test_nw_gen.sh test_nw_duration.sh test_nw_stats.sh \
-	test_nw_sched.sh test_summary.sh	# keep this one at the end!
+	test_nw_sched.sh test_nw_luaed.sh \
+	test_summary.sh	# keep this one at the end!
 
 check_PROGRAMS = test_rnode test_list test_link test_newick_scanner \
 		 test_canvas test_concat test_hash test_lca \

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([Newick Utils],[1.5.1],[thomas.junier@.unige.ch])
+AC_INIT([Newick Utils],[1.6],[thomas.junier@.unige.ch])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src])
@@ -32,6 +32,17 @@ AC_ARG_WITH([guile],
 	[with_guile=yes]	# not passed: set to yes (default)
 )
 
+# Lua
+
+AC_ARG_WITH([lua],
+	[
+	 	AS_HELP_STRING([--with-lua],
+			[Use Lua (enables nw_luaed) @<:@default=yes@:>@])
+	],
+	[], # default: do nothing
+	[with_lua=yes]	# not passed: set to yes (default)
+)
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_YACC
@@ -59,6 +70,7 @@ AS_IF([test "x$with_libxml" = xyes],
 	[
 		AC_CHECK_LIB([xml2], [xmlParseMemory], [], [with_libxml=no_lib])
 		# Try to get xml2-config to tell us where the headers are.
+		# TODO: DON'T touch CPPFLAGS! Use AM_CPPFLAGS instead
 		AS_IF([xml2-config --version > /dev/null],
 			[CPPFLAGS="$(xml2-config --cflags) $CPPFLAGS "]
 		)
@@ -73,6 +85,23 @@ AS_IF([test "x$with_guile" = xyes],
 		AC_CHECK_HEADERS([libguile.h], [], [with_guile=no_hdr])
 		#AS_IF([test "x$with_guile_libdir" != xno], [LDFLAGS="$LDFLAGS -L$with_guile_libdir"])
 		AC_CHECK_LIB([guile], [scm_with_guile], [], [with_guile=no_lib])
+	]
+)
+
+AS_IF([test "x$with_lua" = xyes],
+	[
+	 	OLD_AM_CPPFLAGS="$AM_CPPFLAGS"
+		AM_CPPFLAGS="$AM_CPPFLAGS $CPPFLAGS"
+	 	AC_CHECK_HEADERS([lua.h], [], [with_lua=no_hdr])
+		AM_CPPFLAGS="$OLD_AM_CPPFLAGS"
+		AC_CHECK_LIB([lua], [luaL_openlibs], [], [with_lua=no_lib])
+		# Some distros call it lua5.1 
+		AS_IF([test "x$with_lua" = xno_lib],
+	     	[
+		    	AC_CHECK_LIB([lua5.1], [luaL_openlibs],
+							 [with_lua=yes],
+							 [])
+			])
 	]
 )
 
@@ -107,6 +136,23 @@ AS_CASE([x$with_guile],
 )
 # This is accessible in Makefile.in's
 AM_CONDITIONAL([WANT_NW_SCHED], [test x$with_guile = xyes])
+
+AS_CASE([x$with_lua],
+		[xyes],
+			[
+			 	# This goes into config.h
+			 	AC_DEFINE([CHECK_NW_LUAED], 1, [Check nw_luaed])
+			],
+		[xno],
+			[AC_MSG_NOTICE([Lua disabled by user.])],
+		[xno_hdr],
+			[AC_MSG_NOTICE([Lua disabled due to missing header.])],
+		[xno_lib],
+			[AC_MSG_NOTICE([liblua missing (disabled).])],
+		[AC_MSG_NOTICE([Invalid argument --with-lua=$with_lua])]
+)
+# This is accessible in Makefile.in's
+AM_CONDITIONAL([WANT_NW_LUAED], [test x$with_lua = xyes])
 
 
 # Checks for typedefs, structures, and compiler characteristics.
