@@ -27,3 +27,4 @@ ig: -n pecora.nw r 'if N.fc.c > N.lc.c then s(N.fc) else s(N.lc) end'
 kids1: -n pecora.nw 'not l' 'print(N.lbl); for i,v in ipairs(N.kids) do print(v.c) end'
 file_1: -n -f edges.lua catarrhini.nw
 file_2: -n -f edges_num.lua catarrhini.nw
+ben: -f ben_prob.lua falconiformes.nw
