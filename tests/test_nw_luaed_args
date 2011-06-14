@@ -1,0 +1,30 @@
+b_s:-n HRV.bs.nw 'i and (b == 13)' 's()'
+b_d:HRV.bs.nw 'i and (b == 13)' 'u()'
+ib_o:HRV.bs.nw 'i and (b < 11)' 'o()'
+top:top.nw 'i' 'o()'
+const_1: -n catarrhini.nw true 's()'
+const_0: -n catarrhini.nw false 's()'
+nr_1s:-n -r catarrhini.nw true 's()'
+no:-no catarrhini.nw 'd > 10' 's()'
+n_l:-n catarrhini.nw true  'print(lbl)'
+multi: -no forest_ind.nw 'a >= 4' 's()'
+d_s:-n catarrhini.nw 'D == 2' 's()'
+c_s:-n falc_families.nw 'c > 2' 's()'
+set_len: catarrhini.nw "L ~= nil" "N.len = 2 * L"
+to_cg: catarrhini.nw true 'N.len = ""'
+fmt: HRV.nw "L ~= nil" 'N.len = string.format("%.2f", L)'
+def_d: -n part_def.nw "d ~= nil"  'print(lbl)'
+undef_d: -n part_def.nw "d == nil" 'print(lbl)'
+set_lbl: catarrhini.nw true 'N.lbl = ""'
+parpar: -n catarrhini.nw 'a > 1' 'print(N.par.par.lbl)'
+# finds the outgroup (child of root with fewer children),
+# assuming root has 2 children
+og1: -rn pecora.nw r "c1 = N.first_child; c2 = N.last_child; if c1.children_count < c2.children_count then s(c1) else s(c2) end"
+og1short: -n pecora.nw r "c1 = N.fc; c2 = N.lc; if c1.c < c2.c then s(c1) else s(c2) end"
+ogmult: -n edged_root.nw r "c1 = N.fc; c2 = N.lc; if c1.c < c2.c then s(c1) else s(c2) end"
+# And e.g. this gets the ingroup:
+ig: -n pecora.nw r 'if N.fc.c > N.lc.c then s(N.fc) else s(N.lc) end'
+kids1: -n pecora.nw 'not l' 'print(N.lbl); for i,v in ipairs(N.kids) do print(v.c) end'
+file_1: -n -f edges.lua catarrhini.nw
+file_2: -n -f edges_num.lua catarrhini.nw
+ben: -f ben_prob.lua falconiformes.nw

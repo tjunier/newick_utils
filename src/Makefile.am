@@ -5,10 +5,14 @@ BUILT_SOURCES = newick_parser.h newick_scanner.c newick_parser.c \
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 	       nw_condense nw_support nw_ed nw_topology nw_distance \
 	       nw_labels nw_prune nw_order nw_match nw_gen nw_trim \
-	       nw_duration nw_stats #nw_toy disabled for release
+	       nw_duration nw_stats
 
 if WANT_NW_SCHED
 bin_PROGRAMS += nw_sched
+endif
+
+if WANT_NW_LUAED
+bin_PROGRAMS += nw_luaed
 endif
 
 # I mention all headers here, so they're included in the distro (otherwise this
@@ -95,12 +99,12 @@ nw_duration_LDADD = libnw.la
 nw_stats_SOURCES = stats.c
 nw_stats_LDADD = libnw.la
 
+# TODO: see if lguile and lpthread are not already specified (due to autoconf)
 nw_sched_SOURCES = scheme_tree_editor.c rnode_smob.c
 nw_sched_LDADD = libnw.la -lguile -lpthread
 
-# disabled for release
-#nw_toy_SOURCES = toy.c
-#nw_toy_LDADD = libnw.la
+nw_luaed_SOURCES = lua_tree_editor.c 
+nw_luaed_LDADD = libnw.la -llua5.1
 
 # Removes automatically generated C code (Lex & YACC)
 #
