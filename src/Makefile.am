@@ -104,7 +104,7 @@ nw_sched_SOURCES = scheme_tree_editor.c rnode_smob.c
 nw_sched_LDADD = libnw.la -lguile -lpthread
 
 nw_luaed_SOURCES = lua_tree_editor.c 
-nw_luaed_LDADD = libnw.la -llua5.1
+nw_luaed_LDADD = libnw.la
 
 # Removes automatically generated C code (Lex & YACC)
 #

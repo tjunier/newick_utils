@@ -94,7 +94,7 @@ AS_IF([test "x$with_lua" = xyes],
 		AM_CPPFLAGS="$AM_CPPFLAGS $CPPFLAGS"
 	 	AC_CHECK_HEADERS([lua.h], [], [with_lua=no_hdr])
 		AM_CPPFLAGS="$OLD_AM_CPPFLAGS"
-		AC_CHECK_LIB([lua], [luaL_openlibs], [], [with_lua=no_lib])
+		AC_SEARCH_LIBS([luaL_openlibs], [lua5.1 lua-5.1 lua], [], [with_lua=no_lib])
 		# Some distros call it lua5.1 
 		AS_IF([test "x$with_lua" = xno_lib],
 	     	[
