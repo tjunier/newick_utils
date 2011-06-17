@@ -158,6 +158,8 @@ declare -ri LINE_WIDTH=2
 ################################################################
 # Main
 
+export EMBOSS_FILTER=true
+
 echo "Aligning"
 muscle -quiet -in $INPUT_FILE -out $MUSCLE_OUT
 echo "Slicing alignment"

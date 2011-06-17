@@ -155,8 +155,8 @@ AC_C_CONST
 # Checks for library functions.
 # NOTE: checking for malloc and realloc causes weird problems on Fedora 13.
 # OTOH it should be a very rare system that doesn't have them.
-#AC_FUNC_MALLOC
-#AC_FUNC_REALLOC
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memset rint strdup strpbrk strspn])
 
