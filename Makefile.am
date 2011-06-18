@@ -54,7 +54,8 @@ bin-dist: $(bin_dist_dir)
 mydistcheck: dist
 	tar xzf $(distdir).tar.gz	
 	cd $(distdir) ; ./configure && make check
-	$(RM) $(distdir)
+	rm -rf $(distdir)
 	tar xzf $(distdir).tar.gz	
 	cd $(distdir) ; ./configure --disable-shared && make check
-	$(RM) $(distdir)
+	rm -rf $(distdir)
+
