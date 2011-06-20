@@ -46,6 +46,12 @@ else
 	check_nw_sched='off'
 fi
 
+if grep '^#define.*CHECK_NW_LUAED' ../config.h > /dev/null; then
+	check_nw_luaed='on'
+else
+	check_nw_luaed='off'
+fi
+
 # I can't use these in strict Bourne shell, so I use a sed command
 #prog=${0%.sh}	# derive tested program's name from own name
 #prog=${prog#*_}
@@ -58,6 +64,15 @@ args_file=test_${prog}_args
 if [ "$prog" = "nw_sched" ] ; then
 	if [ "$check_nw_sched" = "off" ]; then
 		echo "Guile not used - nw_sched test disabled."
+		exit 0
+	fi
+fi
+
+# nw_luaed is only tested if Lua is being used
+
+if [ "$prog" = "nw_luaed" ] ; then
+	if [ "$check_nw_luaed" = "off" ]; then
+		echo "Lua not used - nw_luaed test disabled."
 		exit 0
 	fi
 fi
