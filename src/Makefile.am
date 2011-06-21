@@ -1,6 +1,3 @@
-# These sources are built automatically (by lex and yacc)
-#BUILT_SOURCES = newick_parser.h newick_scanner.c newick_parser.c \
-		#address_scanner.c address_parser.c
 
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 	       nw_condense nw_support nw_ed nw_topology nw_distance \
