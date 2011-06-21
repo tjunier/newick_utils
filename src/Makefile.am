@@ -34,6 +34,9 @@ newick_scanner.c: newick_scanner.l
 address_scanner.c: address_scanner.l
 	flex -oaddress_scanner.c address_scanner.l 
 
+indent_lex.c: indent_lex.l
+	flex -oindent_lex.c indent_lex.l
+
 lib_LTLIBRARIES = libnw.la
 libnw_la_SOURCES = $(NW_CORE)
 
@@ -78,7 +81,7 @@ nw_prune_LDADD = libnw.la
 nw_order_SOURCES = order.c order_tree.c
 nw_order_LDADD = libnw.la
 
-nw_indent_SOURCES = indent.c indent_lex.l
+nw_indent_SOURCES = indent.c indent_lex.c
 nw_indent_LDADD = libnw.la
 
 nw_match_SOURCES = match.c order_tree.c
