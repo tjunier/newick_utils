@@ -5,7 +5,7 @@ AC_PREREQ(2.61)
 AC_INIT([Newick Utils],[1.5.0],[thomas.junier@.unine.ch])
 AM_INIT_AUTOMAKE
 
-AC_CONFIG_SRCDIR([src])
+AC_CONFIG_SRCDIR([src/display.c])
 
 AC_CONFIG_HEADERS([config.h])
 AH_TEMPLATE([USE_LIBXML2],[Defined to 1 if all conditions are met for use of LibXML2])
