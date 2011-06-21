@@ -29,12 +29,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* functions for tree models */
 
-#define _GNU_SOURCE
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "list.h"
 #include "rnode.h"
@@ -58,14 +57,14 @@ static int running_number()
 
 /* Determines if a node is to have children, based on a pseudorandom number */
 
-static int geo_has_children(double prob_node_has_children)
+static bool geo_has_children(double prob_node_has_children)
 {
 	double rn = (double) rand() / RAND_MAX;
 
 	if (rn <= prob_node_has_children)
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 }
 
 /* Visits a leaf: probabilistically adds children to the leaf, and adds those
@@ -81,8 +80,8 @@ static int geo_visit_leaf(struct rnode *leaf, double prob_node_has_children,
 		if (NULL == kid1) return FAILURE;
 		struct rnode *kid2 = create_rnode("kid2", "");	
 		if (NULL == kid2) return FAILURE;
-		if (! add_child(leaf, kid1)) return FAILURE;
-		if (! add_child(leaf, kid2)) return FAILURE;
+		add_child(leaf, kid1);
+		add_child(leaf, kid2);
 		if (! append_element(leaves_queue, kid1)) return FAILURE;
 		if (! append_element(leaves_queue, kid2)) return FAILURE;
 	} else {
@@ -128,7 +127,7 @@ int geometric_tree(double prob_node_has_children)
 /******************************************************************/
 /* Time-limited model */
 
-double reciprocal_exponential_CDF(double x, double k)
+double _reciprocal_exponential_CDF(double x, double k)
 {
 	return - (log(1 - x)/k);
 }
@@ -151,7 +150,7 @@ double random_lt_1()
  * The function returns the remaining time (threshold - randomly drawn length)
  * If the function fails for some reason (e.g. no RAM left), it returns -1 */
 
-double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
+double _tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
 		double alt_random)
 {
 	double rn;
@@ -161,7 +160,7 @@ double tlt_grow_node(struct rnode *leaf, double branch_termination_rate,
        	else
 	       rn = alt_random;
 
-	double length = reciprocal_exponential_CDF(rn, 
+	double length = _reciprocal_exponential_CDF(rn, 
 			branch_termination_rate);
 
 	/* The remaining time is the node's alloted time minus the branch
@@ -218,7 +217,6 @@ void free_data(struct llist *leaves_queue,
 		free(kid->edge_length_as_string);
 		free(kid->label);
 	       	free(kid->data);
-		destroy_llist(kid->children);
 		free(kid);
 	}
 	destroy_llist(all_children);
@@ -247,21 +245,21 @@ int time_limited_tree(double branch_termination_rate, double duration)
 	kid = create_child_with_time_limit(duration);
 	if (NULL == kid) return FAILURE;
 	/* add_child(...): length is determined below */
-	if (! add_child(root, kid)) return FAILURE;
+	add_child(root, kid);
 	if (! append_element(leaves_queue, kid)) return FAILURE;
 	if (! append_element(all_children, kid)) return FAILURE;
 
 	/* 2nd child */
 	kid = create_child_with_time_limit(duration);
 	if (NULL == kid) return FAILURE;
-	if (! add_child(root, kid)) return FAILURE;
+	add_child(root, kid);
 	if (! append_element(leaves_queue, kid)) return FAILURE;
 	if (! append_element(all_children, kid)) return FAILURE;
 
 
 	while (0 != leaves_queue->count) {
 		struct rnode *current = shift(leaves_queue);
-		double remaining_time = tlt_grow_node(current,
+		double remaining_time = _tlt_grow_node(current,
 				branch_termination_rate, UNUSED); 
 		/* length is set by tlt_grow_node(), NULL means error */
 		if (NULL == current->edge_length_as_string)
@@ -269,13 +267,13 @@ int time_limited_tree(double branch_termination_rate, double duration)
 		if (remaining_time > 0) {
 			kid = create_child_with_time_limit(remaining_time);
 			if (NULL == kid) return FAILURE;
-			if (! add_child(current, kid)) return FAILURE;
+			add_child(current, kid);
 			if (! append_element(leaves_queue, kid)) return FAILURE;
 			if (! append_element(all_children, kid)) return FAILURE;
 
 			kid = create_child_with_time_limit(remaining_time);
 			if (NULL == kid) return FAILURE;
-			if (! add_child(current, kid)) return FAILURE;
+			add_child(current, kid);
 			if (! append_element(leaves_queue, kid)) return FAILURE;
 			if (! append_element(all_children, kid)) return FAILURE;
 		} 

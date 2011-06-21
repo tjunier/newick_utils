@@ -30,6 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct h_data;
 struct rooted_tree;
 
+/* Interface of svg_graph_radial.c: functions, structures, etc. used for drawing
+ * radial trees. */
+
 /* Sets the length of the tree's root (in pixels). This can be useful if the
  * tree is very star-like. */
 

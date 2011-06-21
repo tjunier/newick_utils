@@ -214,7 +214,7 @@ static int get_properties(struct rooted_tree *tree,
 	struct list_elem *el;
 	for (el = tree->nodes_in_order->head; NULL != el; el =el->next) {
 		struct rnode *current = (struct rnode *) el->data;
-		int num_kids = current->children->count;
+		int num_kids = current->child_count;
 		/* tests */
 		if (2 == num_kids)
 			props->num_dichotomies++;
@@ -226,22 +226,6 @@ static int get_properties(struct rooted_tree *tree,
 		}
 	}
 	return SUCCESS;
-}
-
-
-static void write_info (struct tree_properties *props)
-{
-	/* for now there is only one output format, but we could add more */
-	// later: switch on the format, or pass output function ptr */
-	printf("Type\t\t#nodes\t#leaves\t#dichot\t#l-lbl\t#i-lbl\n");
-	printf("%s\t%d\t%d\t%d\t%d\t%d\n",
-			type_string(props->type),
-			props->num_nodes,
-			props->num_leaves,
-			props->num_dichotomies,
-			props->num_leaf_labels,
-			props->num_inner_labels
-			);
 }
 
 static void process_tree(struct rooted_tree *tree,
@@ -267,7 +251,7 @@ int main (int argc, char* argv[])
 	struct rooted_tree *tree;
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params.output_function);
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	return 0;

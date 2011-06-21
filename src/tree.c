@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <sys/types.h>
 #include <regex.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "link.h"
@@ -91,46 +92,8 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	tree->root = new_root;
         destroy_llist(tree->nodes_in_order);
 	tree->nodes_in_order = get_nodes_in_order(tree->root);
-	reset_current_child_elem(tree);
 
 	return SUCCESS;
-}
-
-/* Returns true IFF all children are leaves. Assumes n is not a leaf. */
-
-int all_children_are_leaves(struct rnode *n)
-{
-	struct list_elem *el;
-	for (el = n->children->head; NULL != el; el = el->next) {
-		struct rnode *child = el->data;
-		if (! is_leaf(child)) return 0;
-	}
-
-	return 1;
-}
-
-/* Returns true IFF all children have the same label. If true, sets 'label' to
- * the shared label. Assumes n is inner node, and all its children are leaves. */
-
-int all_children_have_same_label(struct rnode *n, char **label)
-{
-
-	/* get first child's label */
-
-	struct list_elem *el = n->children->head;
-	struct rnode *child = el->data;
-	char *ref_label = child->label;
-
-	/* iterate over other children, and compare their label to the first's */
-
-	for (el = el->next; NULL != el; el = el->next) {
-		child = el->data;
-		if (0 != strcmp(ref_label, child->label))
-			return 0; /* found a different label */
-	}
-
-	*label = ref_label;
-	return 1;
 }
 
 void collapse_pure_clades(struct rooted_tree *tree)
@@ -149,68 +112,12 @@ void collapse_pure_clades(struct rooted_tree *tree)
 			 * because it will be later passed to free() */
 			free(current->label);
 			current->label = strdup(label);
-			/* remove children */
-			clear_llist(current->children);
+			remove_children(current);
 		}
 	}
 }
 
-void destroy_tree(struct rooted_tree *tree, int free_node_data)
-{
-	struct list_elem *e;
-
-	/* Traversing in post-order ensures that children list's data are
-	 * already empty when we destroy the list */
-	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
-		struct rnode *current = e->data;
-		destroy_llist(current->children);
-		free(current->label);
-		free(current->edge_length_as_string);
-		/* only works if data can be free()d, i.e. has no pointer to
-		 * allocated storage. Otherwise free the data "manually". */
-		if (free_node_data)
-			free(current->data);
-		free(current);
-	}
-
-	destroy_llist(tree->nodes_in_order);
-	free(tree);
-}
-
-/* A new version that accepts a freeing callback */
-// TODO: all programs should use this one (making the previous one obsolete).
-// If node_data_destroyer is not NULL, it should be called to free
-// current->data. If node_data_destroyer is NULL but current->data is not NULL,
-// then it is assumed that current->data can be just free()d (i.e. it is a
-// pointer to something that does not contain other pointers), otherwise
-// just don't free.  node_data_destroyer() is responsible for checking for
-// NULL in its args
-
-void destroy_tree_cb(struct rooted_tree *tree,
-		void (*node_data_destroyer)(struct rnode *))
-{
-	struct list_elem *e;
-
-	/* Traversing in post-order ensures that children list's data are
-	 * already empty when we destroy the list (since the lists contain
-	 * children edges) */
-	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
-		struct rnode *current = e->data;
-		destroy_llist(current->children);
-		free(current->label);
-		free(current->edge_length_as_string);
-		if (NULL != node_data_destroyer)
-			node_data_destroyer(current);
-		else if (NULL != current->data) 
-			free(current->data);
-		free(current);
-	}
-
-	destroy_llist(tree->nodes_in_order);
-	free(tree);
-}
-
-void destroy_tree_cb_2(struct rooted_tree *tree,
+void destroy_tree(struct rooted_tree *tree,
 		void (*node_data_destroyer)(void *))
 {
 	struct list_elem *e;
@@ -240,7 +147,9 @@ int leaf_count(struct rooted_tree * tree)
 	return n;
 }
 
-// TODO: is this ever used?
+/* NOTE: this f() is not used in app code, but at least 1 test does use it (
+ test_graph_common.c) */
+
 struct llist *get_leaf_labels(struct rooted_tree *tree)
 {
 	struct llist *labels = create_llist();
@@ -258,24 +167,7 @@ struct llist *get_leaf_labels(struct rooted_tree *tree)
 	return labels;
 }
 
-// TODO: is this ever used?
-struct llist *get_labels(struct rooted_tree *tree)
-{
-	struct llist *labels = create_llist();
-	if (NULL == labels) return NULL;
-	struct list_elem *el;
-
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *current = (struct rnode *) el->data;
-		if (strcmp ("", current->label) != 0)
-			if (! append_element(labels, current->label))
-				return NULL;
-	}
-
-	return labels;
-}
-
-int is_cladogram(struct rooted_tree *tree)
+bool is_cladogram(struct rooted_tree *tree)
 {
 	return TREE_TYPE_CLADOGRAM == get_tree_type(tree);
 }
@@ -338,49 +230,6 @@ struct llist *nodes_from_labels(struct rooted_tree *tree,
 	return result;
 }
 
-// TODO: is this ever used?
-struct llist *nodes_from_regexp_string(struct rooted_tree *tree,
-		char *regexp_string)
-{
-	int errcode;
-	regex_t *preg = malloc(sizeof(regex_t));
-	int cflags = 0;
-	if (NULL == preg) return NULL;
-	errcode = regcomp(preg, regexp_string, cflags);
-	if (errcode) {
-		size_t errbufsize = regerror(errcode, preg, NULL, 0);
-		char *errbuf = malloc(errbufsize * sizeof(char));
-		if (NULL == errbuf) return NULL;
-		/* NOTE: this would be more informative, but I want to return
-		 * an error value instead of just exit()ing. 
-		regerror(errcode, preg, errbuf, errbufsize);
-		fprintf (stderr, "%s\n", errbuf);
-		exit(EXIT_FAILURE);
-		*/
-	}
-       				       
-	struct llist *result = create_llist();
-	if (NULL == result) return NULL;
-	struct list_elem *el;
-
-	size_t nmatch = 1;	/* either matches or doesn't */
-	regmatch_t pmatch[nmatch]; 
-	int eflags = 0;
-
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *node = el->data;
-		errcode = regexec(preg, node->label, nmatch, pmatch, eflags);	
-		if (0 == errcode) 
-			if (! append_element(result, node)) return NULL;
-	}
-	/* This does not free 'preg' itself, only memory pointed to by 'preg'
-	 * members and allocated by regcomp().*/
-	regfree(preg);
-	/* Therefore: */
-	free(preg);
-
-	return result;
-}
 
 struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 {
@@ -404,39 +253,4 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 	}
 
 	return result;
-}
-
-/* Clones a clade (recursively) */
-// TODO: try an iterative version using a rnode_iterator
-static struct rnode *clone_clade(struct rnode *root)
-{
-	struct rnode *root_clone = create_rnode(root->label,
-			root->edge_length_as_string);
-	if (NULL == root_clone) return NULL;
-	struct list_elem *el;
-	for (el = root->children->head; NULL != el; el = el->next) {
-		struct rnode *kid = el->data;
-		struct rnode *kid_clone = clone_clade(kid);
-		if (NULL == kid_clone) return NULL;
-		if (! add_child(root_clone, kid_clone)) return NULL;
-	}
-
-	return root_clone;
-}
-
-// TODO: is this ever used?
-struct rooted_tree* clone_subtree(struct rnode *root)
-{
-	struct rnode *root_clone = clone_clade(root);
-	if (NULL == root_clone) return NULL;
-	struct llist *nodes_in_order_clone = get_nodes_in_order(root_clone);
-	if (NULL == nodes_in_order_clone) return NULL;
-
-	struct rooted_tree *clone = malloc(sizeof(struct rooted_tree));
-	if (NULL == clone) return NULL;
-
-	clone->root = root_clone;
-	clone->nodes_in_order = nodes_in_order_clone;
-
-	return clone;
 }

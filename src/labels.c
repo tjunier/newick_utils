@@ -194,7 +194,7 @@ int main (int argc, char* argv[])
 
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params);
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	return 0;

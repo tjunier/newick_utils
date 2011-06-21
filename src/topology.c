@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "parser.h"
 #include "to_newick.h"
@@ -42,9 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 
 struct parameters {
-	int show_inner_labels;
-	int show_leaf_labels;
-	int show_branch_lengths;
+	bool show_inner_labels;
+	bool show_leaf_labels;
+	bool show_branch_lengths;
 };
 
 void help(char *argv[])
@@ -100,24 +101,24 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	/* defaults */
-	params.show_inner_labels = TRUE;
-	params.show_leaf_labels = TRUE;
-	params.show_branch_lengths = FALSE;
+	params.show_inner_labels = true;
+	params.show_leaf_labels = true;
+	params.show_branch_lengths = false;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "bhIL")) != -1) {
 		switch (opt_char) {
 		case 'b':
-			params.show_branch_lengths = TRUE;
+			params.show_branch_lengths = true;
 			break;
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'I':
-			params.show_inner_labels = FALSE;
+			params.show_inner_labels = false;
 			break;
 		case 'L':
-			params.show_leaf_labels = FALSE;
+			params.show_leaf_labels = false;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -180,7 +181,7 @@ int main (int argc, char* argv[])
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params);
 		dump_newick(tree->root);
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	return 0;

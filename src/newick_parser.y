@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "list.h"
 #include "link.h"
-#include "to_newick.h" // TODO: needed?
 #include "parser.h"
 
 /* in the (admittedly artificial) case of trees with lots of nesting on the
@@ -84,9 +83,6 @@ void nwserror(char *s)
 
 %%
 
-// TODO: check the parser's behaviour if create_rnode(), append_element(), etc
-// fail
-
 tree: /* empty */	{
 		root = NULL;
 		newick_parser_status = PARSER_STATUS_EMPTY;
@@ -134,14 +130,8 @@ inner_node: O_PAREN nodelist C_PAREN {
 			root = NULL;
 			YYACCEPT;
 		}
-		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			if (! add_child(np, (struct rnode*) lep->data)) {
-				root = NULL;
-				newick_parser_status =
-					PARSER_STATUS_MALLOC_ERROR;
-				YYACCEPT;
-			}
-		}
+		for (lep = $2->head; NULL != lep; lep = lep->next)
+			add_child(np, (struct rnode*) lep->data);
 		destroy_llist($2);
 		$$ = np;
     }
@@ -155,14 +145,8 @@ inner_node: O_PAREN nodelist C_PAREN {
 			YYACCEPT;
 		}
 		free($4);
-		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			if (! add_child(np, (struct rnode*) lep->data)) {
-				root = NULL;
-				newick_parser_status =
-					PARSER_STATUS_MALLOC_ERROR;
-				YYACCEPT;
-			}
-		}
+		for (lep = $2->head; NULL != lep; lep = lep->next) 
+			add_child(np, (struct rnode*) lep->data);
 		destroy_llist($2);
 		$$ = np;
     }
@@ -176,14 +160,8 @@ inner_node: O_PAREN nodelist C_PAREN {
 			YYACCEPT;
 		}
 		free($4);
-		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			if (! add_child(np, (struct rnode*) lep->data)) {
-				root = NULL;
-				newick_parser_status =
-					PARSER_STATUS_MALLOC_ERROR;
-				YYACCEPT;
-			}
-		}
+		for (lep = $2->head; NULL != lep; lep = lep->next) 
+			add_child(np, (struct rnode*) lep->data); 
 		destroy_llist($2);
 		free($6);
 		$$ = np;
@@ -197,14 +175,8 @@ inner_node: O_PAREN nodelist C_PAREN {
 			root = NULL;
 			YYACCEPT;
 		}
-		for (lep = $2->head; NULL != lep; lep = lep->next) {
-			if (! add_child(np, (struct rnode*) lep->data)) {
-				root = NULL;
-				newick_parser_status =
-					PARSER_STATUS_MALLOC_ERROR;
-				YYACCEPT;
-			}
-		}
+		for (lep = $2->head; NULL != lep; lep = lep->next) 
+			add_child(np, (struct rnode*) lep->data); 
 		destroy_llist($2);
 		free($5);
 		$$ = np;

@@ -2,10 +2,14 @@
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 	       nw_condense nw_support nw_ed nw_topology nw_distance \
 	       nw_labels nw_prune nw_order nw_match nw_gen nw_trim \
-	       nw_duration nw_stats #nw_toy disabled for release
+	       nw_duration nw_stats
 
 if WANT_NW_SCHED
 bin_PROGRAMS += nw_sched
+endif
+
+if WANT_NW_LUAED
+bin_PROGRAMS += nw_luaed
 endif
 
 # I mention all headers here, so they're included in the distro (otherwise this
@@ -15,7 +19,7 @@ HDR = canvas.h concat.h enode.h error.h hash.h lca.h link.h list.h nodemap.h \
 	rnode_iterator.h simple_node_pos.h svg_graph.h text_graph.h \
 	to_newick.h tree.h tree_editor_rnode_data.h common.h order_tree.h \
 	tree_models.h xml_utils.h graph_common.h svg_graph_common.h \
-	svg_graph_radial.h svg_graph_ortho.h masprintf.h
+	svg_graph_radial.h svg_graph_ortho.h masprintf.h subtree.h
 
 NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
 	link.c tree.c nodemap.c hash.c rnode_iterator.c \
@@ -39,7 +43,7 @@ nw_display_SOURCES = display.c canvas.c text_graph.c \
 		svg_graph_ortho.c svg_graph_radial.c 
 nw_display_LDADD = -lm libnw.la
 
-nw_clade_SOURCES = subtree.c
+nw_clade_SOURCES = clade.c subtree.c
 nw_clade_LDADD = libnw.la
 
 nw_reroot_SOURCES = reroot.c
@@ -92,12 +96,11 @@ nw_duration_LDADD = libnw.la
 nw_stats_SOURCES = stats.c
 nw_stats_LDADD = libnw.la
 
-nw_sched_SOURCES = scheme_tree_editor.c
-nw_sched_LDADD = libnw.la -lguile
+nw_sched_SOURCES = scheme_tree_editor.c rnode_smob.c
+nw_sched_LDADD = libnw.la
 
-# disabled for release
-#nw_toy_SOURCES = toy.c
-#nw_toy_LDADD = libnw.la
+nw_luaed_SOURCES = lua_tree_editor.c 
+nw_luaed_LDADD = libnw.la
 
 # Removes automatically generated C code (Lex & YACC)
 #

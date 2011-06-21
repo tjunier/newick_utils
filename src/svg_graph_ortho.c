@@ -41,21 +41,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "svg_graph_common.h"
 
 extern enum inner_lbl_pos inner_label_pos;
+static const int whole_v_shift = 20; 	/* Vertical translation of whole graph */
 
 /* Prevents labels of single-child nodes from being crossed over by the child
- * branch. Also used when putting inner labels near root. TODO: change name*/
+ * branch. Also used when putting inner labels near root. */
 const int KNEE_NODE_V_NUDGE = 6;
 const int INNER_LBL_H_NUDGE = 2;
 
 double leaf_vskip = -1; 	/* Vertical separation of leaves (px) */
 
-void set_svg_leaf_vskip(double skip) { leaf_vskip = skip; }
+void set_leaf_vskip(double skip) { leaf_vskip = skip; }
 
 /* Overall graph height (assuming 1 tree per graph, as always) */
 
 int graph_height(int nb_leaves, int with_scale_bar)
 {
-	int height = 2 * svg_whole_v_shift + ((nb_leaves -1)  * leaf_vskip);
+	int height = 2 * whole_v_shift + ((nb_leaves -1)  * leaf_vskip);
 	if (with_scale_bar) 
 		height += scale_bar_height;
 
@@ -265,7 +266,7 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	 * more than one tree*/
 	printf( "<g"
 		" transform='translate(0,%d)'"
-		">", svg_whole_v_shift);
+		">", whole_v_shift);
 	/* We draw all the tree's branches in an SVG group of their own, to
 	 * facilitate editing via Inkscape, Illustrator, etc. */
 	draw_branches_ortho(tree, h_scale, v_scale, align_leaves, hd.d_max);
@@ -274,7 +275,7 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	/* Draw scale bar if required */
 	if (with_scale_bar) {
 		double scalebar_vpos = (double) graph_height(leaf_count(tree),
-				with_scale_bar) - svg_whole_v_shift;
+				with_scale_bar) - whole_v_shift;
 		draw_scale_bar(ROOT_SPACE, scalebar_vpos, h_scale, hd.d_max,
 			branch_length_unit);
 	}

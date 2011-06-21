@@ -29,8 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* Functions for creating and manipulating trees at the node level. */
 
-#define RM_CHILD_IS_ROOT (-1)
-#define RM_CHILD_MEM_ERROR (-2)
+/* remove_child() returns negative values on error (and only then). We start
+ * at -10, that should allow for enough kinds of errors... */
+enum remove_child_status {  RM_CHILD_IS_ROOT = -10, RM_CHILD_MEM_ERROR };
 
 /* NOTE: Tree properties such as 'nodes_in_order' will generally be invalidated
  * by these methods. You will need either to recompute them, or to avoid
@@ -44,20 +45,13 @@ enum unlink_rnode_status { UNLINK_RNODE_DONE, UNLINK_RNODE_ROOT_CHILD,
 
 struct rnode;
 
-extern struct rnode * unlink_rnode_root_child;
+/* Adds 'child' to 'parent''s children (after last child). Added child's
+ * next_sibling is LEFT UNTOUCHED, so don't count on it being NULL. */
 
-/* Adds 'child' to 'parent''s list of children nodes */
-/* Returns FAILURE iff there was a problem (malloc(), most probably) */
-int add_child(struct rnode *parent, struct rnode *child);
+void add_child(struct rnode *parent, struct rnode *child);
 
 /* sets 'edge' as 'child''s parent edge, and 'child' as 'edge''s child
  * node. */
-
-// OBSOLETE
-// void set_parent_edge(struct rnode *child, struct redge *edge);
-
-// OBSOLETE - use add_child() 
-// void link_p2c(struct rnode *parent, struct rnode *child, char *length);
 
 /* Inserts a node with the label 'label' in this node's parent edge. The two
  * resulting edges will each have a length of half the original's, if
@@ -68,7 +62,7 @@ int insert_node_above(struct rnode *node, char *label);
 
 /* Replaces child node 'old' by 'new'. Does nothing if 'old' is not found. */
 
-void replace_child(struct rnode *node, struct rnode *old, struct rnode *new);
+void replace_child(struct rnode *old, struct rnode *new);
 
 /* Splices out node 'node' (which must be inner). Children are linked directly
  * to 'node''s parent. New edges have edges such that the children nodes'
@@ -82,41 +76,54 @@ int splice_out_rnode(struct rnode *node);
 
 /* deletes child from parent's children list; returns the index of the child in
  * the list prior to removal. Child's parent is set to NULL. In case of error,
- * returns a negative number (see RM_CHILD_*) above. */
+ * returns a negative number (see RM_CHILD_*) above. This function makes no
+ * attempt to leave the tree in a coherent state, see unlink_rnode() for this.
+ * */
 
-int remove_child(struct rnode *child);
+enum remove_child_status remove_child(struct rnode *child);
 
-/* Inserts child into parent's children list, at the specified index. Sets the
- * child's parent. */
-/* Returns FAILURE iff there was a problem (malloc(), most probably) */
+/* Inserts 'insert' into 'parent's children list, at the specified index. Sets
+ * the child's parent. An index of 0 means insertion before the first child, an
+ * index of 1 means after the first child, etc. If there are n children, an
+ * index of n means inserttion after the last child. */
+/* Returns FAILURE iff index is off limits (<0 or > number of children). */
 
-int insert_child(struct rnode *parent, struct rnode *child, int index);
+int insert_child(struct rnode *parent, struct rnode *insert, int index);
 
-/* Swaps 'node' and its parent, i.e, parent becomes a child of 'node' */
-/* Returns FAILURE in case of problem (memory) */
+/* Swaps 'node' and its parent which must be the root, i.e, parent becomes a
+ * child of 'node', which itself becomes the new root. */
+/* Returns FAILURE in case of memory problem. Assumes that parent is root. */
 
 int swap_nodes(struct rnode *node);
 
 /* Removes a node from its parent's children list. The node is not freed. There
  * are the following cases: If the removed node had more than one sibling, the
  * tree is in a normal state and the function stops here (case 1). If not, the
- * tree is abnormal because the parent has only one child. There are two
+ * tree is abnormal because the parent now has only one child. There are two
  * possibilities: i) the parent is the root (case 2) - the function stops there
- * and returns the root's (only) child so that it may become the tree's root
- * (we cannot do this here, since we're working at node level, not tree level);
- * ii) the parent is an inner node (case 3) - it gets spliced out.
+ * and sets an external variable to the root's (only) child so that it may
+ * become the tree's root (we cannot do this here, since we're working at node
+ * level, not tree level) - function get_unlink_rnode_root_child() can be used
+ * to retrieve it; ii) the parent is an inner node (case 3) - it gets spliced
+ * out.
  * RETURN VALUE:
 	UNLINK_RNODE_ERROR - there was an error (malloc(), most probably)
 	UNLINK_RNODE_DONE - cases 1 and 3 (nothing else to do)
-	UNLINK_RNODE_ROOT_CHILD - case 2; also sets the external variable
-		'unlink_rnode_root_child' to the root's child.
+	UNLINK_RNODE_ROOT_CHILD - case 2; use get_unlink_rnode_root_child()
+		to get the root's only child.
 */
 
 int unlink_rnode(struct rnode *);
+struct rnode *get_unlink_rnode_root_child();
 
-/* Returns the node's list of siblings. Siblings appear in the same order as in
- * the parent's children list. The list is empty for root, it may be empty for
- * leaves (it's not illegal for a node to have just one child), but this is
- * unusual. */
+/* Returns the node's list of siblings (NOT including the argument node).
+ * Siblings appear in the same order as in the parent's children list. The list
+ * is empty for root, it may be empty for leaves (it's not illegal for a node
+ * to have just one child), but this is unusual. */
 
 struct llist *siblings(struct rnode *);
+
+/* Removes all children (does not free them). Has no effect is node is a leaf.
+ * */ 
+
+void remove_children(struct rnode *);

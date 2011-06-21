@@ -13,28 +13,28 @@ int test_reciprocal_exponential_CDF()
 {
 	const char *test_name = "test_reciprocal_exponential_CDF";
 
-	double val = reciprocal_exponential_CDF(0,1);
+	double val = _reciprocal_exponential_CDF(0,1);
 	if (fabs(val - 0) > TOLERANCE) {
 		printf ("%s: expected 0, got %g\n", test_name, val);
 		return 1;
 	}
-	val = reciprocal_exponential_CDF(0,10);
+	val = _reciprocal_exponential_CDF(0,10);
 	if (fabs(val - 0) > TOLERANCE) {
 		printf ("%s: expected 0, got %g\n", test_name, val);
 		return 1;
 	}
-	val = reciprocal_exponential_CDF(0,.1);
+	val = _reciprocal_exponential_CDF(0,.1);
 	if (fabs(val - 0) > TOLERANCE) {
 		printf ("%s: expected 0, got %g\n", test_name, val);
 		return 1;
 	}
-	val = reciprocal_exponential_CDF(0.5,1);
+	val = _reciprocal_exponential_CDF(0.5,1);
 	double exp = 0.693147; /* -ln(0.5) */
 	if (fabs(val - exp) > TOLERANCE) {
 		printf ("%s: expected %g, got %g (diff: %g)\n", test_name, exp, val, fabs(val-exp));
 		return 1;
 	}
-	val = reciprocal_exponential_CDF(0.5,3);
+	val = _reciprocal_exponential_CDF(0.5,3);
 	exp = 0.693147 / 3;
 	if (fabs(val - exp) > TOLERANCE) {
 		printf ("%s: expected %g, got %g (diff: %g)\n", test_name, exp, val, fabs(val-exp));
@@ -54,7 +54,7 @@ int test_tlt_grow_node()
 	kid->data = &prior_remaining_time;
 	add_child(parent, kid);
 
-	double posterior_remaining_time = tlt_grow_node(kid, 1.0, 0.5);
+	double posterior_remaining_time = _tlt_grow_node(kid, 1.0, 0.5);
 	double grown_length = strtod(kid->edge_length_as_string, NULL);
 
 	double exp = prior_remaining_time - posterior_remaining_time;

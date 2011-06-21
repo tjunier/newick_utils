@@ -47,20 +47,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "node_pos_alloc.h"
 #include "common.h"
 
-enum {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
-enum {HORIZONTAL, VERTICAL};
-enum {SQUARE, TRIANGLE};
-enum {ALL_NODES, ALL_LABELS, ALL_LEAF_LABELS, ARGV_LABELS, ALL_INNER_NODES,
+enum distance_methods {FROM_ROOT, FROM_LCA, MATRIX, FROM_PARENT};
+enum orientations {HORIZONTAL, VERTICAL};
+enum shapes {SQUARE, TRIANGLE};
+enum selections {ALL_NODES, ALL_LABELS, ALL_LEAF_LABELS, ARGV_LABELS, ALL_INNER_NODES,
 	ALL_LEAVES};
 
 struct parameters {
-	int distance_type;	// TODO: rename to 'method'
-	int selection;
+	enum distance_methods distance_method;	
+	enum selections selection;
 	struct llist *labels;
 	char separator;
-	int show_header;
-	int list_orientation;
-	int matrix_shape;
+	bool show_header;
+	enum orientations list_orientation;
+	enum shapes matrix_shape;
 };
 
 void help(char *argv[])
@@ -173,7 +173,7 @@ int get_selection()
 /* Returns the distance type (root, LCA, or matrix) based on the first characer
  * of 'optarg' */
 
-int get_distance_type()
+int get_distance_method()
 {
 	switch (tolower(optarg[0])) {
 	case 'l': /* lca, l, etc */
@@ -198,10 +198,10 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	params.distance_type = FROM_ROOT;
+	params.distance_method = FROM_ROOT;
 	params.selection = ALL_LEAF_LABELS;
 	params.separator = '\n';
-	params.show_header = FALSE;
+	params.show_header = false;
 	params.list_orientation = VERTICAL;
 	params.matrix_shape = SQUARE;
 
@@ -214,10 +214,10 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'm':
-			params.distance_type = get_distance_type();
+			params.distance_method = get_distance_method();
 			break;
 		case 'n':
-			params.show_header = TRUE;
+			params.show_header = true;
 			break;
 		case 's':
 			params.selection = get_selection();
@@ -260,7 +260,7 @@ struct parameters get_params(int argc, char *argv[])
 	}
 
 	if (alternative_format) {
-		if (MATRIX == params.distance_type)
+		if (MATRIX == params.distance_method)
 			params.matrix_shape = TRIANGLE;
 		else
 			params.list_orientation = HORIZONTAL;
@@ -589,8 +589,8 @@ int main(int argc, char *argv[])
 	struct h_data depths;	
 	params = get_params(argc, argv);
 
-	/* TODO: could take the switch out of the loop, since the distance type
-	 * is fixed for the program's lifetime. OTOH the code is easier to
+	/* I could take the switch out of the loop, since the distance type
+	 * is fixed for the process's lifetime. OTOH the code is easier to
 	 * understand this way, and it's unlikely the switch has a visible
 	 * impact on performance. */
 
@@ -617,7 +617,7 @@ int main(int argc, char *argv[])
 			selected_nodes = get_selected_nodes(tree,
 					params.selection);
 		}
-		switch (params.distance_type) {
+		switch (params.distance_method) {
 		case FROM_ROOT:
 			print_distance_list(tree->root, selected_nodes,
 				params.list_orientation, params.show_header);
@@ -664,12 +664,12 @@ int main(int argc, char *argv[])
 		default:
 			fprintf (stderr,
 				"ERROR: invalid distance type '%d'.\n",
-				params.distance_type);
+				params.distance_method);
 			exit(EXIT_FAILURE);
 		}
 
 		destroy_llist(selected_nodes);
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	destroy_llist(params.labels);

@@ -27,12 +27,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+/* Interface of svg_graph_ortho.c: functions, structures, etc. used for drawing
+ * orthogonal trees. */
+
 struct rooted_tree;
 struct h_data;
 
 extern double leaf_vskip;
-
-/* Functions for drawing orthogonal trees */
 
 int graph_height(int, int);
 

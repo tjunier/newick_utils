@@ -43,9 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "order_tree.h"
 
 enum order_criterion { ORDER_ALNUM_LBL, ORDER_NUM_DESCENDANTS, ORDER_DELADDERIZE };
+enum sort_order { ORDER_DIRECT, ORDER_REVERSE };
 
 struct parameters {
 	enum order_criterion criterion;
+	enum sort_order order;
 };
 
 void help (char *argv[])
@@ -133,13 +135,16 @@ struct parameters get_params(int argc, char *argv[])
 	params.criterion = ORDER_ALNUM_LBL;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "c:hn")) != -1) {
+	while ((opt_char = getopt(argc, argv, "c:hr")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'c':
 			params.criterion = get_criterion(optarg);
+			break;
+		case 'r':
+			params.order = ORDER_REVERSE;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -159,37 +164,47 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-h] <filename|->\n", argv[0]);
+		fprintf(stderr, "Usage: %s [-c:hr] <filename|->\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
 	return params;
 }
 
+/* Counts the number of descendants of the tree, using the data pointer of each
+ * node. */
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params = get_params(argc, argv);
-	int (*order_function)(struct rooted_tree *);
+	int (*comparator)(const void*,const void*);
+	int (*sort_field_setter)(struct rnode *);
 
 	switch(params.criterion) {
 	case ORDER_ALNUM_LBL:
-		order_function =  order_tree_lbl;
+		comparator = lbl_comparator;
+		sort_field_setter = set_sort_field_label;
 		break;
 	case ORDER_DELADDERIZE:
-		order_function =  order_tree_deladderize;
+		comparator = num_desc_deladderize;
+		sort_field_setter = set_sort_field_num_desc;
 		break;
 	case ORDER_NUM_DESCENDANTS:
-		order_function =  order_tree_num_desc;
+		comparator = num_desc_comparator;
+		sort_field_setter = set_sort_field_num_desc;
 		break;
 	default:
 		assert(0); // programmer error
 	}
 
 	while (NULL != (tree = parse_tree())) {
-		if (! order_function(tree)) { perror(NULL); exit(EXIT_FAILURE); }
+		if (! order_tree (tree, comparator, sort_field_setter)) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
 		dump_newick(tree->root);
-		destroy_tree_cb(tree, NULL);
+		destroy_tree(tree, NULL);
 	}
 
 	return 0;

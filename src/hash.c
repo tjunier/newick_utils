@@ -42,6 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "masprintf.h"
 #include "common.h"
 
+struct key_val_pair {
+	char *key;
+	void *value;
+};
+
 struct hash *create_hash(int n)
 {
 	struct hash *h;

@@ -1,5 +1,51 @@
+general: look at public structures such as struct hash and see if it would be
+ok to make them private -- this means replacing direct access (st->member) by
+accessor function calls (get_member(st)). The tradeoff is: accessors enable
+hiding the detail of the structure, which is a Good Thing; but they add
+overhead WRT direct access. The question is thus: does that overhead
+significantly impact performance?
 
-nw_reroot: if the outgroup-to-be is already the outgroup, the tree should not change (both because there is no need (PLOS), and also because it saves time). Try e.g. rerooting '(((Dog,Cat),Cow),Jay);' on Jay: should be an invariant.
+nw_distance: add new kind of selection: user-specified labels.
+
+general: check that the apps' get_params() functions set the nwsin external via
+set_parser_input_filename() rather than manually.
+
+general: for integer-valued functions that can have more than two status codes
+(i.e., not just SUCCESS and FAILURE), generalize the enum mechanism and
+consider putting the enum declaration close to the function declaration in the
+.h file.
+
+rnode_iterator: add 'status' field to struct rnode_iterator, and use it so hold
+reason for NULL (end or error). Client code should of course check this.
+
+general: for now I don't check the return value of printf(). See if this would
+be useful. In fact it would be better to keep all the printf()s in a few
+defined places. The SVG code has printf()s all over the place, it would
+probably be better to do it like to_newick_i() does: by appending strings to a
+list, then printing the whole list. Only, we'd need to have the whole tree in
+memory, at least until we print it; OTOH we could rather easily print several
+trees in the same doc this way. Make a separate branch, or better yet,  allow
+for the two versions.
+
+tree.c: think of adding a label->node map to the tree structure. The nodes
+could then directly be accessed by functions like get_node_by_label(struct
+rooted_tree *tree, char *label). This function would assume
+unicity of labels; there could be another that does not (and returns a list of
+matching nodes); finally there could be regexp matching. And of
+course, this would all be lazy: the map would be NULL at first, and only
+computed if needed.
+
+general: use (i.e., check) the parser status values defined in parser.h
+
+general: make all functions static unless needed otherwise
+
+general: check that all source files contain the BSD license.
+
+general: identify obsolete f() and replace by newer versions.
+
+nw_sched: would be nice to merge with new_rnode, as this would open up the possibility of a 'next-sib' function.
+
+nw_reroot: if the outgroup-to-be is already the outgroup, the tree should not change (both because there is no need (PoLS), and also because it saves time). Try e.g. rerooting '(((Dog,Cat),Cow),Jay);' on Jay: should be an invariant.
 
 nw_match: try to implement the whole thing using iterators rather than comparing Newick strings.
 
@@ -499,15 +545,24 @@ will shift some rootward and the others leafward. One needs, I'm afraid, to
 tweak the <text> elements themselves and change the sign of x='...' attributes
 for one side of the tree.
 
+[done ] nw_sched: define a SMOB for trees. Access the nodes_in_order as a
+Scheme list (what else?), then... car and cdr! 
+
+[done] nw_sched: implement lbl!
+
+[done] nw_sched: check help page, and sync w/ tutorial; add examples incl.
+implementation of other nutils (nw_topology, nw_label, nw_trim?); 
+
 tests for nw_sched: test undefinedness of b, d, etc. -- all variables that may
 be undefined.
-
-nw_sched: implement lbl!
-
-nw_shed: check help page, and sync w/ tutorial; add examples incl. implementation of other nutils (nw_topology, nw_label, nw_trim?)
 
 new rnode: some TODO items list tests to write. Write them. Now.
 
 nw_display: add CSS to labels (in CSS map) 
 
 nw_display: add branch lengths to radial trees.
+
+nw_rename: add example to -h about 3-arg form; also discuss in tutorial.
+
+nw_scheme: sync man, help w/ actual code; add example of numbering inner nodes
+(EK question).

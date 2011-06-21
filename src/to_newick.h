@@ -27,27 +27,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-/* Returns a Newick string representing the tree rooted at 'node'.*/
+
+#include <stdbool.h>
+
+/** \file
+ * Functions for representing a struct rooted_tree.
+ */
 
 struct rnode;
 
-/* Returns a Newick representation of the tree. Memory is allocated, don't
- * forget to free() it. Returns NULL in case of failure (which will be a memory
- * allocation problem). WARNING: the current implementation is recursive, and
- * hence is slow for big trees.  */
+/** Returns a Newick representation of the tree rooted at \c root. This is
+ * often, but doesn't have to be, the \c root member of a struct rooted_tree.
+ * Memory is allocated, don't forget to free() it. Returns NULL in case of
+ * failure (which will be a memory allocation problem). WARNING: the current
+ * implementation is recursive, and hence is slow for big trees.
+ * \par \c root the root of the tree to print 
+ * \return a Newick-formatted string, or NULL (see text).*/
 
 char *to_newick(struct rnode* root);
 
-/* Like to_newick, but returns a list of strings. Concatenating the strings in
- * list order results in the Newick representation of the tree. The function
- * does not do this, because it would involve repeated calls to concat(), which
- * are costly and not necessarily needed (e.g., if you just want to print the
+/** Debugging function. If passed 'true', causes to_newick_i() to append the
+ * address of each node to their labels. This is a debuging instruction rather
+ * than a parameter, therefore it is not passed as a function argument. 
+ * \par \c show whether or not to show addresses.
+ */
+
+void set_show_addresses(bool show);
+
+/** Represents a tree as a list of strings. Like to_newick(), but returns a list
+ * of strings instead of a single string. Concatenating the strings in list
+ * order results in the Newick representation of the tree. The function does
+ * not do this, because it would involve repeated calls to concat(), which are
+ * costly and not necessarily needed (e.g., if you just want to print the
  * Newick, which is usually the case, you can just print the strings in list
  * order -- and dump_newick() does this for you, using buffered output) Also,
- * this function is iterative rather than recursive. */
+ * this function is iterative rather than recursive.
+ * \par \c root (as in to_newick())
+ * \return a struct llist, each element of which points to a char*.
+ */
 
 struct llist *to_newick_i(struct rnode *root);
 
-/* Dumps the newick rooted at 'root' to stdout, using to_newick_i() */
+/** Dumps the newick rooted at \c root to stdout. This function calls
+ * to_newick_i() to get a representation of the tree as a list of strings,
+ * which it prints. It is therefore iterative (and hence fast). */
 
 void dump_newick(struct rnode* root);

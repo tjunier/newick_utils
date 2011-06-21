@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -55,8 +56,8 @@ static int num_leaves;
 struct parameters {
 	FILE * target_tree_file;
 	FILE * rep_trees_file;
-	int show_label_numbers;
-	int use_percent;
+	bool show_label_numbers;
+	bool use_percent;
 };
 
 void help(char* argv[])
@@ -110,8 +111,8 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 	char opt_char;
 
-	params.show_label_numbers = FALSE;
-	params.use_percent = FALSE;
+	params.show_label_numbers = false;
+	params.use_percent = false;
 
 	/* parse options and switches */
 	while ((opt_char = getopt(argc, argv, "hlp")) != -1) {
@@ -121,10 +122,10 @@ struct parameters get_params(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 		/* we keep this for debugging, but not documented */
 		case 'l':
-			params.show_label_numbers = TRUE;
+			params.show_label_numbers = true;
 			break;
 		case 'p':
-			params.use_percent = TRUE;
+			params.use_percent = true;
 			break;
 		}
 	}
@@ -175,16 +176,17 @@ int init_lbl2num(struct rooted_tree *tree)
 	return SUCCESS;
 }
 
-// TODO: shouldn't this call node_set_union() ?
+/* This could also be done with node_set_union(), but it's easier to write with
+ * 'result' as an accumulator. */
+
 node_set union_of_child_node_sets(struct rnode *node)
 {
 	node_set result = create_node_set(num_leaves);
 	if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
-	struct list_elem *el;
+	struct rnode *curr;
 
-	for (el = node->children->head; NULL != el; el = el->next) {
-		struct rnode *child = el->data;
-		node_set child_node_set = (node_set) child->data;
+	for (curr=node->first_child; NULL != curr; curr = curr->next_sibling) {
+		node_set child_node_set = (node_set) curr->data;
 		node_set_add_set(result, child_node_set, num_leaves);
 	}
 
@@ -245,16 +247,6 @@ void compute_bipartitions(struct rooted_tree *tree)
 	}
 }
 
-void empty_data(struct rooted_tree *tree)
-{
-	struct list_elem *el;
-
-	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
-		struct rnode *current = (struct rnode *) el->data;
-		free(current->data);
-	}
-}
-
 int process_tree(struct rooted_tree *tree)
 {
 	if (NULL == lbl2num) { /* first tree */
@@ -264,8 +256,7 @@ int process_tree(struct rooted_tree *tree)
 		if (NULL == bipart_counts) return FAILURE;
 	}
 	compute_bipartitions(tree);
-	empty_data(tree);
-	destroy_tree(tree, DONT_FREE_NODE_DATA);
+	destroy_tree(tree, NULL);
 
 	return SUCCESS;
 }
@@ -405,7 +396,7 @@ int main(int argc, char *argv[])
 		printf ("%s\n", newick);
 		free(newick);
 		if (params.show_label_numbers) show_label_numbers();
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	fclose(params.target_tree_file);

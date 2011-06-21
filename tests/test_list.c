@@ -1790,6 +1790,150 @@ int test_from_array()
 	return 0;
 }
 
+int test_delete_last()
+{
+	const char *test_name = __func__;
+	struct llist *list1;
+	struct llist *list2;
+	struct list_elem *el;
+
+	list1 = create_llist();
+	append_element(list1, "omega");
+
+	list2 = delete_after(list1, -1, 1);
+
+	/* check list1 */
+	if (0 != list1->count) {
+		printf ("%s: expected count of 0, got %d.\n", 
+				test_name, list1->count);
+		return 1;
+	}
+	if (NULL != list1->head) {
+		printf ("%s: expected NULL head, got '%s'.\n", test_name,
+				(char *) list1->head->data);
+		return 1;
+	}
+	if (NULL != list1->tail) {
+		printf ("%s: expected NULL tail, got '%s'.\n", test_name,
+				(char *) list1->tail->data);
+		return 1;
+	}
+
+	/* check list2 */
+	if (1 != list2->count) {
+		printf ("%s: expected count of 1, got %d.\n", 
+				test_name, list2->count);
+		return 1;
+	}
+	el = list2->head;
+	if (strcmp("omega", (char *) el->data) != 0) {
+		printf ("%s: expected 'omega' at head, got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = list2->tail;
+	if (strcmp("omega", (char *) el->data) != 0) {
+		printf ("%s: expected 'omega' at tail, got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: expected NULL next, got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_delete_last_few()
+{
+	const char *test_name = __func__;
+	struct llist *list1;
+	struct llist *list2;
+	struct list_elem *el;
+
+	list1 = create_llist();
+	append_element(list1, "ichi");
+	append_element(list1, "ni");
+	append_element(list1, "san");
+	append_element(list1, "shi");
+	append_element(list1, "go");
+
+	list2 = delete_after(list1, -1, 5);
+
+	/* check list1 */
+	if (0 != list1->count) {
+		printf ("%s: expected count of 0, got %d.\n", 
+				test_name, list1->count);
+		return 1;
+	}
+	if (NULL != list1->head) {
+		printf ("%s: expected NULL head, got '%s'.\n", test_name,
+				(char *) list1->head->data);
+		return 1;
+	}
+	if (NULL != list1->tail) {
+		printf ("%s: expected NULL tail, got '%s'.\n", test_name,
+				(char *) list1->tail->data);
+		return 1;
+	}
+
+	/* check list2 */
+	if (5 != list2->count) {
+		printf ("%s: expected count of 5, got %d.\n", 
+				test_name, list2->count);
+		return 1;
+	}
+	el = list2->head;
+	if (strcmp("ichi", (char *) el->data) != 0) {
+		printf ("%s: expected 'ichi' at head, got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("ni", (char *) el->data) != 0) {
+		printf ("%s: expected 'ni', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("san", (char *) el->data) != 0) {
+		printf ("%s: expected 'san', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("shi", (char *) el->data) != 0) {
+		printf ("%s: expected 'shi', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (strcmp("go", (char *) el->data) != 0) {
+		printf ("%s: expected 'go', got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = list2->tail;
+	if (strcmp("go", (char *) el->data) != 0) {
+		printf ("%s: expected 'go' at tail, got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: expected NULL next, got '%s'.\n", test_name,
+				(char *) el->data);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -1820,6 +1964,8 @@ int main()
 	failures += test_clear();
 	failures += test_llist_index_of_f();
 	failures += test_to_array();
+	failures += test_delete_last();
+	failures += test_delete_last_few();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

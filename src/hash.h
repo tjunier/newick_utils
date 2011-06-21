@@ -39,16 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct llist;
 
-struct hash {
-	struct llist **bins;
-	int size;	/* the number of bins */
-	int count;	/* the number of data elements - initially 0 */
-};
+/**  \todo this might be made private. */
 
-// TODO: does this need to be public?
-struct key_val_pair {
-	char *key;
-	void *value;
+/** A simple hash table. The number of bins is fixed at the time the structure
+ * is created. */
+
+struct hash {
+	struct llist **bins;	/**< the bins */
+	int size;	/**< the number of bins */
+	int count;	/**< the number of data elements - initially 0 */
 };
 
 /* Creates a hash with n bins. If memory allocation fails, returns NULL . */

@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include <regex.h>
+#include <stdbool.h>
 
 struct rnode;
 struct llist;
@@ -37,10 +38,15 @@ extern const int DONT_FREE_NODE_DATA;
 
 enum tree_type {TREE_TYPE_UNKNOWN, TREE_TYPE_CLADOGRAM, TREE_TYPE_PHYLOGRAM, TREE_TYPE_NEITHER};
 
+
+/** The struct used for rooted trees. 
+ \todo: would probably be a good idea to make this private and use accessors.
+ */
+
 struct rooted_tree {
-	struct rnode *root;
-	struct llist *nodes_in_order;
-	enum tree_type type;
+	struct rnode *root;		/**< tree's root */
+	struct llist *nodes_in_order;	/**< llist of nodes, in postorder */
+	enum tree_type type;		/**< see enum tree_type */
 };
 
 /* Reroots the tree in such a way that 'outgroup' and descendants are one of
@@ -55,20 +61,14 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
 
 void collapse_pure_clades(struct rooted_tree *tree);
 
-/* Destroys a tree, releasing memory. Node data is freed if 'free_node_data' is
- * true (but any dynamically allocated memory pointed to by node data is NOT
- * freed), so 'free_node_data' should be set to true IFF the data can be
- * free()d directly. Otherwise, it will need to be free()d manually. */
+/* Destroys a tree, releasing memory. Also frees memory held in the tree's
+ * nodes and node list. Each node is freed with destroy_rnode(), which is
+ * passed 'destroyer' as argument. */
+/* NOTE: if the tree's nodes-in-order list is no longer valid (e.g. because the
+ * tree structure has been altered), this function will fail. Instead, call
+ * free_descendants() on the tree's root. */
 
-void destroy_tree(struct rooted_tree *, int free_node_data);
-
-//TODO: replace by this
-
-void destroy_tree_cb(struct rooted_tree *, void (*destroyer)(struct rnode*));
-
-//TODO: ...or even better, by this (but change the name):
-
-void destroy_tree_cb_2(struct rooted_tree *, void (*destroyer)(void *));
+void destroy_tree(struct rooted_tree *, void (*destroyer)(void *));
 
 /* Returns the number of leaves of this tree */
 
@@ -88,7 +88,7 @@ struct llist *get_labels(struct rooted_tree *);
  * Likewise, a tree with all branch lengths set to zero isn't a cladogram
  * either (exactly what it is, I don't know :-) ) */
 
-int is_cladogram(struct rooted_tree *tree);
+bool is_cladogram(struct rooted_tree *tree);
 
 /* Takes a list of labels and returns the corresponding nodes, in the same
  * order */

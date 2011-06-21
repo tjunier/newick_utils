@@ -9,27 +9,27 @@ svg_cldgram_r:-sr catarrhini_wrong.nw
 svlb_r: -s -r -l 'font-size:7' -W 5 -b 'font-size:6' HRV.nw
 svgu: -s -u 'substitutions/site' HRV.nw
 svgac: -sr -w 700 -l 'font-size:8' -i 'font-size:7' -a 0.01 -A -0.02 -c 5NCR.cmap figure_S1a.nw
-svgurl: -s -r -l 'font-size:7pt' -W 3.5 -w 500 -c dg_color.map -U dg_url.map dg_tree.nw
+svgurl: -s -r -b 'visibility:hidden' -l 'font-size:7pt' -W 3.5 -w 500 -c dg_color.map -U dg_url.map dg_tree.nw
 svg_mlbl1: -sr -w 450 -c falc_css.map falc_families.nw
 css_multi: -s -c bacteria_css.map bacteria.nw
 css_multi_def: -s -c bacteria_css.map -d 'stroke:grey' bacteria.nw
-rl: -sr -R 50 -w 500 catarrhini.nw
+rl: -sr -R 50 -w 500 -b 'visibility:hidden' catarrhini.nw
 sbar: -s simiiformes.nw
 multi_svg:-s forest.nw
-cssquot: -sr -w 450 -c quotcss.map catarrhini.nw
+cssquot: -sr -w 450 -c quotcss.map -b 'visibility:hidden' catarrhini.nw
 sS: -sS catarrhini.nw
-srS: -srS catarrhini.nw
+srS: -srS -b 'visibility:hidden' catarrhini.nw
 orn_withxml: -s -b 'visibility:hidden' -o ornament.map catarrhini.nw
-orn_r_withxml: -sr -w 500 -o ornament_r.map catarrhini.nw
+orn_r_withxml: -sr -w 500 -o ornament_r.map -b 'visibility:hidden' catarrhini.nw
 orn_r_img_withxml: -sr -w 500 -o img_r.map pecora.nw
 orn_noxml: -s -b 'visibility:hidden' -o ornament.map catarrhini.nw
 orn_r_noxml: -sr -w 500 -o orn_r_noxml.map catarrhini.nw
 Il: -s -Il -b 'visibility:hidden' simiiformes.nw
 Im: -s -Im -b 'visibility:hidden' simiiformes.nw
 Ir: -s -Ir -b 'visibility:hidden' simiiformes.nw
-Ilr: -sr -Il -b 'visibility:hidden' simiiformes.nw
-Imr: -sr -Im -b 'visibility:hidden' simiiformes.nw
-Irr: -sr -Ir -b 'visibility:hidden' simiiformes.nw
+Ilr: -sr -Il -w 800 -l 'font-size:large' -b 'visibility:hidden' simiiformes.nw
+Imr: -sr -Im -w 800 -l 'font-size:large' -b 'visibility:hidden' simiiformes.nw
+Irr: -sr -Ir -w 800 -l 'font-size:large' -b 'visibility:hidden' simiiformes.nw
 Ilt: -Il -b 'visibility:hidden' simiiformes.nw
 Irt: -Ir -b 'visibility:hidden' simiiformes.nw
 tnobar: -S catarrhini.nw

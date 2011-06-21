@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "common.h"
 #include "list.h"
@@ -45,11 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "svg_graph_common.h"
 #include "error.h"
 
-// TODO: switch the logical ints to bools (stdbool.h)
-
 struct parameters {
 	int 	width;
-	int 	svg;
+	bool 	svg;
 	FILE 	*css_map;	
 	FILE 	*url_map;
 	FILE 	*ornament_map;			/* SVG */
@@ -58,13 +57,13 @@ struct parameters {
 	char 	*edge_label_style;		/* CSS */
 	char 	*plain_node_style;		/* CSS */
 	double 	leaf_vskip;
-	int 	svg_style;			/* radial or orthogonal */
+	enum 	graph_style style;		/* radial or orthogonal */
 	char 	*branch_length_unit;
 	double 	label_angle_correction;
 	double 	left_label_angle_correction;
 	int 	root_length;
 	double 	label_char_width;	/* for estimating label length */
-	int 	no_scale_bar;		/* suppresses scale bar if true */
+	bool 	no_scale_bar;		/* suppresses scale bar if true */
 	enum 	inner_lbl_pos inner_label_pos;	/* where to put the label */
 	bool	scale_zero_at_root;	/* if false, at max depth */
 	int	label_space_correction;	/* between a node and its label */
@@ -235,7 +234,7 @@ enum inner_lbl_pos get_inner_label_pos(char *optarg)
 		case 'r':
 			return INNER_LBL_ROOT;
 	}
-	return -1;	// TODO: handle invalid chars
+	return -1;
 }
 
 struct parameters get_params(int argc, char *argv[])
@@ -243,7 +242,7 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	params.width =	-1;
-	params.svg = FALSE;
+	params.svg = false;
 	params.css_map = NULL;
 	params.ornament_map = NULL;
 	params.url_map = NULL;
@@ -252,13 +251,13 @@ struct parameters get_params(int argc, char *argv[])
 	params.edge_label_style = "font-size:small;font-family:sans";
 	params.plain_node_style = NULL;	/* svg_graph.c has default */
 	params.leaf_vskip = 40.0;
-	params.svg_style = SVG_ORTHOGONAL;
+	params.style = SVG_ORTHOGONAL;
 	params.branch_length_unit = "substitutions/site";
 	params.label_angle_correction = 0.0;
 	params.left_label_angle_correction = 0.0;
 	params.root_length = ROOT_SPACE;
 	params.label_char_width = 8.0;
-	params.no_scale_bar = FALSE;
+	params.no_scale_bar = false;
 	params.inner_label_pos = INNER_LBL_LEAVES;
 	params.scale_zero_at_root = true;
 	params.label_space_correction = 0;	/* px */
@@ -266,6 +265,7 @@ struct parameters get_params(int argc, char *argv[])
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
 	const int DEFAULT_WIDTH_CHARS = 80;
+	int pos;
 	
 	/* parse options and switches */
 	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:n:o:rR:sStu:U:v:w:W:")) != -1) {
@@ -295,7 +295,12 @@ struct parameters get_params(int argc, char *argv[])
 			params.inner_label_style = optarg;
 			break;
 		case 'I':
-			params.inner_label_pos = get_inner_label_pos(optarg);
+			pos = get_inner_label_pos(optarg);
+			if (pos < 0)
+				fprintf(stderr, "WARNING: invalid arg '%s' "
+					"to -I - using default.\n", optarg);
+			else
+				params.inner_label_pos = pos;
 			break;
 		case 'l':
 			params.leaf_label_style = optarg;
@@ -310,16 +315,16 @@ struct parameters get_params(int argc, char *argv[])
 			params.label_space_correction = atoi(optarg);
 			break;
 		case 'r':
-			params.svg_style = SVG_RADIAL;
+			params.style = SVG_RADIAL;
 			break;
 		case 'R':
 			params.root_length = atoi(optarg);
 			break;
 		case 's':
-			params.svg = TRUE;
+			params.svg = true;
 			break;
 		case 'S':
-			params.no_scale_bar = TRUE;
+			params.no_scale_bar = true;
 			break;
 		case 't':
 			params.scale_zero_at_root = false;
@@ -391,29 +396,22 @@ struct parameters get_params(int argc, char *argv[])
 
 void set_svg_parameters(struct parameters params)
 {
-	set_svg_width(params.width);
-	set_svg_leaf_vskip(params.leaf_vskip);
-	// TODO: not sure if this should be parameterized. If so, add an
-	// option; if not, use a constant and get rid of the setter.
-	set_svg_whole_v_shift(20);	/* pixels */
-	set_svg_label_angle_correction(params.label_angle_correction);
-	set_svg_left_label_angle_correction(params.left_label_angle_correction);
-	// TODO: this is not really an SVG param, it should be passed as an
-	// argument to display_svg_tree()
-	set_svg_style(params.svg_style);	/* radial vs orthogonal */
-	set_svg_URL_map_file(params.url_map);
-	// TODO: refer to this as "clade CSS", as opposed to node label CSS
-	set_svg_CSS_map_file(params.css_map);
-	set_svg_ornament_map_file(params.ornament_map);
-	set_svg_leaf_label_style(params.leaf_label_style);
-	set_svg_inner_label_style(params.inner_label_style);
-	set_svg_inner_label_pos(params.inner_label_pos);
-	set_svg_edge_label_style(params.edge_label_style);
-	set_svg_plain_node_style(params.plain_node_style);
-	set_svg_root_length(params.root_length);
-	set_svg_label_char_width(params.label_char_width);
-	set_svg_scalebar_zero_at_root(params.scale_zero_at_root);
-	add_to_svg_label_space(params.label_space_correction);
+	set_width(params.width);
+	set_leaf_vskip(params.leaf_vskip);
+	set_label_angle_correction(params.label_angle_correction);
+	set_left_label_angle_correction(params.left_label_angle_correction);
+	set_URL_map_file(params.url_map);
+	set_clade_CSS_map_file(params.css_map);
+	set_ornament_map_file(params.ornament_map);
+	set_leaf_label_style(params.leaf_label_style);
+	set_inner_label_style(params.inner_label_style);
+	set_inner_label_pos(params.inner_label_pos);
+	set_edge_label_style(params.edge_label_style);
+	set_plain_node_style(params.plain_node_style);
+	set_root_length(params.root_length);
+	set_label_char_width(params.label_char_width);
+	set_scalebar_zero_at_root(params.scale_zero_at_root);
+	add_to_label_space(params.label_space_correction);
 }
 
 /* Prints an XML comment containing the command line parameters, so that the
@@ -436,10 +434,11 @@ int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;
 	struct parameters params;
-	int align_leaves;
-	int with_scale_bar;
+	bool align_leaves;
+	bool with_scale_bar;
 	enum display_status status; 
-	void (*node_destroyer)(struct rnode *) = NULL;
+	/* Stays NULL for text, but not for SVG */
+	void (*node_destroyer)(void *) = NULL;
 
 	params = get_params(argc, argv);
 
@@ -459,12 +458,12 @@ int main(int argc, char *argv[])
 		 * up  'align_leaves' which has the same value. */
 		with_scale_bar = !align_leaves;
 		/* User can also suppress scale bar */
-		if (params.no_scale_bar) with_scale_bar = FALSE;
+		if (params.no_scale_bar) with_scale_bar = false;
 
 		if (params.svg) {
-			svg_header(leaf_count(tree), with_scale_bar);
+			svg_header(leaf_count(tree), with_scale_bar, params.style);
 			svg_run_params_comment(argc, argv);
-			status = display_svg_tree(tree,
+			status = display_svg_tree(tree, params.style,
 					align_leaves, with_scale_bar,
 					params.branch_length_unit);
 			switch(status) {
@@ -501,7 +500,7 @@ int main(int argc, char *argv[])
 					assert(0);
 			}
 		}
-		destroy_tree_cb(tree, node_destroyer);
+		destroy_tree(tree, node_destroyer);
 	}
 
 	return 0;

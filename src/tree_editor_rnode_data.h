@@ -28,7 +28,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/** \file
+ * Data structure for \c nw_ed.
+ * \deprecated - see \c nw_sched */
+
 #include <stdbool.h>
+
+/** \cond -- this is obsolete, so don't show. */
 
 /* This is a structure that can hold many node properties. It is used e.g. in
  * the tree editor, when the properties that will actually be used are not known
@@ -42,10 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * (like NJ) may produce negative lengths. */
 
 struct rnode_data {
-	float support;	/* normally derived from label */
-	float depth;	/* from root; normally root's depth == 0 */
-	bool  is_depth_defined;	/* false if depth is undefined */
-	int nb_ancestors;	/* root has 0 */
-	int nb_descendants;	/* direct (children) and indirect */
-	int stop_mark;	/* to stop processing of a clade, see option -o */
+	float support;		/**< normally derived from label */
+	float depth;		/**< from root; normally root's depth == 0 */
+	bool is_depth_defined;	/**< false if depth is undefined */
+	int nb_ancestors;	/**< root has 0 */
+	int nb_descendants;	/**< direct (children) and indirect */
+	bool stop_mark;		/**< to stop processing of a clade, see option -o */
 };
+
+/** \endcond */

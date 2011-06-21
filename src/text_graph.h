@@ -27,15 +27,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+/** \file
+ * functions for displaying a text (ASCII) tree graph.
+ */
+
 #include <stdbool.h>
 
 struct rooted_tree;
 enum inner_lbl_pos;
 
-/* Dumps a tree to stdout, as a text graph. 'width' is the width of the output
- * line, in characters. If 'align_leaves' is true, the leaves will be aligned
- * (surprise!) - useful for cladograms.  */
+/** Dumps a tree to stdout, as a text graph.
+ * \arg \c tree the tree to dump
+ * \arg \c width the maximum width (in columns, 80 is typical for a tty)
+ * \arg \c align_leaves whether to align the leaves (cladograms)
+ * \arg \c lbl_pos position of inner labels 
+ * \arg \c with_scalebar whether or not to print a scale bar
+ * \arg \c units scale bar units (only meaningful if \c with_scalebar is true)
+ * \arg \c scale_zero_at_root zero is at the leaves (which should be aligned, useful e.g. for paleontological trees where 0 is present and time is in million years)
+ * \return a display_status
+ */
 
-enum display_status display_tree(struct rooted_tree *,
-		int width, int align_leaves, enum inner_lbl_pos,
+enum display_status display_tree(struct rooted_tree *tree,
+		int width, bool align_leaves, enum inner_lbl_pos lbl_pos,
 		bool with_scalebar, char *units, bool scale_zero_at_root);

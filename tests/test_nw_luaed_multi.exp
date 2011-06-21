@@ -1,0 +1,6 @@
+Papio:10;
+Macaca:10;
+(Pan:10,Homo:10)Hominini:10;
+Gorilla:16;
+(Hylobates,(((Cercopithecus,(Macaca,Papio)),Simias),Cebus));
+Pongo;

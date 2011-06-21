@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "enode.h"
 #include "rnode.h"
@@ -41,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "parser.h"
 #include "to_newick.h"
 #include "address_parser.h"
+#include "address_parser_status.h"
 #include "tree_editor_rnode_data.h"
 #include "common.h"
 
@@ -58,9 +60,9 @@ struct enode *expression_root;
 struct parameters {
 	char * address;
 	int action;
-	int show_tree;
+	bool show_tree;
 	int order;
-	int stop_clade_at_first_match;
+	bool stop_clade_at_first_match;
 };
 
 void help(char *argv[])
@@ -215,9 +217,9 @@ struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
-	params.show_tree = TRUE;
+	params.show_tree = true;
 	params.order = POST_ORDER;
-	params.stop_clade_at_first_match = FALSE;
+	params.stop_clade_at_first_match = false;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "hnor")) != -1) {
@@ -226,10 +228,10 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'n':
-			params.show_tree = FALSE;
+			params.show_tree = false;
 			break;
 		case 'o':
-			params.stop_clade_at_first_match = TRUE;
+			params.stop_clade_at_first_match = true;
 			params.order = PRE_ORDER;
 			break;
 		case 'r':
@@ -284,13 +286,11 @@ struct parameters get_params(int argc, char *argv[])
 
 int get_nb_descendants(struct rnode *node)
 {
-	struct list_elem *e;
 	struct rnode *kid;
 	struct rnode_data *rndata;
 	int descendants = 0;
 
-	for (e = node->children->head; NULL != e; e = e->next) {
-		kid = e->data;
+	for (kid = node->first_child; NULL != kid; kid = kid->next_sibling) {
 		rndata = kid->data;
 		descendants += rndata->nb_descendants;
 		descendants += 1;	/* kid itself (no pun intended :-) ) */
@@ -319,7 +319,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 	if (NULL == rndata) { perror(NULL); exit (EXIT_FAILURE); }
 	rndata->nb_ancestors = 0;
 	rndata->depth = 0;
-	rndata->stop_mark = FALSE;
+	rndata->stop_mark = false;
 	node->data = rndata;
 
 	/* WARNING: don't forget to set values for the root's data, above. The
@@ -334,7 +334,7 @@ void reverse_parse_order_traversal(struct rooted_tree *tree)
 		rndata->depth = parent_data->depth +
 			atof(node->edge_length_as_string);
 
-		rndata->stop_mark = FALSE;
+		rndata->stop_mark = false;
 		node->data = rndata;
 	}
 
@@ -364,7 +364,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct llist *nodes;
 	struct list_elem *el;
 	enum unlink_rnode_status result;
-	char *newick;
+	struct rnode *root_child;
 
 	/* these two traversals fill the node data. */
 	reverse_parse_order_traversal(tree);
@@ -389,7 +389,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			if (((struct rnode_data *) current->parent->data)->stop_mark) {
 				/* Stop-mark the current node and continue */ 
 				((struct rnode_data *)
-				current->data)->stop_mark = TRUE;
+				current->data)->stop_mark = true;
 				continue;
 			}
 		} 
@@ -401,10 +401,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		if (eval_enode(expression_root)) {
 			switch (params.action) {
 			case ACTION_SUBTREE:
-				// TODO: try to replace by dump_newick()
-				newick = to_newick(current);
-				printf("%s\n", newick);
-				free(newick);
+				dump_newick(current);
 				break;
 			case ACTION_SPLICE_OUT:
 				if (is_inner_node(current)) {
@@ -427,8 +424,10 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				case UNLINK_RNODE_DONE:
 					break;
 				case UNLINK_RNODE_ROOT_CHILD:
-					unlink_rnode_root_child->parent = NULL;
-					tree->root = unlink_rnode_root_child;
+					root_child =
+						get_unlink_rnode_root_child();
+					root_child->parent = NULL;
+					tree->root = root_child;
 					break;
 				case UNLINK_RNODE_ERROR:
 					fprintf (stderr, "Memory error - "
@@ -450,7 +449,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			 * since this node matches -  we set the stop mark on
 			 * this node */
 			if (params.stop_clade_at_first_match)
-				((struct rnode_data *) current->data)->stop_mark = TRUE;
+				((struct rnode_data *) current->data)->stop_mark = true;
 		} /* matching node */	
 	}
 
@@ -466,11 +465,21 @@ int main(int argc, char* argv[])
 	struct rooted_tree *tree;
 
 	address_scanner_set_input(params.address);
-	// TODO: have adsparse() set an error code to distinguish the various
-	// causes of NULL (e.g., syntax error and memory error)
 	adsparse(); /* sets 'expression_root' */ 
 	if (NULL == expression_root) {
-		fprintf (stderr, "Could not parse address.\n");
+		switch (address_parser_status) {
+			/* NOTE: for now the parser does not report parse
+			 * errors, but when (or if...) it does, it will use
+			 * this constant. */
+		case ADDRESS_PARSER_PARSE_ERROR:
+			fprintf (stderr, "Could not parse address.\n");
+			break;
+		case ADDRESS_PARSER_MALLOC_ERROR:
+			perror(NULL);
+			break;
+		default:
+			assert(0);	/* programmer error */
+		}
 		exit(EXIT_FAILURE);
 	}
 	address_scanner_clear_input();
@@ -480,7 +489,7 @@ int main(int argc, char* argv[])
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
-		destroy_tree(tree, FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	return 0;

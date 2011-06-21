@@ -33,28 +33,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <assert.h>
 
-// TODO: Check this!
-#ifndef RNODE_DEF
 #include "rnode.h"
-#endif
-
 #include "list.h"
 #include "link.h"
 #include "masprintf.h"
 #include "common.h"
 
-struct rnode *unlink_rnode_root_child;
+/* Avoid global variables by making external vars static and using a getter. */
 
-int add_child(struct rnode *parent, struct rnode *child)
+static struct rnode *unlink_rnode_root_child;
+
+struct rnode *get_unlink_rnode_root_child()
 {
-	struct llist *children_list;
+	return unlink_rnode_root_child;
+}
+
+void add_child(struct rnode *parent, struct rnode *child)
+{
 	child->parent = parent;
 
-	children_list = parent->children;
-	if (! append_element(children_list, child))
-		return FAILURE;
+	if (0 == parent->child_count)
+		parent->first_child = child;
+	else
+		parent->last_child->next_sibling = child;
 
-	return SUCCESS;
+	parent->child_count++;
+	parent->last_child = child;
 }
 
 /* Returns half the length passed as a parameter (as char *), or "". */
@@ -91,30 +95,43 @@ int insert_node_above(struct rnode *this, char *label)
 	/* create new node */
 	new = create_rnode(label, new_edge_length);
 	if (NULL == new) return FAILURE;
-	/* link new node to this node */
-	if (! add_child(new, this)) return FAILURE;
 	free(this->edge_length_as_string);
 	this->edge_length_as_string = strdup(new_edge_length);
-	replace_child(parent, this, new);
+	replace_child(this, new);
+	this->next_sibling = NULL;
+	/* link new node to this node */
+	add_child(new, this);
 
 	free(new_edge_length);
 
 	return SUCCESS;
 }
 	
-void replace_child (struct rnode *node, struct rnode *old, struct rnode *new)
+void replace_child (struct rnode *old, struct rnode *new)
 {
-	struct list_elem *el;
+	/* To replace the old rnode by the new one, we need a pointer to the
+	 * node _before_ the old node (so as to be able to change its
+	 * next_sibling member). We therefore start "ahead" of the list, using
+	 * a dummy first child. */
 
-	for (el = node->children->head; NULL != el; el = el->next) { 
-		if (el->data == old) {
-			el->data = new;
-			new->parent = node; /* only if old was found... */
-			return;
-		}
-	}
+	struct rnode dummy_first;	/* NOT a pointer! */
+	struct rnode *current;
+	struct rnode *dad = old->parent;
 
-	/* not found - do nothing */
+	dummy_first.next_sibling = dad->first_child;
+
+	for (current = &dummy_first; NULL != current->next_sibling;
+			current = current->next_sibling) 
+		if (current->next_sibling == old) 
+			break;
+
+	current->next_sibling = new;
+	new->next_sibling = old->next_sibling; 
+	if (dad->first_child == old) 
+		dad->first_child = new;
+	if (dad->last_child == old)
+		dad->last_child = new;
+	new->parent = dad;
 }
 
 char *add_len_strings(char *ls1, char *ls2)
@@ -142,36 +159,46 @@ char *add_len_strings(char *ls1, char *ls2)
 
 int splice_out_rnode(struct rnode *this)
 {
+	struct rnode dummy_head;	/* see [where?] */
 	struct rnode *parent = this->parent;
-	struct list_elem *elem;
+	struct rnode *current_child, *current_sibling;
 
 	/* change the children's parent edges: they must now point to their
 	 * 'grandparent', and the length from their parent to their grandparent
 	 * must be added. */
-	for (elem = this->children->head; NULL != elem; elem = elem->next) {
-		struct rnode *child = elem->data;
+	for (current_child = this->first_child; NULL != current_child;
+			current_child = current_child->next_sibling) {
 		char *new_edge_len_s = add_len_strings(
 			this->edge_length_as_string,
-			child->edge_length_as_string);
+			current_child->edge_length_as_string);
 		if (NULL == new_edge_len_s) return FAILURE;
-		free(child->edge_length_as_string);
-		child->edge_length_as_string = new_edge_len_s;
-		child->parent = parent;  /* instead of this node */
+		free(current_child->edge_length_as_string);
+		current_child->edge_length_as_string = new_edge_len_s;
+		current_child->parent = parent;  /* instead of this node */
 	}
-	struct llist *kids_copy = shallow_copy(this->children);
-	if (NULL == kids_copy) return FAILURE;
 
-	/* find where this node's parent edge is in parent */
-	int i = llist_index_of(parent->children, this);
+	/* Insert this node's children in place of itself among its parent's
+	 * children */
+	dummy_head.next_sibling = parent->first_child;
+	for (current_sibling = &dummy_head;
+			NULL != current_sibling->next_sibling;
+			current_sibling = current_sibling->next_sibling) {
 
-	/* delete old edge from parent's children list */
-	struct llist *del = delete_after(parent->children, i-1, 1);
-	if (NULL == del) return FAILURE;
-	destroy_llist(del);
+		if (current_sibling->next_sibling == this) {
+			current_sibling->next_sibling = this->first_child;
+			this->last_child->next_sibling = this->next_sibling;
+			break;
+		}
+	}
 
-	/* insert list of modified edges in parent's children list */
-	insert_after(parent->children, i-1, kids_copy);
-	free(kids_copy);
+	/* Update prent's first_child and last_child pointers, if needed */
+	if (parent->first_child == this)
+		parent->first_child = this->first_child;
+	if (parent->last_child == this)
+		parent->last_child = this->last_child;
+
+	/* Update parent's children count */
+	parent->child_count += this->child_count - 1;
 
 	return SUCCESS;
 }
@@ -181,31 +208,69 @@ int remove_child(struct rnode *child)
 	if (is_root(child)) return RM_CHILD_IS_ROOT;;
 
 	struct rnode *parent = child->parent;
-	struct llist *kids = parent->children;
-	int n = llist_index_of(kids, child);
-	assert(n >= 0);
-	struct llist *deleted = delete_after(kids, n-1, 1);
-	if (NULL == deleted) return RM_CHILD_MEM_ERROR;
-	child->parent = NULL;
-	destroy_llist(deleted);
+	struct rnode dummy_head;
+	struct rnode *previous;
+	int n;
 
-	return n;
+	child->parent = NULL;
+
+	/* Easy special case: parent has exactly one child. */
+	if (1 == parent->child_count) {
+		parent->first_child = NULL;
+		parent->last_child = NULL;
+		parent->child_count = 0;
+		return 0;
+	}
+
+	/* Find node previous to child */
+	dummy_head.next_sibling = parent->first_child;
+	for (n = 0, previous = &dummy_head;
+		NULL != previous->next_sibling;
+		n++, previous = previous->next_sibling) 
+		if (previous->next_sibling == child) 
+			break;
+	
+	/* Update parent's first_child and last_child, if needed. */
+	if (parent->first_child == child)
+		parent->first_child = child->next_sibling;
+	if (parent->last_child == previous->next_sibling)
+			parent->last_child = previous;
+
+	/* Skip 'child', effectively removing if from children list */
+	previous->next_sibling = previous->next_sibling->next_sibling;
+
+	parent->child_count --;
+	return n;	
 }
 
-// TODO: is this f() ever used?
-int insert_child(struct rnode *parent, struct rnode *child, int index)
+int insert_child(struct rnode *parent, struct rnode *insert, int index)
 {
-	struct llist *kids = parent->children;
-	struct llist *insert = create_llist();
-	if (NULL == insert) return FAILURE;
-	if (! append_element(insert, child)) return FAILURE;
-	insert_after(kids, index-1, insert);
-	child->parent = parent;
+	struct rnode dummy_head, *current;
+	int n;
+
+	if (index < 0 || index > parent->child_count)
+		return FAILURE;	/* invalid index */
+
+	/* Find node just before insertion point */
+	dummy_head.next_sibling = parent->first_child;
+	for (	current = &dummy_head, n = index; 
+		n > 0;
+		current = current->next_sibling, n--);
+
+	/* current is now the node before the insertion point */
+	insert->next_sibling = current->next_sibling;
+	current->next_sibling = insert;
+	insert->parent = parent;
+
+	/* Update parent's child pointers */
+	if (0 == index)
+		parent->first_child = insert;
+	if (parent->child_count == index)
+		parent->last_child = insert;
 
 	return SUCCESS;
 }
 
-// TODO: return value should differentiate between mem error and child-is-root
 int swap_nodes(struct rnode *node)
 {
 	assert(NULL != node->parent);
@@ -214,7 +279,7 @@ int swap_nodes(struct rnode *node)
 	struct rnode *parent = node->parent;
 	char *length = strdup(node->edge_length_as_string);
 	if(remove_child(node) < 0) return FAILURE;
-	if (! add_child(node, parent)) return FAILURE;
+	add_child(node, parent);
 
 	free(node->edge_length_as_string);
 	node->edge_length_as_string = strdup("");
@@ -227,21 +292,16 @@ int swap_nodes(struct rnode *node)
 int unlink_rnode(struct rnode *node)
 {
 	struct rnode *parent = node->parent;
-	struct llist *siblings = parent->children; 	/* includes 'node'! */
-	int index = llist_index_of(siblings, node);
-	/* This removes this node from its parent's list of children.  We get
-	 * the resulting list only so we can free it. */
-	struct llist *del = delete_after(siblings, index-1, 1);
-	if (NULL == del) return UNLINK_RNODE_ERROR;
-	destroy_llist(del);	
+	/* Remove this node from its parent's list of children.  */
+	remove_child(node);
 
 	/* If deleting this node results in the parent having only one child,
 	 * we splice the parent out (unless it's the root, in which case we
 	 * return its first child) */
-	if (1 == siblings->count) {
+	unlink_rnode_root_child = NULL;
+	if (1 == parent->child_count) {
 		if (is_root(parent)) {
-			unlink_rnode_root_child = 
-				(struct rnode *) siblings->head->data;
+			unlink_rnode_root_child = parent->first_child;
 			return UNLINK_RNODE_ROOT_CHILD;
 		}
 		else {
@@ -256,19 +316,24 @@ int unlink_rnode(struct rnode *node)
 
 struct llist *siblings(struct rnode *node)
 {
-	struct rnode *sib;
+	struct rnode *sib, *parent;
 	struct llist *result = create_llist();
 	if (NULL == result) return NULL;
-	struct list_elem *elem;
 
 	if (is_root(node)) return result;
 
-	for (elem = node->parent->children->head; NULL != elem; elem = elem->next) {
-		sib = (struct rnode *) elem->data;
+	parent = node->parent;
+	for (sib = parent->first_child; NULL != sib; sib = sib->next_sibling)
 		if (sib != node)
 			if (! append_element(result, sib))
 				return NULL;
-	}
 
 	return result;
+}
+
+void remove_children(struct rnode *node)
+{
+	node->first_child = NULL;
+	node->last_child = NULL;
+	node->child_count = 0;
 }

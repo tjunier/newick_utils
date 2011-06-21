@@ -66,19 +66,3 @@ char * masprintf(const char *fmt, ...)
 		   }
 	}
 }
-
-// TODO: is this f() ever used?
-char * mastrcat(char *dest, const char *src)
-{
-	size_t dest_len = strlen(dest);
-	size_t src_len = strlen(src);
-	
-	/* 'dest' MUST have been allocated by malloc() etc */
-	char * result = realloc(dest, dest_len + src_len + 1);
-	if (NULL == result) return NULL;
-
-	strncpy(result + dest_len, src, src_len + 1);
-
-	return result;
-}
-

@@ -140,7 +140,7 @@ struct parameters get_params(int argc, char *argv[])
 
 	/* check arguments */
 	int nargs = argc - optind; /* non-option arguments */
-	int args_ok = true;
+	bool args_ok = true;
 	switch (nargs) {
 	case 0:
 		args_ok = false;
@@ -215,9 +215,7 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 
 int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 {
-	struct rnode *outgroup_root;
-
-	outgroup_root = lca(tree, outgroup_nodes);
+	struct rnode *outgroup_root = lca_from_nodes(tree, outgroup_nodes);
 	if (NULL == outgroup_root) { perror(NULL); exit(EXIT_FAILURE); }
 
 	if (tree->root == outgroup_root) {
@@ -237,18 +235,18 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 
 enum deroot_status deroot(struct rooted_tree *tree)
 {
-	if (2 != tree->root->children->count)
+	if (2 != tree->root->child_count)
 		return NOT_BIFURCATING;
-	struct rnode *left_kid = tree->root->children->head->data;
-	struct rnode *right_kid = tree->root->children->tail->data;
+	struct rnode *left_kid = tree->root->first_child;
+	struct rnode *right_kid = tree->root->last_child;
 	/* We splice out the left or right kid of the root, and also free() it. */
-	if (left_kid->children->count < right_kid->children->count) {
+	if (left_kid->child_count < right_kid->child_count) {
 		if (! splice_out_rnode(right_kid)) {
 			perror(NULL); exit(EXIT_FAILURE);
 		}
 		// destroy_rnode(right_kid, NULL);
 	}
-	else if (left_kid->children->count > right_kid->children->count) {
+	else if (left_kid->child_count > right_kid->child_count) {
 		if (! splice_out_rnode(left_kid)) {
 			perror(NULL); exit(EXIT_FAILURE);
 		}
@@ -263,7 +261,7 @@ enum deroot_status deroot(struct rooted_tree *tree)
 /* Returns true IFF arguments (cast to char*) are equal - IOW, the negation
  * of strcmp(). See llist_index_of() in list.h */
 
-int string_eq(void *list_data, void *target)
+bool string_eq(void *list_data, void *target)
 {
 	return (strcmp((char *) list_data, (char *) target) == 0);
 }
@@ -276,35 +274,54 @@ struct llist *get_ingroup_leaves(struct rooted_tree *tree,
 {
 	struct llist *result = create_llist();
 	if (NULL == result) { perror(NULL); exit(EXIT_FAILURE); }
+	struct hash *excluded_lbl_hash = create_hash(excluded_labels->count);
+	if (NULL == excluded_lbl_hash) { perror(NULL); exit(EXIT_FAILURE); }
 	struct list_elem *el;
 
+	/* Make a hash with all excluded labels. */
+	for (el = excluded_labels->head; NULL != el; el = el->next)  {
+		if (! hash_set(excluded_lbl_hash, 
+					(char *) el->data,
+					(void *) "member")) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+	}
+
 	/* add nodes to result iff i) node is a leaf, ii) node's label is not
-	 * among 'excluded_labels' */ 
+	 * among 'excluded_lbl_hash' */ 
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = (struct rnode *) el->data;
 		if (is_leaf(current)) {
-			/* Can't use llist_index_of(), because it compares the
-			 * addresses of the 'data' members of elements. Instead
-			 * we must check string equality, which is why we use
-			 * llist_index_of_f(), and pass it string_eq(). */
-			if (llist_index_of_f(excluded_labels, string_eq,
-						current->label) == -1) 
+			bool add = false;
+			if (strcmp ("", current->label) == 0)
+				add = true;	
+			else  {
+				if (NULL == hash_get(excluded_lbl_hash,
+						current->label))
+					add = true;
+			}
+			if (add) {
 				if (! append_element(result, current)) {
 					perror(NULL);
 					exit(EXIT_FAILURE);
 				}
+			}
 			
 		}
 	}
 
+	destroy_hash(excluded_lbl_hash);
 	return result;
 }
 
 void try_ingroup(struct rooted_tree *tree, struct parameters params)
 {
 	/* we will try to insert the root above the ingroup - for this we'll
-	 * need all leaves that are NOT in the outgroup. */
-	// TODO: why just leaves?
+	 * need all leaves that are NOT in the outgroup. We don't need the
+	 * inner nodes, though, since tha leaves are sufficient for determining
+	 * the ingroup's LCA. This also works if some leaf labels are empty
+	 * (see test case 'nolbl_ingrp' in test_nw_reroot_args) */
 	struct llist *ingroup_leaves;
 	ingroup_leaves = get_ingroup_leaves(tree, params.labels);
 	enum reroot_status result = reroot(tree, ingroup_leaves);
@@ -347,7 +364,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		default:
 			assert(0);
 		}
-		destroy_tree_cb(tree, NULL);
+		destroy_tree(tree, NULL);
 	} else {
 		enum deroot_status result = deroot(tree);
 		switch (result) {
@@ -367,7 +384,7 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		default:
 			assert(0);
 		}
-		destroy_tree_cb(tree, NULL);
+		destroy_tree(tree, NULL);
 	}
 	destroy_llist(outgroup_nodes);
 }
@@ -380,8 +397,8 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 	while (NULL != (tree = parse_tree())) {
 		/* tree is free()d in process_tree(), as derooting is
-		 * compatible with ordinary free()ing (with destroy_tree()),
-		 * but rerooting is not. */
+		 * compatible with ordinary free()ing (with
+		 * destroy_tree()), but rerooting is not. */
 		process_tree(tree, params);
 	}
 

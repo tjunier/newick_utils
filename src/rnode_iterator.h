@@ -29,12 +29,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /* The functions in this module provide an iterator interface on a node and its
- * descendents, allowing traversal. The low-level rnode_iterator and functions
- * that call it directly (such as rnode_iterator_next()) visit the tree by
- * following edges (depth first, and visiting each child node in order). All
- * nodes except leaves are thus visited more than once. Higher-level functions
- * (like get_nodes_in_order()) can discard already-visited nodes and produce
- * e.g. post-order traversals, etc. */
+ * descendents, allowing iterative traversal. The low-level rnode_iterator and
+ * functions that call it directly (such as rnode_iterator_next()) visit the
+ * tree by following edges (depth first, and visiting each child node in
+ * order). All nodes except leaves are thus visited more than once.
+ * Higher-level functions (like get_nodes_in_order()) can discard
+ * already-visited nodes and produce e.g. post-order traversals, etc. */
 
 /* In general, there is no need to use these functions because most operations
  * can be done using a tree's 'nodes_in_order' list. Looping on this list will
@@ -49,23 +49,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
+/* The iterator relies on members 'seen' and 'current_child' of struct rnode.
+ * This avoids the need for the iterator itself to keep track of the nodes it
+ * has already seen, but of course it also means that at any given time only
+ * one iterator can be traversing any clade. This seems not to be a problem,
+ * and it is much faster (the first version of rnode_iterator kept track of
+ * seen nodes with a hash table, and it was significantly slower. */
+
 #include <stdbool.h>
 
 struct rnode;
 struct llist;
 struct rooted_tree;
 
-struct rnode_iterator
-{
-	struct rnode *root;	/* starting point */
-	struct rnode *current;
-};
-
+struct rnode_iterator;
 
 /* Creates an iterator. You can then pass it to the functions below. */
-/* Returns NULL in case of problems (which will be with allocation) */
+/* Returns NULL in case of problems (which will be with allocation). Do NOT use
+ * more than one iterator simultaneously on the same tree/subtree (see above).
+ * */
 
 struct rnode_iterator *create_rnode_iterator(struct rnode *root);
+
+/** Gets the iterators's root 
+ *
+ * \param it the iterator
+ * \return its root
+ */
+
+struct rnode *get_rnode_iterator_root(struct rnode_iterator*);
 
 /* Destroys the iterator, freeing allocated memory */
 
@@ -80,23 +92,3 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *);
 /* Returns true IFF there are more children to visit on the current node. */
 
 bool more_children_to_visit (struct rnode_iterator *);
-
-/* TODO: these are client functions, they may belong elsewhere */
-
-/* Returns the list of nodes that descend from the argument node, in parse
- * order. Together with the argument node, this can be used to create a struct
- * rooted_tree. */
-/* Returns NULL in case of malloc() problems. */
-
-struct llist *get_nodes_in_order(struct rnode *);
-
-/* Returns a label->rnode map of all leaves that descend from 'root' */
-/* Returns NULL in case of malloc() problems. */
-
-struct hash *get_leaf_label_map_from_node(struct rnode *root);
-
-/* Resets all 'current_child_elem' pointers in 'tree's nodes to NULL. */
-// TODO: now that rnode_iterator_next() resets the nodes' current_child_elem
-// after exiting to the parent, we probably don't need this f() anymore. Check.
-
-void reset_current_child_elem (struct rooted_tree *tree);

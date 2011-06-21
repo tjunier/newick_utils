@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /* Functions for creating and searching label->node maps */
 
+struct rnode;
 struct hash;
 struct llist;
 
@@ -53,3 +54,8 @@ struct hash *create_label2node_list_map(const struct llist *);
  * create_label2node_list_map() */
 
 void destroy_label2node_list_map(struct hash *);
+
+/* Returns a label->rnode map of all leaves that descend from 'root' */
+/* Returns NULL in case of malloc() problems. */
+
+struct hash *get_leaf_label_map_from_node(struct rnode *root);

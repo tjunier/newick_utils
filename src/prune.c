@@ -173,12 +173,14 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 		if (NULL == goner->parent)
 			continue;
 		enum unlink_rnode_status result = unlink_rnode(goner);
+		struct rnode *root_child;
 		switch(result) {
 		case UNLINK_RNODE_DONE:
 			break;
 		case UNLINK_RNODE_ROOT_CHILD:
-			unlink_rnode_root_child->parent = NULL;
-			tree->root = unlink_rnode_root_child;
+			root_child = get_unlink_rnode_root_child();
+			root_child->parent = NULL;
+			tree->root = root_child;
 			break;
 		case UNLINK_RNODE_ERROR:
 			fprintf (stderr, "Memory error - exiting.\n");
@@ -192,8 +194,7 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 }
 
 /* Produces a new list with all labels in the tree that are NOT in 'labels'. */
-// TODO: should in fact implement a Complement function for lists (preserving order
-// in at least one of the lists)
+
 struct llist *reverse_labels(struct rooted_tree *tree, struct llist *labels)
 {
 	struct llist *rev_labels = create_llist();
@@ -252,9 +253,9 @@ int main(int argc, char *argv[])
 			process_tree(tree, params.labels);
 		}
 		dump_newick(tree->root);
-		/* NOTE: the tree was modified, but no nodes were added so it
-		 * should be possible to use destroy_tree() */
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+		/* NOTE: the tree was modified, but no nodes were added so 
+		 * we can use destroy_tree() */
+		destroy_tree(tree, NULL);
 	}
 
 	destroy_llist(params.labels);

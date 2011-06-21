@@ -40,9 +40,7 @@ struct llist *nodes_in_order;
 struct rnode *root;
 enum parser_status_type newick_parser_status;
 
-int nwsparse(); // TODO: rm this if fails
-
-// TODO: use this f() in the apps' get_param() 
+int nwsparse(); 
 
 int set_parser_input_filename (char *filename)
 {
@@ -54,7 +52,6 @@ int set_parser_input_filename (char *filename)
 	return SUCCESS;
 }
 
-// TODO: have caller check value
 struct rooted_tree *parse_tree()
 {
 	struct rooted_tree *tree;

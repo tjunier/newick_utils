@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "tree.h"
 #include "parser.h"
@@ -63,7 +64,7 @@ void help(char *argv[])
 "--------\n"
 "\n"
 "%s [-hl] <newick trees filename|-> <map filename>\n"
-"or"
+"or\n"
 "%s [-hl] <newick trees filename|-> <old-label> <new-label>\n"
 "\n"
 "Input\n"
@@ -183,7 +184,7 @@ struct parameters get_params(int argc, char *argv[])
 
 	struct parameters params;
 
-	params.only_leaves = FALSE;	/* default: rename all nodes */
+	params.only_leaves = false;	/* default: rename all nodes */
 	params.map_filename = NULL;
 	params.old_label = NULL;
 	params.new_label = NULL;
@@ -195,7 +196,7 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit(EXIT_SUCCESS);
 		case 'l':
-			params.only_leaves = TRUE;
+			params.only_leaves = true;
 			break;
 		}
 	}
@@ -273,7 +274,7 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, rename_map, params);
-		destroy_tree(tree, DONT_FREE_NODE_DATA);
+		destroy_tree(tree, NULL);
 	}
 
 	struct llist *keys = hash_keys(rename_map);

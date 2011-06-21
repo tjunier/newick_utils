@@ -120,7 +120,7 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 void draw_scalebar(struct canvas *canvas, const double scale,
 		const double dmax, char *units, bool scale_zero_at_root)
 {
-	int v_pos = canvas->height - SCALEBAR_SPACE;
+	int v_pos = get_canvas_height(canvas) - SCALEBAR_SPACE;
 	int h_start = ROOT_SPACE;
 	int h_end = ROOT_SPACE + rint(scale * dmax);
 	canvas_draw_hline(canvas, v_pos, h_start, h_end);

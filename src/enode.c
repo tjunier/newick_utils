@@ -46,7 +46,7 @@ static struct rnode *current_tree_node;
 /* A general enode constructor. This is not meant to be used directly, but
  * rather via the create_enode_* functions. */
 
-static struct enode *create_enode(int type, 
+static struct enode *create_enode(enum enode_type type, 
 		struct enode *left,
 		struct enode *right,
 		float value)
@@ -67,7 +67,7 @@ struct enode *create_enode_constant(float value)
 	return create_enode(ENODE_CONSTANT, NULL, NULL, value);
 }
 
-struct enode *create_enode_op(int type, struct enode *left, struct enode *right)
+struct enode *create_enode_op(enum enode_type type, struct enode *left, struct enode *right)
 {
 	return create_enode(type, left, right, 0);
 }
@@ -77,8 +77,7 @@ struct enode *create_enode_not(struct enode *node)
 	return create_enode(ENODE_NOT, node, NULL, 0);
 }
 
-// TODO: type should be an enum
-struct enode *create_enode_func(int type)
+struct enode *create_enode_func(enum enode_type type)
 {
 	return create_enode(type, NULL, NULL, 0);
 }
@@ -139,7 +138,7 @@ float eval_enode(struct enode *node)
 	case ENODE_NB_DESCENDANTS:
 		return data->nb_descendants;
 	case ENODE_NB_CHILDREN:
-		return current_tree_node->children->count;
+		return current_tree_node->child_count;
 	default:
 		assert(0);	/* programmer error */
 	}

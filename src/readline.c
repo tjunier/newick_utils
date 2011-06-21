@@ -30,11 +30,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #include "readline.h"
 
 enum read_status read_line_status;
 enum next_status next_token_status;
+
+struct word_tokenizer {
+	char *string;
+	char *word_start;
+	char *word_stop;
+	size_t string_len;
+};
 
 char * read_line(FILE *file)
 {
@@ -89,8 +97,11 @@ char * read_line(FILE *file)
 		return NULL;
 	}
 
-	/* suppress compiler warnings */
+	/* I just need to read the line, but to suppress compiler warnings I
+	 * need to use the returned value... or at least, too look like I'm
+	 * using it. Hopefully the compiler isn't too smart. */
 	char *unused = fgets(line, len+1, file);
+	unused = unused;	/* an incredibly useful statement */
 
 	/* consumes newline (otherwise gets stuck here...) */
 	fgetc(file);

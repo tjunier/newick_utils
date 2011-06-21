@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "hash.h"
 #include "common.h"
+#include "rnode_iterator.h"
 
 struct hash * create_label2node_map(struct llist *node_list)
 {
@@ -83,6 +84,9 @@ struct hash * create_label2node_list_map(struct llist *node_list)
 	return map;
 }
 
+/* NOTE: we can't just destroy this hash, because its elements are lists and
+ * most therefore be destroyed with destroy_llist() rather than just free(). */
+
 void destroy_label2node_list_map(struct hash *map)
 {
 
@@ -97,3 +101,35 @@ void destroy_label2node_list_map(struct hash *map)
 	destroy_llist(keys);
 	destroy_hash(map);
 }
+
+/* Returns a label->node map of (labeled) leaves descending from 'root' */
+/* Nodes' 'seen' member must be zero - see note above about the 'seen' member
+ * of struct rnode. NOTE: this function is meant to work on any node, not just
+ * a tree's root (e.g. in is_monophyletic()). So don't be tempted to rewrite it
+ * to use tree->nodes_in_order. */
+
+static const int INIT_HASH_SIZE = 1000;
+
+struct hash *get_leaf_label_map_from_node(struct rnode *root)
+{
+	struct rnode_iterator *it = create_rnode_iterator(root);
+	if (NULL == it) return NULL;
+	struct rnode *current;
+	struct hash *result = create_hash(INIT_HASH_SIZE);
+	if (NULL == result) return NULL;
+
+	while ((current = rnode_iterator_next(it)) != NULL) {
+		if (is_leaf(current)) {
+			if (strcmp("", current->label) != 0) {
+				if (! hash_set(result,
+					current->label, current)) 
+						return NULL;
+			}
+		}
+	}
+
+	destroy_rnode_iterator(it);
+
+	return result;
+}
+

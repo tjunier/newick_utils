@@ -39,15 +39,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * FAILURE will often be caused by insufficient memory in a called function. 
  */
 
+/* Note: we could also make these two structures private and use only
+ * accessors. But they are so pervasive that it would entail many additional
+ * function calls, which may impact performance. Check before deciding. */
+
+/** An element of a linked list (see struct llist). */
+
 struct list_elem {
-	struct list_elem *next;
-	void *data;
+	struct list_elem *next;	/**< next element (NULL at end of list) */
+	void *data;		/**< arbitrary data */
 };
 
+/** A linked list. Apart from the head pointer, it also maintains a pointer to
+ * the tail, to enable finding the tail in constant time (useful for
+ * appending); and a count of elements (for finding teh length in constant
+ * time). */
+
 struct llist {
-	struct list_elem *head;
+	struct list_elem *head;	/**< first element, NULL in an empty list. */
+	/** last element, equal to head if list has 0 or 1 element (NULL in the
+	 * first case) */
 	struct list_elem *tail;
-	int count;
+	int count;		/**< number of elements in list (0: empty) */
 };
 
 /* allocates a llist and returns a pointer to it.
