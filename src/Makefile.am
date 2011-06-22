@@ -28,14 +28,8 @@ NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
 
 AM_YFLAGS = -d
 
-newick_scanner.c: newick_scanner.l
-	flex -onewick_scanner.c newick_scanner.l 
-
-address_scanner.c: address_scanner.l
-	flex -oaddress_scanner.c address_scanner.l 
-
-indent_lex.c: indent_lex.l
-	flex -oindent_lex.c indent_lex.l
+address_parser.h address_parser.c: address_parser.y
+	bison -d -o address_parser.c address_parser.y
 
 lib_LTLIBRARIES = libnw.la
 libnw_la_SOURCES = $(NW_CORE)
@@ -61,8 +55,8 @@ nw_condense_LDADD = libnw.la
 nw_support_SOURCES = support.c node_set.c
 nw_support_LDADD = libnw.la
 
-nw_ed_SOURCES = address_scanner.l address_parser.y \
-	tree_editor.c enode.c
+nw_ed_SOURCES = address_scanner.c address_parser.c address_parser.h \
+		tree_editor.c enode.c
 nw_ed_LDADD = -lm libnw.la
 
 nw_topology_SOURCES = topology.c
