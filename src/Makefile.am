@@ -21,15 +21,21 @@ HDR = canvas.h concat.h enode.h error.h hash.h lca.h link.h list.h nodemap.h \
 	tree_models.h xml_utils.h graph_common.h svg_graph_common.h \
 	svg_graph_radial.h svg_graph_ortho.h masprintf.h subtree.h
 
-NW_CORE = newick_parser.y newick_scanner.l rnode.c list.c parser.c \
+NW_CORE =  rnode.c list.c parser.c \
 	link.c tree.c nodemap.c hash.c rnode_iterator.c \
 	masprintf.c to_newick.c concat.c lca.c error.c $(HDR)
 
 
 AM_YFLAGS = -d
 
+newick_scanner.c: newick_scanner.l
+	flex -o newick_scanner.c newick_scanner.l
+
 address_parser.h address_parser.c: address_parser.y
 	bison -d -o address_parser.c address_parser.y
+
+indent_lex.c: indent_lex.l
+	flex -o indent_lex.c indent_lex.l
 
 lib_LTLIBRARIES = libnw.la
 libnw_la_SOURCES = $(NW_CORE)
@@ -76,7 +82,6 @@ nw_order_SOURCES = order.c order_tree.c
 nw_order_LDADD = libnw.la
 
 nw_indent_SOURCES = indent.c indent_lex.c
-nw_indent_LDADD = libnw.la
 
 nw_match_SOURCES = match.c order_tree.c
 nw_match_LDADD = libnw.la
