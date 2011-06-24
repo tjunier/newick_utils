@@ -31,11 +31,14 @@ AM_YFLAGS = -d
 newick_scanner.c: newick_scanner.l
 	flex -o newick_scanner.c newick_scanner.l
 
-address_parser.h address_parser.c: address_parser.y
-	bison -d -o address_parser.c address_parser.y
+newick_parser.c: newick_parser.y
+	bison -d -o newick_parser.c -p nws newick_parser.y
 
 indent_lex.c: indent_lex.l
 	flex -o indent_lex.c indent_lex.l
+
+address_parser.h address_parser.c: address_parser.y
+	bison -d -o address_parser.c address_parser.y
 
 lib_LTLIBRARIES = libnw.la
 libnw_la_SOURCES = $(NW_CORE)
