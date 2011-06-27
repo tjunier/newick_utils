@@ -1,4 +1,3 @@
-
 bin_PROGRAMS = nw_indent nw_display nw_clade nw_reroot nw_rename \
 	       nw_condense nw_support nw_ed nw_topology nw_distance \
 	       nw_labels nw_prune nw_order nw_match nw_gen nw_trim \
@@ -19,7 +18,8 @@ HDR = canvas.h concat.h enode.h error.h hash.h lca.h link.h list.h nodemap.h \
 	rnode_iterator.h simple_node_pos.h svg_graph.h text_graph.h \
 	to_newick.h tree.h tree_editor_rnode_data.h common.h order_tree.h \
 	tree_models.h xml_utils.h graph_common.h svg_graph_common.h \
-	svg_graph_radial.h svg_graph_ortho.h masprintf.h subtree.h
+	svg_graph_radial.h svg_graph_ortho.h masprintf.h subtree.h \
+	newick_parser.h
 
 NW_CORE = newick_parser.c newick_scanner.c rnode.c list.c parser.c \
 	link.c tree.c nodemap.c hash.c rnode_iterator.c \
@@ -28,13 +28,13 @@ NW_CORE = newick_parser.c newick_scanner.c rnode.c list.c parser.c \
 newick_scanner.c: newick_scanner.l
 	flex -o newick_scanner.c newick_scanner.l
 
-newick_parser.c: newick_parser.y
+newick_parser.c newick_parser.h: newick_parser.y
 	bison -d -o newick_parser.c -p nws newick_parser.y
 
 indent_lex.c: indent_lex.l
 	flex -o indent_lex.c indent_lex.l
 
-address_parser.h address_parser.c: address_parser.y
+address_parser.c: address_parser.y
 	bison -d -o address_parser.c address_parser.y
 
 address_scanner.c: address_scanner.l address_parser.h
@@ -65,7 +65,7 @@ nw_support_SOURCES = support.c node_set.c
 nw_support_LDADD = libnw.la
 
 nw_ed_SOURCES = address_scanner.c address_parser.c address_parser.h \
-		tree_editor.c enode.c
+		tree_editor.c enode.c address_parser_status.h
 nw_ed_LDADD = -lm libnw.la
 
 nw_topology_SOURCES = topology.c
@@ -101,7 +101,7 @@ nw_duration_LDADD = libnw.la
 nw_stats_SOURCES = stats.c
 nw_stats_LDADD = libnw.la
 
-nw_sched_SOURCES = scheme_tree_editor.c rnode_smob.c
+nw_sched_SOURCES = scheme_tree_editor.c rnode_smob.c rnode_smob.h
 nw_sched_LDADD = libnw.la
 
 nw_luaed_SOURCES = lua_tree_editor.c 

@@ -1,4 +1,6 @@
-AM_CFLAGS = -I ../src
+# There is no real need for ../../src, but 'make distcheck' won't work without
+# it. Or should this be done with VPATH?
+AM_CFLAGS = -I../src -I../../src
 
 TESTS = test_newick_scanner test_newick_parser test_rnode test_list \
 	test_link test_masprintf test_svg_graph_radial \
@@ -25,7 +27,7 @@ check_PROGRAMS = test_rnode test_list test_link test_newick_scanner \
 		 test_newick_parser test_svg_graph_radial \
 		 test_subtree
 
-check_HEADERS = tree_stubs.h
+check_HEADERS = tree_stubs.h $(SRC)/rnode.h
 
 SRC = $(top_builddir)/src
 
