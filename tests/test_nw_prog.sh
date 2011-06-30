@@ -12,6 +12,9 @@
 # used; if it contains 'noxml', it applies only when libxml is NOT being used;
 # otherwise it applies regardless of libxml use.
 
+echo $SRCDIR > /tmp/srcdir
+echo $PWD > /tmp/wd
+
 check_applies()
 {
 	name=$1
@@ -57,7 +60,7 @@ fi
 #prog=${prog#*_}
 
 prog=`echo $0 | sed -e 's|\.sh$||' -e 's/^.*test_//'`
-args_file=test_${prog}_args
+args_file=$SRCDIR/test_${prog}_args
 
 # nw_sched is only tested if Guile is being used
 
@@ -95,6 +98,8 @@ fi
 # arguments>. The expected result is in a file named test_<prog name>_<case
 # name>.exp Lines starting with '#' are ignored.
 
+export PATH=../src:../_build/src:$PATH
+
 pass=TRUE
 while IFS=':' read name args ; do
 	# if first word starts with '#', discard (comment)
@@ -105,14 +110,15 @@ while IFS=':' read name args ; do
 		echo "Skipping $name"
 		continue
 	fi
-	IFS='' cmd="../src/$prog $args"
+	IFS='' cmd="$prog $args"
 	echo -n "test '$name': '$cmd' - "
-	eval $cmd > test_${prog}_$name.out
+	outfile=/tmp/test_${prog}_$name.out
+	(cd $SRCDIR; eval $cmd > $outfile)
 	if [ "$?" -ne "0" ] ; then
 		pass=FALSE
 		break
 	fi
-	if diff test_${prog}_$name.out test_${prog}_$name.exp ; then
+	if diff $outfile $SRCDIR/test_${prog}_$name.exp ; then
 		echo "pass"
 	else
 		echo "FAIL"

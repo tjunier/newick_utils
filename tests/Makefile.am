@@ -2,6 +2,12 @@
 # it. Or should this be done with VPATH?
 AM_CFLAGS = -I../src -I../../src
 
+SRCDIR = @srcdir@
+export SRCDIR
+
+showsrc:
+	@echo $(srcdir)
+
 TESTS = test_newick_scanner test_newick_parser test_rnode test_list \
 	test_link test_masprintf test_svg_graph_radial \
 	test_canvas test_concat test_hash test_lca test_enode \
