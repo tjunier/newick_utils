@@ -34,7 +34,7 @@ newick_parser.c newick_parser.h: newick_parser.y
 indent_lex.c: indent_lex.l
 	flex -o indent_lex.c indent_lex.l
 
-address_parser.c: address_parser.y
+address_parser.c address_parser.h: address_parser.y
 	bison -d -o address_parser.c address_parser.y
 
 address_scanner.c: address_scanner.l address_parser.h

@@ -81,6 +81,8 @@ if [ "$prog" = "nw_luaed" ] ; then
 fi
 
 # Ok, try to test $prog.
+# TODO: check for prog here instead of setting PATH as below. If $prog is
+# found, prefix it with the relative path (e.g. ../src/$prog).
 
 echo "Testing program: $prog"
 
