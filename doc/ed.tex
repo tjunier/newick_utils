@@ -18,15 +18,18 @@ general to the specific:
 	\item a {\tt grep} command
 \end{itemize}
 Perl is a general-purpose language, it just happens to be rather good at
-processing text. Sed is specialized for editing text streams, and {\tt grep} is
-designed for precisely the line-finding task in question\footnote{The name
-"grep" comes from the {\tt sed} expression {\tt g/re/p}, where "re" stands for
-"regular expression"}. We should expect {\tt grep} to be the most efficient, but
-we should not expect it to be able to perform any significantly different task.
-By contrast, Perl may be (I haven't checked!) less efficient than {\tt grep},
-but it can handle pretty much any task. Sed will lie in between. The programs we
-have seen so far are {\tt grep}-like: they are specialized for one task (and
-hopefully, they are efficient).
+processing text\footnote{Ok, Perl was \emph{initially} designed for processing
+text -- it't the Practical Extraction and Report Language, after all -- but it
+has long grown out of this initial specialization.}. Sed is specialized for
+editing text streams, and {\tt grep} is designed for precisely the line-finding
+task in question\footnote{The name "grep" comes from the {\tt sed} expression
+{\tt g/re/p}, where "re" stands for "regular expression".}. We should expect
+{\tt grep} to be the most efficient, but we should not expect it to be able to
+perform any significantly different task.  By contrast, Perl may be (I haven't
+checked!) less efficient than {\tt grep}, but it can handle pretty much any
+task. Sed will lie in between. The programs we have seen so far are {\tt
+grep}-like: they are specialized for one task (and hopefully, they are
+efficient).
 
 The programs described in this section are more {\tt sed}-like: they are less
 specialized, usually less efficient, but more flexible than the ones shown up to
@@ -38,20 +41,265 @@ user-specified action is performed. In other words, they are node-oriented
 stream editors for trees.
 
 As a word of warning, I should say that these programs are among the more
-experimental in the \nutils{} package. This is why there are two programs (at
-least one more is on the way) that do basically the same thing, although
-differently and with different capabilities: \ed{} is the simplest (and first),
-it is written entirely in C and it is fairly limited. \sched{} was developed to
-address \ed{}'s limitations: by embedding a Scheme (\url{http://www.r6rs.org})
-interpreter (\gnu{} Guile, \url{http://www.gnu.org/software/guile/}), its
-flexibility is, for practical purposes, limitless. Of course, this comes at the
-price of linking to an external library, which may not be available. Therefore
-\ed{}, for all its limitations, will stay in the package as it does not depend
-on Guile. Finally, I understand that Scheme is not the only solution as an
-embedded language, and that many people (myself included) find learning it a
-challenge. Therefore, my intention is to try the same approach with Lua
-(\url{http://www.lua.org}), which is designed as an embeddable language, is
-even smaller than Guile, and by many accounts easier to learn.
+experimental in the \nutils{} package. This is why there are three programs that
+do basically the same thing, although differently and with different
+capabilities: \ed{} is the simplest (and first), it is written entirely in C and
+it is fairly limited. \sched{} was developed to address \ed{}'s limitations: by
+embedding a Scheme (\url{http://www.r6rs.org}) interpreter (\gnu{} Guile,
+\url{http://www.gnu.org/software/guile/}), its flexibility is, for practical
+purposes, limitless. Of course, this comes at the price of linking to an
+external library, which may not be available. Therefore \ed{}, for all its
+limitations, will stay in the package as it has no external dependency. Finally,
+I understand that Scheme is not the only solution as an embedded language, and
+that many people (myself included) find learning it a bit of a challenge.
+Therefore, I tried the same approach with Lua\footnote{In case you're curious,
+the reason I tried Scheme before Lua is simply that I heard about them in that
+order.} (\url{http://www.lua.org}), which is designed as an embeddable language,
+is even smaller than Guile, and by most accounts easier to learn\footnote{And,
+in my experience, easier to embed in a C program, but your experience may
+differ.}. The result, \luaed, is probably the best so far: as powerful as
+\sched, while smaller and easier to use. For this reason, I will probably not
+develop \sched{} much more, but I won't drop it altogether either, not soon at
+any rate. 
+
+\noindent{}The bottom line is: try \luaed{} first.
+
+\subsection{The General Idea}
+
+\ed, \sched, and \luaed{} work in the same way: they iterate over the nodes in a
+specific order, and for each node they evaluate a logical expression provided by
+the user. If the expression is true, they perform a user-specified action.  By
+default, the (possibly modified) tree is printed at the end of the run.
+
+Where the programs differ is the way the expression and action are expressed; as
+well as the expressive power of the languages used; some of them can also
+perform actions at the start or end of the run, or of each input tree. These are
+summarized in the table below.
+
+\begin{center}
+	\begin{minipage}{0.8\textwidth}
+		\begin{tabular}{llll}
+		& \ed & \sched & \luaed \\
+		\hline
+		language & own & Scheme & Lua \\
+		programming constructs & no & yes & yes \\
+		functions & fixed & arbitrary\footnote{\ie, user can define their own} & arbitrary \\
+		depends on & nothing & \gnu{} Guile & Lua library \\
+		pre- \& post-tree code & no & yes & yes \\
+		pre- \& post-run code & no & yes & yes
+		\end{tabular}
+	\end{minipage}
+\end{center}
+
+\subsection{\luaed}
+
+Although \luaed{} is the most recent of the three, we'll cover it first because
+if this one does what you need it's unlikely you'll need the others.  Let's look
+at an example before we jump into the details. Here is a tree of vertebrate
+genera, showing support values:
+
+\verbatiminput{ed_1_svg.cmd}
+\begin{center}
+\includegraphics{ed_1_svg.pdf}
+\end{center}
+
+\noindent{}Let's extract all well-supported clades, using a support value of 95\% or more as the criterion for being well-supported:
+
+\verbatiminput{ed_10_txt.cmd}
+\begin{samepage}
+\verbatiminput{ed_10_txt.out}
+\end{samepage}
+
+The expression \texttt{((\& (def? 'b) (>= 95 b)) (s))} parses as follows:
+\begin{itemize}
+	\item the first element (or \texttt{car}, in Scheme parlance),
+	\texttt{(\& (def? 'b) (>= 95 b))}, is the selector.  It is a Boolean
+	expression, namely a conjunction (\texttt{\&})\footnote{\texttt{\&} is
+	a short name for the Scheme form \texttt{and}, which is defined by
+	\sched{} to allow for shorter expressions on the command line.} of the
+	expressions \texttt{(def? 'b)} and \texttt{(>= 95 b)}.  The former
+	checks that variable \texttt{b} (bootstrap support) is
+	defined\footnote{In \ed, \texttt{b} was zero if the support was not
+	defined. \sched{} distinguishes between undefined and zero, which is
+	why one has to check that \texttt{b} is defined before using it.
+	\texttt{def?} is just a shorter name for \texttt{defined?}.}, and the
+	latter is true iff \texttt{b} is not smaller than 95.
+	\item the second element (\texttt{cadr} in Scheme jargon),
+	\texttt{(s)}, is the action -- in this case, a call to function
+	\texttt{s}, which has the same meaning as action \texttt{s} in \ed,
+	namely to print out the subclade rooted at the current node.
+\end{itemize}
+
+\subsubsection{Selectors}
+
+Like \ed{} addresses, \sched{} selectors are Boolean expressions normally
+involving node properties which are available as predefined variables. As the
+program "visits" each node in turn, the variables are set to reflect the current
+node's properties. As in \ed{}, the variables have short names, to keep
+expressions concise. The predefined variables are shown in the table below.
+
+\begin{center}
+\begin{tabular}{cll}
+name & type & meaning \\
+\hline
+\texttt{a} & integer & number of ancestors  \\
+\texttt{b} & rational & support value \\
+\texttt{c} & integer & number of children (direct descendants) \\
+\texttt{D} & integer & total number of descendants (includes children) \\
+\texttt{d} & numeric & depth (distance to root) \\
+\texttt{i} & Boolean & true iff node is strictly internal (i.e., not root!) \\
+\texttt{lbl} & string & label \\
+\texttt{l} (ell) & Boolean & true iff node is a leaf \\
+\texttt{L} & rational & parent edge length \\
+\texttt{r} & Boolean & true iff node is the root
+\end{tabular}
+\end{center}
+
+\noindent{}Variables \texttt{b} and \texttt{lbl} are both derived from the
+label, but \texttt{b} is interpreted as a number, and is undefined if the
+conversion to a number fails, or if the node is a leaf. Edge length and depth
+(\texttt{L} and \texttt{d}) are undefined (not zero!) if not specified in the
+Newick tree, as in cladograms.
+
+Whereas \ed{} defines logical and relational operators, \sched{} just uses those
+of the Scheme language. It just defines a few shorter names to help keep command
+lines compact:
+
+\begin{center}
+\begin{tabular}{lcl}
+Scheme & \sched{} short form & meaning \\
+\hline
+\texttt{not} 	& \texttt{!} 				& logical negation \\
+\texttt{and} 	& \texttt{\&} 			& logical and \\
+\texttt{or}  	& \texttt{|} 				& logical or \\
+\texttt{defined?}	& \texttt{def?}	& checks if arg is defined
+\end{tabular}
+\end{center}
+
+\noindent{}Here are a the same examples as above, but for \sched:
+
+\begin{center}
+\begin{tabular}{cl}
+expression & selects: \\
+\hline
+\texttt{l} (lowercase ell) & all leaves \\
+\texttt{(\& l (<= a 3))} & leaves with 3 ancestors or less \\
+\texttt{(\& i (def? 'b) (>= b 95))} & internal nodes with support greater than 95\% \\ 
+\texttt{(\& i (def? 'b) (b < 50)} & unsupported nodes (less than 50\%) \\
+\texttt{(! r)} & all nodes except the root \\
+\texttt{(> c 2)} & multifurcating nodes
+\end{tabular}
+\end{center}
+
+\noindent{}When it is clear that all inner nodes will have a defined support
+value, one can leave out the \texttt{(def? 'b)} clause.
+
+\subsubsection{Actions}
+
+Actions are arbitrary Scheme expressions, so they are much more flexible than
+the fixed actions defined by \ed. \sched{} defines most of them, as well as a
+few new ones, as Scheme functions\footnote{Note that you must use Scheme's function call syntax to call the function, \ie, \texttt{(function [args...])}.}:
+
+\begin{center}
+\begin{tabular}{clc}
+code & effect & modifies tree?\\
+\hline
+\texttt{L! <len>}	& sets the node's parent-edge length to \texttt{len}	& yes \\
+\texttt{lbl! <lbl>}	& sets the node's label to \texttt{lbl}	& yes \\
+\texttt{o} 				& splice out the node 									& yes \\
+\texttt{p <arg>} 	& print \texttt{arg}, then a newline 		& no \\
+\texttt{s} 				& print the subtree rooted at the node 	& no \\
+\texttt{u} 				& delete ("unlink") the node (and all descendants) & yes \\
+\end{tabular}
+\end{center}
+
+\noindent{}The \texttt{l} action of \ed{}, which prints the current node's
+label, can be achieved in \sched{} with the more general \texttt{p} function:
+\texttt{(p lbl)}.
+
+The \texttt{L!} function sets the current node's parent-edge length. It accepts
+a string or a number. If the argument is a string, it attempts to convert it to
+a number. If this fails, the edge length is undefined. The \texttt{lbl!}
+function sets the current node's label. Its argument is a string.
+
+The delete action was renamed to \texttt{u} because the \texttt{d} symbol stands
+for the node's depth.
+
+\subsubsection{Examples}
+
+{\it Formatting Lengths} 
+
+\noindent{}Some phylogeny programs return \nw{} trees with an unrealistic number
+of decimal places. For example, the \texttt{HRV.nw} tree has six:
+
+\verbatiminput{ed_6_txt.cmd}
+\begin{samepage}
+\verbatiminput{ed_6_txt.out}
+\end{samepage}
+
+\noindent{}Here I use \nwindent{} to show each node on a line for clarity, and
+show only the last ten.\footnote{the \emph{first} ten lines contain only
+opening parentheses.} To format\footnote{\sched{} automatically loads the {\tt
+format} module so that the full-fledged {\tt format} function is available.}
+the lengths to two decimal places, do the following:
+
+\verbatiminput{ed_7_txt.cmd}
+\begin{samepage}
+\verbatiminput{ed_7_txt.out}
+\end{samepage}
+
+\begin{samepage}
+\noindent{}{\it Multiplying lengths by a constant}
+
+It may be necessary to have two trees which only differ by a constant multiple
+of the branch lengths. This can be used, for example, to test competing
+hypotheses about evolution rates.
+\end{samepage}
+Here is our good friend the Catarrhinine tree again:
+
+\verbatiminput{ed_8_svg.cmd}
+\begin{center}
+\includegraphics{ed_8_svg.pdf}
+\end{center}
+
+To multiply all its branch lengths by (say) 3.5, do the following:
+
+\verbatiminput{ed_9_svg.cmd}
+\begin{center}
+\includegraphics{ed_9_svg.pdf}
+\end{center}
+
+\begin{samepage}
+\noindent{}{\it Implementing other \nutils}
+
+\noindent{}\sched{} can emulate other programs in the package, when these
+iterate on every node and perform some action. There is no real reason to use
+\sched{} rather than the original, since \sched{} will be slower (after all, it
+has to start the Scheme interpreter, parse the Scheme expressions, etc.). But it
+can serve as illustration.
+\end{samepage}
+
+\begin{center}
+\begin{tabular}{ll}
+program & \sched{} equivalent \\
+\hline
+\labels{} 						& {\tt '((! (string-null? lbl)) (p lbl))'}  \\
+\labels{} {\tt -I} 		& {\tt '((! (| i (string-null? lbl))) (p lbl))'} \\
+\topology{}						& {\tt '(\#t (L! ""))'} \\
+\topology{} {\tt -I} 	& {\tt '(\#t (if l (L! "") (begin (L! "") (lbl!  ""))))'}
+\end{tabular}
+\end{center}
+
+The {\tt string-null?} predicate in the \labels{} replacements is checked
+because the original \labels{} does not print empty labels. The {\tt begin} form
+in the \topology{} replacement is used to perform two actions: setting the
+length and setting the label. Note also that the check for node type is done in
+the action rather than the selector. The {\tt if} on the selector is implicit.
+Future versions will allow more than one (selector, action) pair (just as Awk
+does) and allow the {\tt nw\_topology -I} equivalent to be written {\tt '((\#t
+(L! "")) ((! l) (lbl! "")))} -- set length to undefined for every node, and set
+label to empty for all non-leaf nodes. I also intend to put an implicit {\tt
+begin} around the action.
 
 \subsection{\ed}
 
@@ -61,11 +309,6 @@ evaluates a logical expression provided by the user. If the expression is true,
 tree is printed at the end of the run.
 
 Let's look at an example before we jump into the details. Here is a tree of vertebrate genera, showing support values:
-
-\verbatiminput{ed_1_svg.cmd}
-\begin{center}
-\includegraphics{ed_1_svg.pdf}
-\end{center}
 
 \noindent{}Let's extract all well-supported clades, using a support value of 95\% or more as the criterion for being well-supported:
 
