@@ -272,6 +272,13 @@ static void help(char *argv[])
 	);
 }
 
+static void print_usage(const char *progname) 
+{
+	fprintf(stderr, "Usage: %s [-hnor] <filename|-> <condition> <action>\n"
+			" or:   %s -f scriptname [-hnor] <filename|->\n",
+			progname, progname);
+}
+
 static struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
@@ -324,6 +331,11 @@ static struct parameters get_params(int argc, char *argv[])
 		params.lua_condition = argv[optind+1];
 		params.lua_action = argv[optind+2];
 	} else if (1 == (argc - optind)) {
+		/* use only with -f: check */
+		if (NULL == params.user_hooks_filename) {
+			print_usage(argv[0]);
+			exit(EXIT_FAILURE);
+		}
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
 			extern FILE *nwsin;
@@ -334,9 +346,7 @@ static struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-hnro] <filename|-> "
-				"<Scheme expression>\n",
-				argv[0]);
+		print_usage(argv[0]);
 		exit(EXIT_FAILURE);
 	}
 

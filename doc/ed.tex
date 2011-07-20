@@ -103,40 +103,39 @@ genera, showing support values:
 \includegraphics{ed_1_svg.pdf}
 \end{center}
 
-\noindent{}Let's extract all well-supported clades, using a support value of 95\% or more as the criterion for being well-supported:
+\noindent{}Let's extract all well-supported clades, using a support value of
+95\% or more as the criterion for being well-supported. In our jargon, the
+\emph{condition} would be that a node i) has a support value (some nodes don't,
+\eg{} the root and the \lca{} of (Fugu,Tetraodon)), and ii) that this value be
+no less than 95. The \emph{action} would simply be to print out the tree rooted
+at the current node.
 
 \verbatiminput{ed_10_txt.cmd}
 \begin{samepage}
 \verbatiminput{ed_10_txt.out}
 \end{samepage}
 
-The expression \texttt{((\& (def? 'b) (>= 95 b)) (s))} parses as follows:
-\begin{itemize}
-	\item the first element (or \texttt{car}, in Scheme parlance),
-	\texttt{(\& (def? 'b) (>= 95 b))}, is the selector.  It is a Boolean
-	expression, namely a conjunction (\texttt{\&})\footnote{\texttt{\&} is
-	a short name for the Scheme form \texttt{and}, which is defined by
-	\sched{} to allow for shorter expressions on the command line.} of the
-	expressions \texttt{(def? 'b)} and \texttt{(>= 95 b)}.  The former
-	checks that variable \texttt{b} (bootstrap support) is
-	defined\footnote{In \ed, \texttt{b} was zero if the support was not
-	defined. \sched{} distinguishes between undefined and zero, which is
-	why one has to check that \texttt{b} is defined before using it.
-	\texttt{def?} is just a shorter name for \texttt{defined?}.}, and the
-	latter is true iff \texttt{b} is not smaller than 95.
-	\item the second element (\texttt{cadr} in Scheme jargon),
-	\texttt{(s)}, is the action -- in this case, a call to function
-	\texttt{s}, which has the same meaning as action \texttt{s} in \ed,
-	namely to print out the subclade rooted at the current node.
-\end{itemize}
+\noindent{}As always, the first argument to the program is a tree file, \texttt{vrt2cg.nw}.
 
-\subsubsection{Selectors}
+The second argument, \verb+b ~= nil and b >= 95+, is the condition.  In this
+case, it is just the conjunction (\texttt{and}) of two expressions
+\verb+b ~= nil+ and \texttt{b >= 95}.  The former checks that the node's support
+value (variable \texttt{b}) is defined (\ie, not \texttt{nil}), the latter
+checks that the support value is no less than 95. Note that the checks occur in
+that order, and that if \texttt{b} isn't defined, the second check isn't even
+performed, as it is meaningless.
 
-Like \ed{} addresses, \sched{} selectors are Boolean expressions normally
-involving node properties which are available as predefined variables. As the
-program "visits" each node in turn, the variables are set to reflect the current
-node's properties. As in \ed{}, the variables have short names, to keep
-expressions concise. The predefined variables are shown in the table below.
+The third argument, \texttt{s()}, is the action: it specifies what to do when a
+node meets the condition -- in this case, call function \texttt{s},
+which just prints the tree rooted at the current node.
+
+\subsubsection{Conditions}
+
+Conditions are Boolean expressions usually involving node properties which are
+available as predefined variables. As the program "visits" each node in turn,
+the variables are set to the current node's properties.  These predefined
+variables have short names, to keep expressions concise. They are shown in the
+table below.
 
 \begin{center}
 \begin{tabular}{cll}
