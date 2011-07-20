@@ -1,3 +1,6 @@
+nw_luaed: when only passed a tree file, segfaults instead of outputting a usage
+msg.
+
 general: look at public structures such as struct hash and see if it would be
 ok to make them private -- this means replacing direct access (st->member) by
 accessor function calls (get_member(st)). The tradeoff is: accessors enable
