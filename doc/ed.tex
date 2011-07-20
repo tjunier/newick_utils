@@ -205,12 +205,13 @@ And you can of course use any arbitrary Lua code -- you can even write your own
 functions (this is most convenient if you pass the Lua code in a file, see
 \ref{sct:lua_file_input}).
 
-\sched{} defines a node type, and the current node is always accessible as
+\sched{} defines a "node" type, and the current node is always accessible as
 variable \texttt{N} (other nodes can be obtained through node properties, see
 below).  Node properties can be accessed via Lua table syntax. Some fields have
 both a short and a long name, the former is intended for use on the command line
 (where space is at a premium), the latter is for use in scripts (but both can be
-used anywhere). The following fields are accessible:
+used anywhere). The following fields are accessible (note that only edge length
+and label can be modified):
 
 \begin{center}
 	\begin{minipage}{0.8\textwidth}
@@ -229,27 +230,8 @@ used anywhere). The following fields are accessible:
 	\end{minipage}
 \end{center}
 
-\begin{center}
-\begin{tabular}{clc}
-code & effect & modifies tree?\\
-\hline
-\texttt{L! <len>}	& sets the node's parent-edge length to \texttt{len}	& yes \\
-\texttt{lbl! <lbl>}	& sets the node's label to \texttt{lbl}	& yes \\
-\texttt{o} 				& splice out the node 									& yes \\
-\texttt{p <arg>} 	& print \texttt{arg}, then a newline 		& no \\
-\texttt{s} 				& print the subtree rooted at the node 	& no \\
-\texttt{u} 				& delete ("unlink") the node (and all descendants) & yes \\
-\end{tabular}
-\end{center}
-
-\noindent{}The \texttt{l} action of \ed{}, which prints the current node's
-label, can be achieved in \sched{} with the more general \texttt{p} function:
-\texttt{(p lbl)}.
-
-The \texttt{L!} function sets the current node's parent-edge length. It accepts
-a string or a number. If the argument is a string, it attempts to convert it to
-a number. If this fails, the edge length is undefined. The \texttt{lbl!}
-function sets the current node's label. Its argument is a string.
+So for example the parent of the current node is expressed by \texttt{N.par};
+doubling its length would be \texttt{N.par.len = N.par.len * 2}. 
 
 The delete action was renamed to \texttt{u} because the \texttt{d} symbol stands
 for the node's depth.
