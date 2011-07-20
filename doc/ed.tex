@@ -115,12 +115,13 @@ at the current node.
 \verbatiminput{ed_10_txt.out}
 \end{samepage}
 
-\noindent{}As always, the first argument to the program is a tree file, \texttt{vrt2cg.nw}.
+\noindent{}As always, the first argument to the program is a tree file,
+\texttt{vrt2cg.nw} in this example.
 
 The second argument, \verb+b ~= nil and b >= 95+, is the condition.  In this
 case, it is just the conjunction (\texttt{and}) of two expressions
 \verb+b ~= nil+ and \texttt{b >= 95}.  The former checks that the node's support
-value (variable \texttt{b}) is defined (\ie, not \texttt{nil}), the latter
+value (variable \texttt{b}) is defined (\ie, not \texttt{nil}); the latter
 checks that the support value is no less than 95. Note that the checks occur in
 that order, and that if \texttt{b} isn't defined, the second check isn't even
 performed, as it is meaningless.
@@ -139,17 +140,18 @@ table below.
 
 \begin{center}
 \begin{tabular}{cll}
-name & type & meaning \\
+name & (Lua) type & meaning (refers to the current node)\\
 \hline
 \texttt{a} & integer & number of ancestors  \\
-\texttt{b} & rational & support value \\
+\texttt{b} & number & support value (or \texttt{nil}) \\
 \texttt{c} & integer & number of children (direct descendants) \\
 \texttt{D} & integer & total number of descendants (includes children) \\
-\texttt{d} & numeric & depth (distance to root) \\
+\texttt{d} & number & depth (distance to root) \\
 \texttt{i} & Boolean & true iff node is strictly internal (i.e., not root!) \\
 \texttt{lbl} & string & label \\
 \texttt{l} (ell) & Boolean & true iff node is a leaf \\
-\texttt{L} & rational & parent edge length \\
+\texttt{L} & number & parent edge length \\
+\texttt{N} & node & the current node itself \\
 \texttt{r} & Boolean & true iff node is the root
 \end{tabular}
 \end{center}
@@ -160,44 +162,72 @@ conversion to a number fails, or if the node is a leaf. Edge length and depth
 (\texttt{L} and \texttt{d}) are undefined (not zero!) if not specified in the
 Newick tree, as in cladograms.
 
-Whereas \ed{} defines logical and relational operators, \sched{} just uses those
-of the Scheme language. It just defines a few shorter names to help keep command
-lines compact:
+The condition being just a Boolean expression written in Lua, all the logical
+operators of the Lua language can be used (indeed, any valid Lua snippet can be
+used, provided it evaluates to a Boolean), and you can use parentheses to
+override operator precedence or for clarity.
 
-\begin{center}
-\begin{tabular}{lcl}
-Scheme & \sched{} short form & meaning \\
-\hline
-\texttt{not} 	& \texttt{!} 				& logical negation \\
-\texttt{and} 	& \texttt{\&} 			& logical and \\
-\texttt{or}  	& \texttt{|} 				& logical or \\
-\texttt{defined?}	& \texttt{def?}	& checks if arg is defined
-\end{tabular}
-\end{center}
-
-\noindent{}Here are a the same examples as above, but for \sched:
+\noindent{}Here are some examples of \luaed{} conditions:
 
 \begin{center}
 \begin{tabular}{cl}
 expression & selects: \\
 \hline
 \texttt{l} (lowercase ell) & all leaves \\
-\texttt{(\& l (<= a 3))} & leaves with 3 ancestors or less \\
-\texttt{(\& i (def? 'b) (>= b 95))} & internal nodes with support greater than 95\% \\ 
-\texttt{(\& i (def? 'b) (b < 50)} & unsupported nodes (less than 50\%) \\
-\texttt{(! r)} & all nodes except the root \\
-\texttt{(> c 2)} & multifurcating nodes
+\texttt{l and a <= 3} & leaves with 3 ancestors or less \\
+\texttt{i and (b \~{ }= nil) and (b >= 95)} & internal nodes with support $\geq$ 95\% \\ 
+\texttt{i and (b \~{ }= nil) and (b < 50)} & unsupported nodes (less than 50\%) \\
+\texttt{not r} & all nodes except the root \\
+\texttt{c > 2} & multifurcating nodes
 \end{tabular}
 \end{center}
 
-\noindent{}When it is clear that all inner nodes will have a defined support
-value, one can leave out the \texttt{(def? 'b)} clause.
+\noindent{}If it is certain that all nodes do have support, checks such as
+\verb+b ~= nil+ can be omitted.
 
 \subsubsection{Actions}
 
-Actions are arbitrary Scheme expressions, so they are much more flexible than
-the fixed actions defined by \ed. \sched{} defines most of them, as well as a
-few new ones, as Scheme functions\footnote{Note that you must use Scheme's function call syntax to call the function, \ie, \texttt{(function [args...])}.}:
+Actions are arbitrary Lua expressions. \luaed{} predefines some of the most
+current functions (these have one-letter names for convenience when passing the
+action on the command line):
+
+\begin{center}
+	\begin{tabular}{clc}
+		code & effect & modifies tree?\\
+		\hline
+		\texttt{o}	& splice out the node 									& yes \\
+		\texttt{s}	& print the subtree rooted at the node 	& no \\
+		\texttt{u} 	& delete ("unlink") the node (and all descendants) & yes
+	\end{tabular}
+\end{center}
+  
+And you can of course use any arbitrary Lua code -- you can even write your own
+functions (this is most convenient if you pass the Lua code in a file, see
+\ref{sct:lua_file_input}).
+
+\sched{} defines a node type, and the current node is always accessible as
+variable \texttt{N} (other nodes can be obtained through node properties, see
+below).  Node properties can be accessed via Lua table syntax. Some fields have
+both a short and a long name, the former is intended for use on the command line
+(where space is at a premium), the latter is for use in scripts (but both can be
+used anywhere). The following fields are accessible:
+
+\begin{center}
+	\begin{minipage}{0.8\textwidth}
+		\begin{tabular}{llcl}
+			name & type & mode\footnote{rw: read-write; ro: read only} & meaning \\
+			\hline
+			\texttt{len}, \texttt{L} 	& number 	& rw & parent edge's length \\
+			\texttt{lbl}							& string 	& rw & label \\
+			\texttt{b}								& number	& ro & support value \\
+			\texttt{par}							& node		& ro & parent \\
+			\texttt{first\_child}, \texttt{fc}  & node & ro & first child \\
+			\texttt{last\_child}, \texttt{lc} 	& node & ro & last child \\
+			\texttt{children\_count}, \texttt{c} 	& integer & ro & number of children \\
+			\texttt{kids}							& table		& ro & list of children nodes
+		\end{tabular}
+	\end{minipage}
+\end{center}
 
 \begin{center}
 \begin{tabular}{clc}
@@ -299,6 +329,10 @@ does) and allow the {\tt nw\_topology -I} equivalent to be written {\tt '((\#t
 (L! "")) ((! l) (lbl! "")))} -- set length to undefined for every node, and set
 label to empty for all non-leaf nodes. I also intend to put an implicit {\tt
 begin} around the action.
+
+\subsubsection{Lua script in a file}
+\label{sct:lua_file_input}
+%%% END copied from nw_sched
 
 \subsection{\ed}
 
@@ -536,7 +570,7 @@ expression & selects: \\
 \texttt{l} (lowercase ell) & all leaves \\
 \texttt{(\& l (<= a 3))} & leaves with 3 ancestors or less \\
 \texttt{(\& i (def? 'b) (>= b 95))} & internal nodes with support greater than 95\% \\ 
-\texttt{(\& i (def? 'b) (b < 50)} & unsupported nodes (less than 50\%) \\
+\texttt{(\& i (def? 'b) (< b 50)} & unsupported nodes (less than 50\%) \\
 \texttt{(! r)} & all nodes except the root \\
 \texttt{(> c 2)} & multifurcating nodes
 \end{tabular}
