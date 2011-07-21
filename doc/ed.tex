@@ -18,12 +18,12 @@ general to the specific:
 	\item a {\tt grep} command
 \end{itemize}
 Perl is a general-purpose language, it just happens to be rather good at
-processing text\footnote{Ok, Perl was \emph{initially} designed for processing
-text -- it't the Practical Extraction and Report Language, after all -- but it
-has long grown out of this initial specialization.}. Sed is specialized for
+processing text.\footnote{Ok, Perl was \emph{initially} designed for processing
+text -- it's the Practical Extraction and Report Language, after all -- but it
+has long grown out of this initial specialization.} Sed is specialized for
 editing text streams, and {\tt grep} is designed for precisely the line-finding
-task in question\footnote{The name "grep" comes from the {\tt sed} expression
-{\tt g/re/p}, where "re" stands for "regular expression".}. We should expect
+task in question.\footnote{The name "grep" comes from the {\tt sed} expression
+{\tt g/re/p}, where "re" stands for "regular expression".} We should expect
 {\tt grep} to be the most efficient, but we should not expect it to be able to
 perform any significantly different task.  By contrast, Perl may be (I haven't
 checked!) less efficient than {\tt grep}, but it can handle pretty much any
@@ -191,8 +191,8 @@ expression & selects: \\
 \subsubsection{Actions}
 
 Actions are arbitrary Lua expressions. \luaed{} predefines some of the most
-current functions (table \ref{tbl:luaedPredefFunc}), and you can of course use
-any arbitrary Lua code -- you can even write your own functions (this is most
+common ones (table \ref{tbl:luaedPredefFunc}), and you can of course write
+your own in Lua -- including by defining new functions (this is most
 convenient if you pass the Lua code in a file, see \ref{sct:lua_file_input}).
 
 \begin{table}
@@ -207,7 +207,10 @@ convenient if you pass the Lua code in a file, see \ref{sct:lua_file_input}).
 	\caption{%
 		\label{tbl:luaedPredefFunc}
 		Predefined actions in \luaed. The names are one letter long for convenience
-		when passing the action on the command line.
+		when passing the action on the command line. When called without an
+		argument, these functions operate on the current node (\ie, \texttt{s()} is
+		the same as \texttt{s(N)} (where \texttt{N} means the current node -- see
+		table \ref{tbl:luaedPredefVar}).
 	}
 \end{table}
 
@@ -219,26 +222,32 @@ line (where space is at a premium), the latter is for use in scripts (but both
 can be used anywhere). The following fields are defined (note that only edge
 length and label can be modified):
 
-\begin{center}
-	\begin{minipage}{0.8\textwidth}
-		\begin{tabular}{llcl}
-			name & type & mode\footnote{rw: read-write; ro: read only} & meaning \\
-			\hline
-			\texttt{len}, \texttt{L} 	& number 	& rw & parent edge's length \\
-			\texttt{lbl}							& string 	& rw & label \\
-			\texttt{b}								& number	& ro & support value \\
-			\texttt{par}							& node		& ro & parent \\
-			\texttt{first\_child}, \texttt{fc}  & node & ro & first child \\
-			\texttt{last\_child}, \texttt{lc} 	& node & ro & last child \\
-			\texttt{children\_count}, \texttt{c} 	& integer & ro & number of children \\
-			\texttt{kids}							& table		& ro & list of children nodes
-		\end{tabular}
-	\end{minipage}
-\end{center}
+\begin{table}
+	\center
+	\begin{tabular}{llcl}
+		name & type & mode & meaning \\
+		\hline
+		\texttt{len}, \texttt{L} 	& number 	& rw & parent edge's length \\
+		\texttt{lbl}							& string 	& rw & label \\
+		\texttt{b}								& number	& ro & support value \\
+		\texttt{par}							& node		& ro & parent \\
+		\texttt{first\_child}, \texttt{fc}  & node & ro & first child \\
+		\texttt{last\_child}, \texttt{lc} 	& node & ro & last child \\
+		\texttt{children\_count}, \texttt{c} 	& integer & ro & number of children \\
+		\texttt{kids}							& table		& ro & list of children nodes
+	\end{tabular}
+	\caption{%
+		\label{tbl:luaedNodeProp}
+		Node properties accessible from Lua. rw: read-write, ro: read only. Note
+		that when referring to the \emph{current} node, the predefined variables
+		(see table \ref{tbl:luaedPredefVar}) are even more concise, \eg{}
+		\texttt{N.len} or \texttt{N.L} can be written just \texttt{L}, but they
+		are read-only.
+	}
+\end{table}
 
 \noindent{}So for example the parent of the current node is expressed by
-\texttt{N.par}; doubling its length would be \texttt{N.par.len = N.par.len * 2}.
-Note that the predefined variables 
+\texttt{N.par}; doubling its length could be \texttt{N.par.len = N.par.len * 2}.
 
 \subsubsection{Examples}
 
