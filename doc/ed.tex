@@ -135,32 +135,35 @@ which just prints the tree rooted at the current node.
 Conditions are Boolean expressions usually involving node properties which are
 available as predefined variables. As the program "visits" each node in turn,
 the variables are set to the current node's properties.  These predefined
-variables have short names, to keep expressions concise. They are shown in the
-table below.
+variables have short names, to keep expressions concise. They are shown in table
+\ref{tbl:luaedPredefVar}.
 
-\begin{center}
-\begin{tabular}{cll}
-name & (Lua) type & meaning (refers to the current node)\\
-\hline
-\texttt{a} & integer & number of ancestors  \\
-\texttt{b} & number & support value (or \texttt{nil}) \\
-\texttt{c} & integer & number of children (direct descendants) \\
-\texttt{D} & integer & total number of descendants (includes children) \\
-\texttt{d} & number & depth (distance to root) \\
-\texttt{i} & Boolean & true iff node is strictly internal (i.e., not root!) \\
-\texttt{lbl} & string & label \\
-\texttt{l} (ell) & Boolean & true iff node is a leaf \\
-\texttt{L} & number & parent edge length \\
-\texttt{N} & node & the current node itself \\
-\texttt{r} & Boolean & true iff node is the root
-\end{tabular}
-\end{center}
-
-\noindent{}Variables \texttt{b} and \texttt{lbl} are both derived from the
-label, but \texttt{b} is interpreted as a number, and is undefined if the
-conversion to a number fails, or if the node is a leaf. Edge length and depth
-(\texttt{L} and \texttt{d}) are undefined (not zero!) if not specified in the
-Newick tree, as in cladograms.
+\begin{table}
+	\centering
+	\begin{tabular}{cll}
+		name & (Lua) type & meaning (refers to the current node)\\
+		\hline
+		\texttt{a} & integer & number of ancestors  \\
+		\texttt{b} & number & support value (or \texttt{nil}) \\
+		\texttt{c} & integer & number of children (direct descendants) \\
+		\texttt{D} & integer & total number of descendants (includes children) \\
+		\texttt{d} & number & depth (distance to root) \\
+		\texttt{i} & Boolean & true iff node is strictly internal (i.e., not root!) \\
+		\texttt{lbl} & string & label \\
+		\texttt{l} (ell) & Boolean & true iff node is a leaf \\
+		\texttt{L} & number & parent edge length \\
+		\texttt{N} & node & the current node itself \\
+		\texttt{r} & Boolean & true iff node is the root
+	\end{tabular}
+	\caption{%
+		\label{tbl:luaedPredefVar}
+		Predefined variables in \luaed. Variables \texttt{b} and \texttt{lbl} are
+		both derived from the label, but \texttt{b} is interpreted as a number, and
+		is undefined if the conversion to a number fails, or if the node is a leaf.
+		Edge length and depth (\texttt{L} and \texttt{d}) are undefined (not zero!)
+		if not specified in the Newick tree, as in cladograms.
+	}
+\end{table}
 
 The condition being just a Boolean expression written in Lua, all the logical
 operators of the Lua language can be used (indeed, any valid Lua snippet can be
@@ -188,10 +191,12 @@ expression & selects: \\
 \subsubsection{Actions}
 
 Actions are arbitrary Lua expressions. \luaed{} predefines some of the most
-current functions (these have one-letter names for convenience when passing the
-action on the command line):
+current functions (table \ref{tbl:luaedPredefFunc}), and you can of course use
+any arbitrary Lua code -- you can even write your own functions (this is most
+convenient if you pass the Lua code in a file, see \ref{sct:lua_file_input}).
 
-\begin{center}
+\begin{table}
+	\centering
 	\begin{tabular}{clc}
 		code & effect & modifies tree?\\
 		\hline
@@ -199,11 +204,12 @@ action on the command line):
 		\texttt{s}	& print the subtree rooted at the node 	& no \\
 		\texttt{u} 	& delete ("unlink") the node (and all descendants) & yes
 	\end{tabular}
-\end{center}
-  
-And you can of course use any arbitrary Lua code -- you can even write your own
-functions (this is most convenient if you pass the Lua code in a file, see
-\ref{sct:lua_file_input}).
+	\caption{%
+		\label{tbl:luaedPredefFunc}
+		Predefined actions in \luaed. The names are one letter long for convenience
+		when passing the action on the command line.
+	}
+\end{table}
 
 \sched{} defines a "node" type, and the current node is always accessible as
 variable \texttt{N} (other nodes can be obtained through node properties, see
@@ -230,9 +236,9 @@ length and label can be modified):
 	\end{minipage}
 \end{center}
 
-So for example the parent of the current node is expressed by \texttt{N.par};
-doubling its length would be \texttt{N.par.len = N.par.len * 2}. 
-
+\noindent{}So for example the parent of the current node is expressed by
+\texttt{N.par}; doubling its length would be \texttt{N.par.len = N.par.len * 2}.
+Note that the predefined variables 
 
 \subsubsection{Examples}
 
@@ -273,9 +279,9 @@ Here is our good friend the Catarrhinine tree again:
 
 To multiply all its branch lengths by (say) 3.5, do the following:
 
-\verbatiminput{ed_9_svg.cmd}
+\verbatiminput{ed_12_svg.cmd}
 \begin{center}
-\includegraphics{ed_9_svg.pdf}
+\includegraphics{ed_12_svg.pdf}
 \end{center}
 
 \begin{samepage}
