@@ -207,11 +207,11 @@ functions (this is most convenient if you pass the Lua code in a file, see
 
 \sched{} defines a "node" type, and the current node is always accessible as
 variable \texttt{N} (other nodes can be obtained through node properties, see
-below).  Node properties can be accessed via Lua table syntax. Some fields have
-both a short and a long name, the former is intended for use on the command line
-(where space is at a premium), the latter is for use in scripts (but both can be
-used anywhere). The following fields are accessible (note that only edge length
-and label can be modified):
+below).  Node properties can be accessed as fields in a Lua table. Some fields
+have both a short and a long name, the former is intended for use on the command
+line (where space is at a premium), the latter is for use in scripts (but both
+can be used anywhere). The following fields are defined (note that only edge
+length and label can be modified):
 
 \begin{center}
 	\begin{minipage}{0.8\textwidth}
@@ -233,8 +233,6 @@ and label can be modified):
 So for example the parent of the current node is expressed by \texttt{N.par};
 doubling its length would be \texttt{N.par.len = N.par.len * 2}. 
 
-The delete action was renamed to \texttt{u} because the \texttt{d} symbol stands
-for the node's depth.
 
 \subsubsection{Examples}
 
@@ -254,9 +252,9 @@ opening parentheses.} To format\footnote{\sched{} automatically loads the {\tt
 format} module so that the full-fledged {\tt format} function is available.}
 the lengths to two decimal places, do the following:
 
-\verbatiminput{ed_7_txt.cmd}
+\verbatiminput{ed_11_txt.cmd}
 \begin{samepage}
-\verbatiminput{ed_7_txt.out}
+\verbatiminput{ed_11_txt.out}
 \end{samepage}
 
 \begin{samepage}
