@@ -1,2 +1,2 @@
 nw_luaed -f number_inodes.lua falconiformes \
-| nw_display -s -v 25 -b 'visibility:hidden' -
+| nw_display -s -v 25 -b 'opacity:0' -
