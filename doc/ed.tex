@@ -362,14 +362,15 @@ when they are called.
 	}
 \end{table}
 
-A simple examle is a tree counter. As you know by now, the \nutils{} are able to
-process files that contain any number of trees. But just how many trees are
-there in a file? If you're certain that there is exactly one tree per line, you
-just use \texttt{wc -l}. But the \nw{} format allows trees to span more than one
-line, or conversely there may be more than one tree per line; finally there may
-be blank lines. All these conspire to yield wrong tree counts. To solve this, we
-write a tree counter in Lua, and pass it to \luaed. Here is the counter:
+\paragraph{A tree counter}
 
+As you know by now, the \nutils{} are able to process files that contain any
+number of trees. But just how many trees are there in a file? If you're certain
+that there is exactly one tree per line, you just use \texttt{wc -l}. But the
+\nw{} format allows trees to span more than one line, or conversely there may be
+more than one tree per line; finally there may be blank lines. All these
+conspire to yield wrong tree counts. To solve this, we write a tree counter in
+Lua, and pass it to \luaed. Here is the counter:
 
 \begin{samepage}
 \verbatiminput{ed_13_txt.cmd}
@@ -392,6 +393,49 @@ Here it is in action. First, the simple case of one tree per line:
 \verbatiminput{ed_15_txt.cmd}
 \verbatiminput{ed_15_txt.out}
 
+\noindent{}Right. Now how about this one: these are the same trees as in
+\texttt{forest}, but all on a single line:
+
+\verbatiminput{ed_16_txt.cmd}
+\verbatiminput{ed_16_txt.out}
+
+\verbatiminput{ed_17_txt.cmd}
+\verbatiminput{ed_17_txt.out}
+
+\noindent{}\luaed{} is not fooled! And this is the opposite case -- an indented tree, which has one \emph{node} per line:
+
+\verbatiminput{ed_18_txt.cmd}
+\verbatiminput{ed_18_txt.out}
+
+\verbatiminput{ed_19_txt.cmd}
+\verbatiminput{ed_19_txt.out}
+
+There's no confusing our tree counter, it seems. Note that in future versions I
+might well make this unnecessary by supplying a predefined variable which counts
+the input trees, akin to Awk's \texttt{NR}.
+
+\paragraph{Numbering inner nodes}
+
+I was once handed a tree with the task of numbering the inner nodes, starting
+close to the leaves and ending at the root.\footnote{Thanks to Beno\^{i}t
+Defaucheux for this example.} Here is a tree with unlabeled inner nodes (I hide
+the branch lengths lest they obscure the inner node labels, which will also be
+numeric):
+
+\verbatiminput{ed_22_svg.cmd}
+\begin{center}
+\includegraphics{ed_22_svg.pdf}
+\end{center}
+
+A solution is the following \luaed{} script:
+
+\verbatiminput{ed_20_txt.cmd}
+\verbatiminput{ed_20_txt.out}
+
+\verbatiminput{ed_21_svg.cmd}
+\begin{center}
+\includegraphics{ed_21_svg.pdf}
+\end{center}
 \subsection{\ed}
 
 \ed{} iterates over the nodes in a specific order, and for each node it
