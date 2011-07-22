@@ -63,11 +63,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const char *CONDITION = "condition";
 const char *ACTION = "action";
 const char *STOP_AT_1ST_MATCH = "stop";
-const char *START = "start";
+const char *START = "start_run";
 const char *START_TREE = "start_tree";
 const char *NODE = "node";
 const char *STOP_TREE = "stop_tree";
-const char *STOP = "stop";
+const char *STOP = "stop_run";
 
 enum order { POST_ORDER, PRE_ORDER };
 
@@ -854,6 +854,11 @@ static int lua_node_get(lua_State *L)
 	}
 }
 
+/* does nothing - uses this one when passed -f and the use has not written a
+ * node() function. */
+
+static int lua_no_op(lua_State *L) {}
+
 /* Processes the current node according to the condtion and action given on the
  * command line. */
 
@@ -919,6 +924,9 @@ static int luaopen_lnode (lua_State *L)
 static void run_user_hook(lua_State *L, const char *phase)
 {
 	lua_getfield(L, LUA_GLOBALSINDEX, phase);
+	// TODO: this lua_isfunction() check should be done once and for all,
+	// before the tree is processed, like for the NODE function (see main(),
+	// around l. 956
 	if (lua_isfunction(L, -1))
 		lua_call(L, 0, 0);
 	else 
@@ -948,6 +956,22 @@ int main(int argc, char* argv[])
 
 	if (NULL != params.user_hooks_filename) {
 		run_user_hooks_file(L, params.user_hooks_filename);
+		lua_getfield(L, LUA_GLOBALSINDEX, NODE);
+		int NODE_type = lua_type(L, -1);
+		switch(NODE_type) {
+		case LUA_TFUNCTION:
+			break; /* ok, do nothing */
+		case LUA_TNIL:
+			/* function node() was not defined: set it to no-op */
+			lua_pushcfunction(L, lua_no_op);
+			lua_setglobal(L, NODE);
+			break;
+		default:
+			fprintf(stderr, "WARNING: 'node' is not a function"
+				" - substituting no-op.\n");
+			lua_pushcfunction(L, lua_no_op);
+			lua_setglobal(L, NODE);
+		}
 	} else {
 		lua_pushcfunction(L, lua_cli_process_node);
 		lua_setglobal(L, NODE);
