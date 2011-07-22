@@ -191,8 +191,12 @@ expression & selects: \\
 \end{tabular}
 \end{center}
 
-\noindent{}If it is certain that all nodes do have support, checks such as
-\verb+b ~= nil+ can be omitted.
+Notes:
+\begin{itemize}
+	\item If it is certain that all nodes do have support, checks such as \verb+b ~= nil+ can be omitted. 
+	\item if an action must be performed on every node, just pass \texttt{true} as
+	the condition.
+\end{itemize}
 
 \subsubsection{Actions}
 
@@ -257,7 +261,7 @@ fields.
 
 \subsubsection{Examples}
 
-{\it Formatting Lengths} 
+\paragraph{Formatting Lengths} 
 
 \noindent{}Some phylogeny programs return \nw{} trees with an unrealistic number
 of decimal places. For example, the \texttt{HRV.nw} tree has six:
@@ -279,7 +283,7 @@ the lengths to two decimal places, do the following:
 \end{samepage}
 
 \begin{samepage}
-\noindent{}{\it Multiplying lengths by a constant}
+\paragraph{Multiplying lengths by a constant}
 
 It may be necessary to have two trees which only differ by a constant multiple
 of the branch lengths. This can be used, for example, to test competing
@@ -300,40 +304,93 @@ To multiply all its branch lengths by (say) 3.5, do the following:
 \end{center}
 
 \begin{samepage}
-\noindent{}{\it Implementing other \nutils}
+\paragraph{Implementing other \nutils}
 
-\noindent{}\sched{} can emulate other programs in the package, when these
+\noindent{}\luaed{} can emulate other programs in the package, when these
 iterate on every node and perform some action. There is no real reason to use
-\sched{} rather than the original, since \sched{} will be slower (after all, it
-has to start the Scheme interpreter, parse the Scheme expressions, etc.). But it
+\luaed{} rather than the original, since \luaed{} will be slower (after all, it
+has to start the Lua interpreter, parse the Lua expressions, etc.). But it
 can serve as illustration.
 \end{samepage}
 
 \begin{center}
 \begin{tabular}{ll}
-program & \sched{} equivalent \\
+program & \luaed{} equivalent \\
 \hline
-\labels{} 						& {\tt '((! (string-null? lbl)) (p lbl))'}  \\
-\labels{} {\tt -I} 		& {\tt '((! (| i (string-null? lbl))) (p lbl))'} \\
-\topology{}						& {\tt '(\#t (L! ""))'} \\
-\topology{} {\tt -I} 	& {\tt '(\#t (if l (L! "") (begin (L! "") (lbl!  ""))))'}
+\labels{} 						& {\tt 'lbl \~{}= ""' 'print(lbl)'}  \\
+\labels{} {\tt -I} 		& {\tt 'l and lbl \~{}= ""' 'print(lbl)'} \\
+\topology{}						& {\tt true 'N.len = ""'} \\
+\topology{} {\tt -I} 	& {\tt true 'N.len = ""; if not l then N.lbl = "" end'}
 \end{tabular}
 \end{center}
 
-The {\tt string-null?} predicate in the \labels{} replacements is checked
-because the original \labels{} does not print empty labels. The {\tt begin} form
-in the \topology{} replacement is used to perform two actions: setting the
-length and setting the label. Note also that the check for node type is done in
-the action rather than the selector. The {\tt if} on the selector is implicit.
-Future versions will allow more than one (selector, action) pair (just as Awk
-does) and allow the {\tt nw\_topology -I} equivalent to be written {\tt '((\#t
-(L! "")) ((! l) (lbl! "")))} -- set length to undefined for every node, and set
-label to empty for all non-leaf nodes. I also intend to put an implicit {\tt
-begin} around the action.
+The {\tt lbl \~{}= ""} condition in the \labels{} replacements is checked
+because the original \labels{} does not print empty labels. In the \topology{}
+replacement, the check for node type (\texttt{l}) is done in the action rather
+than the condition, because there is some code that is performed for every node
+and some additional code only for non-leaves. 
 
 \subsubsection{Lua script in a file}
 \label{sct:lua_file_input}
-%%% END copied from nw_sched
+
+Sometimes the command line is too short to comfortably write the condition and
+action. In this case, one can put the Lua code in a file, which is passed to
+\luaed{} via option \texttt{-f}. The file can contain any Lua code, but some
+function names are special: they function as "hooks", that is, they are called
+at predefined occasions. Table \ref{tbl:luaedHooks} shows the hook names and
+when they are called.
+
+\begin{table}
+	\centering
+	\begin{tabular}{ll}
+		hook name & called\ldots \\
+		\hline
+		\texttt{start\_run} 	& before processing any tree \\
+		\texttt{start\_tree}	& for each tree, before processing \\
+		\texttt{node}					& for each node \\
+		\texttt{stop\_tree}		& for each tree, after processing \\
+		\texttt{stop\_run}			& after processing all trees
+	\end{tabular}
+	\caption{%
+		\label{tbl:luaedHooks}
+		Hooks defined by \luaed. If a function named \texttt{start\_tree} is
+		defined, it will be called once per tree, before the tree is processed; etc.
+		If a hook is not defined, no action is performed on the corresponding
+		occasion. Strictly speaking, \texttt{start\_run} is not really necessary, as
+		the file is evaluated before the run anyway, but it seems cleaner to provide
+		a start-of-the-run hook as well.
+	}
+\end{table}
+
+A simple examle is a tree counter. As you know by now, the \nutils{} are able to
+process files that contain any number of trees. But just how many trees are
+there in a file? If you're certain that there is exactly one tree per line, you
+just use \texttt{wc -l}. But the \nw{} format allows trees to span more than one
+line, or conversely there may be more than one tree per line; finally there may
+be blank lines. All these conspire to yield wrong tree counts. To solve this, we
+write a tree counter in Lua, and pass it to \luaed. Here is the counter:
+
+
+\begin{samepage}
+\verbatiminput{ed_13_txt.cmd}
+\verbatiminput{ed_13_txt.out}
+\end{samepage}
+
+As you can see, I've defined three of the five possible hooks. Before any tree
+is processed, \texttt{start\_run} is called, which defines variable
+\texttt{count} and initializes it to zero. After each tree is processed
+(actually, no processing is done, since the \texttt{node} hook is not defined),
+function \texttt{stop\_tree} is called, which increments the counter. And after
+the last tree has been processed, the \texttt{stop\_run} hook is called, which
+just prints out the count.
+
+Here it is in action. First, the simple case of one tree per line:
+
+\verbatiminput{ed_14_txt.cmd}
+\verbatiminput{ed_14_txt.out}
+
+\verbatiminput{ed_15_txt.cmd}
+\verbatiminput{ed_15_txt.out}
 
 \subsection{\ed}
 
@@ -635,7 +692,7 @@ the lengths to two decimal places, do the following:
 \end{samepage}
 
 \begin{samepage}
-\noindent{}{\it Multiplying lengths by a constant}
+\paragraph{Multiplying lengths by a constant}
 
 It may be necessary to have two trees which only differ by a constant multiple
 of the branch lengths. This can be used, for example, to test competing
@@ -656,7 +713,7 @@ To multiply all its branch lengths by (say) 3.5, do the following:
 \end{center}
 
 \begin{samepage}
-\noindent{}{\it Implementing other \nutils}
+\paragraph{Implementing other \nutils}
 
 \noindent{}\sched{} can emulate other programs in the package, when these
 iterate on every node and perform some action. There is no real reason to use
