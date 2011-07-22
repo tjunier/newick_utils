@@ -196,10 +196,11 @@ expression & selects: \\
 
 \subsubsection{Actions}
 
-Actions are arbitrary Lua expressions. \luaed{} predefines some of the most
-common ones (table \ref{tbl:luaedPredefFunc}), and you can of course write
-your own. -- including by defining new functions (this is most
-convenient if you pass the Lua code in a file, see \ref{sct:lua_file_input}).
+Actions are arbitrary Lua expressions. These will typically involve printing out
+data or altering node properties or even tree structure. \luaed{} predefines a
+few functions for such purposes (table \ref{tbl:luaedPredefFunc}), and you can
+of course write your own (unless the function is very short, this is easier if
+you pass the Lua code in a file, see \ref{sct:lua_file_input}).
 
 \begin{table}
 	\centering
@@ -222,11 +223,8 @@ convenient if you pass the Lua code in a file, see \ref{sct:lua_file_input}).
 
 \sched{} defines a "node" type, and the current node is always accessible as
 variable \texttt{N} (other nodes can be obtained through node properties, see
-below).  Node properties can be accessed as fields in a Lua table. Some fields
-have both a short and a long name, the former is intended for use on the command
-line (where space is at a premium), the latter is for use in scripts (but both
-can be used anywhere). The following fields are defined (note that only edge
-length and label can be modified):
+below).  Node properties can be accessed as fields in a Lua table. Table \ref{tbl:luaedNodeProp} lists the available node
+fields.
 
 \begin{table}
 	\center
@@ -244,11 +242,13 @@ length and label can be modified):
 	\end{tabular}
 	\caption{%
 		\label{tbl:luaedNodeProp}
-		Node properties accessible from Lua. rw: read-write, ro: read only. Note
-		that when referring to the \emph{current} node, the predefined variables
-		(see table \ref{tbl:luaedPredefVar}) are even more concise, \eg{}
-		\texttt{N.len} or \texttt{N.L} can be written just \texttt{L}, but they
-		are read-only.
+		Node properties accessible from Lua. rw: read-write, ro: read only. Some
+		fields have both a short and a long name, the former is intended for use on
+		the command line (where space is at a premium), the latter is for use in
+		scripts (but both can be used anywhere). Note that when referring to the
+		\emph{current} node, the predefined variables (see table
+		\ref{tbl:luaedPredefVar}) are even more concise, \eg{} \texttt{N.len} or
+		\texttt{N.L} can be written just \texttt{L}, but they are read-only.
 	}
 \end{table}
 
