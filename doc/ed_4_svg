@@ -1,1 +1,1 @@
-nw_ed HRV_cg.nw 'i & b < 50' o | nw_display -sr -w 450 -
+nw_luaed HRV_cg.nw 'i and b < 50' 'o()' | nw_display -sr -w 450 -
