@@ -259,6 +259,41 @@ fields.
 \noindent{}So for example the parent of the current node is expressed by
 \texttt{N.par}; doubling its length could be \texttt{N.par.len = N.par.len * 2}.
 
+\subsubsection{Lua script in a file}
+\label{sct:lua_file_input}
+
+Sometimes the command line is too short to comfortably write the condition and
+action. In this case, one can put the Lua code in a file, which is passed to
+\luaed{} via option \texttt{-f}. The file can contain any Lua code, but some
+function names are special: they function as "hooks", that is, they are called
+on predefined occasions. Table \ref{tbl:luaedHooks} shows the hook names and
+when they are called.
+
+\begin{table}
+	\centering
+	\begin{tabular}{ll}
+		hook name & called\ldots \\
+		\hline
+		\texttt{start\_run} 	& before processing any tree \\
+		\texttt{start\_tree}	& for each tree, before processing \\
+		\texttt{node}					& for each node \\
+		\texttt{stop\_tree}		& for each tree, after processing \\
+		\texttt{stop\_run}			& after processing all trees
+	\end{tabular}
+	\caption{%
+		\label{tbl:luaedHooks}
+		Hooks defined by \luaed. If a function named \texttt{start\_tree} is
+		defined, it will be called once per tree, before the tree is processed; etc.
+		If a hook is not defined, no action is performed on the corresponding
+		occasion. Strictly speaking, \texttt{start\_run} is not really necessary, as
+		the file is evaluated before the run anyway, but it seems cleaner to provide
+		a start-of-the-run hook as well.
+	}
+\end{table}
+
+See "tree counter" and "numbering nodes" below for examples of use of
+\texttt{-f}.
+
 \subsubsection{Examples}
 
 \paragraph{Opening Poorly-supported Nodes}
@@ -361,39 +396,6 @@ because the original \labels{} does not print empty labels. In the \topology{}
 replacement, the check for node type (\texttt{l}) is done in the action rather
 than the condition, because there is some code that is performed for every node
 and some additional code only for non-leaves. 
-
-\subsubsection{Lua script in a file}
-\label{sct:lua_file_input}
-
-Sometimes the command line is too short to comfortably write the condition and
-action. In this case, one can put the Lua code in a file, which is passed to
-\luaed{} via option \texttt{-f}. The file can contain any Lua code, but some
-function names are special: they function as "hooks", that is, they are called
-on predefined occasions. Table \ref{tbl:luaedHooks} shows the hook names and
-when they are called.
-
-\begin{table}
-	\centering
-	\begin{tabular}{ll}
-		hook name & called\ldots \\
-		\hline
-		\texttt{start\_run} 	& before processing any tree \\
-		\texttt{start\_tree}	& for each tree, before processing \\
-		\texttt{node}					& for each node \\
-		\texttt{stop\_tree}		& for each tree, after processing \\
-		\texttt{stop\_run}			& after processing all trees
-	\end{tabular}
-	\caption{%
-		\label{tbl:luaedHooks}
-		Hooks defined by \luaed. If a function named \texttt{start\_tree} is
-		defined, it will be called once per tree, before the tree is processed; etc.
-		If a hook is not defined, no action is performed on the corresponding
-		occasion. Strictly speaking, \texttt{start\_run} is not really necessary, as
-		the file is evaluated before the run anyway, but it seems cleaner to provide
-		a start-of-the-run hook as well.
-	}
-\end{table}
-
 \paragraph{A tree counter}
 
 As you know by now, the \nutils{} are able to process files that contain any
