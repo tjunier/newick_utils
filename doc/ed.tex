@@ -337,7 +337,7 @@ Sometimes the command line is too short to comfortably write the condition and
 action. In this case, one can put the Lua code in a file, which is passed to
 \luaed{} via option \texttt{-f}. The file can contain any Lua code, but some
 function names are special: they function as "hooks", that is, they are called
-at predefined occasions. Table \ref{tbl:luaedHooks} shows the hook names and
+on predefined occasions. Table \ref{tbl:luaedHooks} shows the hook names and
 when they are called.
 
 \begin{table}
@@ -368,7 +368,7 @@ As you know by now, the \nutils{} are able to process files that contain any
 number of trees. But just how many trees are there in a file? If you're certain
 that there is exactly one tree per line, you just use \texttt{wc -l}. But the
 \nw{} format allows trees to span more than one line, or conversely there may be
-more than one tree per line; finally there may be blank lines. All these
+more than one tree per line; moreover there may be blank lines. All these
 conspire to yield wrong tree counts. To solve this, we write a tree counter in
 Lua, and pass it to \luaed. Here is the counter:
 
