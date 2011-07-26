@@ -98,6 +98,7 @@ summarized in the table below.
 \end{center}
 
 \subsection{\luaed}
+\label{sct:luaed}
 
 Although \luaed{} is the most recent of the three, we'll cover it first because
 if this one does what you need it's unlikely you'll need the others.  Let's look
@@ -471,33 +472,21 @@ A solution is the following \luaed{} script:
 \includegraphics{ed_21_svg.pdf}
 \end{center} 
 
-%% TODO: slim down the nw_ed and nw_sched sections, as most of the context is
-%% introduced with nw_luaed.
+%% TODO: command-line options such as -n and -o
+
+\subsubsection{Future}
+
+I intend to develop \luaed{} further. Among the items in my TODO list are a few
+new predefined variables (number of records, root of the tree, more powerful
+structure-altering functions, etc).
 
 \subsection{\ed}
 
-\ed{} works along the same principles as does \luaed, and has a similar
-interface, but its functionality is much more limited, in particular there is a
-fixed set of actions, and the user cannot define new ones.
+\textbf{Note}: it is likely that \luaed{} (\ref{sct:luaed}) will be more useful
+than \ed. See also section \ref{sct_ed} for a general intro to the stream
+editing programs. This section gives a minimal description of \ed, without
 
-\noindent{}I'll show the same examples as for \luaed{} (when possible), but
-without all the discussion. Everything that \ed{} does can be done with \luaed.
-
-\verbatiminput{ed_2_txt.cmd}
-\begin{samepage}
-\verbatiminput{ed_2_txt.out}
-\end{samepage}
-
-\noindent{}This instructs \ed{} to iterate over the nodes, in \no{}, and to
-print the subtree (action \texttt{s}) for all nodes that match the expression
-\texttt{b >= 95}, which means "interpret the node label as a (bootstrap) support
-value, and evaluate to true if that value is greater than 95". As we can see,
-\ed{} reports the three well-supported clades (primates, tetrapods, and
-ray-finned fishes), in \no. We also remark that one of the clades (primates) is
-contained in another (tetrapods). Finally, option \texttt{-n} suppresses
-the printing of the whole tree at the end of the run, which isn't useful here.
-
-Like for \luaed, the two parameters of \ed{} (besides the input file) are the
+The two parameters of \ed{} (besides the input file) are the
 condition and the action. 
 
 \subsubsection{Conditions}
@@ -562,8 +551,7 @@ expression & selects: \\
 
 \subsubsection{Actions}
 
-The actions are also coded by a single letter, for the same reason. For now,
-the following are implemented:
+The actions are also coded by a single letter, for the same reason. The following are implemented:
 
 \begin{center}
 \begin{tabular}{clc}
@@ -576,23 +564,26 @@ code & effect & modifies tree?\\
 \end{tabular}
 \end{center}
 
-%TODO: check next §
-\ed{} is somewhat experimental; it is also the only program that is not
-deliberately "orthogonal" to the rest, that is, it can emulate some of the
-functionality of other utilities.
+I have no plans to implement any other actions, as this can be done easily
+with \luaed{} (or \sched).
 
 \subsection{\sched}
 
-As mentioned above, \sched{} works like \ed{}, but embeds a Scheme interpreter
-so that the address (also called the {\em selector}) and action are passed as a
-Scheme expression. The Scheme language (see link above) has a simple syntax,
-but it can be slightly surprising at first. To understand the following
-examples, you just need to know that operators \emph{precede} their arguments,
-as do function names, so that the sum of 2 and 2 is written \texttt{(+ 2 2)},
-the sine of $x$ is \texttt{(sin x)}, \texttt{(< 3 2)} is false, etc.
+\textbf{Note}: it is likely that \luaed{} (\ref{sct:luaed}) will be more
+convenient than \sched. See also section \ref{sct_ed} for a general intro to the
+stream editing programs. This section gives a minimal description of \sched,
+with no motivation and only a few examples (see \ref{sct:luaed} for more).
+
+\noindent{}As mentioned above, \sched{} works like \luaed{}, but uses Scheme
+instead of Lua. Accordingly, the condition and action are passed as a Scheme
+expression. The Scheme language has a simple syntax, but it can
+be slightly surprising at first. To understand the following examples, you just
+need to know that operators \emph{precede} their arguments, as do function
+names, so that the sum of 2 and 2 is written \texttt{(+ 2 2)}, the sine of $x$
+is \texttt{(sin x)}, \texttt{(< 3 2)} is false, etc.
 
 \noindent{}As a first example, let's again extract all
-well-supported clades from the tree of vertebrate genera, as we did with \ed.
+well-supported clades from the tree of vertebrate genera, as we did with \luaed.
 
 \verbatiminput{ed_5_txt.cmd}
 \begin{samepage}
@@ -711,81 +702,7 @@ a string or a number. If the argument is a string, it attempts to convert it to
 a number. If this fails, the edge length is undefined. The \texttt{lbl!}
 function sets the current node's label. Its argument is a string.
 
-The delete action was renamed to \texttt{u} because the \texttt{d} symbol stands
-for the node's depth.
+\subsubsections{Future}
 
-\subsubsection{Examples}
-
-{\it Formatting Lengths} 
-
-\noindent{}Some phylogeny programs return \nw{} trees with an unrealistic number
-of decimal places. For example, the \texttt{HRV.nw} tree has six:
-
-\verbatiminput{ed_6_txt.cmd}
-\begin{samepage}
-\verbatiminput{ed_6_txt.out}
-\end{samepage}
-
-\noindent{}Here I use \nwindent{} to show each node on a line for clarity, and
-show only the last ten.\footnote{the \emph{first} ten lines contain only
-opening parentheses.} To format\footnote{\sched{} automatically loads the {\tt
-format} module so that the full-fledged {\tt format} function is available.}
-the lengths to two decimal places, do the following:
-
-\verbatiminput{ed_7_txt.cmd}
-\begin{samepage}
-\verbatiminput{ed_7_txt.out}
-\end{samepage}
-
-\begin{samepage}
-\paragraph{Multiplying lengths by a constant}
-
-It may be necessary to have two trees which only differ by a constant multiple
-of the branch lengths. This can be used, for example, to test competing
-hypotheses about evolution rates.
-\end{samepage}
-Here is our good friend the Catarrhinine tree again:
-
-\verbatiminput{ed_8_svg.cmd}
-\begin{center}
-\includegraphics{ed_8_svg.pdf}
-\end{center}
-
-To multiply all its branch lengths by (say) 3.5, do the following:
-
-\verbatiminput{ed_9_svg.cmd}
-\begin{center}
-\includegraphics{ed_9_svg.pdf}
-\end{center}
-
-\begin{samepage}
-\paragraph{Implementing other \nutils}
-
-\noindent{}\sched{} can emulate other programs in the package, when these
-iterate on every node and perform some action. There is no real reason to use
-\sched{} rather than the original, since \sched{} will be slower (after all, it
-has to start the Scheme interpreter, parse the Scheme expressions, etc.). But it
-can serve as illustration.
-\end{samepage}
-
-\begin{center}
-\begin{tabular}{ll}
-program & \sched{} equivalent \\
-\hline
-\labels{} 						& {\tt '((! (string-null? lbl)) (p lbl))'}  \\
-\labels{} {\tt -I} 		& {\tt '((! (| i (string-null? lbl))) (p lbl))'} \\
-\topology{}						& {\tt '(\#t (L! ""))'} \\
-\topology{} {\tt -I} 	& {\tt '(\#t (if l (L! "") (begin (L! "") (lbl!  ""))))'}
-\end{tabular}
-\end{center}
-
-The {\tt string-null?} predicate in the \labels{} replacements is checked
-because the original \labels{} does not print empty labels. The {\tt begin} form
-in the \topology{} replacement is used to perform two actions: setting the
-length and setting the label. Note also that the check for node type is done in
-the action rather than the selector. The {\tt if} on the selector is implicit.
-Future versions will allow more than one (selector, action) pair (just as Awk
-does) and allow the {\tt nw\_topology -I} equivalent to be written {\tt '((\#t
-(L! "")) ((! l) (lbl! "")))} -- set length to undefined for every node, and set
-label to empty for all non-leaf nodes. I also intend to put an implicit {\tt
-begin} around the action.
+I do not plan to develop \sched{} any more, because in my opinion \luaed{} is
+better. I will probably drop it eventually, but not immediately.
