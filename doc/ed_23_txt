@@ -1,0 +1,2 @@
+nw_luaed -orn vrt2cg.nw 'b ~= nil and b >= 95' 's()' \
+| nw_display -w 65 -

@@ -122,6 +122,12 @@ out the tree rooted at the current node.
 \verbatiminput{ed_10_txt.out}
 \end{samepage}
 
+Note that the \texttt{(Papio,(Hylobates,Homo))} clade appears twice -- once on
+its own, and once within a larger clades (the tetrapods). This is because both
+clades meet the condition -- the first has support value 99, the second has 100.
+There is a way (see Examples below) of only showing non-overlapping clades,
+which results in the "deepest" of two overlapping clades to be printed.
+
 \noindent{}As always, the first argument to the program is a tree file,
 \texttt{vrt2cg.nw} in this example.
 
@@ -472,7 +478,24 @@ A solution is the following \luaed{} script:
 \includegraphics{ed_21_svg.pdf}
 \end{center} 
 
-%% TODO: command-line options such as -n and -o
+\paragraph{Extracting deep, well-supported clades}
+
+In the first example of this section (\ref{sct:luaed}), we extracted
+well-supported clades, but there was an overlap because one well-supported clade
+was a subclade of another. We may want to extract only the "deepest" clades that
+meet the condition, in other words, once a node has been found to match, its
+descendants should not be processed. This is the purpose of option \texttt{-o}.
+For this option to be useful, though, the tree must be processed from the root
+to the leaves, which is the opposite of the default (namely, \no). To override
+this, we pass option \texttt{-r} ("reverse"):
+
+\verbatiminput{ed_23_txt.cmd}
+\begin{samepage}
+\verbatiminput{ed_23_txt.out}
+\end{samepage}
+
+\noindent{}All overlap has now disappeared: the
+\texttt{(Papio,(Hylobates,Homo))} clade is no longer printed on its own. 
 
 \subsubsection{Future}
 
@@ -702,7 +725,7 @@ a string or a number. If the argument is a string, it attempts to convert it to
 a number. If this fails, the edge length is undefined. The \texttt{lbl!}
 function sets the current node's label. Its argument is a string.
 
-\subsubsections{Future}
+\subsubsection{Future}
 
 I do not plan to develop \sched{} any more, because in my opinion \luaed{} is
 better. I will probably drop it eventually, but not immediately.
