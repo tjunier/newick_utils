@@ -46,7 +46,7 @@ AC_ARG_WITH([lua],
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_YACC
-AM_PROG_LEX
+AM_PROG_LEX	# TODO: ensure Flex >= 2.5.35
 # TODO: mb check for LaTeX for doc...
 
 LT_INIT#([disable-fast-install)]
