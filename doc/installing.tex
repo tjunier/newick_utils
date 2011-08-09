@@ -41,6 +41,9 @@ explicitly disable it (see below). On MacOS (10.6) I had to install it with
 Fink, and I needed to use the "x86\_64 only" option when installing Fink
 (otherwise the Guile library was 32 bit and the \nutils{} would not link to it).
 
+In the same way, \luaed{} will be built if the Lua headers and libraries are
+found and you do not explicitly disable them.
+
 Note that you need \emph{both} the library \emph{and} the headers for the build
 to succeed.
 
@@ -77,8 +80,9 @@ before launching \texttt{./configure} as above.
 \subsubsection{Variants}
 
 To prevent the use of \libxml, pass \texttt{--without-libxml} to
-\texttt{./configure}. Likewise, to prevent the use of Guile, pass
-\texttt{--without-guile}. 
+\texttt{./configure}. Likewise,  pass
+\texttt{--without-guile} or \texttt{without-lua}, to prevent the use of Guile or
+Lua, respectively. 
 
 If you have headers (such as Guile or LibXML's) in a non-standard location, pass
 that location via the \texttt{CPPFLAGS} environment variable when running
@@ -97,10 +101,11 @@ libraries and headers, respectively. Note that there is no space between the
 Since version 1.1, there are also binaries for some platforms. The name of the
 archive matches
 \texttt{newick-utils-<version>-<platform>-<enabled|disabled>-extra.tar.gz}.
-"enabled-extra" means that the binary depends on libXML and libguile and will
-expect to find them (as shared libs) on your system. "disabled-extra" means that
-the binary will not depend on those libraries, but of course the corresponding
-functionality (see \ref{sct:optional}) won't be available. Simply do:
+"enabled-extra" means that the binary depends on optional software (see
+\ref{sct:optional})  and will expect to find it (as shared libs) on your
+system. "disabled-extra" means that the binary will not depend on those
+libraries, but of course the corresponding functionality (see
+\ref{sct:optional}) won't be available. Simply do: 
 
 \begin{verbatim}
 $ tar xzf newick-utils-<version,etc>.tar.gz
@@ -108,7 +113,9 @@ $ cd newick-utils-<version>
 \end{verbatim}
 
 \noindent{}The binaries are in \texttt{src}. You can copy/move the binaries
-wherever it suits you.
+wherever it suits you.\footnote{Ideally, this should be done with \texttt{make
+install}, but for some reason this doesn't seem to work with the binary
+release.}
 
 \section{Versions}
 \label{sct:versions}
@@ -126,6 +133,7 @@ Flex						& \texttt{flex} 				& 2.5.35 	& source \\
 \gnu{} Guile		& \texttt{guile}				& 1.8.7 	& (optional) \\
 GCC 						& \texttt{gcc}  				& 4.4.5 	& source \\
 \gnu{} Libtool	& \texttt{ltmain.sh}  	& 2.2.6b 	& source \\
+\gnu{} Lua			& \texttt{ltmain.sh}  	& 5.1.4 	& (optional) \\
 \libxml{}				& \texttt{xml2-config}	& 2.7.7 	& (optional) \\ 
 \gnu{} Make			& \texttt{make}			 		& 3.81		& source \\
 \end{tabular}
