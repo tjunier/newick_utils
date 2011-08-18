@@ -210,7 +210,7 @@ void free_data(struct llist *leaves_queue,
 
 	destroy_llist(leaves_queue);
 
-	destroy_rnode(root, NULL);
+	//destroy_rnode(root, NULL);
 	struct list_elem *elem;
 	for (elem = all_children->head; NULL != elem; elem = elem->next) {
 		kid = elem->data;

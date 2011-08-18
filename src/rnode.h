@@ -73,10 +73,10 @@ struct rnode {
 
 struct rnode *create_rnode(char *label, char *length_as_string);
 
-/* Destroys the rnode, including the parent edge (if any). If free_data is not
- * NULL, it is called to free the node's data */
+/* Frees all rnode structures allocated so far. Use this after processing a
+ * tree. */
 
-void destroy_rnode(struct rnode *node, void (*free_data)(void*));
+void destroy_all_rnodes();
 
 /* returns the number of children a node has. */
 

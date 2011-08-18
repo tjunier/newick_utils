@@ -398,7 +398,7 @@ int main(int argc, char *argv[])
 		struct list_elem *el = original_nodes_in_order->head;
 		for (; NULL != el; el = el->next) {
 			struct rnode *current = el->data;
-			destroy_rnode(current, NULL);
+			//destroy_rnode(current, NULL);
 		}
 		destroy_llist(original_nodes_in_order);
 		destroy_llist(tree->nodes_in_order);

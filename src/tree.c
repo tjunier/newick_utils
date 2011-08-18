@@ -85,8 +85,6 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	if (children_count(old_root) == 1) {
 		if (! splice_out_rnode(old_root))
 			return FAILURE;
-		// fprintf (stderr, "freeing '%s' (spliced out).\n", old_root->label);
-		destroy_rnode(old_root, NULL);
 	}
 
 	tree->root = new_root;
@@ -122,12 +120,7 @@ void destroy_tree(struct rooted_tree *tree,
 {
 	struct list_elem *e;
 
-	/* Traversing in post-order ensures that children list's data are
-	 * already empty when we destroy the list */
-	for (e = tree->nodes_in_order->head; NULL != e; e = e->next) {
-		struct rnode *current = e->data;
-		destroy_rnode(current, node_data_destroyer);
-	}
+	/* The nodes themselves are destroyed using destroy_all_rnodes() */
 
 	destroy_llist(tree->nodes_in_order);
 	free(tree);
