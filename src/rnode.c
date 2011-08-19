@@ -38,6 +38,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "list.h"
 
+/* These variables are for keeping track of all allocated rnodes, so that we
+ * can free them all (one call to free them all :-) */
+
+static const int rnode_array_size_increment = 1000;
+static int rnode_count = 0;
+static int rnode_array_size = 0;
+static struct rnode** rnode_array = NULL;
+
 struct rnode *create_rnode(char *label, char *length_as_string)
 {
 	struct rnode *node;
@@ -71,6 +79,7 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	fprintf(stderr, "creating rnode %p '%s'\n", node, node->label);
 #endif
 
+	rnode_count++;
 	return node;
 }
 
