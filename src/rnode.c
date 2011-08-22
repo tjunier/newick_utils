@@ -79,6 +79,12 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	fprintf(stderr, "creating rnode %p '%s'\n", node, node->label);
 #endif
 
+	/* Now add to list of nodes */
+	if (NULL == rnode_array) {
+		rnode_array = malloc(rnode_array_size_increment * sizeof(struct rnode*));
+		if (NULL == rnode_array) return NULL;
+	}
+	rnode_array[rnode_count] = node;
 	rnode_count++;
 	return node;
 }
@@ -98,6 +104,16 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void *))
 	else if (NULL != node->data)
 		free(node->data);
 	free(node);
+}
+
+/* A debugging function: show all nodes in the rnode array. */
+
+void show_all_rnodes()
+{
+	struct rnode **rnode_h;
+	for (rnode_h = rnode_array; NULL != *rnode_h; rnode_h++) {
+		dump_rnode(*rnode_h);
+	}
 }
 
 inline int children_count(struct rnode *node)

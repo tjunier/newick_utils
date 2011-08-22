@@ -122,6 +122,7 @@ void destroy_tree(struct rooted_tree *tree,
 
 	/* The nodes themselves are destroyed using destroy_all_rnodes() */
 
+	show_all_rnodes();
 	destroy_llist(tree->nodes_in_order);
 	free(tree);
 }
