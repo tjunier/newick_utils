@@ -81,11 +81,14 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 
 	/* Now add to list of nodes */
 	rnode_count++;
-	if (rnode_array_size > rnode_count)
-		rnode_array = calloc(rnode_array_size_increment * sizeof(struct rnode*));
+	if (rnode_array_size > rnode_count) {
+		int new_size = rnode_array_size + rnode_array_size_increment;
+		rnode_array = realloc(rnode_array,
+			new_size * sizeof(struct rnode*));
 		if (NULL == rnode_array) return NULL;
+		rnode_array_size = new_size;
 	}
-	rnode_array[rnode_count] = node;
+	rnode_array[rnode_count - 1] = node;
 	return node;
 }
 
