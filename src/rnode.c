@@ -80,12 +80,12 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 #endif
 
 	/* Now add to list of nodes */
-	if (NULL == rnode_array) {
-		rnode_array = malloc(rnode_array_size_increment * sizeof(struct rnode*));
+	rnode_count++;
+	if (rnode_array_size > rnode_count)
+		rnode_array = calloc(rnode_array_size_increment * sizeof(struct rnode*));
 		if (NULL == rnode_array) return NULL;
 	}
 	rnode_array[rnode_count] = node;
-	rnode_count++;
 	return node;
 }
 
