@@ -127,9 +127,13 @@ struct rnode** children_array(struct rnode *node);
 
 struct llist *get_nodes_in_order(struct rnode *);
 
-/* Gets the number of rnodes created since the beginning of the run, or since
- * destroy_all_rnodes() was last called. This is a testing function, not meant
- * for app use (hence the leading '_'). */
+/* Gets the number of rnodes in rnode_array. These are the rnodes created since
+ * the beginning of the run, or since destroy_all_rnodes() was last called.
+ * This is a testing function, not meant for app use (hence the leading '_').
+ * */
 
 int _get_rnode_count();
 
+/* A debugging method that shows all nodes currently in rnode_array. */
+
+void _show_all_rnodes();

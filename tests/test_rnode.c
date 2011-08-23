@@ -65,20 +65,30 @@ int test_static_rnode_vars()
 {
 	const char *test_name = __func__;
 
+	/* Start with a blank slate: previous tests have allocated nodes. */
+	destroy_all_rnodes(NULL);
+	/* Node count should now be zero. */
+	if (0 != _get_rnode_count()) {
+		printf("%s: expected node count of 0, got %d.\n",
+				test_name, _get_rnode_count());
+		return 1;
+	}
 	/* create 10 nodes, then check the vars */
 	int i;
-	for (i = 0; i < 10; i++) 
+	for (i = 0; i < 10; i++) {
 		 create_rnode("","");
+		 // printf("[%s]: %d nodes created.\n", __func__, _get_rnode_count());
+	}
 
-	if (10 != _get_rnode_count) {
+	if (10 != _get_rnode_count()) {
 		printf("%s: expected node count of 10, got %d.\n",
-				test_name, _get_rnode_count);
+				test_name, _get_rnode_count());
 		return 1;
 	}
 	destroy_all_rnodes(NULL);
-	if (0 != _get_rnode_count) {
+	if (0 != _get_rnode_count()) {
 		printf("%s: expected node count of 0, got %d.\n",
-				test_name, _get_rnode_count);
+				test_name, _get_rnode_count());
 		return 1;
 	}
 
