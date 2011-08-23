@@ -61,6 +61,31 @@ int test_create_rnode()
 	return 0;
 }
 
+int test_static_rnode_vars()
+{
+	const char *test_name = __func__;
+
+	/* create 10 nodes, then check the vars */
+	int i;
+	for (i = 0; i < 10; i++) 
+		 create_rnode("","");
+
+	if (10 != _get_rnode_count) {
+		printf("%s: expected node count of 10, got %d.\n",
+				test_name, _get_rnode_count);
+		return 1;
+	}
+	destroy_all_rnodes(NULL);
+	if (0 != _get_rnode_count) {
+		printf("%s: expected node count of 0, got %d.\n",
+				test_name, _get_rnode_count);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int test_create_rnode_nulllabel()
 {
 	const char *test_name = "test_create_rnode_nulllabel";
@@ -560,6 +585,7 @@ int main()
 	int failures = 0;
 	printf("Starting rooted node test...\n");
 	failures += test_create_rnode();
+	failures += test_static_rnode_vars();
 	failures += test_create_rnode_nulllabel();
 	failures += test_create_rnode_emptylabel();
 	failures += test_create_rnode_nulllength();

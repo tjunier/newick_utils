@@ -126,3 +126,10 @@ struct rnode** children_array(struct rnode *node);
 /* Returns NULL in case of malloc() problems. */
 
 struct llist *get_nodes_in_order(struct rnode *);
+
+/* Gets the number of rnodes created since the beginning of the run, or since
+ * destroy_all_rnodes() was last called. This is a testing function, not meant
+ * for app use (hence the leading '_'). */
+
+int _get_rnode_count();
+

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const int rnode_array_size_increment = 1000;
 static int rnode_count = 0;
-static int rnode_array_size = 0;
+static int rnode_array_size = 0;	/* in number of nodes */
 static struct rnode** rnode_array = NULL;
 
 struct rnode *create_rnode(char *label, char *length_as_string)
@@ -81,7 +81,7 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 
 	/* Now add to list of nodes */
 	rnode_count++;
-	if (rnode_array_size > rnode_count) {
+	if (rnode_count > rnode_array_size) {
 		int new_size = rnode_array_size + rnode_array_size_increment;
 		rnode_array = realloc(rnode_array,
 			new_size * sizeof(struct rnode*));
@@ -93,6 +93,23 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 }
 
 void destroy_rnode(struct rnode *node, void (*free_data)(void *))
+{
+#ifdef SHOW_RNODE_DESTROY
+	fprintf (stderr, " freeing rnode %p '%s'\n", node, node->label);
+#endif
+	free(node->label);
+	free(node->edge_length_as_string);
+	/* if free_data is not NULL, we call it to free the node data (use this
+	 * when the data cannot just be free()d); otherwise we just free()
+	 * node->data  */
+	if (NULL != free_data)
+		free_data(node->data);
+	else if (NULL != node->data)
+		free(node->data);
+	free(node);
+}
+
+void destroy_all_rnodes(struct rnode *node, void (*free_data)(void *))
 {
 #ifdef SHOW_RNODE_DESTROY
 	fprintf (stderr, " freeing rnode %p '%s'\n", node, node->label);
@@ -271,3 +288,5 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	}
 	return nodes_in_order;
 }
+
+int _get_rnode_count() { return rnode_count; }
