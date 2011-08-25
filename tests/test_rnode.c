@@ -96,6 +96,37 @@ int test_static_rnode_vars()
 	return 0;
 }
 
+int test_static_rnode_vars_2()
+{
+	const char *test_name = __func__;
+	struct rooted_tree tree;
+
+	/* Start with a blank slate: previous tests have allocated nodes. */
+	destroy_all_rnodes(NULL);
+	/* Node count should now be zero. */
+	if (0 != _get_rnode_count()) {
+		printf("%s: expected node count of 0, got %d.\n",
+				test_name, _get_rnode_count());
+		return 1;
+	}
+	/* create tree */
+	tree = tree_8();
+	if (9 != _get_rnode_count()) {
+		printf("%s: expected node count of 9, got %d.\n",
+				test_name, _get_rnode_count());
+		return 1;
+	}
+	destroy_all_rnodes(NULL);
+	if (0 != _get_rnode_count()) {
+		printf("%s: expected node count of 0, got %d.\n",
+				test_name, _get_rnode_count());
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int test_create_rnode_nulllabel()
 {
 	const char *test_name = "test_create_rnode_nulllabel";
@@ -596,6 +627,7 @@ int main()
 	printf("Starting rooted node test...\n");
 	failures += test_create_rnode();
 	failures += test_static_rnode_vars();
+	failures += test_static_rnode_vars_2();
 	failures += test_create_rnode_nulllabel();
 	failures += test_create_rnode_emptylabel();
 	failures += test_create_rnode_nulllength();
