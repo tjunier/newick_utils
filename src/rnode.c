@@ -119,6 +119,7 @@ void destroy_all_rnodes(void (*free_data)(void *))
 	while (rnode_count > 0)
 		destroy_rnode(rnode_array[--rnode_count], free_data);
 	free(rnode_array);
+	rnode_array_size = 0;
 	rnode_array = NULL;
 }
 
