@@ -497,7 +497,7 @@ static int draw_ornament (struct svg_data *node_data,
 			node_data->ornament,
 			mid_angle / (2*PI) * 360,
 			mid_x_pos, mid_y_pos);
-	if (NULL != transform_ornaments)
+	if (NULL != transformed_ornaments)
 		printf("%s", transformed_ornaments);
 	else 
 		return FAILURE;
