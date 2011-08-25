@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 
 #include "tree.h"
+#include "rnode.h"
 #include "parser.h"
 #include "to_newick.h"
 
@@ -140,7 +141,8 @@ int main(int argc, char *argv[])
 		if (NULL != tree) {
 			collapse_pure_clades(tree);
 			dump_newick(tree->root);
-			destroy_tree(tree, NULL);
+			destroy_all_rnodes(NULL);
+			destroy_tree(tree);
 		}
 		else switch (newick_parser_status) {
 			case PARSER_STATUS_EMPTY:	/* EOF, etc. */

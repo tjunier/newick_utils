@@ -115,15 +115,12 @@ void collapse_pure_clades(struct rooted_tree *tree)
 	}
 }
 
-// TODO: remove node_data_destroyer params (kept so things still compile)
-void destroy_tree(struct rooted_tree *tree,
-		void (*node_data_destroyer)(void *))
+void destroy_tree(struct rooted_tree *tree)
 {
 	struct list_elem *e;
 
 	/* The nodes themselves are destroyed using destroy_all_rnodes() */
 
-	// _show_all_rnodes();
 	destroy_llist(tree->nodes_in_order);
 	free(tree);
 }

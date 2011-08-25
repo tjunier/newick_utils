@@ -61,14 +61,9 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
 
 void collapse_pure_clades(struct rooted_tree *tree);
 
-/* Destroys a tree, releasing memory. Also frees memory held in the tree's
- * nodes and node list. Each node is freed with destroy_rnode(), which is
- * passed 'destroyer' as argument. */
-/* NOTE: if the tree's nodes-in-order list is no longer valid (e.g. because the
- * tree structure has been altered), this function will fail. Instead, call
- * free_descendants() on the tree's root. */
+/* Destroys a tree, releasing memory. */
 
-void destroy_tree(struct rooted_tree *, void (*destroyer)(void *));
+void destroy_tree(struct rooted_tree *);
 
 /* Returns the number of leaves of this tree */
 

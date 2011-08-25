@@ -669,7 +669,8 @@ int main(int argc, char *argv[])
 		}
 
 		destroy_llist(selected_nodes);
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	}
 
 	destroy_llist(params.labels);

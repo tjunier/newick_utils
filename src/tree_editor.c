@@ -489,7 +489,8 @@ int main(int argc, char* argv[])
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	}
 
 	return 0;

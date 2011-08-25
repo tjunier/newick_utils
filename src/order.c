@@ -204,7 +204,8 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 		dump_newick(tree->root);
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	}
 
 	return 0;

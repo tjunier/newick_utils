@@ -255,7 +255,8 @@ int main(int argc, char *argv[])
 		dump_newick(tree->root);
 		/* NOTE: the tree was modified, but no nodes were added so 
 		 * we can use destroy_tree() */
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	}
 
 	destroy_llist(params.labels);

@@ -364,7 +364,8 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		default:
 			assert(0);
 		}
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	} else {
 		enum deroot_status result = deroot(tree);
 		switch (result) {
@@ -384,7 +385,8 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 		default:
 			assert(0);
 		}
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	}
 	destroy_llist(outgroup_nodes);
 }

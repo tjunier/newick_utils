@@ -988,7 +988,8 @@ int main(int argc, char* argv[])
 			dump_newick(tree->root);
 		}
 		run_user_hook(L, STOP_TREE);
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	}
 	run_user_hook(L, STOP);
 

@@ -500,7 +500,8 @@ int main(int argc, char *argv[])
 					assert(0);
 			}
 		}
-		destroy_tree(tree, node_destroyer);
+		destroy_all_rnodes(node_destroyer);
+		destroy_tree(tree);
 	}
 
 	return 0;

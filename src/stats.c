@@ -251,7 +251,8 @@ int main (int argc, char* argv[])
 	struct rooted_tree *tree;
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params.output_function);
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	}
 
 	return 0;

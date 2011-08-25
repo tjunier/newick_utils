@@ -307,7 +307,8 @@ int main(int argc, char *argv[])
 
 	while ((tree = parse_tree()) != NULL) {
 		process_tree(tree, params);
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	}
 
 	if (EXACT == params.mode)

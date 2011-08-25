@@ -274,7 +274,8 @@ int main(int argc, char *argv[])
 
 	while (NULL != (tree = parse_tree())) {
 		process_tree(tree, rename_map, params);
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 	}
 
 	struct llist *keys = hash_keys(rename_map);
