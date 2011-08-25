@@ -75,6 +75,9 @@ struct rnode *create_rnode(char *label, char *length_as_string);
 
 /* Frees all rnode structures allocated so far. Use this after processing a
  * tree. */
+// NOTE: for some reason it seems to make no difference whether or not this f()
+// is called (according to Valgrind), even when running on several input trees.
+// I conclude that my idea of a memory leak is incomplete.
 
 void destroy_all_rnodes();
 

@@ -40,6 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* These variables are for keeping track of all allocated rnodes, so that we
  * can free them all (one call to free them all :-) */
+/* NOTE: since all rnode pointers are stored in the rnode_array, the memory
+ * they occupy will never count as a leak unless and until rnode_array is
+ * free()d. This happens in destroy_all_rnodes(), so don't forget to call it.
+ * */
 
 static const int rnode_array_size_increment = 1000;
 static int rnode_count = 0;
@@ -109,10 +113,13 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void *))
 	free(node);
 }
 
+
 void destroy_all_rnodes(void (*free_data)(void *))
 {
 	while (rnode_count > 0)
 		destroy_rnode(rnode_array[--rnode_count], free_data);
+	free(rnode_array);
+	rnode_array = NULL;
 }
 
 void show_all_rnodes()

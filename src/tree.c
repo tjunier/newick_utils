@@ -115,6 +115,7 @@ void collapse_pure_clades(struct rooted_tree *tree)
 	}
 }
 
+// TODO: remove node_data_destroyer params (kept so things still compile)
 void destroy_tree(struct rooted_tree *tree,
 		void (*node_data_destroyer)(void *))
 {
