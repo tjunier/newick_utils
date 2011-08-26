@@ -197,21 +197,6 @@ void dump_rnode(void *arg)
 	printf ("  data    = %p\n", node->data);
 }
 
-void free_descendants(struct rnode *node)
-{
-	struct llist *nodes_in_order = get_nodes_in_order(node);
-	/* If something fails when freeing, we just return. */
-	if (NULL == nodes_in_order) return;
-	struct list_elem *el;
-	for (el = nodes_in_order->head;
-		el != nodes_in_order->tail; /* skip last element ('node') */
-		el = el->next) {
-		struct rnode *current = el->data;
-		destroy_rnode(current, NULL);
-	}
-	destroy_llist(nodes_in_order);
-}
-
 struct rnode** children_array(struct rnode *node)
 {
 	struct rnode **array = malloc(node->child_count *
