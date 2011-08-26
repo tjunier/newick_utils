@@ -721,7 +721,7 @@ static void run_user_hooks_file(lua_State * L, char *user_hooks_filename)
 {
 	int error = luaL_dofile(L, user_hooks_filename);
 	if (error) {
-		char *err_msg = lua_tostring(L, -1);
+		const char *err_msg = lua_tostring(L, -1);
 		fprintf(stderr, "%s\n", err_msg);
 		exit(EXIT_FAILURE);
 	}
@@ -857,7 +857,7 @@ static int lua_node_get(lua_State *L)
 /* does nothing - uses this one when passed -f and the use has not written a
  * node() function. */
 
-static int lua_no_op(lua_State *L) {}
+static int lua_no_op(lua_State *L) { return 0; }
 
 /* Processes the current node according to the condtion and action given on the
  * command line. */

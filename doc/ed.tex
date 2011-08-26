@@ -41,29 +41,34 @@ user-specified action is performed. In other words, they are node-oriented
 stream editors for trees.
 
 As a word of warning, I should say that these programs are among the more
-experimental in the \nutils{} package. This is why there are three programs that
-do basically the same thing, although differently and with different
-capabilities: \ed{} is the simplest (and first), it is written entirely in C and
-it is fairly limited. \sched{} was developed to address \ed{}'s limitations: by
-embedding a Scheme (\url{http://www.r6rs.org}) interpreter (\gnu{} Guile,
-\url{http://www.gnu.org/software/guile/}), its flexibility is, for practical
-purposes, limitless. Of course, this comes at the price of linking to an
-external library, which may not be available. Therefore \ed{}, for all its
-limitations, will stay in the package as it has no external dependency. Finally,
-I understand that Scheme is not the only solution as an embedded language, and
-that many people (myself included) find learning it a bit of a challenge.
-Therefore, I tried the same approach with Lua\footnote{In case you're curious,
-the reason I tried Scheme before Lua is simply that I heard about them in that
-order.} (\url{http://www.lua.org}), which is designed as an embeddable language,
-is even smaller than Guile, and by most accounts easier to learn.\footnote{And,
-in my experience, easier to embed in a C program, but your experience may
-differ. In particular, I could provide all of \luaed's functionality without
-writing a single line of Lua code, whereas \sched{} relies on a few dozen lines
-of embedded Scheme code that have to be parsed and interpreted on each run. But
-that may very possibly just reflect my poor Scheme/Guile skills.} The result,
-\luaed, is probably the best so far: as powerful as \sched, while smaller,
-faster and easier to use. For this reason, I will probably not develop \sched{}
-much more, but I won't drop it altogether either, not soon at any rate. 
+experimental in the \nutils{} package. This is why there are three programs
+that do basically the same thing, although differently and with different
+capabilities: \ed{} is the simplest (and first), it is written entirely in C
+and it is fairly limited. \sched{} was developed to address \ed{}'s
+limitations: by embedding a Scheme (\url{http://www.r6rs.org}) interpreter
+(\gnu{} Guile, \url{http://www.gnu.org/software/guile/}), its flexibility is,
+for practical purposes, limitless. Of course, this comes at the price of
+linking to an external library, which may not be available. Therefore \ed{},
+for all its limitations, will stay in the package as it has no external
+dependency. Finally, I understand that Scheme is not the only solution as an
+embedded language, and that many people (myself included) find learning it a
+bit of a challenge.  Therefore, I tried the same approach with Lua\footnote{In
+case you're curious, the reason I tried Scheme before Lua is simply that I
+heard about them in that order.} (\url{http://www.lua.org}), which is designed
+as an embeddable language, is even smaller than Guile, and by most accounts
+easier to learn.\footnote{And, in my experience, easier to embed in a C
+program, but your experience may differ. In particular, I could provide all of
+\luaed's functionality without writing a single line of Lua code, whereas
+\sched{} relies on a few dozen lines of embedded Scheme code that have to be
+parsed and interpreted on each run. But that may very possibly just reflect my
+poor Scheme/Guile skills. Furthermore, I can apparently run \luaed{} through
+Valgrind's (\url{http://www.valgrind.org}) memcheck utility without problems (I
+do this with all the programs in the utils), but with \sched{} I get tons of
+error messages. But it may be that I don't get how to manage memory with
+Guile}. The result, \luaed, is probably the best so far: as powerful as \sched,
+while smaller, faster and easier to use. For this reason, I will probably not
+develop \sched{} much more, but I won't drop it altogether either, not soon at
+any rate. 
 
 \subsection{The General Idea}
 
