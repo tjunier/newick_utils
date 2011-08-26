@@ -901,7 +901,8 @@ static void inner_main(void *closure, int argc, char* argv[])
 		if (params.show_tree) {
 			dump_newick(tree->root);
 		}
-		destroy_tree(tree, NULL);
+		destroy_all_rnodes(NULL);
+		destroy_tree(tree);
 		run_phase_code(code_phase_alist, "end-tree");
 	}
 	run_phase_code(code_phase_alist, "end");
