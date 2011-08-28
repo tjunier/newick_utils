@@ -19,7 +19,7 @@ doc/nwutils_tutorial.pdf:
 	$(MAKE) -C doc
 
 # Make a binary distribution
-# set PLATFORM=<your current platform>. Also, this should be done with
+# This should be done with
 # static libraries - pass option '--disable-shared' to ./configure.
 
 PLATFORM = $(shell uname -s)-$(shell uname -m)
