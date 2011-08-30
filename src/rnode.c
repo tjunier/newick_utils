@@ -68,6 +68,7 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	node->parent = NULL;
 	node->next_sibling = NULL;
 	node->first_child = NULL;
+	node->last_child = NULL;
 	node->child_count = 0;
 	node->data = NULL;
 	/* We must initialize to some numeric value, so we use -1 to mean
