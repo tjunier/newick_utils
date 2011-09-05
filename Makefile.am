@@ -18,12 +18,6 @@ EXTRA_DIST = \
 doc/nwutils_tutorial.pdf:
 	$(MAKE) -C doc
 
-# Make a binary distribution
-# This should be done with
-# static libraries - pass option '--disable-shared' to ./configure.
-
-PLATFORM = $(shell uname -s)-$(shell uname -m)
-
 api-doc:
 	doxygen
 
@@ -35,7 +29,7 @@ api-doc-latex: api-doc
 # static libraries - pass option '--disable-shared' to ./configure.
 
 PLATFORM = $(shell uname -s)-$(shell uname -m)
-EXTRA = enabled
+
 
 show:
 	echo $(PLATFORM)
