@@ -6,14 +6,11 @@
 
 # set -v
 
-# Checks if a test _case_ applies. For now a case always applies unless it
-# requires libxml but this is not used, or the other way around. If the test's
-# name contains the string, 'withxml', it only applies when libxml is being
-# used; if it contains 'noxml', it applies only when libxml is NOT being used;
-# otherwise it applies regardless of libxml use.
-
-echo $SRCDIR > /tmp/srcdir
-echo $PWD > /tmp/wd
+# Checks if a (nw_display) test _case_ applies. For now a case always applies
+# unless it requires libxml but this is not used, or the other way around. If
+# the test's name contains the string, 'withxml', it only applies when libxml
+# is being used; if it contains 'noxml', it applies only when libxml is NOT
+# being used; otherwise it applies regardless of libxml use.
 
 check_applies()
 {
@@ -37,23 +34,32 @@ check_applies()
 
 # Set flags, for checking which tests apply.
 
-if grep '^#define.*USE_LIBXML2' ../config.h > /dev/null ; then
+if ../src/nw_display -h | grep 'This executable uses LibXML2.' > /dev/null
+then
 	xml='on'
-else
+elif ../src/nw_display -h | grep 'This executable does NOT use LibXML2' > /dev/null
+then
 	xml='off'
+else
+	echo "Can't determine if nw_display uses LibXML - Aborting" >&2
+	exit 1
 fi
 
-if grep '^#define.*CHECK_NW_SCHED' ../config.h > /dev/null ; then
+if [ -x ../src/nw_sched ] ; then
 	check_nw_sched='on'
 else
 	check_nw_sched='off'
 fi
 
-if grep '^#define.*CHECK_NW_LUAED' ../config.h > /dev/null; then
+if [ -x ../src/nw_luaed ] ; then
 	check_nw_luaed='on'
 else
 	check_nw_luaed='off'
 fi
+
+# When this is run through the Makefile, SRCDIR is set. Otherwise, we set it
+# here.
+SRCDIR=${SRCDIR:-.}
 
 # I can't use these in strict Bourne shell, so I use a sed command
 #prog=${0%.sh}	# derive tested program's name from own name
@@ -114,7 +120,7 @@ while IFS=':' read name args ; do
 	fi
 	IFS='' cmd="$prog $args"
 	echo -n "test '$name': '$cmd' - "
-	outfile=/tmp/test_${prog}_$name.out
+	outfile=./test_${prog}_$name.out
 	(cd $SRCDIR; eval $cmd > $outfile)
 	if [ "$?" -ne "0" ] ; then
 		pass=FALSE
@@ -122,6 +128,7 @@ while IFS=':' read name args ; do
 	fi
 	if diff $outfile $SRCDIR/test_${prog}_$name.exp ; then
 		echo "pass"
+		rm $outfile
 	else
 		echo "FAIL"
 		pass=FALSE
