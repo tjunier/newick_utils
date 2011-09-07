@@ -1,3 +1,5 @@
+nw_rename: accept more than one map, and apply them in order.
+
 nw_luaed: when only passed a tree file, segfaults instead of outputting a usage
 msg.
 
