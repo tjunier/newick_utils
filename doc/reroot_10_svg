@@ -1,0 +1,1 @@
+nw_display -s -b 'opacity:0;visibility:hidden' -v 25 vrt.nw

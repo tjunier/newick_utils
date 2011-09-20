@@ -9,11 +9,11 @@ maximum-likelihood).  The Newick format is implicitly rooted, in the sense that
 there is a 'top' node from which all other nodes descend. Some applications
 regard a tree with a trifurcation at the top node as unrooted. 
 
-Rooting a tree is usually done by specifying an \textit{outgroup}. In the
-simplest case, this is a single leaf. The root is then placed in such a way
-that one of its children is the outgroup, while the other child is the rest of
-the tree (sometimes known as the \textit{ingroup}). Consider the following
-primate tree, \texttt{simiiformes\_wrong}:
+Rooting a tree is usually done by specifying an \textit{outgroup} (but see
+\ref{sct:no-outgroup}). In the simplest case, this is a single leaf. The root is
+then placed in such a way that one of its children is the outgroup, while the
+other child is the rest of the tree (sometimes known as the \textit{ingroup}).
+Consider the following primate tree, \texttt{simiiformes\_wrong}:
 
 \begin{center}
 \includegraphics{reroot_1_svg.pdf}
@@ -87,6 +87,35 @@ outgroup):
 \noindent{}To repeat: all outgroup labels were passed, not just the two
 normally needed to find the last common ancestor -- since, precisely, we can't
 use the \lca.
+
+\subsection{Rooting without an (explicit) outgroup}
+\label{sct:no-outgroup}
+
+\noindent{}Sometimes it is not clear what node(s) should form the outgroup --
+perhaps the phylogeny of the group under study is not clear, or someone forgot
+to include an outgroup in the tree\footnote{This happens regulary in published
+trees}. In that case, one can assume that the root is within the longest branch
+in the tree, and reroot there. Whether this assumption is reasonable is another
+question, indeed there are plenty of possible reasons why this may not be the
+case.
+
+In any case, should you want to reroot on the longest branch, just call
+\reroot{} without specifying any labels. Consider this tree:
+\begin{center}
+\includegraphics{reroot_10_svg.pdf}
+\end{center}
+
+As it happens, rerooting on the longest branch gets it right:
+
+\verbatiminput{reroot_11_svg.cmd}
+\begin{center}
+\includegraphics{reroot_11_svg.pdf}
+\end{center}
+
+
+
+
+
 
 \subsection{Derooting}
 
