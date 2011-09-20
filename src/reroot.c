@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "link.h"
 
+const char *err_cladogram = "Tree must be a phylogram, but some branch lengths"
+	" are not defined - aborting.\n";
+
 enum reroot_status { REROOT_OK, LCA_IS_TREE_ROOT };
 enum deroot_status { DEROOT_OK, BALANCED, NOT_BIFURCATING };
 
@@ -238,11 +241,17 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 {
 	struct rnode *outgroup_root;
-	if (0 == outgroup_nodes->count) 
+	if (0 == outgroup_nodes->count) {
 		outgroup_root = node_with_longest_edge(tree);
-	else
+		if (NULL == outgroup_root) { 
+			fprintf (stderr, err_cladogram);
+			exit(EXIT_FAILURE);
+		}
+	}
+	else {
 		outgroup_root = lca_from_nodes(tree, outgroup_nodes);
-	if (NULL == outgroup_root) { perror(NULL); exit(EXIT_FAILURE); }
+		if (NULL == outgroup_root) { perror(NULL); exit(EXIT_FAILURE); }
+	}
 
 	if (tree->root == outgroup_root) {
 		return LCA_IS_TREE_ROOT;
