@@ -46,10 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.h"
 #include "link.h"
 
-const char *err_cladogram = "Tree must be a phylogram, but some branch lengths"
-	" are not defined - aborting.\n";
-
-enum reroot_status { REROOT_OK, LCA_IS_TREE_ROOT };
+enum reroot_status { REROOT_OK, LCA_IS_TREE_ROOT, NOT_PHYLOGRAM };
 enum deroot_status { DEROOT_OK, BALANCED, NOT_BIFURCATING };
 
 struct parameters {
@@ -243,10 +240,8 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 	struct rnode *outgroup_root;
 	if (0 == outgroup_nodes->count) {
 		outgroup_root = node_with_longest_edge(tree);
-		if (NULL == outgroup_root) { 
-			fprintf (stderr, err_cladogram);
-			exit(EXIT_FAILURE);
-		}
+		if (NULL == outgroup_root)
+			return NOT_PHYLOGRAM;
 	}
 	else {
 		outgroup_root = lca_from_nodes(tree, outgroup_nodes);
@@ -391,9 +386,14 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 				try_ingroup(tree, params);
 			else {
 				fprintf (stderr,
-					"Outgroup's LCA is tree's root "
+					"ERROR: Outgroup's LCA is tree's root "
 					"- cannot reroot. Try -l.\n");
 			}
+			break;
+		case NOT_PHYLOGRAM:
+			fprintf (stderr, 
+				"ERROR: Tree must be a phylogram, but some "
+				"branch lengths are not defined - aborting.\n");
 			break;
 		default:
 			assert(0);
@@ -408,12 +408,12 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			break;
 		case NOT_BIFURCATING:
 			fprintf (stderr,
-				"WARNING: tree is already unrooted, or root"
+				"ERROR: tree is already unrooted, or root"
 				" has only 1 child - cannot deroot.\n");
 			break;
 		case BALANCED:
 			fprintf (stderr,
-				"WARNING: can't decide which of root's "
+				"ERROR: can't decide which of root's "
 				"children is the outgroup.\n");
 			break;
 		default:
