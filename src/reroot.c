@@ -63,7 +63,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hl] <newick trees filename|-> <label> [label*]\n"
+"%s [-dhl] <newick trees filename|-> [label*]\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -71,7 +71,9 @@ void help(char *argv[])
 "First argument is the name of a file that contains Newick trees, or '-' (in\n"
 "which case trees are read from standard input).\n"
 "\n"
-"Further arguments are node labels. There must be at least one.\n"
+"Further arguments are node labels. If there is at least one label, the tree\n"
+"will be re-rooted on their LCAa. If there is no label, the tree is rerooted\n"
+"on the longest branch. In this case the tree must be a phylogram.\n"
 "\n"
 "Output\n"
 "------\n"
@@ -122,6 +124,7 @@ struct parameters get_params(int argc, char *argv[])
 	while ((opt_char = getopt(argc, argv, "dhl")) != -1) {
 		switch (opt_char) {
 		case '?':
+			// TODO what is this case for?
 			exit (EXIT_FAILURE);
 		case 'd':
 			params.deroot = true;
@@ -140,18 +143,9 @@ struct parameters get_params(int argc, char *argv[])
 
 	/* check arguments */
 	int nargs = argc - optind; /* non-option arguments */
-	bool args_ok = true;
-	switch (nargs) {
-	case 0:
-		args_ok = false;
-		break;
-	case 1:
-		if (! params.deroot)
-			args_ok = false;
-	}
-	if (! args_ok) {
+	if (nargs < 1) {
 		fprintf(stderr,
-			"Usage: %s [-dhl] <filename|-> <label> [label+]\n",
+			"Usage: %s [-dhl] <filename|->  [label+]\n",
 			argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -177,6 +171,34 @@ struct parameters get_params(int argc, char *argv[])
 	params.labels = lbl_list;
 
 	return params;
+}
+
+/* Returns the node whose length is the longest. Returns NULL if it finds a
+ * node with an undefined length (i.e., the tree is not a strict phylogram).
+ * The root is not considered (although technically Newick allows edge lengths
+ * on the root) */
+
+struct rnode *node_with_longest_edge(struct rooted_tree *tree)
+{
+	double max = 0; /* some branch lengths can be < 0, but not all */
+	struct rnode *result = NULL;
+
+	struct list_elem *el;
+	/* NULL != el->next: stops the iteration _just before_ the root,
+	 * since we don't need to consider it. */
+	for (el = tree->nodes_in_order->head; NULL != el->next;
+			el = el->next) {
+		struct rnode *current = el->data;
+		if (strcmp(current->edge_length_as_string, "") == 0)
+			return NULL;
+		double len = atof(current->edge_length_as_string);
+		if (len > max) {
+			max = len;
+			result = current;
+		}
+	}
+
+	return result;
 }
 
 /* given the labels of the outgroup nodes, returns the nodes themselves, as a
@@ -215,7 +237,11 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
 
 int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 {
-	struct rnode *outgroup_root = lca_from_nodes(tree, outgroup_nodes);
+	struct rnode *outgroup_root;
+	if (0 == outgroup_nodes->count) 
+		outgroup_root = node_with_longest_edge(tree);
+	else
+		outgroup_root = lca_from_nodes(tree, outgroup_nodes);
 	if (NULL == outgroup_root) { perror(NULL); exit(EXIT_FAILURE); }
 
 	if (tree->root == outgroup_root) {
@@ -228,7 +254,6 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 
 	return REROOT_OK;
 }
-
 
 /* De-roots a tree, in the sense that the top node must contain 3 (or more if
  * the tree isn't strictly bifurcating) children. */
@@ -401,6 +426,8 @@ int main(int argc, char *argv[])
 		/* tree is free()d in process_tree(), as derooting is
 		 * compatible with ordinary free()ing (with
 		 * destroy_tree()), but rerooting is not. */
+		// TODO: why not? Can this be obsolete now that rnodes are
+		// free()d at the end? 
 		process_tree(tree, params);
 	}
 
