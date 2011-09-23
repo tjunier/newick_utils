@@ -6,7 +6,6 @@ AC_INIT([Newick Utils],[1.6],[thomas.junier@.unige.ch])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src/display.c])
-AC_CONFIG_MACRO_DIR([m4])
 
 AC_CONFIG_HEADERS([config.h])
 AH_TEMPLATE([USE_LIBXML2],[Defined to 1 if all conditions are met for use of LibXML2])

@@ -1,5 +1,3 @@
-ACLOCAL_AMFLAGS = '-I m4' 
-
 SUBDIRS = src tests 
 EXTRA_DIST = \
 	BSD_license \
