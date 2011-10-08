@@ -9,7 +9,6 @@ html
 latex
 libtool
 Makefile
-Makefile.in
 mkinstalldirs
 Session.vim
 stamp-h1
