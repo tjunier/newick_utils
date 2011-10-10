@@ -7,6 +7,7 @@ EXTRA_DIST = \
 	tests/*.sh \
 	tests/*.map \
 	tests/*.cmap \
+	tests/*.lua \
 	src/*.sh \
 	src/newick_utils.py \
 	src/nw_info.py \
