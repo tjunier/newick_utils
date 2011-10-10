@@ -1,4 +1,3 @@
-
 SUBDIRS = src tests 
 EXTRA_DIST = \
 	BSD_license \
