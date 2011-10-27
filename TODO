@@ -1,4 +1,3 @@
-mention test_binaries.sh in manual
 
 nw_rename: accept more than one map, and apply them in order.
 
@@ -559,6 +558,8 @@ Scheme list (what else?), then... car and cdr!
 
 [done] nw_sched: check help page, and sync w/ tutorial; add examples incl.
 implementation of other nutils (nw_topology, nw_label, nw_trim?); 
+
+[done] mention test_binaries.sh in manual
 
 tests for nw_sched: test undefinedness of b, d, etc. -- all variables that may
 be undefined.
