@@ -1,3 +1,10 @@
+use curses-like charcters for nw_display (ASCII version)
+
+nw_condense: condense clades with bootstrap value greater than some threshold.
+
+write an independent nw_open program that does what we now do with nw_*ed; or
+possibly add this behaviour to nw_condense (though the name would be
+counter-intuitive).
 
 nw_rename: accept more than one map, and apply them in order.
 
