@@ -9,4 +9,6 @@ ls ../src/nw_* | grep -v '\.py$' | while read bin; do
 		exit
 	fi
 done
-echo "\nAll tests PASS."
+
+echo
+echo "All tests PASS."
