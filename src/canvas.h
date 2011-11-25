@@ -103,6 +103,27 @@ void canvas_draw_hline(struct canvas* canvas , int line, int start, int end);
 
 void canvas_write(struct canvas* canvas, int col, int line, char *text);
 
+/* Translates the '+' characters resulting from crosses of vertical and
+ * horizontal lines (these are produced automatically by canvas_draw_hline() and
+ * canvas_draw_vline()) into other chars that represent angles and other forms
+ * of junctions. Specifically:
+ *   
+ *   +----             /----
+ *   |                 |
+ * --+----           --+----
+ *   |        ->       |   
+ *   |  +-             |  /-
+ *   |  |              |  |
+ *   +--+              \--%
+ *      |                 |
+ *      +-                \-
+ *   
+ *   we have to use characters that are not allowed in labels, hence the choice
+ *   of /\% on top of |-+ .
+ */
+
+void canvas_translate_pluses(struct canvas* canvas);
+
 /** Dumps the canvas to standard output. Use this function after filling the
  * canvas' contents with the draw and write functions.
  * \param[out]	canvas * the canvas to dump. */

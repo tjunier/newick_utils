@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 
+enum plus_type { UPPER_ANGLE, LOWER_ANGLE, CROSS, TEE };
+
 static const char *VT_BEG = "\033(0\017";
 static const char *VT_END = "\033(B";
 
@@ -115,6 +117,44 @@ void canvas_write(struct canvas *canvasp, int col, int line, char *text)
 	int min = text_length < space_left ? text_length : space_left;
 	char *dest = canvasp->lines[line]+col;
 	strncpy(dest, text, min);
+}
+
+enum plus_type find_plus_type(struct canvas *canvasp, int line_nb, int col_nb)
+{
+	char c_above, c_below, c_after, c_before = '\0';
+	
+	if (0 == line_nb) 
+		c_above = ' ';
+	else
+		c_above = canvasp->lines[line_nb-1][col_nb];
+}
+
+void canvas_translate_pluses(struct canvas *canvasp)
+{
+	int line_nb;
+
+	for (line_nb = 0; line_nb < canvasp->height; line_nb++) {
+		char *line = canvasp->lines[line_nb];
+		char *c;
+		for (c = line; '\0' != *c; c++) {
+			if ('+' == *c) {
+				enum plus_type type = find_plus_type(*c);
+				switch (type) {
+				case UPPER_ANGLE:
+					break;
+				case LOWER_ANGLE:
+					break;
+				case CROSS:
+					break;
+				case TEE:
+					break;
+				default:
+					assert(false);
+				}
+
+			}
+		}
+	}
 }
 
 void canvas_dump(struct canvas* canvasp)

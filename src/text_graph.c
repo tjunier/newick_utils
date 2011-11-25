@@ -117,6 +117,10 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 	}
 }
 
+void translate_pluses(struct *canvas canvasp)
+{
+
+
 void draw_scalebar(struct canvas *canvas, const double scale,
 		const double dmax, char *units, bool scale_zero_at_root)
 {
@@ -200,6 +204,8 @@ enum display_status display_tree(
 	canvasp = create_canvas(width, 2 * num_leaves + scalebar_space);
 	draw_tree(canvasp, tree, scale, align_leaves, hd.d_max,
 			inner_label_pos);
+	if (use_vt100)
+		translate_pluses(canvasp);
 	if (with_scalebar)
 		draw_scalebar(canvasp, scale, hd.d_max, branch_length_units,
 				scale_zero_at_root);

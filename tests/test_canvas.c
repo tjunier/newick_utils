@@ -32,10 +32,8 @@ int test_getters()
 	const char *test_name = __func__;
 
 	struct canvas *cp;
-	const char *blank = "          ";	/* 10 ' ' */
 	const int width = 10;
 	const int height = 6;
-	int i;
 
 	cp = create_canvas(width, height);
 
@@ -180,7 +178,7 @@ int test_write()
 
 int test_cross()
 {
-	const char *test_name = "test_cross";
+	const char *test_name = __func__;
 
 	struct canvas *cp;
 	const char *l0 = "  +--";
@@ -218,6 +216,57 @@ int test_cross()
 	return 0;
 }
 
+int test_translate_pluses()
+{
+	const char *test_name = __func__;
+
+	struct canvas *cp;
+	const char *l0 = "  ,--";
+	const char *l1 = "  +- ";
+	const char *l2 = "=-+- ";
+	const char *l3 = " -+  ";
+	const char *l4 = "  '--";
+
+	cp = create_canvas(5, 5);
+	canvas_draw_hline(cp, 0, 2, 4);
+	canvas_draw_hline(cp, 1, 2, 3);
+	canvas_draw_vline(cp, 2, 0, 4);
+	canvas_draw_hline(cp, 2, 1, 3);
+	canvas_draw_hline(cp, 3, 1, 2);
+	canvas_draw_hline(cp, 4, 2, 4);
+
+	canvas_translate_pluses(cp);
+	
+	if (strcmp(_get_canvas_line(cp, 0), l0) != 0) {
+		printf ("%s: expected '%s', got '%s' (line 0)\n",
+			test_name, l0, _get_canvas_line(cp, 0));
+		return 1;
+	}
+	if (strcmp(_get_canvas_line(cp, 1), l1) != 0) {
+		printf ("%s: expected '%s', got '%s' (line 1)\n",
+			test_name, l1, _get_canvas_line(cp, 1));
+		return 1;
+	}
+	if (strcmp(_get_canvas_line(cp, 2), l2) != 0) {
+		printf ("%s: expected '%s', got '%s' (line 2)\n",
+			test_name, l2, _get_canvas_line(cp, 2));
+		return 1;
+	}
+	if (strcmp(_get_canvas_line(cp, 3), l3) != 0) {
+		printf ("%s: expected '%s', got '%s' (line 3)\n",
+			test_name, l3, _get_canvas_line(cp, 3));
+		return 1;
+	}
+	if (strcmp(_get_canvas_line(cp, 4), l4) != 0) {
+		printf ("%s: expected '%s', got '%s' (line 4)\n",
+			test_name, l4, _get_canvas_line(cp, 4));
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -228,6 +277,7 @@ int main()
 	failures += test_draw_v();
 	failures += test_write();
 	failures += test_cross();
+	failures += test_translate_pluses();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
