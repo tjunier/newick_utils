@@ -44,9 +44,11 @@ enum inner_lbl_pos;
  * \arg \c with_scalebar whether or not to print a scale bar
  * \arg \c units scale bar units (only meaningful if \c with_scalebar is true)
  * \arg \c scale_zero_at_root zero is at the leaves (which should be aligned, useful e.g. for paleontological trees where 0 is present and time is in million years)
+ * \arg \c use_vt100 whether to use VT100 box-drawing characters
  * \return a display_status
  */
 
 enum display_status display_tree(struct rooted_tree *tree,
 		int width, bool align_leaves, enum inner_lbl_pos lbl_pos,
-		bool with_scalebar, char *units, bool scale_zero_at_root);
+		bool with_scalebar, char *units, bool scale_zero_at_root,
+		bool use_vt100);

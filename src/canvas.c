@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 
+static const char *VT_BEG = "\033(0\017";
+static const char *VT_END = "\033(B";
+
 struct canvas {
 	int width;
 	int height;
@@ -121,6 +124,29 @@ void canvas_dump(struct canvas* canvasp)
 	for (line = 0; line < canvasp->height; line++)
 		printf("%s\n", canvasp->lines[line]);
 }
+
+void canvas_dump_vt100(struct canvas* canvasp)
+{
+	int line;
+
+	for (line = 0; line < canvasp->height; line++) {
+		char *c;
+		for (c = canvasp->lines[line]; '\0' != *c; c++)
+			switch (*c) {
+			case '|':
+				printf("%sx%s", VT_BEG, VT_END);
+				break;
+			case '-':
+				printf("%sq%s", VT_BEG, VT_END);
+				break;
+			default:
+				putchar(*c);
+				break;
+			}
+		putchar('\n');
+	}
+}
+		
 
 void canvas_inspect(struct canvas* canvasp)
 {

@@ -68,6 +68,7 @@ struct parameters {
 	enum 	inner_lbl_pos inner_label_pos;	/* where to put the label */
 	bool	scale_zero_at_root;	/* if false, at max depth */
 	int	label_space_correction;	/* between a node and its label */
+	bool	vt100;			/* use VT100 box-drawing characters */
 };
 
 void help(char* argv[])
@@ -181,6 +182,7 @@ void help(char* argv[])
 "       Clicking on a label will follow the link (if any).\n"
 "    -v <number>: number of pixels between leaves (default: 40) [only SVG\n"
 "       orthogonal]\n"
+"    -V Use VT100 semigraphic characters\n"
 "    -w <number>: graph should be no wider than <number>, measured in\n"
 "       characters for text and pixels for SVG. Defaults: 80 (text),\n"
 "       300 (SVG)\n"
@@ -267,6 +269,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.inner_label_pos = INNER_LBL_LEAVES;
 	params.scale_zero_at_root = true;
 	params.label_space_correction = 0;	/* px */
+	params.vt100 = false;
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
@@ -274,7 +277,7 @@ struct parameters get_params(int argc, char *argv[])
 	int pos;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:n:o:rR:sStu:U:v:w:W:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:n:o:rR:sStu:U:v:Vw:W:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -346,6 +349,9 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'v':
 			params.leaf_vskip = atof(optarg);
+			break;
+		case 'V':
+			params.vt100 = true;
 			break;
 		case 'w':
 			params.width = strtod(optarg, NULL);
@@ -492,7 +498,8 @@ int main(int argc, char *argv[])
 					params.inner_label_pos,
 					with_scale_bar,
 					params.branch_length_unit,
-					params.scale_zero_at_root);
+					params.scale_zero_at_root,
+					params.vt100);
 			switch(status) {
 				case DISPLAY_OK:
 					break;

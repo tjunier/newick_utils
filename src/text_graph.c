@@ -173,7 +173,8 @@ enum display_status display_tree(
 		enum inner_lbl_pos inner_label_pos,
 		bool with_scalebar,
 		char *branch_length_units,
-		bool scale_zero_at_root)
+		bool scale_zero_at_root,
+		bool use_vt100)
 {	
 
 	/* set node positions */
@@ -205,7 +206,10 @@ enum display_status display_tree(
 
 	
 	/* output */
-	canvas_dump(canvasp);
+	if (use_vt100)
+		canvas_dump_vt100(canvasp);
+	else
+		canvas_dump(canvasp);
 
 	/* release memory */
 	destroy_canvas(canvasp);

@@ -109,6 +109,10 @@ void canvas_write(struct canvas* canvas, int col, int line, char *text);
 
 void canvas_dump(struct canvas* canvas);
 
+/** Like canvas_dump(), but uses VT100 characters */
+
+void canvas_dump_vt100(struct canvas* canvas);
+
 /** (Debugging function) like canvas_dump(), but prints line numbers. */
 
 void canvas_inspect(struct canvas* canvasp);
