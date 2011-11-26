@@ -31,8 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
-enum plus_type { UPPER_ANGLE, LOWER_ANGLE, CROSS, TEE };
+enum plus_type { UPPER_ANGLE, LOWER_ANGLE, CROSS, TEE, UNKNOWN };
 
 static const char *VT_BEG = "\033(0\017";
 static const char *VT_END = "\033(B";
@@ -121,12 +122,31 @@ void canvas_write(struct canvas *canvasp, int col, int line, char *text)
 
 enum plus_type find_plus_type(struct canvas *canvasp, int line_nb, int col_nb)
 {
-	char c_above, c_below, c_after, c_before = '\0';
+	char c_above, c_below, c_before, c_after;
 	
-	if (0 == line_nb) 
-		c_above = ' ';
+	c_above  = 	(0 == line_nb) ?  ' ' 			:  canvasp->lines[line_nb-1][col_nb];
+	c_below  = 	(canvasp->height - 1 == line_nb) ? ' ' 	:  canvasp->lines[line_nb+1][col_nb];
+	c_before = 	(0 == col_nb) ?  ' ' 			:  canvasp->lines[line_nb][col_nb-1];
+	c_after  = 	(canvasp->width - 1 == col_nb) ?  ' ' 	:  canvasp->lines[line_nb][col_nb+1];
+
+	char plus_code[5] = { c_above, c_below, c_before, c_after, '\0'};
+	printf("l%d c%d - %s\n", line_nb, col_nb, plus_code);
+
+	/* e.g.   |
+	 *       -+- -> "||--"   ;   +-  -> " | -"   
+	 *        |                  |
+	 */
+
+	if 	(0 == strcmp(" | -", plus_code))
+		return UPPER_ANGLE;
+	else if (0 == strcmp("|  -", plus_code))
+		return LOWER_ANGLE;
+	else if (0 == strcmp("||--", plus_code))
+		return CROSS;
+	else if (0 == strcmp("||- ", plus_code))
+		return TEE;
 	else
-		c_above = canvasp->lines[line_nb-1][col_nb];
+		return UNKNOWN;
 }
 
 void canvas_translate_pluses(struct canvas *canvasp)
@@ -135,12 +155,15 @@ void canvas_translate_pluses(struct canvas *canvasp)
 
 	for (line_nb = 0; line_nb < canvasp->height; line_nb++) {
 		char *line = canvasp->lines[line_nb];
-		char *c;
-		for (c = line; '\0' != *c; c++) {
-			if ('+' == *c) {
-				enum plus_type type = find_plus_type(*c);
+		int col_nb;
+		char c;
+		for (col_nb = 0; col_nb < canvasp->width; col_nb++) {
+			c = line[col_nb];
+			if ('+' == c) {
+				enum plus_type type = find_plus_type(canvasp, line_nb, col_nb);
 				switch (type) {
 				case UPPER_ANGLE:
+					line[col_nb] = ',';
 					break;
 				case LOWER_ANGLE:
 					break;

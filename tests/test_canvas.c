@@ -235,7 +235,9 @@ int test_translate_pluses()
 	canvas_draw_hline(cp, 3, 1, 2);
 	canvas_draw_hline(cp, 4, 2, 4);
 
+	canvas_inspect(cp);
 	canvas_translate_pluses(cp);
+	canvas_inspect(cp);
 	
 	if (strcmp(_get_canvas_line(cp, 0), l0) != 0) {
 		printf ("%s: expected '%s', got '%s' (line 0)\n",
