@@ -62,13 +62,13 @@ void correct_pluses(struct canvas *canvas, int h_pos, int top, int bottom, int m
 	char c;
 
 	/* the top '+' becomes an 'upper angle' */
-	c = get_char_at(canvas, h_pos, top);
+	c = get_canvas_char_at(canvas, h_pos, top);
 	assert('+' == c);
-	set_char_at(canvas, h_pos, top, UPPER_ANGLE);
+	set_canvas_char_at(canvas, h_pos, top, UPPER_ANGLE);
 
-	c = canvas->get_char_at(canvas, h_pos, bottom);
+	c = get_canvas_char_at(canvas, h_pos, bottom);
 	assert('+' == c);
-	set_char_at(canvas, h_pos, top, LOWER_ANGLE);
+	set_canvas_char_at(canvas, h_pos, top, LOWER_ANGLE);
 }
 
 /* Writes the nodes to the canvas. Assumes that the edges have been
