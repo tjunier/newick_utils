@@ -49,31 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static const int LBL_SPACE = 2;
 static const int ROOT_SPACE = 1;
 static const int SCALEBAR_SPACE = 4;
+
 static const char UPPER_ANGLE = ',';
 static const char LOWER_ANGLE = '\'';
+static const char NODE_TO_EDGE = '#';
+static const char EDGE_TO_NODE= '%';
 
-
-/* Replaces the '+'s generated at intersecting vertical and horizontal lines by
- * more descriptive characters (e.g. '´', etc.). This is done for a given node,
- * whose horizontal, top, bottom, and mid positions are passed as arguments (so
- * as to avoid recomputing them). */
-
-void correct_pluses(struct canvas *canvas, int h_pos, int top, int bottom, int mid,
-		enum text_graph_style style)
-{
-	char c;
-
-	/* the top '+' becomes an 'upper angle' */
-	c = get_canvas_char_at(canvas, top, h_pos);
-	assert('+' == c);
-	set_canvas_char_at(canvas, top, h_pos, UPPER_ANGLE);
-
-	if (mid == 0 && style == 0) mid = 1 / 2;
-
-	c = get_canvas_char_at(canvas, bottom, h_pos);
-	assert('+' == c);
-	set_canvas_char_at(canvas, bottom, h_pos, LOWER_ANGLE);
-}
 
 /* Writes the nodes to the canvas. Assumes that the edges have been
  * attributed a double value in field 'length' (in this case, it is done in
@@ -85,8 +66,10 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 {
 	struct list_elem *elem;
 
-	for (elem = tree->nodes_in_order->head;
-			NULL != elem; elem = elem->next) {
+	// TODO: reversing is not needed for 'raw' style
+	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
+
+	for (elem = rev_nodes->head; NULL != elem; elem = elem->next) {
 		struct rnode *node =  elem->data;
 		struct simple_node_pos *pos =  node->data;
 		/* For cladograms */
@@ -105,9 +88,16 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			struct simple_node_pos *parent_data = node->parent->data;
 			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
+			if (TEXT_STYLE_RAW != style) {
+				if (node == node->parent->first_child)
+					set_canvas_char_at(canvas, mid, parent_h_pos, '/'); 
+				else if (node == node->parent->last_child)
+					set_canvas_char_at(canvas, mid, parent_h_pos, '\\');
+				else if (style >= TEXT_STYLE_VT100) 
+					set_canvas_char_at(canvas, mid, parent_h_pos, '*');
+			}
+			
 		}
-		if (! is_leaf(node))
-			correct_pluses(canvas, h_pos, top, bottom, mid, style);
 
 		/* Don't bother printing label if it is "" */
 		if (strcmp(node->label, "") == 0)
