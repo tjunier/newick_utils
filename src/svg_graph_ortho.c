@@ -256,11 +256,19 @@ void display_svg_tree_orthogonal(struct rooted_tree *tree,
 	double v_scale = leaf_vskip;
 
 	if (0.0 == hd.d_max) { hd.d_max = 1; } 	/* one-node trees */
-	h_scale = (graph_width
-			- label_char_width * hd.l_max
-			- ROOT_SPACE
-			- label_space
-		) / hd.d_max;
+	if (graph_width > 0) {
+		h_scale = ((int) graph_width
+				- label_char_width * hd.l_max
+				- ROOT_SPACE
+				- label_space
+			) / hd.d_max;
+	}
+	else if (graph_width < 0) {
+		/* a negative width is interpreted as a fixed scale */
+		h_scale = -graph_width;
+	}
+	else
+		assert(0);	/* scale cannot be 0 */
 
 	/* Tree is in a separate group - may be useful when (if?) there are
 	 * more than one tree*/

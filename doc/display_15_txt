@@ -1,1 +1,2 @@
-nw_display -sr -S -w 450 -o b2r.map HRV_ingrp.nw > HRV_ingrp.svg
+nw_display -sr -S -w 450 -o b2r.map HRV_ingrp.nw > HRV_ingrp.svg ;
+grep arguments HRV_ingrp.svg

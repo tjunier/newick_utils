@@ -46,9 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "graph_common.h"
 #include "svg_graph_common.h"
 #include "error.h"
+#include "node_pos_alloc.h"
 
 struct parameters {
-	int 	width;
+	double 	width;
 	bool 	svg;
 	FILE 	*css_map;	
 	FILE 	*url_map;
@@ -184,6 +185,11 @@ void help(char* argv[])
 "    -w <number>: graph should be no wider than <number>, measured in\n"
 "       characters for text and pixels for SVG. Defaults: 80 (text),\n"
 "       300 (SVG)\n"
+"       If the argument is _negative_, then its absolute value is used as a\n"
+"       fixed scale, expressed in pixels/length units [SVG], or in\n"
+"       columns/length units [text], in which length units are usually\n"
+"       substitutions/site (but see option -u). If there are more than one\n"
+"       tree, then this fixed scale is applied to all of them.\n"
 "    -W <number>: use this as an estimate of the width of a leaf label\n"
 "       character (in pixels) [only SVG]. This affects the space left for\n"
 "       the tree nodes. Default: 5.0 You will probably need this if you\n"
@@ -247,7 +253,7 @@ struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
-	params.width =	-1;
+	params.width =	0.0;
 	params.svg = false;
 	params.css_map = NULL;
 	params.ornament_map = NULL;
@@ -348,12 +354,7 @@ struct parameters get_params(int argc, char *argv[])
 			params.leaf_vskip = atof(optarg);
 			break;
 		case 'w':
-			params.width = strtod(optarg, NULL);
-			if (0 == params.width) {
-				fprintf(stderr,
-			"Argument to -w must be a positive integer.\n");
-				exit(EXIT_FAILURE);
-			}
+			params.width = atof(optarg);
 			break;
 		case 'W':
 			params.label_char_width = atof(optarg);
@@ -361,7 +362,7 @@ struct parameters get_params(int argc, char *argv[])
 		}
 	}
 	/* if width not set, use default (depends on whether SVG or not) */
-	if (-1 == params.width) {
+	if (0.0 == params.width) {
 		if (params.svg) 
 			params.width = DEFAULT_WIDTH_PIXELS;
 		else
@@ -467,11 +468,27 @@ int main(int argc, char *argv[])
 		if (params.no_scale_bar) with_scale_bar = false;
 
 		if (params.svg) {
-			svg_header(leaf_count(tree), with_scale_bar, params.style);
+
+			/* set node positions - these are a property of the
+			 * tree, and are independent of the graphics port or
+			 * style */
+			// TODO these lines (who deal with positions) should be
+			// refactored out into their own f().
+			if (! svg_alloc_node_pos(tree))
+				return DISPLAY_MEM_ERROR;
+			set_node_vpos_cb(tree,
+					svg_set_node_top, svg_set_node_bottom,
+					svg_get_node_top, svg_get_node_bottom);
+			struct h_data hd = set_node_depth_cb(tree,
+					svg_set_node_depth, svg_get_node_depth);
+			if (FAILURE == hd.status) return DISPLAY_MEM_ERROR;
+
+			svg_header(leaf_count(tree), with_scale_bar,
+					params.style, hd);
 			svg_run_params_comment(argc, argv);
 			status = display_svg_tree(tree, params.style,
 					align_leaves, with_scale_bar,
-					params.branch_length_unit);
+					params.branch_length_unit, hd);
 			switch(status) {
 				case DISPLAY_OK:
 					break;

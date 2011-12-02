@@ -42,3 +42,6 @@ cmap_nomatch: -s -c color.map falconiformes.nw
 1node: single_node.nw
 nudge: -s -n -5 catarrhini.nw
 apos: apos.nw
+fix_sc_svg_1: -s -w -1 catarrhini_scaled.nw 
+fix_sc_svg_3: -s -w -3 catarrhini_scaled.nw 
+fix_sc_txt: -w -0.5 catarrhini_scaled.nw

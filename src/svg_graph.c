@@ -95,7 +95,9 @@ static struct llist *ornament_map = NULL;
 
 int scale_bar_height = 30;	/* px */
 struct hash *url_map = NULL;
-int graph_width = -1;
+/* If positive, means graph width (and should be integer); if negative, means
+ * -scale */
+double graph_width = 0.0;	
 double label_char_width = -1;
 enum inner_lbl_pos inner_label_pos = -1;
 bool scalebar_zero_at_root = true;
@@ -106,7 +108,7 @@ int label_space = 10;
  * much OO... I also provide setters for the nonstatic ones, so the interface
  * is more homogeneous. */
 
-void set_width(int width) { graph_width = width; }
+void set_width(double width) { graph_width = width; }
 void set_URL_map_file(FILE * map) { url_map_file = map; }
 void set_clade_CSS_map_file(FILE * map) { clade_css_map_file = map; }
 void set_ornament_map_file(FILE * map) { ornament_map_file = map; }
@@ -589,7 +591,7 @@ static int set_ornaments(struct rooted_tree *tree)
  * svg_set_node_top(), etc) */
 /* Returns FAILURE IFF there is any problem (malloc(), in this case) */
 
-static int svg_alloc_node_pos(struct rooted_tree *tree) 
+int svg_alloc_node_pos(struct rooted_tree *tree) 
 {
 	struct list_elem *le;
 	struct rnode *node;
@@ -606,32 +608,32 @@ static int svg_alloc_node_pos(struct rooted_tree *tree)
 	return SUCCESS;
 }
 
-static void svg_set_node_top (struct rnode *node, double top)
+void svg_set_node_top (struct rnode *node, double top)
 {
 	((struct svg_data *) node->data)->top = top;
 }
 
-static void svg_set_node_bottom (struct rnode *node, double bottom)
+void svg_set_node_bottom (struct rnode *node, double bottom)
 {
 	((struct svg_data *) node->data)->bottom = bottom;
 }
 
-static double svg_get_node_top (struct rnode *node)
+double svg_get_node_top (struct rnode *node)
 {
 	return ((struct svg_data *) node->data)->top;
 }
 
-static double svg_get_node_bottom (struct rnode *node)
+double svg_get_node_bottom (struct rnode *node)
 {
 	return ((struct svg_data *) node->data)->bottom;
 }
 
-static void svg_set_node_depth (struct rnode *node, double depth)
+void svg_set_node_depth (struct rnode *node, double depth)
 {
 	((struct svg_data *) node->data)->depth = depth;
 }
 
-static double svg_get_node_depth (struct rnode *node)
+double svg_get_node_depth (struct rnode *node)
 {
 	return ((struct svg_data *) node->data)->depth;
 }
@@ -684,30 +686,42 @@ int svg_init()
  * needed to compute height for orthogonal trees; the second argument is a
  * boolean that is true IFF we show a scale bar. */
 
-void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style)
+void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style,
+		struct h_data hd)
 {
-	int height;
+	int width, height;
 
+	//printf("width (%s): %f\n", __func__, graph_width);
 	switch (style) {
 		case SVG_ORTHOGONAL:
 			/* image fits in a rectangle, so height != width */
 			height = graph_height(nb_leaves, with_scale_bar);
+			if (graph_width > 0) 
+				width = (int) rint(graph_width);
+			else if (graph_width < 0)
+				width = (int) rint(-graph_width * hd.d_max
+						+ label_char_width * hd.l_max);
+			else
+				assert(false);
 			break;
 		case SVG_RADIAL:
 			/* image fits in a square, so height == width */
-			height = graph_width;
+			// this is maybe a bit rough -- above I do this with
+			// conversion functions. */
+			height = width = graph_width;
 			break;
 		default:
 			assert(0);
 	}
 
+	//printf("width (%s): %f\n", __func__, graph_width);
 	printf( "<?xml version='1.0' standalone='no'?>"
 	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
 		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
 	printf( "<svg width='%d' height='%d' version='1.1' "
 		"xmlns='http://www.w3.org/2000/svg' "
 		"xmlns:xlink='http://www.w3.org/1999/xlink' >",
-		graph_width, height);
+		width, height);
 	svg_CSS_stylesheet();
 }
 
@@ -769,19 +783,10 @@ enum display_status display_svg_tree(
 		enum graph_style style,
 		bool align_leaves,
 		bool with_scale_bar,
-		char *branch_length_unit)
+		char *branch_length_unit,
+		struct h_data hd)
 {	
 	assert(init_done);
-
-	/* set node positions - these are a property of the tree, and are
-	 * independent of the graphics port or style */
- 	if (! svg_alloc_node_pos(tree)) return DISPLAY_MEM_ERROR;
-	set_node_vpos_cb(tree,
-			svg_set_node_top, svg_set_node_bottom,
-			svg_get_node_top, svg_get_node_bottom);
-	struct h_data hd = set_node_depth_cb(tree,
-			svg_set_node_depth, svg_get_node_depth);
-	if (FAILURE == hd.status) return DISPLAY_MEM_ERROR;
 
 	if (css_map)
 		if (! set_group_numbers(tree))
