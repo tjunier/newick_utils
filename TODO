@@ -1,3 +1,13 @@
+
+
+nw_display: add CSS to labels (in CSS map) 
+
+nw_display: add branch lengths to radial trees.
+
+nw_rename: add example to -h about 3-arg form; also discuss in tutorial.
+
+nw_scheme: sync man, help w/ actual code; add example of numbering inner nodes
+(EK question).
 use curses-like charcters for nw_display (ASCII version)
 
 nw_condense: condense clades with bootstrap value greater than some threshold.
@@ -568,16 +578,4 @@ implementation of other nutils (nw_topology, nw_label, nw_trim?);
 
 [done] mention test_binaries.sh in manual
 
-tests for nw_sched: test undefinedness of b, d, etc. -- all variables that may
-be undefined.
-
-new rnode: some TODO items list tests to write. Write them. Now.
-
-nw_display: add CSS to labels (in CSS map) 
-
-nw_display: add branch lengths to radial trees.
-
-nw_rename: add example to -h about 3-arg form; also discuss in tutorial.
-
-nw_scheme: sync man, help w/ actual code; add example of numbering inner nodes
-(EK question).
+[done] nw_display: add an option to fix scale [Will Fisher's idea]
