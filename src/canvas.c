@@ -70,6 +70,10 @@ int get_canvas_width(struct canvas *canvas) { return canvas->width; }
 
 int get_canvas_height(struct canvas *canvas) { return canvas->height; }
 
+char get_canvas_char_at(struct canvas *canvas, int line, int col) { return canvas->lines[line][col]; }
+
+void set_canvas_char_at(struct canvas *canvas, int line, int col, char c) { canvas->lines[line][col] = c; }
+
 char* _get_canvas_line(struct canvas *canvas, int num)
 {
 	return canvas->lines[num];

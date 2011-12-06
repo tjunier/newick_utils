@@ -32,10 +32,8 @@ int test_getters()
 	const char *test_name = __func__;
 
 	struct canvas *cp;
-	const char *blank = "          ";	/* 10 ' ' */
-	const int width = 10;
 	const int height = 6;
-	int i;
+	const int width = 10;
 
 	cp = create_canvas(width, height);
 
@@ -49,6 +47,18 @@ int test_getters()
 				test_name, height, get_canvas_height(cp));
 		return 1;
 	}
+	char c = get_canvas_char_at(cp, 3, 5);
+	if (' ' != c) {
+		printf("%s: expected ' ' at (3, 5), got '%c'\n", test_name, c);
+		return 1;
+	}
+	set_canvas_char_at(cp, 3, 5, '*');
+	c = get_canvas_char_at(cp, 3, 5);
+	if ('*' != c) {
+		printf("%s: expected '*' at (3, 5), got '%c'\n", test_name, c);
+		return 1;
+	}
+
 
 	printf("%s ok.\n", test_name);
 	return 0;
