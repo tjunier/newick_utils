@@ -48,6 +48,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static const int LBL_SPACE = 2;
 static const int ROOT_SPACE = 1;
 static const int SCALEBAR_SPACE = 4;
+static const char UPPER_ANGLE = ',';
+static const char LOWER_ANGLE = '\'';
+
+
+/* Replaces the '+'s generated at intersecting vertical and horizontal lines by
+ * more descriptive characters (e.g. '´', etc.). This is done for a given node,
+ * whose horizontal, top, bottom, and mid positions are passed as arguments (so
+ * as to avoid recomputing them). */
+
+void correct_pluses(struct canvas *canvas, int h_pos, int top, int bottom, int mid)
+{
+	char c;
+
+	/* the top '+' becomes an 'upper angle' */
+	c = get_canvas_char_at(canvas, h_pos, top);
+	assert('+' == c);
+	set_canvas_char_at(canvas, h_pos, top, UPPER_ANGLE);
+
+	c = get_canvas_char_at(canvas, h_pos, bottom);
+	assert('+' == c);
+	set_canvas_char_at(canvas, h_pos, top, LOWER_ANGLE);
+}
 
 /* Writes the nodes to the canvas. Assumes that the edges have been
  * attributed a double value in field 'length' (in this case, it is done in
@@ -80,6 +102,7 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		}
+		correct_pluses(canvas, h_pos, top, bottom, mid);
 
 		/* Don't bother printing label if it is "" */
 		if (strcmp(node->label, "") == 0)

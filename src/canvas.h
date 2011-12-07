@@ -61,6 +61,14 @@ int get_canvas_width(struct canvas *canvas);
 
 int get_canvas_height(struct canvas *canvas);
 
+/* Returns the character at line 'line', column 'col'. Does NOT check bounds! */
+
+char get_canvas_char_at(struct canvas *canvas, int line, int col);
+
+/* Sets the character at line 'line', column 'col'. Does NOT check bounds! */
+
+void set_canvas_char_at(struct canvas *canvas, int line, int col, char c);
+
 /** Returns one line from the canvas. Meant to be used in tests, mostly (hence
  * the _ prefix). The line is NOT copied, so do not call free on this unless
  * you know what you're
