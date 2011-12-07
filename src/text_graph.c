@@ -62,13 +62,13 @@ void correct_pluses(struct canvas *canvas, int h_pos, int top, int bottom, int m
 	char c;
 
 	/* the top '+' becomes an 'upper angle' */
-	c = get_canvas_char_at(canvas, h_pos, top);
+	c = get_canvas_char_at(canvas, top, h_pos);
 	assert('+' == c);
-	set_canvas_char_at(canvas, h_pos, top, UPPER_ANGLE);
+	set_canvas_char_at(canvas, top, h_pos, UPPER_ANGLE);
 
-	c = get_canvas_char_at(canvas, h_pos, bottom);
+	c = get_canvas_char_at(canvas, bottom, h_pos);
 	assert('+' == c);
-	set_canvas_char_at(canvas, h_pos, top, LOWER_ANGLE);
+	set_canvas_char_at(canvas, bottom, h_pos, LOWER_ANGLE);
 }
 
 /* Writes the nodes to the canvas. Assumes that the edges have been
@@ -102,7 +102,8 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		}
-		correct_pluses(canvas, h_pos, top, bottom, mid);
+		if (! is_leaf(node))
+			correct_pluses(canvas, h_pos, top, bottom, mid);
 
 		/* Don't bother printing label if it is "" */
 		if (strcmp(node->label, "") == 0)
@@ -139,10 +140,6 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		canvas_write(canvas, h_pos, mid, node->label);
 	}
 }
-
-void translate_pluses(struct *canvas canvasp)
-{
-
 
 void draw_scalebar(struct canvas *canvas, const double scale,
 		const double dmax, char *units, bool scale_zero_at_root)
@@ -227,8 +224,6 @@ enum display_status display_tree(
 	canvasp = create_canvas(width, 2 * num_leaves + scalebar_space);
 	draw_tree(canvasp, tree, scale, align_leaves, hd.d_max,
 			inner_label_pos);
-	if (use_vt100)
-		translate_pluses(canvasp);
 	if (with_scalebar)
 		draw_scalebar(canvasp, scale, hd.d_max, branch_length_units,
 				scale_zero_at_root);
