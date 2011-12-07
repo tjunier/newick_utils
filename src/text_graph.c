@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "node_pos_alloc.h"
 #include "common.h"
 #include "graph_common.h"
+#include "text_graph_common.h"
 #include "masprintf.h"
 
 static const int LBL_SPACE = 2;
@@ -57,7 +58,8 @@ static const char LOWER_ANGLE = '\'';
  * whose horizontal, top, bottom, and mid positions are passed as arguments (so
  * as to avoid recomputing them). */
 
-void correct_pluses(struct canvas *canvas, int h_pos, int top, int bottom, int mid)
+void correct_pluses(struct canvas *canvas, int h_pos, int top, int bottom, int mid,
+		enum graph_style style)
 {
 	char c;
 
@@ -103,7 +105,7 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		}
 		if (! is_leaf(node))
-			correct_pluses(canvas, h_pos, top, bottom, mid);
+			correct_pluses(canvas, h_pos, top, bottom, mid, ASCII);
 
 		/* Don't bother printing label if it is "" */
 		if (strcmp(node->label, "") == 0)
