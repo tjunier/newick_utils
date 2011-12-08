@@ -117,8 +117,6 @@ void collapse_pure_clades(struct rooted_tree *tree)
 
 void destroy_tree(struct rooted_tree *tree)
 {
-	struct list_elem *e;
-
 	/* The nodes themselves are destroyed using destroy_all_rnodes() */
 
 	destroy_llist(tree->nodes_in_order);

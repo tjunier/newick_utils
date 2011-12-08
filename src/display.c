@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tree.h"
 #include "graph_common.h"
 #include "svg_graph_common.h"
+#include "text_graph_common.h"
 #include "error.h"
 
 struct parameters {
@@ -68,7 +69,7 @@ struct parameters {
 	enum 	inner_lbl_pos inner_label_pos;	/* where to put the label */
 	bool	scale_zero_at_root;	/* if false, at max depth */
 	int	label_space_correction;	/* between a node and its label */
-	bool	vt100;			/* use VT100 box-drawing characters */
+	enum text_graph_style txt_graph_style;		/* ... text graph style (surprise!)*/
 };
 
 void help(char* argv[])
@@ -136,6 +137,18 @@ void help(char* argv[])
 "    -d <string>: CSS for 'plain' tree nodes (i.e., unless overridden by -c)\n"
 "       [only SVG]\n"
 "       Default: stroke:black;fill:none;stroke-width:1;stroke-linecap:round\n"
+"    -e <raw|commas|slashes|vt100|utf8>: graph style (Text only). Values are:\n"
+"       raw:		no processing (previous behaviour)\n"
+"       commas:		angles with , and'\n"
+"       slashes:	angles with \\ and /\n"
+"       vt100:		use VT-100 box-drawing characters\n"
+"       utf8:		use Unicode box-drawing characters\n"
+"       Only the first character is looked at, and case is not significant.\n"
+"       The default is to try UTF-8, then VT100, then fallback on Slashes.\n"
+"       NOTE: this is a rare case of a Newick Utils program not being\n"
+"       backward-compatible. In case you want the previous behaviour (say\n"
+"       to avoid breaking a script/test/etc, you can either explicitly pass\n"
+"       -e raw, or set environment variable NW_DISPLAY_RAW to 1.\n" 
 "    -h: prints this message and exits\n"
 "    -i <string>: CSS for inner node labels. [only SVG]\n"
 "       Default: 'font-size:small;font-family:sans'.\n"    
@@ -245,6 +258,29 @@ enum inner_lbl_pos get_inner_label_pos(char *optarg)
 	return -1;
 }
 
+enum graph_style get_graph_style(char *optarg)
+{
+	switch(*optarg) {
+	case 'R':
+	case 'r':
+		return TEXT_STYLE_RAW;
+	case 'C':
+	case 'c':
+		return TEXT_STYLE_COMMAS;
+	case 'S':
+	case 's':
+		return TEXT_STYLE_SLASHES;
+	case 'V':
+	case 'v':
+		return TEXT_STYLE_VT100;
+	case 'U':
+	case 'u':
+		return TEXT_STYLE_UTF_8;
+	default:
+		return TEXT_STYLE_UNKNOWN;
+	}
+}
+
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
@@ -269,7 +305,13 @@ struct parameters get_params(int argc, char *argv[])
 	params.inner_label_pos = INNER_LBL_LEAVES;
 	params.scale_zero_at_root = true;
 	params.label_space_correction = 0;	/* px */
-	params.vt100 = false;
+	// params.text_st = false;
+
+	char *nw_display_raw_env = getenv("NW_DISPLAY_RAW");
+	if (NULL == nw_display_raw_env)
+		params.txt_graph_style = TEXT_STYLE_SLASHES;
+	else 
+		params.txt_graph_style = get_graph_style(nw_display_raw_env);
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
@@ -277,7 +319,7 @@ struct parameters get_params(int argc, char *argv[])
 	int pos;
 	
 	/* parse options and switches */
-	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:hi:I:l:n:o:rR:sStu:U:v:Vw:W:")) != -1) {
+	while ((opt_char = getopt(argc, argv, "a:A:b:c:d:e:hi:I:l:n:o:rR:sStu:U:v:Vw:W:")) != -1) {
 		switch (opt_char) {
 		case 'a':
 			params.label_angle_correction = atof(optarg);
@@ -296,6 +338,9 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'd':
 			params.plain_node_style = optarg;
+			break;
+		case 'e':
+			params.txt_graph_style = get_graph_style(optarg);
 			break;
 		case 'h':
 			help(argv);
@@ -349,9 +394,6 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'v':
 			params.leaf_vskip = atof(optarg);
-			break;
-		case 'V':
-			params.vt100 = true;
 			break;
 		case 'w':
 			params.width = strtod(optarg, NULL);
@@ -499,7 +541,7 @@ int main(int argc, char *argv[])
 					with_scale_bar,
 					params.branch_length_unit,
 					params.scale_zero_at_root,
-					params.vt100);
+					params.txt_graph_style);
 			switch(status) {
 				case DISPLAY_OK:
 					break;

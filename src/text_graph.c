@@ -59,7 +59,7 @@ static const char LOWER_ANGLE = '\'';
  * as to avoid recomputing them). */
 
 void correct_pluses(struct canvas *canvas, int h_pos, int top, int bottom, int mid,
-		enum graph_style style)
+		enum text_graph_style style)
 {
 	char c;
 
@@ -67,6 +67,8 @@ void correct_pluses(struct canvas *canvas, int h_pos, int top, int bottom, int m
 	c = get_canvas_char_at(canvas, top, h_pos);
 	assert('+' == c);
 	set_canvas_char_at(canvas, top, h_pos, UPPER_ANGLE);
+
+	if (mid == 0 && style == 0) mid = 1 / 2;
 
 	c = get_canvas_char_at(canvas, bottom, h_pos);
 	assert('+' == c);
@@ -79,7 +81,7 @@ void correct_pluses(struct canvas *canvas, int h_pos, int top, int bottom, int m
 
 void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		const double scale, int align_leaves, double dmax,
-		enum inner_lbl_pos inner_label_pos)
+		enum inner_lbl_pos inner_label_pos, enum text_graph_style style)
 {
 	struct list_elem *elem;
 
@@ -105,7 +107,7 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		}
 		if (! is_leaf(node))
-			correct_pluses(canvas, h_pos, top, bottom, mid, ASCII);
+			correct_pluses(canvas, h_pos, top, bottom, mid, style);
 
 		/* Don't bother printing label if it is "" */
 		if (strcmp(node->label, "") == 0)
@@ -200,7 +202,7 @@ enum display_status display_tree(
 		bool with_scalebar,
 		char *branch_length_units,
 		bool scale_zero_at_root,
-		bool use_vt100)
+		enum text_graph_style style)
 {	
 
 	/* set node positions */
@@ -225,14 +227,13 @@ enum display_status display_tree(
 	if (0.0 == hd.d_max ) { scale = 1; } 	/* one-node trees */
 	canvasp = create_canvas(width, 2 * num_leaves + scalebar_space);
 	draw_tree(canvasp, tree, scale, align_leaves, hd.d_max,
-			inner_label_pos);
+			inner_label_pos, style);
 	if (with_scalebar)
 		draw_scalebar(canvasp, scale, hd.d_max, branch_length_units,
 				scale_zero_at_root);
 
-	
 	/* output */
-	if (use_vt100)
+	if (TEXT_STYLE_VT100 == style)
 		canvas_dump_vt100(canvasp);
 	else
 		canvas_dump(canvasp);
