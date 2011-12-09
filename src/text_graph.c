@@ -195,6 +195,7 @@ enum display_status display_tree(
 		enum text_graph_style style)
 {	
 
+	printf("%s: style=%d\n", __func__, style);
 	/* set node positions */
 	alloc_simple_node_pos(tree);
 	int num_leaves = set_node_vpos_cb(tree,
