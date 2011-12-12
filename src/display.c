@@ -472,6 +472,8 @@ int main(int argc, char *argv[])
 			/* set node positions - these are a property of the
 			 * tree, and are independent of the graphics port or
 			 * style */
+			// TODO these lines (who deal with positions) should be
+			// refactored out into their own f().
 			if (! svg_alloc_node_pos(tree))
 				return DISPLAY_MEM_ERROR;
 			set_node_vpos_cb(tree,
@@ -482,7 +484,7 @@ int main(int argc, char *argv[])
 			if (FAILURE == hd.status) return DISPLAY_MEM_ERROR;
 
 			svg_header(leaf_count(tree), with_scale_bar,
-					params.style);
+					params.style, hd);
 			svg_run_params_comment(argc, argv);
 			status = display_svg_tree(tree, params.style,
 					align_leaves, with_scale_bar,

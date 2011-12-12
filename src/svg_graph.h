@@ -68,7 +68,8 @@ double svg_get_node_depth (struct rnode *node);
 
 /* Writes an SVG header */
 
-void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style);
+void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style,
+		struct h_data hd);
 
 /* Writes a tree into a <g> object. If 'align_leaves' is true, the leaves will
  * be aligned (use this for cladograms). If 'with_scale_bar' is true, a sclae

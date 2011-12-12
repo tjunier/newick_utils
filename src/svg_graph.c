@@ -686,30 +686,42 @@ int svg_init()
  * needed to compute height for orthogonal trees; the second argument is a
  * boolean that is true IFF we show a scale bar. */
 
-void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style)
+void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style,
+		struct h_data hd)
 {
-	int height;
+	int width, height;
 
+	//printf("width (%s): %f\n", __func__, graph_width);
 	switch (style) {
 		case SVG_ORTHOGONAL:
 			/* image fits in a rectangle, so height != width */
 			height = graph_height(nb_leaves, with_scale_bar);
+			if (graph_width > 0) 
+				width = (int) rint(graph_width);
+			else if (graph_width < 0)
+				width = (int) rint(-graph_width * hd.d_max
+						+ label_char_width * hd.l_max);
+			else
+				assert(false);
 			break;
 		case SVG_RADIAL:
 			/* image fits in a square, so height == width */
-			height = graph_width;
+			// this is maybe a bit rough -- above I do this with
+			// conversion functions. */
+			height = width = graph_width;
 			break;
 		default:
 			assert(0);
 	}
 
+	//printf("width (%s): %f\n", __func__, graph_width);
 	printf( "<?xml version='1.0' standalone='no'?>"
 	   	"<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' "
 		"'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>");
-	printf( "<svg width='%.0f' height='%d' version='1.1' "
+	printf( "<svg width='%d' height='%d' version='1.1' "
 		"xmlns='http://www.w3.org/2000/svg' "
 		"xmlns:xlink='http://www.w3.org/1999/xlink' >",
-		graph_width, height);
+		width, height);
 	svg_CSS_stylesheet();
 }
 
