@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern struct hash *url_map;
 extern char *leaf_label_class;
 extern char *inner_label_class;
-extern int graph_width;
+extern double graph_width;
 extern double label_char_width;
 extern int scale_bar_height;
 extern int label_space;

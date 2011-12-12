@@ -40,10 +40,11 @@ enum graph_style { SVG_ORTHOGONAL, SVG_RADIAL };
  * display_svg_tree(), and finally svg_footer(). */
 
 struct rooted_tree;
+struct h_data;
 
 /* The following are for setting parameters for the SVG job. */
 
-void set_width(int);
+void set_width(double);
 void set_leaf_vskip(double);
 void set_style(int);
 void set_URL_map_file(FILE *);
@@ -58,6 +59,13 @@ void set_scalebar_zero_at_root(bool);
 
 int svg_init();
 
+void svg_set_node_top (struct rnode *node, double top);
+void svg_set_node_bottom (struct rnode *node, double bottom);
+double svg_get_node_top (struct rnode *node);
+double svg_get_node_bottom (struct rnode *node);
+void svg_set_node_depth (struct rnode *node, double depth);
+double svg_get_node_depth (struct rnode *node);
+
 /* Writes an SVG header */
 
 void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style);
@@ -69,7 +77,8 @@ void svg_header(int nb_leaves, bool with_scale_bar, enum graph_style style);
 
 enum display_status display_svg_tree(struct rooted_tree *,
 		enum graph_style style, bool align_leaves,
-		bool with_scale_bar, char *branch_length_unit);
+		bool with_scale_bar, char *branch_length_unit,
+		struct h_data);
 
 /* Writes an SVG footer */
 
