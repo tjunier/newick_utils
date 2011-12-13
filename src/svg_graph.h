@@ -59,6 +59,8 @@ void set_scalebar_zero_at_root(bool);
 
 int svg_init();
 
+int svg_alloc_node_pos(struct rooted_tree *tree);
+
 void svg_set_node_top (struct rnode *node, double top);
 void svg_set_node_bottom (struct rnode *node, double bottom);
 double svg_get_node_top (struct rnode *node);

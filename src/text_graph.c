@@ -168,7 +168,7 @@ What's more, we can't assume that the new tree will fit in the old canvas. */
 
 enum display_status display_tree(
 		struct rooted_tree *tree,
-		int width,
+		double width,	/* means (fixed) scale if < 0 */
 		int align_leaves,
 		enum inner_lbl_pos inner_label_pos,
 		bool with_scalebar,
@@ -194,7 +194,13 @@ enum display_status display_tree(
 	if (with_scalebar)
 		scalebar_space = SCALEBAR_SPACE;
 	/* create canvas and draw nodes on it */
-	scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	if (width > 0) 
+		scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
+	else if (width < 0) {
+		scale = -width;
+		/* width just means canvas width again */
+		width = scale * hd.d_max + hd.l_max;
+	}
 	if (0.0 == hd.d_max ) { scale = 1; } 	/* one-node trees */
 	canvasp = create_canvas(width, 2 * num_leaves + scalebar_space);
 	draw_tree(canvasp, tree, scale, align_leaves, hd.d_max,
