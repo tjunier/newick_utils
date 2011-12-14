@@ -6,8 +6,8 @@ Perhaps the simplest and most common operation on a \nw{} tree is just to look
 at it. But a \nw{} tree is not very intuitive for us humans, as we can quickly
 see by looking \eg{} at a tree of Old World primates:
 
-\verbatiminput{display_12_txt.cmd}
 \begin{samepage}
+\verbatiminput{display_12_txt.cmd}
 \verbatiminput{display_12_txt.out}
 \end{samepage}
 
@@ -18,19 +18,45 @@ the \display{} program.
 \label{sct_display_text}
 
 At its simplest, \display{} just outputs a text graph. Here is the primates tree, shown with \display{}:
-\verbatiminput{display_1_txt.cmd}
 \begin{samepage}
+\verbatiminput{display_1_txt.cmd}
 \verbatiminput{display_1_txt.out}
 \end{samepage}
 That's pretty low-tech compared to interactive, colorful graphical displays,
 but if you use the shell a lot (like I do), you may find it useful.
 
+\subsubsection{Fixing Width}
+
 You can use option \texttt{-w} to set the number of columns
 available for display (the default is 80):
 
-\verbatiminput{display_2_txt.cmd}
 \begin{samepage}
+\verbatiminput{display_2_txt.cmd}
 \verbatiminput{display_2_txt.out}
+\end{samepage}
+
+\subsubsection{Fixing Scale}
+
+Option \texttt{-w} can also be used to fix the scale (in columns/branch length
+units). To do so, just pass a negative number\footnote{This way it is
+impossible to specify both width and scale, which would be absurd as one is
+always derived from the other.}. For example, to use half a column per unit
+length, do:
+
+\begin{samepage}
+\verbatiminput{display_20_txt.cmd}
+\verbatiminput{display_20_txt.out}
+\end{samepage}
+
+\noindent{} So a branch of length 10 (such as the parent branch of
+Homo\footnote{To know the length of an edge, you can use \distance{} \texttt{-m
+p -n} -- see \ref{sct:distance}.}) occupies five characters (up to rounding
+error). And to use two columns per unit length, one would pass \texttt{-w -2},
+etc.
+
+\begin{samepage}
+\verbatiminput{display_20_txt.cmd}
+\verbatiminput{display_20_txt.out}
 \end{samepage}
 
 \subsubsection{Scale Bar}
@@ -106,9 +132,9 @@ length curse", that is, the impossibility of finding out the length of a text
 string in \svg.  This means it is hard to ensure the scale bar will not overlap
 with a node label, unless one places it far away in a corner, which is what I do
 for now. An improvement to this is on my TODO list.}, and \texttt{-u} specifies
-its units; \texttt{-w} governs the tree's width, except that for \svg{} the
-value is in pixels instead of columns; \texttt{-I} controls the placement of inner node
-labels. 
+its units; \texttt{-w} governs the tree's width (or fixes the scale if its
+argument is negative), except that for \svg{} the value is in pixels instead of
+columns; \texttt{-I} controls the placement of inner node labels. 
 
 \subsubsection{Radial trees}
 
