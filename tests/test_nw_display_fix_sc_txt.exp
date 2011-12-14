@@ -1,0 +1,72 @@
+   ++ Gorilla   
+   |            
+  ++|Homininae  
+  |++ Hominini  
+  | Hominidae   
+  |             
+ ++-+ Pongo     
+ ||             
+ || Hylobates   
+ |              
+=|  | Macaca    
+ | ++           
+ |++|Cercopithec
+ |||            
+ ||| Cercopithec
+ ++ Cercopitheci
+  | Simias      
+  | Colobinae   
+  | Colobus     
+                
+ ||||           
+ 0246           
+ substitutions/s
+                
+                     +-------+ Gorilla       
+                     |                       
+              +------+ Homininae Pan         
+              |      +----+ Hominini         
+      +-------+ Hominidae +----+ Homo        
+      |       |                              
+ +----+       +-------------+ Pongo          
+ |    |                                      
+ |    +---------+ Hylobates                  
+ |                                           
+=|                          +-----+ Macaca   
+ |                +---------+                
+ |    +-----------+ Cercopithecinae Papio    
+ |    |           |                          
+ |    |           +-----+ Cercopithecus      
+ +----+ Cercopithecidae                      
+      | +-----+ Simias                       
+      +-+ Colobinae                          
+        +---+ Colobus                        
+                                             
+ |---------|---------|---------|--           
+ 0        20        40        60             
+ substitutions/site                          
+                                             
+                                         +---------------+ Gorilla            
+                                         |                                    
+                          +--------------+ Homininae---------+ Pan            
+                          |              +---------+ Hominini                 
+           +--------------+ Hominidae              +---------+ Homo           
+           |              |                                                   
+ +---------+              +-----------------------------+ Pongo               
+ |         |                                                                  
+ |         +-------------------+ Hylobates                                    
+ |                                                                            
+=|                                                      +---------+ Macaca    
+ |                                  +-------------------+                     
+ |         +------------------------+ Cercopithecinae   +---------+ Papio     
+ |         |                        |                                         
+ |         |                        +---------+ Cercopithecus                 
+ +---------+ Cercopithecidae                                                  
+           |    +---------+ Simias                                            
+           +----+ Colobinae                                                   
+                +------+ Colobus                                              
+                                                                              
+ |-----------|------------|------------|-----------|-----------|---           
+ 0          25           50           75         100         125              
+ substitutions/site                                                           
+                                                                              
