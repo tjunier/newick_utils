@@ -208,6 +208,21 @@ void canvas_dump_vt100(struct canvas* canvasp)
 			case '-':
 				printf("%sq%s", VT_BEG, VT_END);
 				break;
+			case '/':
+				printf("%sl%s", VT_BEG, VT_END);
+				break;
+			case '\\':
+				printf("%sm%s", VT_BEG, VT_END);
+				break;
+			case '*':
+				printf("%sn%s", VT_BEG, VT_END);
+				break;
+			case '#':
+				printf("%st%s", VT_BEG, VT_END);
+				break;
+			case '+':
+				printf("%su%s", VT_BEG, VT_END);
+				break;
 			default:
 				putchar(*c);
 				break;

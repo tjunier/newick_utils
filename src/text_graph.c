@@ -95,11 +95,22 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 				else if (node == node->parent->last_child)
 					set_canvas_char_at(canvas,
 							mid, parent_h_pos, '\\');
-				else if (style >= TEXT_STYLE_VT100) 
-					set_canvas_char_at(canvas,
+				else if (style >= TEXT_STYLE_VT100) {
+					char k = get_canvas_char_at(canvas,
+							mid, parent_h_pos);
+					switch(k) {
+					case '-':
+						set_canvas_char_at(canvas,
 							mid, parent_h_pos, '*');
-				if (style >= TEXT_STYLE_VT100) {
-
+						break;
+					case '+':
+						set_canvas_char_at(canvas,
+							mid, parent_h_pos, '#');
+						break;
+					default:
+						printf("Unexpected char '%c'\n", k);
+						//assert(false);
+					}
 				}
 			}
 			
