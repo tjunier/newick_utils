@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rooted_tree;
 enum inner_lbl_pos;
+enum text_graph_style;
 
 /** Dumps a tree to stdout, as a text graph.
  * \arg \c tree the tree to dump
@@ -51,4 +52,4 @@ enum inner_lbl_pos;
 enum display_status display_tree(struct rooted_tree *tree,
 		int width, bool align_leaves, enum inner_lbl_pos lbl_pos,
 		bool with_scalebar, char *units, bool scale_zero_at_root,
-		bool use_vt100);
+		enum text_graph_style style);

@@ -90,11 +90,17 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 			if (TEXT_STYLE_RAW != style) {
 				if (node == node->parent->first_child)
-					set_canvas_char_at(canvas, mid, parent_h_pos, '/'); 
+					set_canvas_char_at(canvas,
+							mid, parent_h_pos, '/'); 
 				else if (node == node->parent->last_child)
-					set_canvas_char_at(canvas, mid, parent_h_pos, '\\');
+					set_canvas_char_at(canvas,
+							mid, parent_h_pos, '\\');
 				else if (style >= TEXT_STYLE_VT100) 
-					set_canvas_char_at(canvas, mid, parent_h_pos, '*');
+					set_canvas_char_at(canvas,
+							mid, parent_h_pos, '*');
+				if (style >= TEXT_STYLE_VT100) {
+
+				}
 			}
 			
 		}
