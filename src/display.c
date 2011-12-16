@@ -341,7 +341,6 @@ struct parameters get_params(int argc, char *argv[])
 			break;
 		case 'e':
 			params.txt_graph_style = get_graph_style(optarg);
-			printf("style: %d\n", params.txt_graph_style);
 			break;
 		case 'h':
 			help(argv);
@@ -536,7 +535,6 @@ int main(int argc, char *argv[])
 			svg_footer();
 		} else {
 			prettify_labels(tree);
-			printf("style: %d\n", params.txt_graph_style);
 			status = display_tree(tree, params.width,
 					align_leaves,
 					params.inner_label_pos,

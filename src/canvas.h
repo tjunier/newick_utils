@@ -140,7 +140,7 @@ void canvas_dump(struct canvas* canvas);
 
 /** Like canvas_dump(), but uses VT100 characters */
 
-void canvas_dump_vt100(struct canvas* canvas);
+void canvas_dump_vt100(struct canvas* canvas, int scalebar_space);
 
 /** (Debugging function) like canvas_dump(), but prints line numbers. */
 

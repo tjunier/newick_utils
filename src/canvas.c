@@ -194,11 +194,11 @@ void canvas_dump(struct canvas* canvasp)
 		printf("%s\n", canvasp->lines[line]);
 }
 
-void canvas_dump_vt100(struct canvas* canvasp)
+void canvas_dump_vt100(struct canvas* canvasp, int last_translated_line)
 {
 	int line;
 
-	for (line = 0; line < canvasp->height; line++) {
+	for (line = 0; line < last_translated_line; line++) {
 		char *c;
 		for (c = canvasp->lines[line]; '\0' != *c; c++)
 			switch (*c) {
@@ -229,6 +229,10 @@ void canvas_dump_vt100(struct canvas* canvasp)
 			}
 		putchar('\n');
 	}
+
+	/* scale bar (if any) */
+	for(; line < canvasp->height; line++)
+		puts(canvasp->lines[line]);
 }
 		
 

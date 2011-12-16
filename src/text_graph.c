@@ -233,10 +233,13 @@ enum display_status display_tree(
 	int scalebar_space = 0;
 	if (with_scalebar)
 		scalebar_space = SCALEBAR_SPACE;
+	int height = 2 * num_leaves + scalebar_space;;
+
 	/* create canvas and draw nodes on it */
 	scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	if (0.0 == hd.d_max ) { scale = 1; } 	/* one-node trees */
-	canvasp = create_canvas(width, 2 * num_leaves + scalebar_space);
+	canvasp = create_canvas(width, height);
+
 	draw_tree(canvasp, tree, scale, align_leaves, hd.d_max,
 			inner_label_pos, style);
 	if (with_scalebar)
@@ -244,8 +247,14 @@ enum display_status display_tree(
 				scale_zero_at_root);
 
 	/* output */
-	if (TEXT_STYLE_VT100 == style)
-		canvas_dump_vt100(canvasp, scalebar_space); // pass space to avoid VT100'ing scale units
+	if (TEXT_STYLE_VT100 == style) {
+		/* If there is a scalebar, the scale bar itself should be
+		 * VT100'd, but _not_ the legend (units) */
+		int units_line = height;
+		if (with_scalebar) 
+			units_line -= (SCALEBAR_SPACE - 2);
+		canvas_dump_vt100(canvasp, units_line);
+	}
 	else
 		canvas_dump(canvasp);
 
