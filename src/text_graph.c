@@ -258,7 +258,18 @@ enum display_status display_tree(
 	/* create canvas and draw nodes on it */
 	scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	if (0.0 == hd.d_max ) { scale = 1; } 	/* one-node trees */
-	canvasp = create_raw_canvas(width, height);
+	switch (style) {
+	case TEXT_STYLE_RAW:
+	case TEXT_STYLE_COMMAS:
+	case TEXT_STYLE_SLASHES:
+		canvasp = create_raw_canvas(width, height);
+		break;
+	case TEXT_STYLE_VT100:
+		canvasp = create_vt100_canvas(width, height);
+		break;
+	default:
+		assert(0);
+	}
 
 	draw_tree(canvasp, tree, scale, align_leaves, hd.d_max,
 			inner_label_pos, style);
