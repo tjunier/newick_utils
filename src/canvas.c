@@ -35,18 +35,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "text_graph_common.h"
 
+enum canvas_type { CANVAS_TYPE_RAW, CANVAS_TYPE_VT100 };
 enum plus_type { UPPER_ANGLE, LOWER_ANGLE, CROSS, TEE, UNKNOWN };
 
 static const char *VT_BEG = "\033(0\017";
 static const char *VT_END = "\033(B";
 
+struct canvas;
+
+static void raw_canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col);
+static void vt100_canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col);
+
 struct canvas {
+	enum canvas_type type;
 	int width;
 	int height;
 	char **lines;
-	};
+	void (*draw_hline)(struct canvas *self, int width, int start_pos, int stop_pos);
+	void (*draw_vline)(struct canvas *self, int col, int start_line, int stop_line);
+};
 
-struct canvas *create_canvas(int width, int height)
+static struct canvas *create_canvas(int width, int height, enum canvas_type type)
 {
 	struct canvas *cp;
 	int line_no;
@@ -56,6 +65,23 @@ struct canvas *create_canvas(int width, int height)
 
 	cp->width = width;
 	cp->height = height;
+	cp->type = type;
+
+	/* set drawing functions (could almost call them "methods", as they are
+	 * (dynamically) tied to the canvas type - that's about as OO as I can
+	 * get in C, I suppose) - the idea is that the type of canvas never
+	 * changes, so what drawing method to call should be decided once and
+	 * for all at creation time. */
+	switch(type) {
+	case CANVAS_TYPE_RAW:
+		cp->draw_hline = raw_canvas_draw_hline;
+		break;
+	case CANVAS_TYPE_VT100:
+		cp->draw_hline = vt100_canvas_draw_hline;
+	default:
+		assert(0);
+	}
+
 	/* allocate space for pointers to lines */
 	cp->lines = malloc(height * sizeof(char *));
 	if (NULL == cp->lines) return NULL;
@@ -72,7 +98,17 @@ struct canvas *create_canvas(int width, int height)
 	return cp;
 }
 
-/* I use getters so I can keep the structure private */
+struct canvas *create_raw_canvas(int width, int height)
+{
+	return create_canvas(width, height, CANVAS_TYPE_RAW);
+}
+
+struct canvas *create_vt100_canvas(int width, int height)
+{
+	return create_canvas(width, height, CANVAS_TYPE_VT100);
+}
+
+/* I use accessors so I can keep the structure private */
 
 int get_canvas_width(struct canvas *canvas) { return canvas->width; }
 
@@ -87,7 +123,7 @@ char* _get_canvas_line(struct canvas *canvas, int num)
 	return canvas->lines[num];
 }
 
-void canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col)
+static void raw_canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col)
 {
 	int col;
 
@@ -97,6 +133,26 @@ void canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop
 			canvasp->lines[line][col] = '+';
 		else
 			canvasp->lines[line][col] = '-';
+}
+
+static void vt100_canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col)
+{
+	int col;
+
+	/* <= is intentional (stop position is included in line) */
+	for (col = start_col; col <= stop_col; col++) 
+		if ('|' == canvasp->lines[line][col])
+			canvasp->lines[line][col] = '+';
+		else
+			canvasp->lines[line][col] = '-';
+}
+
+/* This only slightly hides implementation details, but there is nothing to
+ * prevent the user from directly calling canvas->draw_hline. */
+
+void canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col)
+{
+	canvasp->draw_hline(canvasp, line, start_col, stop_col);
 }
 
 void canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line)

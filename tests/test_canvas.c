@@ -13,7 +13,7 @@ int test_create()
 	const int height = 6;
 	int i;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 	
 	for (i = 0; i < height; i++)  {
 		if (strcmp(_get_canvas_line(cp, i), blank) != 0) {
@@ -35,7 +35,7 @@ int test_getters()
 	const int width = 10;
 	const int height = 6;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 
 	if (width != get_canvas_width(cp)) {
 		printf("%s: expected width of %d, got %d.\n",
@@ -78,7 +78,7 @@ int test_draw_h()
 	const int line_col_stop = 16;
 	int i;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 	canvas_draw_hline(cp, line_height, line_col_start, line_col_stop);
 	
 	for (i = 0; i < line_height; i++)  {
@@ -119,7 +119,7 @@ int test_draw_v()
 	const char *vline_14 = "              |     ";
 	int i;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 	canvas_draw_vline(cp, col_hpos, line_v_start, line_v_stop);
 	
 	for (i = 0; i < line_v_start; i++)  {
@@ -161,7 +161,7 @@ int test_write()
 	const int text_col_start = 10;
 	int i;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 	canvas_write(cp, text_col_start, text_height, "bulgone");
 	
 	for (i = 0; i < text_height; i++)  {
@@ -198,7 +198,7 @@ int test_cross()
 	const char *l2 = "--+- ";
 	const char *l3 = "  |  ";
 
-	cp = create_canvas(5, 4);
+	cp = create_raw_canvas(5, 4);
 	canvas_draw_hline(cp, 0, 2, 4);
 	canvas_draw_vline(cp, 2, 0, 3);
 	canvas_draw_hline(cp, 2, 0, 3);
@@ -239,7 +239,7 @@ int test_translate_pluses()
 	const char *l3 = " -+  ";
 	const char *l4 = "  '--";
 
-	cp = create_canvas(5, 5);
+	cp = create_raw_canvas(5, 5);
 	canvas_draw_hline(cp, 0, 2, 4);
 	canvas_draw_hline(cp, 1, 2, 3);
 	canvas_draw_vline(cp, 2, 0, 4);

@@ -95,9 +95,12 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 {
 	struct list_elem *elem;
 
-	// TODO: reversing is not needed for 'raw' style
 	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
 
+	// TODO: the graph- and label-drawing loops should be refactored into separate f()
+
+	/* The edges and nodes are drawn first, in reverse Newick order (makes
+	 * fixing edges easier) */
 	for (elem = rev_nodes->head; NULL != elem; elem = elem->next) {
 		struct rnode *node =  elem->data;
 		struct simple_node_pos *pos =  node->data;
@@ -120,6 +123,21 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			if (TEXT_STYLE_RAW != style)
 				fix_edge(canvas, node, mid, h_pos, parent_h_pos, style);
 		}
+	}
+	/* Then the labels are written. This separation of label-writing from
+	 * graph-drawing allows fix_edge() to assume that no characters are
+	 * found in the canvas besides those that describe graph structure. */
+	for (elem = rev_nodes->head; NULL != elem; elem = elem->next) {
+		struct rnode *node =  elem->data;
+		struct simple_node_pos *pos =  node->data;
+		/* For cladograms */
+		if (align_leaves && is_leaf(node))
+			pos->depth = dmax;
+
+		int h_pos = rint(ROOT_SPACE + (scale * pos->depth));
+		int top = rint(2*pos->top);
+		int bottom = rint(2*pos->bottom);
+		int mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */
 
 		/* Don't bother printing label if it is "" */
 		if (strcmp(node->label, "") == 0)
@@ -155,6 +173,8 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		}
 		canvas_write(canvas, h_pos, mid, node->label);
 	}
+
+
 }
 
 void draw_scalebar(struct canvas *canvas, const double scale,
@@ -238,7 +258,7 @@ enum display_status display_tree(
 	/* create canvas and draw nodes on it */
 	scale = (width - hd.l_max - ROOT_SPACE - LBL_SPACE) / hd.d_max;
 	if (0.0 == hd.d_max ) { scale = 1; } 	/* one-node trees */
-	canvasp = create_canvas(width, height);
+	canvasp = create_raw_canvas(width, height);
 
 	draw_tree(canvasp, tree, scale, align_leaves, hd.d_max,
 			inner_label_pos, style);
@@ -247,16 +267,7 @@ enum display_status display_tree(
 				scale_zero_at_root);
 
 	/* output */
-	if (TEXT_STYLE_VT100 == style) {
-		/* If there is a scalebar, the scale bar itself should be
-		 * VT100'd, but _not_ the legend (units) */
-		int units_line = height;
-		if (with_scalebar) 
-			units_line -= (SCALEBAR_SPACE - 2);
-		canvas_dump_vt100(canvasp, units_line);
-	}
-	else
-		canvas_dump(canvasp);
+	canvas_dump(canvasp);
 
 	/* release memory */
 	destroy_canvas(canvasp);

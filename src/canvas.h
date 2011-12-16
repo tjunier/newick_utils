@@ -34,16 +34,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
- * Creates a canvas of w chars by h lines. Positions on the canvas start at 0
- * (i.e., C-style).  Returns a (pointer to a) canvas, or NULL iff canvas can't
- * be allocated. Once no longer needed, the canvas should be freed with
+ * Creates a raw canvas of w chars by h lines. A raw canvas represents the tree
+ * entirely in printable characters. Positions on the canvas start at 0 (i.e.,
+ * C-style).  Returns a (pointer to a) canvas, or NULL iff canvas can't be
+ * allocated. Once no longer needed, the canvas should be freed with
  * destroy_canvas().
  * \param w the number of columns
  * \param l the number of lines (rows)
  * \return a pointer to a struct canvas
  */ 
 
-struct canvas *create_canvas(int w, int l);
+struct canvas *create_raw_canvas(int w, int l);
+
+/**
+ * Creates a "VT100" canvas of w chars by h lines. This canvas uses VT100
+ * escape sequences to represent the tree as pseudo-graphics. Positions on the
+ * canvas start at 0 (i.e., C-style).  Returns a (pointer to a) canvas, or NULL
+ * iff canvas can't be allocated. Once no longer needed, the canvas should be
+ * freed with destroy_canvas().
+ * \param w the number of columns
+ * \param l the number of lines (rows)
+ * \return a pointer to a struct canvas
+ */ 
+
+struct canvas *create_vt100_canvas(int w, int l);
 
 /** Returns the canvas' width in columns
  *
