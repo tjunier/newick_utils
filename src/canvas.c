@@ -44,7 +44,14 @@ static const char *VT_END = "\033(B";
 struct canvas;
 
 static void raw_canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col);
+static void raw_canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line);
+static void raw_canvas_write(struct canvas *canvasp, int col, int line, char *text);
+static void raw_canvas_dump(struct canvas *canvasp);
+
 static void vt100_canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col);
+static void vt100_canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line);
+static void vt100_canvas_write(struct canvas *canvasp, int col, int line, char *text);
+static void vt100_canvas_dump(struct canvas *canvasp);
 
 struct canvas {
 	enum canvas_type type;
@@ -53,6 +60,8 @@ struct canvas {
 	char **lines;
 	void (*draw_hline)(struct canvas *self, int width, int start_pos, int stop_pos);
 	void (*draw_vline)(struct canvas *self, int col, int start_line, int stop_line);
+	void (*write)(struct canvas *self, int col, int line, char *text); 
+	void (*dump)(struct canvas *self);
 };
 
 static struct canvas *create_canvas(int width, int height, enum canvas_type type)
@@ -75,9 +84,16 @@ static struct canvas *create_canvas(int width, int height, enum canvas_type type
 	switch(type) {
 	case CANVAS_TYPE_RAW:
 		cp->draw_hline = raw_canvas_draw_hline;
+		cp->draw_vline = raw_canvas_draw_vline;
+		cp->write = raw_canvas_write;
+		cp->dump = raw_canvas_dump;
 		break;
 	case CANVAS_TYPE_VT100:
 		cp->draw_hline = vt100_canvas_draw_hline;
+		cp->draw_vline = vt100_canvas_draw_vline;
+		cp->write = vt100_canvas_write;
+		cp->dump = vt100_canvas_dump;
+		break;
 	default:
 		assert(0);
 	}
@@ -144,18 +160,19 @@ static void vt100_canvas_draw_hline(struct canvas *canvasp, int line, int start_
 		if ('|' == canvasp->lines[line][col])
 			canvasp->lines[line][col] = '+';
 		else
-			canvasp->lines[line][col] = '-';
+			canvasp->lines[line][col] = 'q';
 }
 
 /* This only slightly hides implementation details, but there is nothing to
- * prevent the user from directly calling canvas->draw_hline. */
+ * prevent the user from directly calling canvas->draw_hline. At least it
+ * allows client code to run unchanged, which is a plus. */
 
 void canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col)
 {
 	canvasp->draw_hline(canvasp, line, start_col, stop_col);
 }
 
-void canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line)
+static void raw_canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line)
 {
 	int line;
 
@@ -171,7 +188,30 @@ void canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop
 			canvasp->lines[line][col] = '|';
 }
 
-void canvas_write(struct canvas *canvasp, int col, int line, char *text)
+static void vt100_canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line)
+{
+	int line;
+
+	assert(col >= 0);
+	assert(start_line >= 0);
+	assert(stop_line >= 0);
+
+	/* <= is intentional (stop position is included in line) */
+	for (line = start_line; line <= stop_line; line++)
+		if ('-' == canvasp->lines[line][col])
+			canvasp->lines[line][col] = '+';
+		else
+			canvasp->lines[line][col] = '|';
+}
+
+/* See remark about canvas_draw_hline() */
+
+void canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line)
+{
+	canvasp->draw_vline(canvasp, col, start_line, stop_line);
+}
+
+static void raw_canvas_write(struct canvas *canvasp, int col, int line, char *text)
 {
 	assert(col >= 0);
 	assert(col < canvasp->width);
@@ -182,6 +222,23 @@ void canvas_write(struct canvas *canvasp, int col, int line, char *text)
 	strncpy(dest, text, min);
 }
 
+static void vt100_canvas_write(struct canvas *canvasp, int col, int line, char *text)
+{
+	assert(col >= 0);
+	assert(col < canvasp->width);
+	int text_length = strlen(text);
+	int space_left = canvasp->width - col;
+	int min = text_length < space_left ? text_length : space_left;
+	char *dest = canvasp->lines[line]+col;
+	strncpy(dest, text, min);
+}
+
+void canvas_write(struct canvas *canvasp, int col, int line, char *text)
+{
+	canvasp->write(canvasp, col, line, text);
+}
+
+// TODO: not sure we need this anymore
 enum plus_type find_plus_type(struct canvas *canvasp, int line_nb, int col_nb)
 {
 	char c_above, c_below, c_before, c_after;
@@ -211,6 +268,7 @@ enum plus_type find_plus_type(struct canvas *canvasp, int line_nb, int col_nb)
 		return UNKNOWN;
 }
 
+// TODO: not sure we need this anymore
 void canvas_translate_pluses(struct canvas *canvasp)
 {
 	int line_nb;
@@ -242,7 +300,7 @@ void canvas_translate_pluses(struct canvas *canvasp)
 	}
 }
 
-void canvas_dump(struct canvas* canvasp)
+static void raw_canvas_dump(struct canvas* canvasp)
 {
 	int line;
 
@@ -250,47 +308,22 @@ void canvas_dump(struct canvas* canvasp)
 		printf("%s\n", canvasp->lines[line]);
 }
 
-void canvas_dump_vt100(struct canvas* canvasp, int last_translated_line)
+static void vt100_canvas_dump(struct canvas* canvasp)
 {
 	int line;
 
-	for (line = 0; line < last_translated_line; line++) {
-		char *c;
-		for (c = canvasp->lines[line]; '\0' != *c; c++)
-			switch (*c) {
-			case '|':
-				printf("%sx%s", VT_BEG, VT_END);
-				break;
-			case '-':
-				printf("%sq%s", VT_BEG, VT_END);
-				break;
-			case '/':
-				printf("%sl%s", VT_BEG, VT_END);
-				break;
-			case '\\':
-				printf("%sm%s", VT_BEG, VT_END);
-				break;
-			case '*':
-				printf("%sn%s", VT_BEG, VT_END);
-				break;
-			case '#':
-				printf("%st%s", VT_BEG, VT_END);
-				break;
-			case '+':
-				printf("%su%s", VT_BEG, VT_END);
-				break;
-			default:
-				putchar(*c);
-				break;
-			}
-		putchar('\n');
+	for (line = 0; line < canvasp->height; line++) {
+		printf("%s", VT_BEG);
+		printf("%s", canvasp->lines[line]);
+		printf("%s\n", VT_END);
 	}
-
-	/* scale bar (if any) */
-	for(; line < canvasp->height; line++)
-		puts(canvasp->lines[line]);
 }
-		
+
+void canvas_dump(struct canvas *canvasp) 
+{
+	canvasp->dump(canvasp);
+}
+
 
 void canvas_inspect(struct canvas* canvasp)
 {
