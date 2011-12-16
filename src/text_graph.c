@@ -89,6 +89,8 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 			if (TEXT_STYLE_RAW != style) {
+				if (is_leaf(node))
+					set_canvas_char_at(canvas, mid, h_pos, '-');
 				if (node == node->parent->first_child)
 					set_canvas_char_at(canvas,
 							mid, parent_h_pos, '/'); 

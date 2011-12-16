@@ -1,3 +1,7 @@
+doc: write a § about artifacts due to compression (use e.g. last tree in
+HRV.nw), and how they're unavoidable in text, and how they can be mitigated my
+showing topology or drwing SVG.
+
 use curses-like charcters for nw_display (ASCII version)
 
 nw_condense: condense clades with bootstrap value greater than some threshold.
