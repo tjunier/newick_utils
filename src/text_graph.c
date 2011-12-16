@@ -55,7 +55,36 @@ static const char LOWER_ANGLE = '\'';
 static const char NODE_TO_EDGE = '#';
 static const char EDGE_TO_NODE= '%';
 
-
+void fix_edge(struct canvas *canvas, struct rnode *node,
+		int mid, int h_pos, int parent_h_pos,
+		enum text_graph_style style)
+{
+	if (is_leaf(node))
+		set_canvas_char_at(canvas, mid, h_pos, '-');
+	if (node == node->parent->first_child)
+		set_canvas_char_at(canvas,
+				mid, parent_h_pos, '/'); 
+	else if (node == node->parent->last_child)
+		set_canvas_char_at(canvas,
+				mid, parent_h_pos, '\\');
+	else if (style >= TEXT_STYLE_VT100) {
+		char k = get_canvas_char_at(canvas,
+				mid, parent_h_pos);
+		switch(k) {
+		case '-':
+			set_canvas_char_at(canvas,
+				mid, parent_h_pos, '*');
+			break;
+		case '+':
+			set_canvas_char_at(canvas,
+				mid, parent_h_pos, '#');
+			break;
+		default:
+			//printf("Unexpected char '%c'\n", k);
+			assert(false);
+		}
+	}
+}
 /* Writes the nodes to the canvas. Assumes that the edges have been
  * attributed a double value in field 'length' (in this case, it is done in
  * set_node_depth()). */
@@ -88,34 +117,8 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			struct simple_node_pos *parent_data = node->parent->data;
 			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
-			if (TEXT_STYLE_RAW != style) {
-				if (is_leaf(node))
-					set_canvas_char_at(canvas, mid, h_pos, '-');
-				if (node == node->parent->first_child)
-					set_canvas_char_at(canvas,
-							mid, parent_h_pos, '/'); 
-				else if (node == node->parent->last_child)
-					set_canvas_char_at(canvas,
-							mid, parent_h_pos, '\\');
-				else if (style >= TEXT_STYLE_VT100) {
-					char k = get_canvas_char_at(canvas,
-							mid, parent_h_pos);
-					switch(k) {
-					case '-':
-						set_canvas_char_at(canvas,
-							mid, parent_h_pos, '*');
-						break;
-					case '+':
-						set_canvas_char_at(canvas,
-							mid, parent_h_pos, '#');
-						break;
-					default:
-						printf("Unexpected char '%c'\n", k);
-						//assert(false);
-					}
-				}
-			}
-			
+			if (TEXT_STYLE_RAW != style)
+				fix_edge(canvas, node, mid, h_pos, parent_h_pos, style);
 		}
 
 		/* Don't bother printing label if it is "" */
@@ -213,8 +216,6 @@ enum display_status display_tree(
 		bool scale_zero_at_root,
 		enum text_graph_style style)
 {	
-
-	printf("%s: style=%d\n", __func__, style);
 	/* set node positions */
 	alloc_simple_node_pos(tree);
 	int num_leaves = set_node_vpos_cb(tree,
@@ -244,7 +245,7 @@ enum display_status display_tree(
 
 	/* output */
 	if (TEXT_STYLE_VT100 == style)
-		canvas_dump_vt100(canvasp);
+		canvas_dump_vt100(canvasp, scalebar_space); // pass space to avoid VT100'ing scale units
 	else
 		canvas_dump(canvasp);
 
