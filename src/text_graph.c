@@ -55,18 +55,17 @@ static const char LOWER_ANGLE = '\'';
 static const char NODE_TO_EDGE = '#';
 static const char EDGE_TO_NODE= '%';
 
-void fix_edge(struct canvas *canvas, struct rnode *node,
+/* Changes the first char (i.e. parent-side) of the edge to reflect its
+ * position within the parent (top, mid, bottom, oer other). */
+
+void decorate_edge(struct canvas *canvas, struct rnode *node,
 		int mid, int h_pos, int parent_h_pos,
 		enum text_graph_style style)
 {
-	if (is_leaf(node))
-		set_canvas_char_at(canvas, mid, h_pos, '-');
 	if (node == node->parent->first_child)
-		set_canvas_char_at(canvas,
-				mid, parent_h_pos, '/'); 
+		canvas_draw_upper_corner(canvas, parent_h_pos, mid, '/'); 
 	else if (node == node->parent->last_child)
-		set_canvas_char_at(canvas,
-				mid, parent_h_pos, '\\');
+		canvas_draw_lower_corner(canvas, parent_h_pos, mid, '\\');
 	else if (style >= TEXT_STYLE_VT100) {
 		char k = get_canvas_char_at(canvas,
 				mid, parent_h_pos);
@@ -85,6 +84,7 @@ void fix_edge(struct canvas *canvas, struct rnode *node,
 		}
 	}
 }
+
 /* Writes the nodes to the canvas. Assumes that the edges have been
  * attributed a double value in field 'length' (in this case, it is done in
  * set_node_depth()). */
@@ -121,11 +121,11 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 			if (TEXT_STYLE_RAW != style)
-				fix_edge(canvas, node, mid, h_pos, parent_h_pos, style);
+				decorate_edge(canvas, node, mid, h_pos, parent_h_pos, style);
 		}
 	}
 	/* Then the labels are written. This separation of label-writing from
-	 * graph-drawing allows fix_edge() to assume that no characters are
+	 * graph-drawing allows decorate_edge() to assume that no characters are
 	 * found in the canvas besides those that describe graph structure. */
 	for (elem = rev_nodes->head; NULL != elem; elem = elem->next) {
 		struct rnode *node =  elem->data;

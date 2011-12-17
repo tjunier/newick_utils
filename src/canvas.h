@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+// TODO: Always use col first (x,y). */
 
 /**
  * \file canvas.h Functions for creating and using text canvases.
@@ -124,6 +125,20 @@ void canvas_draw_hline(struct canvas* canvas , int line, int start, int end);
  * \param	text	the string to write (NULL-terminated) */
 
 void canvas_write(struct canvas* canvas, int col, int line, char *text);
+
+/* The following are specialized functions, useful mainly for drawing trees. */
+
+/* Draws an upper-corner symbol. If the canvas is 'raw', draws the character
+ * passed as argument. If the canvas is VT100, the argument is ignored. This
+ * allows different text-graphics styles. */
+
+void canvas_draw_upper_corner(struct canvas *canvas, int col, int line, char symbol);
+void canvas_draw_lower_corner(struct canvas *canvas, int col, int line, char symbol);	/* see previous */
+
+/* Draws an edge-to-node symbol */
+void canvas_write_edge_to_node(struct canvas *canvas, int col, int line);
+void canvas_write_node_to_edge(struct canvas *canvas, int col, int line);
+void canvas_write_cross(struct canvas *canvas, int col, int line);
 
 /** Dumps the canvas to standard output. Use this function after filling the
  * canvas' contents with the draw and write functions. If the canvas was

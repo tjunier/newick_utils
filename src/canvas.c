@@ -35,6 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "text_graph_common.h"
 
+// TODO: 'canvasp' is the name I used years ago when I wanted to give special
+// names to pointers, something I quit doing very early anyway. Rename this to
+// 'canvas' or just 'c', as it is rather obvious.
+
 enum canvas_type { CANVAS_TYPE_RAW, CANVAS_TYPE_VT100 };
 enum plus_type { UPPER_ANGLE, LOWER_ANGLE, CROSS, TEE, UNKNOWN };
 
@@ -45,11 +49,15 @@ struct canvas;
 
 static void raw_canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col);
 static void raw_canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line);
+static void raw_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol);
+static void raw_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol);
 static void raw_canvas_write(struct canvas *canvasp, int col, int line, char *text);
 static void raw_canvas_dump(struct canvas *canvasp);
 
 static void vt100_canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col);
 static void vt100_canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line);
+static void vt100_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol);
+static void vt100_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol);
 static void vt100_canvas_write(struct canvas *canvasp, int col, int line, char *text);
 static void vt100_canvas_dump(struct canvas *canvasp);
 
@@ -61,6 +69,8 @@ struct canvas {
 	void (*draw_hline)(struct canvas *self, int width, int start_pos, int stop_pos);
 	void (*draw_vline)(struct canvas *self, int col, int start_line, int stop_line);
 	void (*write)(struct canvas *self, int col, int line, char *text); 
+	void (*draw_upper_corner)(struct canvas *self, int col, int width, char symbol);
+	void (*draw_lower_corner)(struct canvas *self, int col, int width, char symbol);
 	void (*dump)(struct canvas *self);
 };
 
@@ -85,12 +95,16 @@ static struct canvas *create_canvas(int width, int height, enum canvas_type type
 	case CANVAS_TYPE_RAW:
 		cp->draw_hline = raw_canvas_draw_hline;
 		cp->draw_vline = raw_canvas_draw_vline;
+		cp->draw_upper_corner = raw_canvas_draw_upper_corner;
+		cp->draw_lower_corner = raw_canvas_draw_lower_corner;
 		cp->write = raw_canvas_write;
 		cp->dump = raw_canvas_dump;
 		break;
 	case CANVAS_TYPE_VT100:
 		cp->draw_hline = vt100_canvas_draw_hline;
 		cp->draw_vline = vt100_canvas_draw_vline;
+		cp->draw_upper_corner = raw_canvas_draw_upper_corner;
+		cp->draw_lower_corner = raw_canvas_draw_lower_corner;
 		cp->write = vt100_canvas_write;
 		cp->dump = vt100_canvas_dump;
 		break;
@@ -143,6 +157,11 @@ static void raw_canvas_draw_hline(struct canvas *canvasp, int line, int start_co
 {
 	int col;
 
+	assert(line >= 0);
+	assert(line < canvasp->height);
+	assert(start_col >= 0);
+	assert(stop_col < canvasp->width);
+
 	/* <= is intentional (stop position is included in line) */
 	for (col = start_col; col <= stop_col; col++) 
 		if ('|' == canvasp->lines[line][col])
@@ -155,12 +174,14 @@ static void vt100_canvas_draw_hline(struct canvas *canvasp, int line, int start_
 {
 	int col;
 
+	assert(line >= 0);
+	assert(line < canvasp->height);
+	assert(start_col >= 0);
+	assert(stop_col < canvasp->width);
+
 	/* <= is intentional (stop position is included in line) */
 	for (col = start_col; col <= stop_col; col++) 
-		if ('|' == canvasp->lines[line][col])
-			canvasp->lines[line][col] = '+';
-		else
-			canvasp->lines[line][col] = 'q';
+		canvasp->lines[line][col] = 'q';
 }
 
 /* This only slightly hides implementation details, but there is nothing to
@@ -198,10 +219,7 @@ static void vt100_canvas_draw_vline(struct canvas *canvasp, int col, int start_l
 
 	/* <= is intentional (stop position is included in line) */
 	for (line = start_line; line <= stop_line; line++)
-		if ('-' == canvasp->lines[line][col])
-			canvasp->lines[line][col] = '+';
-		else
-			canvasp->lines[line][col] = '|';
+		canvasp->lines[line][col] = 'x';
 }
 
 /* See remark about canvas_draw_hline() */
@@ -209,6 +227,36 @@ static void vt100_canvas_draw_vline(struct canvas *canvasp, int col, int start_l
 void canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line)
 {
 	canvasp->draw_vline(canvasp, col, start_line, stop_line);
+}
+
+static void raw_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol)
+{
+	canvas_write(canvasp, col, line, symbol);
+}
+
+static void vt100_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol)
+{
+	canvas_write(canvasp, col, line, 'l');
+}
+
+void canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol)
+{
+	canvasp->draw_upper_corner(canvasp, col, line, symbol);
+}
+
+static void raw_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol)
+{
+	canvas_write(canvasp, col, line, symbol);
+}
+
+static void vt100_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol)
+{
+	canvas_write(canvasp, col, line, 'm');
+}
+
+void canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol)
+{
+	canvasp->draw_lower_corner(canvasp, col, line, symbol);
 }
 
 static void raw_canvas_write(struct canvas *canvasp, int col, int line, char *text)
