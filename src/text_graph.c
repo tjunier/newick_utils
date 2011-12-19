@@ -55,34 +55,26 @@ static const char LOWER_ANGLE = '\'';
 static const char NODE_TO_EDGE = '#';
 static const char EDGE_TO_NODE= '%';
 
-/* Changes the first char (i.e. parent-side) of the edge to reflect its
- * position within the parent (top, mid, bottom, oer other). */
+/* Changes the first char (i.e. distal or parent-side) of the edge to reflect
+ * its position within the parent (top, mid, bottom, ore other); likewise with
+ * the proximal (child-side) character. */
 
 void decorate_edge(struct canvas *canvas, struct rnode *node,
-		int mid, int h_pos, int parent_h_pos,
-		enum text_graph_style style)
+		int mid, int h_pos, int parent_mid, int parent_h_pos)
 {
+	/* Decorates the parent-side end of the edge */
 	if (node == node->parent->first_child)
 		canvas_draw_upper_corner(canvas, parent_h_pos, mid, '/'); 
 	else if (node == node->parent->last_child)
 		canvas_draw_lower_corner(canvas, parent_h_pos, mid, '\\');
-	else if (style >= TEXT_STYLE_VT100) {
-		char k = get_canvas_char_at(canvas,
-				mid, parent_h_pos);
-		switch(k) {
-		case '-':
-			set_canvas_char_at(canvas,
-				mid, parent_h_pos, '*');
-			break;
-		case '+':
-			set_canvas_char_at(canvas,
-				mid, parent_h_pos, '#');
-			break;
-		default:
-			//printf("Unexpected char '%c'\n", k);
-			assert(false);
-		}
-	}
+	else if (mid == parent_mid)
+		canvas_draw_cross(canvas, parent_h_pos, mid);
+	else
+		canvas_draw_node_to_edge(canvas, parent_h_pos, mid);
+
+	/* Decorate the child-side character */
+	canvas_draw_edge_to_node(canvas, h_pos, mid);
+
 }
 
 /* Writes the nodes to the canvas. Assumes that the edges have been
@@ -111,7 +103,7 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		int h_pos = rint(ROOT_SPACE + (scale * pos->depth));
 		int top = rint(2*pos->top);
 		int bottom = rint(2*pos->bottom);
-		int mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */
+		int mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */ // TODO is rint() needed
 		/* draw node */
 		canvas_draw_vline(canvas, h_pos, top, bottom);
 		if (is_root(node)) {
@@ -119,9 +111,10 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		} else {
 			struct simple_node_pos *parent_data = node->parent->data;
 			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
+			int parent_mid = rint(parent_data->top + parent_data->bottom); // see above about rint()
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 			if (TEXT_STYLE_RAW != style)
-				decorate_edge(canvas, node, mid, h_pos, parent_h_pos, style);
+				decorate_edge(canvas, node, mid, h_pos, parent_mid, parent_h_pos);
 		}
 	}
 	/* Then the labels are written. This separation of label-writing from

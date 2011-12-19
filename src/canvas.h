@@ -136,9 +136,9 @@ void canvas_draw_upper_corner(struct canvas *canvas, int col, int line, char sym
 void canvas_draw_lower_corner(struct canvas *canvas, int col, int line, char symbol);	/* see previous */
 
 /* Draws an edge-to-node symbol */
-void canvas_write_edge_to_node(struct canvas *canvas, int col, int line);
-void canvas_write_node_to_edge(struct canvas *canvas, int col, int line);
-void canvas_write_cross(struct canvas *canvas, int col, int line);
+void canvas_draw_edge_to_node(struct canvas *canvas, int col, int line);
+void canvas_draw_node_to_edge(struct canvas *canvas, int col, int line);
+void canvas_draw_cross(struct canvas *canvas, int col, int line);
 
 /** Dumps the canvas to standard output. Use this function after filling the
  * canvas' contents with the draw and write functions. If the canvas was

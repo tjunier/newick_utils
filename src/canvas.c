@@ -51,6 +51,9 @@ static void raw_canvas_draw_hline(struct canvas *canvasp, int line, int start_co
 static void raw_canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line);
 static void raw_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol);
 static void raw_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol);
+static void raw_canvas_draw_edge_to_node(struct canvas *canvasp, int col, int line);
+static void raw_canvas_draw_node_to_edge(struct canvas *canvasp, int col, int line);
+static void raw_canvas_draw_cross(struct canvas *canvasp, int col, int line);
 static void raw_canvas_write(struct canvas *canvasp, int col, int line, char *text);
 static void raw_canvas_dump(struct canvas *canvasp);
 
@@ -58,8 +61,18 @@ static void vt100_canvas_draw_hline(struct canvas *canvasp, int line, int start_
 static void vt100_canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line);
 static void vt100_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol);
 static void vt100_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol);
+static void vt100_canvas_draw_edge_to_node(struct canvas *canvasp, int col, int line);
+static void vt100_canvas_draw_node_to_edge(struct canvas *canvasp, int col, int line);
+static void vt100_canvas_draw_cross(struct canvas *canvasp, int col, int line);
 static void vt100_canvas_write(struct canvas *canvasp, int col, int line, char *text);
 static void vt100_canvas_dump(struct canvas *canvasp);
+
+/* This looks a bit like a class. A canvas structure has a type (raw or
+ * vt100), a few fields, plus a half-dozen pointers to functions, which are
+ * set at creation time depending on the type (because they behave differently
+ * for raw or vt100 canvases). The client code can call the same function
+ * irrespective of the canvas' type (i.e., the interface is the same).
+ * */
 
 struct canvas {
 	enum canvas_type type;
@@ -71,6 +84,9 @@ struct canvas {
 	void (*write)(struct canvas *self, int col, int line, char *text); 
 	void (*draw_upper_corner)(struct canvas *self, int col, int width, char symbol);
 	void (*draw_lower_corner)(struct canvas *self, int col, int width, char symbol);
+	void (*draw_edge_to_node)(struct canvas *canvasp, int col, int line);
+	void (*draw_node_to_edge)(struct canvas *canvasp, int col, int line);
+	void (*draw_cross)(struct canvas *canvasp, int col, int line);
 	void (*dump)(struct canvas *self);
 };
 
@@ -97,14 +113,20 @@ static struct canvas *create_canvas(int width, int height, enum canvas_type type
 		cp->draw_vline = raw_canvas_draw_vline;
 		cp->draw_upper_corner = raw_canvas_draw_upper_corner;
 		cp->draw_lower_corner = raw_canvas_draw_lower_corner;
+		cp->draw_edge_to_node = raw_canvas_draw_edge_to_node;
+		cp->draw_node_to_edge = raw_canvas_draw_node_to_edge;
+		cp->draw_cross = raw_canvas_draw_cross;
 		cp->write = raw_canvas_write;
 		cp->dump = raw_canvas_dump;
 		break;
 	case CANVAS_TYPE_VT100:
 		cp->draw_hline = vt100_canvas_draw_hline;
 		cp->draw_vline = vt100_canvas_draw_vline;
-		cp->draw_upper_corner = raw_canvas_draw_upper_corner;
-		cp->draw_lower_corner = raw_canvas_draw_lower_corner;
+		cp->draw_upper_corner = vt100_canvas_draw_upper_corner;
+		cp->draw_lower_corner = vt100_canvas_draw_lower_corner;
+		cp->draw_edge_to_node = vt100_canvas_draw_edge_to_node;
+		cp->draw_node_to_edge = vt100_canvas_draw_node_to_edge;
+		cp->draw_cross = vt100_canvas_draw_cross;
 		cp->write = vt100_canvas_write;
 		cp->dump = vt100_canvas_dump;
 		break;
@@ -153,6 +175,8 @@ char* _get_canvas_line(struct canvas *canvas, int num)
 	return canvas->lines[num];
 }
 
+/* Draw horizontal line */
+
 static void raw_canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop_col)
 {
 	int col;
@@ -193,6 +217,8 @@ void canvas_draw_hline(struct canvas *canvasp, int line, int start_col, int stop
 	canvasp->draw_hline(canvasp, line, start_col, stop_col);
 }
 
+/* Draw vertical line */
+
 static void raw_canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop_line)
 {
 	int line;
@@ -229,6 +255,8 @@ void canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop
 	canvasp->draw_vline(canvasp, col, start_line, stop_line);
 }
 
+/* Draw upper corner */
+
 static void raw_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol)
 {
 	set_canvas_char_at(canvasp, col, line, symbol);
@@ -236,13 +264,16 @@ static void raw_canvas_draw_upper_corner(struct canvas *canvasp, int col, int li
 
 static void vt100_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol)
 {
-	canvas_write(canvasp, col, line, 'l');
+	// symbol is ignored for vt100
+	set_canvas_char_at(canvasp, col, line, 'l');
 }
 
 void canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol)
 {
 	canvasp->draw_upper_corner(canvasp, col, line, symbol);
 }
+
+/* Draw lower corner */
 
 static void raw_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol)
 {
@@ -251,13 +282,66 @@ static void raw_canvas_draw_lower_corner(struct canvas *canvasp, int col, int li
 
 static void vt100_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol)
 {
-	canvas_write(canvasp, col, line, 'm');
+	set_canvas_char_at(canvasp, col, line, 'm');
 }
 
 void canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol)
 {
 	canvasp->draw_lower_corner(canvasp, col, line, symbol);
 }
+
+/* Draw node-to-edge */
+
+static void raw_canvas_draw_node_to_edge(struct canvas *canvasp, int col, int line)
+{
+	// No-op
+}
+
+static void vt100_canvas_draw_node_to_edge(struct canvas *canvasp, int col, int line)
+{
+	set_canvas_char_at(canvasp, col, line, 't');
+}
+
+void canvas_draw_node_to_edge(struct canvas *canvasp, int col, int line)
+{
+	canvasp->draw_node_to_edge(canvasp, col, line);
+}
+
+/* Draw edge_to_node */
+
+static void raw_canvas_draw_edge_to_node(struct canvas *canvasp, int col, int line)
+{
+	// No-op
+}
+
+static void vt100_canvas_draw_edge_to_node(struct canvas *canvasp, int col, int line)
+{
+	set_canvas_char_at(canvasp, col, line, 'u');
+}
+
+void canvas_draw_edge_to_node(struct canvas *canvasp, int col, int line)
+{
+	canvasp->draw_edge_to_node(canvasp, col, line);
+}
+
+/* Draw cross */
+
+static void raw_canvas_draw_cross(struct canvas *canvasp, int col, int line)
+{
+	// No-op
+}
+
+static void vt100_canvas_draw_cross(struct canvas *canvasp, int col, int line)
+{
+	set_canvas_char_at(canvasp, col, line, 'n');
+}
+
+void canvas_draw_cross(struct canvas *canvasp, int col, int line)
+{
+	canvasp->draw_cross(canvasp, col, line);
+}
+
+/* Write text */
 
 static void raw_canvas_write(struct canvas *canvasp, int col, int line, char *text)
 {
