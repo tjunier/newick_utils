@@ -107,7 +107,7 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		/* draw node */
 		canvas_draw_vline(canvas, h_pos, top, bottom);
 		if (is_root(node)) {
-			canvas_write(canvas, 0, mid, "=");
+			set_canvas_char_at(canvas, 0, mid, '=');
 		} else {
 			struct simple_node_pos *parent_data = node->parent->data;
 			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
