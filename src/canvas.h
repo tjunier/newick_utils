@@ -118,7 +118,10 @@ void canvas_draw_vline(struct canvas* canvas, int col, int start, int end);
 
 void canvas_draw_hline(struct canvas* canvas , int line, int start, int end);
 
-/** Writes a text string.
+/** Writes a text string. NOTE: on a VT100 canvas, this function causes
+ * coordinates greater than 'col' to be garbled (due to insertion of VT100
+ * escape chars). It is therefore recommended to start writing from the _end_
+ * of the line.
  * \param[out]	canvas	the canvas to write the string on
  * \param	col	the colum of the first character in the string
  * \param	line	the line the string is written at

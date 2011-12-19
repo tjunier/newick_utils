@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <masprintf.h>
+#include <concat.h>
 
 #include "text_graph_common.h"
 
@@ -282,6 +284,7 @@ static void raw_canvas_draw_lower_corner(struct canvas *canvasp, int col, int li
 
 static void vt100_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol)
 {
+	// symbol is ignored for vt100
 	set_canvas_char_at(canvasp, col, line, 'm');
 }
 
@@ -358,21 +361,9 @@ static void vt100_canvas_write(struct canvas *canvasp, int col, int line, char *
 {
 	assert(col >= 0);
 	assert(col < canvasp->width);
-	int text_length = strlen(text);
-	int space_left = canvasp->width - col;
-	int min = text_length < space_left ? text_length : space_left;
-	int vt100_begin_len = strlen(VT_BEG); 	// TODO: compute this only once!
-	int vt100_end_len = strlen(VT_END); 	// TODO: compute this only once!
-	char *cur_line = canvasp->lines[line];
-	char *buffer = malloc((canvasp->width + vt100_begin_len + vt100_end_len + 1) * sizeof(char));
-	if (NULL == buffer)
-		return ; /* just do nothing if no memory */
-	strncpy(buffer, cur_line, col);
-	strcpy(buffer+col, VT_END);
-	strcpy(buffer+col+vt100_end_len, text);
-	strcpy(buffer+col+vt100_end_len+strlen(text), VT_BEG);
-	strcpy(buffer+col+vt100_end_len+strlen(text)+vt100_begin_len, cur_line+col);
-	//strcpy(buffer
+	char *insert = masprintf("%s%s%s", VT_END, text, VT_BEG);
+	char *line_str = canvasp->lines[line];
+	char *buffer = str_splice(line_str, insert, col, strlen(text));
 	free(canvasp->lines[line]);
 	canvasp->lines[line] = buffer;
 }
