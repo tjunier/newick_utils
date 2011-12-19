@@ -144,9 +144,9 @@ int get_canvas_width(struct canvas *canvas) { return canvas->width; }
 
 int get_canvas_height(struct canvas *canvas) { return canvas->height; }
 
-char get_canvas_char_at(struct canvas *canvas, int line, int col) { return canvas->lines[line][col]; }
+char get_canvas_char_at(struct canvas *canvas, int col, int line) { return canvas->lines[line][col]; }
 
-void set_canvas_char_at(struct canvas *canvas, int line, int col, char c) { canvas->lines[line][col] = c; }
+void set_canvas_char_at(struct canvas *canvas, int col, int line, char c) { canvas->lines[line][col] = c; }
 
 char* _get_canvas_line(struct canvas *canvas, int num)
 {
@@ -231,7 +231,7 @@ void canvas_draw_vline(struct canvas *canvasp, int col, int start_line, int stop
 
 static void raw_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol)
 {
-	canvas_write(canvasp, col, line, symbol);
+	set_canvas_char_at(canvasp, col, line, symbol);
 }
 
 static void vt100_canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char symbol)
@@ -246,7 +246,7 @@ void canvas_draw_upper_corner(struct canvas *canvasp, int col, int line, char sy
 
 static void raw_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol)
 {
-	canvas_write(canvasp, col, line, symbol);
+	set_canvas_char_at(canvasp, col, line, symbol);
 }
 
 static void vt100_canvas_draw_lower_corner(struct canvas *canvasp, int col, int line, char symbol)
