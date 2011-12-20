@@ -41,6 +41,25 @@ int test_append()
 	return 0;
 }
 
+int test_str_splice()
+{
+	const char *test_name = __func__;
+
+	char *src = "abcdefghi";
+	char *ins = "xyzt";
+
+	char *exp = "abcdxyzthi";
+	char *obt = str_splice(src, ins, 4, 3);
+
+	if (strcmp(exp, obt) != 0) {
+		printf("%s: expected '%s', got '%s'\n",
+				test_name, exp, obt);
+		return 1;
+	}
+
+	printf ("%s ok.\n", test_name);
+	return 0;
+}
 
 int main()
 {
@@ -48,6 +67,7 @@ int main()
 	printf("Starting concat test...\n");
 	failures += test_concat();
 	failures += test_append();
+	failures += test_str_splice();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

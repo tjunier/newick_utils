@@ -37,3 +37,8 @@ char *concat(char *s1, char *s2);
  * realloc(), so does not allocate new (net) memory for s1. */
 
 char *append_to(char *s1, char *s2);
+
+/* Splices ins into src at position pos, replacing len chars. Returns a pointer to
+ * a newly-allocated string containing the result*/
+
+char *str_splice(char *src, char *ins, int pos, int len);
