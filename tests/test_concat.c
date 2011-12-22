@@ -45,17 +45,36 @@ int test_str_splice()
 {
 	const char *test_name = __func__;
 
-	char *src = "abcdefghi";
+	char *src = "abcdefghij";
 	char *ins = "xyzt";
 
-	char *exp = "abcdxyzthi";
+	/* insert in middle, replaced shorter (3) than insert (4) */
+	char *exp = "abcdxyzthij";
 	char *obt = str_splice(src, ins, 4, 3);
-
 	if (strcmp(exp, obt) != 0) {
 		printf("%s: expected '%s', got '%s'\n",
 				test_name, exp, obt);
 		return 1;
 	}
+
+	/* All the end of src is replaced */
+	exp = "abcdxyzt"; 	
+	obt = str_splice(src, ins, 4, 6);
+	if (strcmp(exp, obt) != 0) {
+		printf("%s: expected '%s', got '%s'\n",
+				test_name, exp, obt);
+		return 1;
+	}
+
+	/* Replace the beginning, same length */
+	exp = "xyztefghij";
+	obt = str_splice(src, ins, 0, 4);
+	if (strcmp(exp, obt) != 0) {
+		printf("%s: expected '%s', got '%s'\n",
+				test_name, exp, obt);
+		return 1;
+	}
+
 
 	printf ("%s ok.\n", test_name);
 	return 0;
