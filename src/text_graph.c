@@ -120,7 +120,7 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 	/* Then the labels are written. This separation of label-writing from
 	 * graph-drawing allows decorate_edge() to assume that no characters are
 	 * found in the canvas besides those that describe graph structure. */
-	for (elem = rev_nodes->head; NULL != elem; elem = elem->next) {
+	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
 		struct rnode *node =  elem->data;
 		struct simple_node_pos *pos =  node->data;
 		/* For cladograms */
@@ -179,8 +179,8 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 	canvas_draw_hline(canvas, v_pos, h_start, h_end);
 	float interval = tick_interval(dmax);
 	if (scale_zero_at_root) {
-		float x = 0;
-		while (x <= dmax) {
+		float x = dmax;
+		while (x >= 0) {
 			int tick_h_pos = ROOT_SPACE + rint(scale * x);
 			canvas_write(canvas, tick_h_pos, v_pos, "|");
 			char *tick_lbl = masprintf("%g", x);
@@ -190,7 +190,7 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 				tick_lbl_pos = ROOT_SPACE;
 			canvas_write(canvas, tick_lbl_pos, v_pos + 1, tick_lbl);
 			free (tick_lbl);
-			x += interval;
+			x -= interval;
 			if (dmax == 0)
 				break;
 		}

@@ -73,7 +73,8 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am_test_canvas_OBJECTS = test_canvas.$(OBJEXT) canvas.$(OBJEXT)
+am_test_canvas_OBJECTS = test_canvas.$(OBJEXT) canvas.$(OBJEXT) \
+	masprintf.$(OBJEXT) concat.$(OBJEXT)
 test_canvas_OBJECTS = $(am_test_canvas_OBJECTS)
 test_canvas_LDADD = $(LDADD)
 am_test_concat_OBJECTS = test_concat.$(OBJEXT) concat.$(OBJEXT)
@@ -395,7 +396,9 @@ test_link_SOURCES = test_link.c $(SRC)/link.c $(SRC)/nodemap.c \
 	$(SRC)/concat.c $(SRC)/hash.c tree_stubs.c \
 	$(SRC)/rnode_iterator.c $(SRC)/masprintf.c
 
-test_canvas_SOURCES = test_canvas.c $(SRC)/canvas.c
+test_canvas_SOURCES = test_canvas.c $(SRC)/canvas.c $(SRC)/masprintf.c \
+	$(SRC)/concat.c
+
 test_concat_SOURCES = test_concat.c $(SRC)/concat.c
 test_hash_SOURCES = test_hash.c $(SRC)/hash.c $(SRC)/list.c $(SRC)/masprintf.c
 test_lca_SOURCES = test_lca.c $(SRC)/lca.c $(SRC)/list.c $(SRC)/nodemap.c \
@@ -675,6 +678,20 @@ canvas.obj: $(SRC)/canvas.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o canvas.obj `if test -f '$(SRC)/canvas.c'; then $(CYGPATH_W) '$(SRC)/canvas.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/canvas.c'; fi`
 
+masprintf.o: $(SRC)/masprintf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT masprintf.o -MD -MP -MF $(DEPDIR)/masprintf.Tpo -c -o masprintf.o `test -f '$(SRC)/masprintf.c' || echo '$(srcdir)/'`$(SRC)/masprintf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/masprintf.Tpo $(DEPDIR)/masprintf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/masprintf.c' object='masprintf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o masprintf.o `test -f '$(SRC)/masprintf.c' || echo '$(srcdir)/'`$(SRC)/masprintf.c
+
+masprintf.obj: $(SRC)/masprintf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT masprintf.obj -MD -MP -MF $(DEPDIR)/masprintf.Tpo -c -o masprintf.obj `if test -f '$(SRC)/masprintf.c'; then $(CYGPATH_W) '$(SRC)/masprintf.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/masprintf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/masprintf.Tpo $(DEPDIR)/masprintf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/masprintf.c' object='masprintf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o masprintf.obj `if test -f '$(SRC)/masprintf.c'; then $(CYGPATH_W) '$(SRC)/masprintf.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/masprintf.c'; fi`
+
 concat.o: $(SRC)/concat.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT concat.o -MD -MP -MF $(DEPDIR)/concat.Tpo -c -o concat.o `test -f '$(SRC)/concat.c' || echo '$(srcdir)/'`$(SRC)/concat.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/concat.Tpo $(DEPDIR)/concat.Po
@@ -772,20 +789,6 @@ hash.obj: $(SRC)/hash.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/hash.c' object='hash.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hash.obj `if test -f '$(SRC)/hash.c'; then $(CYGPATH_W) '$(SRC)/hash.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/hash.c'; fi`
-
-masprintf.o: $(SRC)/masprintf.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT masprintf.o -MD -MP -MF $(DEPDIR)/masprintf.Tpo -c -o masprintf.o `test -f '$(SRC)/masprintf.c' || echo '$(srcdir)/'`$(SRC)/masprintf.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/masprintf.Tpo $(DEPDIR)/masprintf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/masprintf.c' object='masprintf.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o masprintf.o `test -f '$(SRC)/masprintf.c' || echo '$(srcdir)/'`$(SRC)/masprintf.c
-
-masprintf.obj: $(SRC)/masprintf.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT masprintf.obj -MD -MP -MF $(DEPDIR)/masprintf.Tpo -c -o masprintf.obj `if test -f '$(SRC)/masprintf.c'; then $(CYGPATH_W) '$(SRC)/masprintf.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/masprintf.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/masprintf.Tpo $(DEPDIR)/masprintf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(SRC)/masprintf.c' object='masprintf.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o masprintf.obj `if test -f '$(SRC)/masprintf.c'; then $(CYGPATH_W) '$(SRC)/masprintf.c'; else $(CYGPATH_W) '$(srcdir)/$(SRC)/masprintf.c'; fi`
 
 error.o: $(SRC)/error.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT error.o -MD -MP -MF $(DEPDIR)/error.Tpo -c -o error.o `test -f '$(SRC)/error.c' || echo '$(srcdir)/'`$(SRC)/error.c
