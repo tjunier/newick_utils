@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <string.h>
 
+#include <stdio.h> // TODO: rm when debug
+
 #include "canvas.h"
 #include "tree.h"
 #include "list.h"
@@ -54,6 +56,8 @@ static const char UPPER_ANGLE = ',';
 static const char LOWER_ANGLE = '\'';
 static const char NODE_TO_EDGE = '#';
 static const char EDGE_TO_NODE= '%';
+
+static const int MAX_NB_TICKS = 10; 	/* never more than 10 ticks (see tick_interval()) */
 
 /* Changes the first char (i.e. distal or parent-side) of the edge to reflect
  * its position within the parent (top, mid, bottom, ore other); likewise with
@@ -178,21 +182,35 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 	int h_end = ROOT_SPACE + rint(scale * dmax);
 	canvas_draw_hline(canvas, v_pos, h_start, h_end);
 	float interval = tick_interval(dmax);
+	int tick_mark_pos[MAX_NB_TICKS];
+	char* tick_mark_lbl[MAX_NB_TICKS];
 	if (scale_zero_at_root) {
+		/* store tick positions and labels in arrays */
 		float x = 0;
+		int i = 0;
 		while (x <= dmax) {
 			int tick_h_pos = ROOT_SPACE + rint(scale * x);
-			canvas_write(canvas, tick_h_pos, v_pos, "|");
+			tick_mark_pos[i] = tick_h_pos;
+			printf ("pos[%d]: %d\n", i, tick_h_pos);
 			char *tick_lbl = masprintf("%g", x);
+			tick_mark_lbl[i] = tick_lbl;
+			printf ("lbl[%d]: %s\n", i, tick_lbl);
+			x += interval;
+			i++;
+			if (dmax == 0) break;
+		}
+		printf("%d ticks\n", i);
+		for (i = i-1; i >= 0; i--) {
+			printf("pos: %d\n", i);
+			int tick_h_pos = tick_mark_pos[i];
+			canvas_write(canvas, tick_h_pos, v_pos, "|");
+			char *tick_lbl = tick_mark_lbl[i];
 			int tick_lbl_len = strlen(tick_lbl);
 			int tick_lbl_pos = tick_h_pos - tick_lbl_len + 1;
 			if (tick_lbl_pos < ROOT_SPACE)
 				tick_lbl_pos = ROOT_SPACE;
 			canvas_write(canvas, tick_lbl_pos, v_pos + 1, tick_lbl);
 			free (tick_lbl);
-			x += interval;
-			if (dmax == 0)
-				break;
 		}
 	} else {
 		/* scale zero at max depth */
