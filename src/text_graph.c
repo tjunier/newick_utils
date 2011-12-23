@@ -191,17 +191,13 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 		while (x <= dmax) {
 			int tick_h_pos = ROOT_SPACE + rint(scale * x);
 			tick_mark_pos[i] = tick_h_pos;
-			printf ("pos[%d]: %d\n", i, tick_h_pos);
 			char *tick_lbl = masprintf("%g", x);
 			tick_mark_lbl[i] = tick_lbl;
-			printf ("lbl[%d]: %s\n", i, tick_lbl);
 			x += interval;
 			i++;
 			if (dmax == 0) break;
 		}
-		printf("%d ticks\n", i);
 		for (i = i-1; i >= 0; i--) {
-			printf("pos: %d\n", i);
 			int tick_h_pos = tick_mark_pos[i];
 			canvas_write(canvas, tick_h_pos, v_pos, "|");
 			char *tick_lbl = tick_mark_lbl[i];
