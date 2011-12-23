@@ -1,4 +1,5 @@
 def: -e r def.nw
+def_s: def.nw
 multiple: -e r forest.nw
 pure_topol: -e r tetrapoda_pure_topol.nw
 svg_cmap:-s -c color.map catarrhini.nw
