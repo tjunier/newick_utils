@@ -66,6 +66,12 @@ static const int MAX_NB_TICKS = 10; 	/* never more than 10 ticks (see tick_inter
 void decorate_edge(struct canvas *canvas, struct rnode *node,
 		int mid, int h_pos, int parent_mid, int parent_h_pos)
 {
+	/* Decorate the child-side character */
+	canvas_draw_edge_to_node(canvas, h_pos, mid);
+
+	if (is_root(node))
+		return;
+
 	/* Decorates the parent-side end of the edge */
 	if (node == node->parent->first_child)
 		canvas_draw_upper_corner(canvas, parent_h_pos, mid, '/'); 
@@ -75,10 +81,6 @@ void decorate_edge(struct canvas *canvas, struct rnode *node,
 		canvas_draw_cross(canvas, parent_h_pos, mid);
 	else
 		canvas_draw_node_to_edge(canvas, parent_h_pos, mid);
-
-	/* Decorate the child-side character */
-	canvas_draw_edge_to_node(canvas, h_pos, mid);
-
 }
 
 /* Writes the nodes to the canvas. Assumes that the edges have been
@@ -108,18 +110,26 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		int top = rint(2*pos->top);
 		int bottom = rint(2*pos->bottom);
 		int mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */ // TODO is rint() needed
+		struct simple_node_pos *parent_data;
+		int parent_h_pos;
+		int parent_mid;
 		/* draw node */
 		canvas_draw_vline(canvas, h_pos, top, bottom);
 		if (is_root(node)) {
-			set_canvas_char_at(canvas, 0, mid, '=');
+			parent_data = NULL;
+			parent_h_pos = 0;
+			parent_mid = -1;
 		} else {
-			struct simple_node_pos *parent_data = node->parent->data;
-			int parent_h_pos = rint(ROOT_SPACE + (scale * parent_data->depth));
-			int parent_mid = rint(parent_data->top + parent_data->bottom); // see above about rint()
+			parent_data = node->parent->data;
+			parent_h_pos = rint(ROOT_SPACE +
+					(scale * parent_data->depth));
+			parent_mid = rint(parent_data->top +
+					parent_data->bottom); // see above about rint()
 			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
-			if (TEXT_STYLE_RAW != style)
-				decorate_edge(canvas, node, mid, h_pos, parent_mid, parent_h_pos);
 		}
+		if (TEXT_STYLE_RAW != style)
+			decorate_edge(canvas, node, mid, h_pos,
+					parent_mid, parent_h_pos);
 	}
 	/* Then the labels are written. This separation of label-writing from
 	 * graph-drawing allows decorate_edge() to assume that no characters are
