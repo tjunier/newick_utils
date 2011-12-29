@@ -125,8 +125,8 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 					(scale * parent_data->depth));
 			parent_mid = rint(parent_data->top +
 					parent_data->bottom); // see above about rint()
-			canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		}
+		canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		if (TEXT_STYLE_RAW != style)
 			decorate_edge(canvas, node, mid, h_pos,
 					parent_mid, parent_h_pos);
