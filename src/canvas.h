@@ -142,6 +142,7 @@ void canvas_draw_lower_corner(struct canvas *canvas, int col, int line, char sym
 void canvas_draw_edge_to_node(struct canvas *canvas, int col, int line);
 void canvas_draw_node_to_edge(struct canvas *canvas, int col, int line);
 void canvas_draw_cross(struct canvas *canvas, int col, int line);
+void canvas_draw_root(struct canvas *canvas, int col, int line);
 
 /** Dumps the canvas to standard output. Use this function after filling the
  * canvas' contents with the draw and write functions. If the canvas was

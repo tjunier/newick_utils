@@ -69,10 +69,10 @@ void decorate_edge(struct canvas *canvas, struct rnode *node,
 	/* Decorate the child-side character */
 	canvas_draw_edge_to_node(canvas, h_pos, mid);
 
-	if (is_root(node))
+	/* Decorates the parent-side end of the edge */
+	if (is_root(node)) 
 		return;
 
-	/* Decorates the parent-side end of the edge */
 	if (node == node->parent->first_child)
 		canvas_draw_upper_corner(canvas, parent_h_pos, mid, '/'); 
 	else if (node == node->parent->last_child)
@@ -134,7 +134,10 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 	/* Then the labels are written. This separation of label-writing from
 	 * graph-drawing allows decorate_edge() to assume that no characters are
 	 * found in the canvas besides those that describe graph structure. */
-	for (elem = tree->nodes_in_order->head; NULL != elem; elem = elem->next) {
+
+	int mid; /* used after the loop */
+	for (elem = tree->nodes_in_order->head;
+			NULL != elem; elem = elem->next) {
 		struct rnode *node =  elem->data;
 		struct simple_node_pos *pos =  node->data;
 		/* For cladograms */
@@ -144,7 +147,7 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		int h_pos = rint(ROOT_SPACE + (scale * pos->depth));
 		int top = rint(2*pos->top);
 		int bottom = rint(2*pos->bottom);
-		int mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */
+		mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */
 
 		/* Don't bother printing label if it is "" */
 		if (strcmp(node->label, "") == 0)
@@ -181,7 +184,10 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		canvas_write(canvas, h_pos, mid, node->label);
 	}
 
-
+	/* The decoration of the root must be done at the end of this loop
+	 * (when node is the root), to overwrite the edge decorations done in
+	 * the previous loop. */
+	canvas_draw_root(canvas, 0, mid);
 }
 
 void draw_scalebar(struct canvas *canvas, const double scale,

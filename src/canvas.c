@@ -56,6 +56,7 @@ static void raw_canvas_draw_lower_corner(struct canvas *canvasp, int col, int li
 static void raw_canvas_draw_edge_to_node(struct canvas *canvasp, int col, int line);
 static void raw_canvas_draw_node_to_edge(struct canvas *canvasp, int col, int line);
 static void raw_canvas_draw_cross(struct canvas *canvasp, int col, int line);
+static void raw_canvas_draw_root(struct canvas *canvasp, int col, int line);
 static void raw_canvas_write(struct canvas *canvasp, int col, int line, char *text);
 static void raw_canvas_dump(struct canvas *canvasp);
 
@@ -66,6 +67,7 @@ static void vt100_canvas_draw_lower_corner(struct canvas *canvasp, int col, int 
 static void vt100_canvas_draw_edge_to_node(struct canvas *canvasp, int col, int line);
 static void vt100_canvas_draw_node_to_edge(struct canvas *canvasp, int col, int line);
 static void vt100_canvas_draw_cross(struct canvas *canvasp, int col, int line);
+static void vt100_canvas_draw_root(struct canvas *canvasp, int col, int line);
 static void vt100_canvas_write(struct canvas *canvasp, int col, int line, char *text);
 static void vt100_canvas_dump(struct canvas *canvasp);
 
@@ -89,6 +91,7 @@ struct canvas {
 	void (*draw_edge_to_node)(struct canvas *canvasp, int col, int line);
 	void (*draw_node_to_edge)(struct canvas *canvasp, int col, int line);
 	void (*draw_cross)(struct canvas *canvasp, int col, int line);
+	void (*draw_root)(struct canvas *canvasp, int col, int line);
 	void (*dump)(struct canvas *self);
 };
 
@@ -118,6 +121,7 @@ static struct canvas *create_canvas(int width, int height, enum canvas_type type
 		cp->draw_edge_to_node = raw_canvas_draw_edge_to_node;
 		cp->draw_node_to_edge = raw_canvas_draw_node_to_edge;
 		cp->draw_cross = raw_canvas_draw_cross;
+		cp->draw_root = raw_canvas_draw_root;
 		cp->write = raw_canvas_write;
 		cp->dump = raw_canvas_dump;
 		break;
@@ -129,6 +133,7 @@ static struct canvas *create_canvas(int width, int height, enum canvas_type type
 		cp->draw_edge_to_node = vt100_canvas_draw_edge_to_node;
 		cp->draw_node_to_edge = vt100_canvas_draw_node_to_edge;
 		cp->draw_cross = vt100_canvas_draw_cross;
+		cp->draw_root = vt100_canvas_draw_root;
 		cp->write = vt100_canvas_write;
 		cp->dump = vt100_canvas_dump;
 		break;
@@ -342,6 +347,23 @@ static void vt100_canvas_draw_cross(struct canvas *canvasp, int col, int line)
 void canvas_draw_cross(struct canvas *canvasp, int col, int line)
 {
 	canvasp->draw_cross(canvasp, col, line);
+}
+
+/* Draw root */
+
+static void raw_canvas_draw_root(struct canvas *canvasp, int col, int line)
+{
+	set_canvas_char_at(canvasp, col, line, '=');
+}
+
+static void vt100_canvas_draw_root(struct canvas *canvasp, int col, int line)
+{
+	// No-op
+}
+
+void canvas_draw_root(struct canvas *canvasp, int col, int line)
+{
+	canvasp->draw_root(canvasp, col, line);
 }
 
 /* Write text */
