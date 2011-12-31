@@ -35,8 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <string.h>
 
-#include <stdio.h> // TODO: rm when debug
-
 #include "canvas.h"
 #include "tree.h"
 #include "list.h"

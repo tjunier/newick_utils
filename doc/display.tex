@@ -25,8 +25,11 @@ At its simplest, \display{} just outputs a text graph. Here is the primates tree
 That's pretty low-tech compared to interactive, colorful graphical displays,
 but if you use the shell a lot (like I do), you may find it useful.
 
-You can use option \texttt{-w} to set the number of columns
-available for display (the default is 80):
+You can use option \texttt{-w} to set the number of columns available for
+display. By default, \display{} will try to find the width of the terminal and
+use this. If the output is not a terminal (but, say, a file or pipe), or if for
+some reason the width cannot be found or is not defined, then the program uses
+a default of 80 characters.
 
 \verbatiminput{display_2_txt.cmd}
 \begin{samepage}

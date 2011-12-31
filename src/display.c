@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <termios.h>
+#include <sys/ioctl.h>
 
 #include "config.h"
 #include "common.h"
@@ -197,8 +199,9 @@ void help(char* argv[])
 "       orthogonal]\n"
 "    -V Use VT100 semigraphic characters\n"
 "    -w <number>: graph should be no wider than <number>, measured in\n"
-"       characters for text and pixels for SVG. Defaults: 80 (text),\n"
-"       300 (SVG)\n"
+"       characters for text and pixels for SVG. Defaults: 300 pixels (SVG);\n"
+"       for text it is either the terminal width when availabl e,or failing\n"
+"       that 80 characters.\n"
 "    -W <number>: use this as an estimate of the width of a leaf label\n"
 "       character (in pixels) [only SVG]. This affects the space left for\n"
 "       the tree nodes. Default: 5.0 You will probably need this if you\n"
@@ -412,8 +415,17 @@ struct parameters get_params(int argc, char *argv[])
 	if (-1 == params.width) {
 		if (params.svg) 
 			params.width = DEFAULT_WIDTH_PIXELS;
-		else
+		else {
 			params.width = DEFAULT_WIDTH_CHARS;
+
+			/* try to find screen width, in that case override
+			 * default */
+			struct winsize winsz;
+			if (ioctl(1, TIOCGWINSZ, &winsz) >= 0)
+				if (winsz.ws_col)
+					params.width = winsz.ws_col;
+
+		}
 	}
 	/* check arguments */
 	if (1 == (argc - optind)) {
