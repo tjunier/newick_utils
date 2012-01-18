@@ -35,8 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <string.h>
 
-#include <stdio.h> // TODO: rm when debug
-
 #include "canvas.h"
 #include "tree.h"
 #include "list.h"
@@ -72,6 +70,9 @@ void decorate_edge(struct canvas *canvas, struct rnode *node,
 	/* Decorates the parent-side end of the edge */
 	if (is_root(node)) 
 		return;
+
+	if (is_leaf(node))
+		canvas_decorate_leaf(canvas, h_pos, mid);
 
 	if (node == node->parent->first_child)
 		canvas_draw_upper_corner(canvas, parent_h_pos, mid, '/'); 
