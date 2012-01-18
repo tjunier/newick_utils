@@ -62,8 +62,15 @@ static const int MAX_NB_TICKS = 10; 	/* never more than 10 ticks (see tick_inter
  * the proximal (child-side) character. */
 
 void decorate_edge(struct canvas *canvas, struct rnode *node,
-		int mid, int h_pos, int parent_mid, int parent_h_pos)
+		int mid, int h_pos, int parent_mid, int parent_h_pos,
+		enum text_graph_style style)
 {
+	if (TEXT_STYLE_RAW == style) {
+		if (! is_root(node))
+			canvas_draw_cross(canvas, parent_h_pos, mid);
+		return;
+	}
+
 	/* Decorate the child-side character */
 	canvas_draw_edge_to_node(canvas, h_pos, mid);
 
@@ -128,13 +135,12 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 					parent_data->bottom); // see above about rint()
 		}
 		canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
-		if (TEXT_STYLE_RAW != style)
-			decorate_edge(canvas, node, mid, h_pos,
-					parent_mid, parent_h_pos);
+		decorate_edge(canvas, node, mid, h_pos, parent_mid, parent_h_pos, style);
 	}
 	/* Then the labels are written. This separation of label-writing from
 	 * graph-drawing allows decorate_edge() to assume that no characters are
 	 * found in the canvas besides those that describe graph structure. */
+	// TODO: check the above comment
 
 	int mid; /* used after the loop */
 	for (elem = tree->nodes_in_order->head;

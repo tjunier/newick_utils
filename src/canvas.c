@@ -341,7 +341,7 @@ void canvas_draw_edge_to_node(struct canvas *canvasp, int col, int line)
 
 static void raw_canvas_draw_cross(struct canvas *canvasp, int col, int line)
 {
-	// No-op
+	set_canvas_char_at(canvasp, col, line, '+');
 }
 
 static void vt100_canvas_draw_cross(struct canvas *canvasp, int col, int line)
