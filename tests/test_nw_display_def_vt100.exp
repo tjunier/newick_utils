@@ -1,0 +1,162 @@
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (B
+(0 x                                                                              (B
+(0 x                                      lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (B
+(0 x                                      x                                       (B
+(0qnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (B
+(0 x                                      x                                       (B
+(0 x                                      mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (B
+(0                                                                                (B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BB(0                                   (B
+(0 x                                                                              (B
+(0 x                                  lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BA(0       (B
+(0 x                                  x                                           (B
+(0qnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnqqqqqqqqqqqqqqqqqqqq (BC(0                     (B
+(0 x                                  x                                           (B
+(0 x                                  mqqqqqqqqqqqqqqqqqqqqqqqqqqq (BE(0              (B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BD(0(B
+(0                                                                                (B
+(0 (B|(0qqqqqqqqqqqqqqqq(B|(0qqqqqqqqqqqqqqqqq(B|(0qqqqqqqqqqqqqqqq(B|(0qqqqqqqqqqqqqqqq(B|(0qqqqqqq  (B
+(0 (B0(0              (B2.5(0                 (B5(0              (B7.5(0               (B10(0         (B
+(0 (Bsubstitutions/site(0                                                             (B
+(0                                                                                (B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BB(0                                   (B
+(0 x                                                                              (B
+(0 x                                  lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BA(0       (B
+(0 x                                  x                                           (B
+(0qnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnq(BAncestor1(0qqqqqqqqqq (BC(0                     (B
+(0 x                                  x                                           (B
+(0 x                                  mqqqqqqqqqqqqqqqqqqqqqqqqqqq (BE(0              (B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BD(0(B
+(0                                                                                (B
+(0 (B|(0qqqqqqqqqqqqqqqq(B|(0qqqqqqqqqqqqqqqqq(B|(0qqqqqqqqqqqqqqqq(B|(0qqqqqqqqqqqqqqqq(B|(0qqqqqqq  (B
+(0 (B0(0              (B2.5(0                 (B5(0              (B7.5(0               (B10(0         (B
+(0 (Bsubstitutions/site(0                                                             (B
+(0                                                                                (B
+(0 lqqqqqqqqqqq (Braccoon(0                                                           (B
+(0 l                                                                              (B
+(0 mqqqq (Bbear(0                                                                     (B
+(0 x                                                                              (B
+(0 x     lqqqqqqq (Bsea lion(0                                                        (B
+(0 x lqqqu                                                                        (B
+(0 x x   mqqqqqqq (Bseal(0                                                            (B
+(0 x x                                                                            (B
+(0qnqu           lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (Bmonkey(0  (B
+(0 x xlqqqqqqqqqqu                                                                (B
+(0 x mu          mqqqqqqqqqqqqqqqqqqqqqqqqqq (Bcat(0                                  (B
+(0 x  x                                                                           (B
+(0 x  mqqqqqqqqqq (Bweasel(0                                                          (B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqq (Bdog(0                                                            (B
+(0                                                                                (B
+(0 (B|(0qqqqqqqqqqqqq(B|(0qqqqqqqqqqqq(B|(0qqqqqqqqqqqqq(B|(0qqqqqqqqqqqq(B|(0qqqqqqqqqqqqq(B|(0q         (B
+(0 (B0(0            (B25(0           (B50(0            (B75(0          (B100(0           (B125(0          (B
+(0 (Bsubstitutions/site(0                                                             (B
+(0                                                                                (B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BBovine(0                               (B
+(0 x                                                                              (B
+(0 x                               lqqqqqqqqqqqqqqqqqqqq (BGibbon(0                   (B
+(0 x                               x                                              (B
+(0 tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu       lqqqqqqqqqqqqqqqqqqqq (BOrang(0            (B
+(0 x                               x       x                                      (B
+(0qu                               mqqqqqqqu   lqqqqqqqqqq (BGorilla(0                (B
+(0 x                                       x   x                                  (B
+(0 x                                       mqqqu    lqqqqqqqqqqq (BChimp(0            (B
+(0 x                                           mqqqqu                             (B
+(0 x                                                mqqqqqqq (BHuman(0                (B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BMouse(0  (B
+(0                                                                                (B
+(0 (B|(0qqqqqqqqqqq(B|(0qqqqqqqqqq(B|(0qqqqqqqqqqq(B|(0qqqqqqqqqq(B|(0qqqqqqqqqqq(B|(0qqqqqqqqqq(B|(0q        (B
+(0 (B0(0         (B0.2(0        (B0.4(0         (B0.6(0        (B0.8(0           (B1(0        (B1.2(0         (B
+(0 (Bsubstitutions/site(0                                                             (B
+(0                                                                                (B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BBovine(0                                 (B
+(0 x                                                                              (B
+(0 x                             lqqqqqqqqqqqqqqqqqqq (BHylobates(0                   (B
+(0 x                             x                                                (B
+(0 tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu       lqqqqqqqqqqqqqqqqqq (BPongo(0                (B
+(0 x                             x       x                                        (B
+(0qu                             mqqqqqqqu  lqqqqqqqqqq (BG. Gorilla(0                (B
+(0 x                                     x  x                                     (B
+(0 x                                     mqqu    lqqqqqqqqqq (BP. paniscus(0          (B
+(0 x                                        mqqqqu                                (B
+(0 x                                             mqqqqqq (BH. sapiens(0               (B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BRodent(0     (B
+(0                                                                                (B
+(0 (B|(0qqqqqqqqqq(B|(0qqqqqqqqqq(B|(0qqqqqqqqqq(B|(0qqqqqqqqq(B|(0qqqqqqqqqq(B|(0qqqqqqqqqq(B|(0q            (B
+(0 (B0(0        (B0.2(0        (B0.4(0        (B0.6(0       (B0.8(0          (B1(0        (B1.2(0             (B
+(0 (Bsubstitutions/site(0                                                             (B
+(0                                                                                (B
+(0qu (BA(0                                                                            (B
+(0                                                                                (B
+(0                                       lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BA(0(B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu                                        (B
+(0 x                                     mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BB(0(B
+(0qu                                                                              (B
+(0 x                                     lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BC(0(B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu                                        (B
+(0                                       mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BD(0(B
+(0                                                                                (B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BAlpha(0  (B
+(0 x                                                                              (B
+(0 tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BBeta(0   (B
+(0 x                                                                              (B
+(0 tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BGamma(0  (B
+(0 x                                                                              (B
+(0 tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BDelta(0  (B
+(0 x                                                                              (B
+(0qnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq        (B
+(0 x                                                                              (B
+(0 tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BEpsilon(0(B
+(0 x                                                                              (B
+(0 tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq        (B
+(0 x                                                                              (B
+(0 tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq        (B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq        (B
+(0                                                                                (B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BA(0(B
+(0 x                                                                              (B
+(0 x                                     lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BB(0(B
+(0qnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu                                        (B
+(0 x                                     mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BC(0(B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BD(0(B
+(0                                                                                (B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BA(0(B
+(0 x                                                                              (B
+(0 x                                     lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BC(0(B
+(0qnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu                                        (B
+(0 x                                     mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BB(0(B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BD(0(B
+(0                                                                                (B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BB(0(B
+(0 x                                                                              (B
+(0 x                                     lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BA(0(B
+(0qnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu                                        (B
+(0 x                                     mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BD(0(B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BC(0(B
+(0                                                                                (B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BA(0(B
+(0 x                                                                              (B
+(0 x                                     lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BB(0(B
+(0qnqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu                                        (B
+(0 x                                     mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BC(0(B
+(0 x                                                                              (B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BD(0(B
+(0                                                                                (B
+(0                                       lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BA(0(B
+(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu                                        (B
+(0 x                                     mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BD(0(B
+(0qu                                                                              (B
+(0 x                                     lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BC(0(B
+(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu                                        (B
+(0                                       mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BB(0(B
+(0                                                                                (B
