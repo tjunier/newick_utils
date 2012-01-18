@@ -57,7 +57,8 @@ test_link_SOURCES = test_link.c $(SRC)/link.c $(SRC)/nodemap.c \
 	$(SRC)/concat.c $(SRC)/hash.c tree_stubs.c \
 	$(SRC)/rnode_iterator.c $(SRC)/masprintf.c
 
-test_canvas_SOURCES = test_canvas.c $(SRC)/canvas.c
+test_canvas_SOURCES = test_canvas.c $(SRC)/canvas.c $(SRC)/masprintf.c \
+	$(SRC)/concat.c
 
 test_concat_SOURCES = test_concat.c $(SRC)/concat.c
 

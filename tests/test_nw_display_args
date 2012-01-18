@@ -1,6 +1,8 @@
-def:def.nw
-multiple:forest.nw
-pure_topol:tetrapoda_pure_topol.nw
+def: -e r def.nw
+def_s: def.nw
+def_vt100: -e v def.nw
+multiple: -e r forest.nw
+pure_topol: -e r tetrapoda_pure_topol.nw
 svg_cmap:-s -c color.map catarrhini.nw
 svg_cldgram:-s -W 8.6 catarrhini_wrong.nw
 svlb: -s -v 8 -l 'font-size:7' -b 'font-size:6' HRV.nw
@@ -30,18 +32,19 @@ Ir: -s -Ir -b 'visibility:hidden' simiiformes.nw
 Ilr: -sr -Il -w 800 -l 'font-size:large' -b 'visibility:hidden' simiiformes.nw
 Imr: -sr -Im -w 800 -l 'font-size:large' -b 'visibility:hidden' simiiformes.nw
 Irr: -sr -Ir -w 800 -l 'font-size:large' -b 'visibility:hidden' simiiformes.nw
-Ilt: -Il -b 'visibility:hidden' simiiformes.nw
-Irt: -Ir -b 'visibility:hidden' simiiformes.nw
-tnobar: -S catarrhini.nw
-tunit: -u 'million years' catarrhini_ultrametric.nw
-time: -t -u 'million years ago' duration.nw
+Ilt: -e r -Il -b 'visibility:hidden' simiiformes.nw
+Irt: -e r -Ir -b 'visibility:hidden' simiiformes.nw
+tnobar: -e r  -S catarrhini.nw
+tunit: -e r  -u 'million years' catarrhini_ultrametric.nw
+time: -e r  -t -u 'million years ago' duration.nw
 stime: -s -t -u 'million years ago' duration.nw
-tiny: tiny_lengths.nw 
-tiny_t: -t tiny_lengths.nw 
+tiny: -e r  tiny_lengths.nw 
+tiny_t: -e r  -t tiny_lengths.nw 
 cmap_nomatch: -s -c color.map falconiformes.nw
-1node: single_node.nw
+1node: -e r  single_node.nw
 nudge: -s -n -5 catarrhini.nw
 apos: apos.nw
 fix_sc_svg_1: -s -w -1 catarrhini_scaled.nw 
 fix_sc_svg_3: -s -w -3 catarrhini_scaled.nw 
 fix_sc_txt: -w -0.5 catarrhini_scaled.nw
+apos: -e r apos.nw

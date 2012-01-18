@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 char *concat(char *s1, char *s2)
 {
@@ -58,6 +59,27 @@ char *append_to(char *s1, char *s2)
 		return NULL;
 	}
 	strcpy(result+l1, s2);
+
+	return result;
+}
+
+char *str_splice(char *src, char *ins, int pos, int len)
+{
+	assert (pos >= 0);
+	assert (pos + len <= strlen(src));
+
+	int insert_len = strlen(ins);
+	int result_len = strlen(src) + insert_len - len;
+	char *result = calloc((result_len + 1), sizeof(char));
+	if (NULL == result)
+		return NULL;
+
+	/* copy the first <pos> char, just up to (but not including) the insert pos. */
+	memcpy(result, src, pos);	
+	/* copy insert */
+	memcpy(result+pos, ins, insert_len);
+	/* copy the rest of src */
+	strcpy(result+pos+insert_len, src+pos+len);
 
 	return result;
 }

@@ -1,5 +1,4 @@
 
-
 nw_display: add CSS to labels (in CSS map) 
 
 nw_display: add branch lengths to radial trees.
@@ -8,7 +7,10 @@ nw_rename: add example to -h about 3-arg form; also discuss in tutorial.
 
 nw_scheme: sync man, help w/ actual code; add example of numbering inner nodes
 (EK question).
-use curses-like charcters for nw_display (ASCII version)
+
+doc: write a § about artifacts due to compression (use e.g. last tree in
+HRV.nw), and how they're unavoidable in text, and how they can be mitigated my
+showing topology or drwing SVG.
 
 nw_condense: condense clades with bootstrap value greater than some threshold.
 
@@ -579,3 +581,7 @@ implementation of other nutils (nw_topology, nw_label, nw_trim?);
 [done] mention test_binaries.sh in manual
 
 [done] nw_display: add an option to fix scale [Will Fisher's idea]
+
+[done] use curses-like charcters for nw_display (ASCII version)
+
+[done] automatically determine screen width (ASCII) and use this.

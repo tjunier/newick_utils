@@ -28,22 +28,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+// TODO: Always use col first (x,y). */
 
 /**
  * \file canvas.h Functions for creating and using text canvases.
  */
 
 /**
- * Creates a canvas of w chars by h lines. Positions on the canvas start at 0
- * (i.e., C-style).  Returns a (pointer to a) canvas, or NULL iff canvas can't
- * be allocated. Once no longer needed, the canvas should be freed with
+ * Creates a raw canvas of w chars by h lines. A raw canvas represents the tree
+ * entirely in printable characters. Positions on the canvas start at 0 (i.e.,
+ * C-style).  Returns a (pointer to a) canvas, or NULL iff canvas can't be
+ * allocated. Once no longer needed, the canvas should be freed with
  * destroy_canvas().
  * \param w the number of columns
  * \param l the number of lines (rows)
  * \return a pointer to a struct canvas
  */ 
 
-struct canvas *create_canvas(int w, int l);
+struct canvas *create_raw_canvas(int w, int l);
+
+/**
+ * Creates a "VT100" canvas of w chars by h lines. This canvas uses VT100
+ * escape sequences to represent the tree as pseudo-graphics. Positions on the
+ * canvas start at 0 (i.e., C-style).  Returns a (pointer to a) canvas, or NULL
+ * iff canvas can't be allocated. Once no longer needed, the canvas should be
+ * freed with destroy_canvas().
+ * \param w the number of columns
+ * \param l the number of lines (rows)
+ * \return a pointer to a struct canvas
+ */ 
+
+struct canvas *create_vt100_canvas(int w, int l);
 
 /** Returns the canvas' width in columns
  *
@@ -60,6 +75,14 @@ int get_canvas_width(struct canvas *canvas);
  */
 
 int get_canvas_height(struct canvas *canvas);
+
+/* Returns the character at line 'line', column 'col'. Does NOT check bounds! */
+
+char get_canvas_char_at(struct canvas *canvas, int col, int line);
+
+/* Sets the character at line 'line', column 'col'. Does NOT check bounds! */
+
+void set_canvas_char_at(struct canvas *canvas, int col, int line, char c);
 
 /** Returns one line from the canvas. Meant to be used in tests, mostly (hence
  * the _ prefix). The line is NOT copied, so do not call free on this unless
@@ -95,7 +118,10 @@ void canvas_draw_vline(struct canvas* canvas, int col, int start, int end);
 
 void canvas_draw_hline(struct canvas* canvas , int line, int start, int end);
 
-/** Writes a text string.
+/** Writes a text string. NOTE: on a VT100 canvas, this function causes
+ * coordinates greater than 'col' to be garbled (due to insertion of VT100
+ * escape chars). It is therefore recommended to start writing from the _end_
+ * of the line.
  * \param[out]	canvas	the canvas to write the string on
  * \param	col	the colum of the first character in the string
  * \param	line	the line the string is written at
@@ -103,9 +129,27 @@ void canvas_draw_hline(struct canvas* canvas , int line, int start, int end);
 
 void canvas_write(struct canvas* canvas, int col, int line, char *text);
 
+/* The following are specialized functions, useful mainly for drawing trees. */
+
+/* Draws an upper-corner symbol. If the canvas is 'raw', draws the character
+ * passed as argument. If the canvas is VT100, the argument is ignored. This
+ * allows different text-graphics styles. */
+
+void canvas_draw_upper_corner(struct canvas *canvas, int col, int line, char symbol);
+void canvas_draw_lower_corner(struct canvas *canvas, int col, int line, char symbol);	/* see previous */
+
+/* Draws an edge-to-node symbol */
+void canvas_draw_edge_to_node(struct canvas *canvas, int col, int line);
+void canvas_draw_node_to_edge(struct canvas *canvas, int col, int line);
+void canvas_draw_cross(struct canvas *canvas, int col, int line);
+void canvas_draw_root(struct canvas *canvas, int col, int line);
+void canvas_decorate_leaf(struct canvas *canvas, int col, int line);
+
 /** Dumps the canvas to standard output. Use this function after filling the
- * canvas' contents with the draw and write functions.
- * \param[out]	canvas * the canvas to dump. */
+ * canvas' contents with the draw and write functions. If the canvas was
+ * created with create_vt100_canvas(), then VT100 characters will be used. 
+ * \param[out]	canvas * the canvas to dump.
+ */
 
 void canvas_dump(struct canvas* canvas);
 

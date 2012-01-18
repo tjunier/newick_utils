@@ -13,7 +13,7 @@ int test_create()
 	const int height = 6;
 	int i;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 	
 	for (i = 0; i < height; i++)  {
 		if (strcmp(_get_canvas_line(cp, i), blank) != 0) {
@@ -32,12 +32,10 @@ int test_getters()
 	const char *test_name = __func__;
 
 	struct canvas *cp;
-	const char *blank = "          ";	/* 10 ' ' */
 	const int width = 10;
 	const int height = 6;
-	int i;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 
 	if (width != get_canvas_width(cp)) {
 		printf("%s: expected width of %d, got %d.\n",
@@ -49,6 +47,18 @@ int test_getters()
 				test_name, height, get_canvas_height(cp));
 		return 1;
 	}
+	char c = get_canvas_char_at(cp, 3, 5);
+	if (' ' != c) {
+		printf("%s: expected ' ' at (3, 5), got '%c'\n", test_name, c);
+		return 1;
+	}
+	set_canvas_char_at(cp, 3, 5, '*');
+	c = get_canvas_char_at(cp, 3, 5);
+	if ('*' != c) {
+		printf("%s: expected '*' at (3, 5), got '%c'\n", test_name, c);
+		return 1;
+	}
+
 
 	printf("%s ok.\n", test_name);
 	return 0;
@@ -68,7 +78,7 @@ int test_draw_h()
 	const int line_col_stop = 16;
 	int i;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 	canvas_draw_hline(cp, line_height, line_col_start, line_col_stop);
 	
 	for (i = 0; i < line_height; i++)  {
@@ -109,7 +119,7 @@ int test_draw_v()
 	const char *vline_14 = "              |     ";
 	int i;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 	canvas_draw_vline(cp, col_hpos, line_v_start, line_v_stop);
 	
 	for (i = 0; i < line_v_start; i++)  {
@@ -151,7 +161,7 @@ int test_write()
 	const int text_col_start = 10;
 	int i;
 
-	cp = create_canvas(width, height);
+	cp = create_raw_canvas(width, height);
 	canvas_write(cp, text_col_start, text_height, "bulgone");
 	
 	for (i = 0; i < text_height; i++)  {
@@ -180,7 +190,7 @@ int test_write()
 
 int test_cross()
 {
-	const char *test_name = "test_cross";
+	const char *test_name = __func__;
 
 	struct canvas *cp;
 	const char *l0 = "  +--";
@@ -188,7 +198,7 @@ int test_cross()
 	const char *l2 = "--+- ";
 	const char *l3 = "  |  ";
 
-	cp = create_canvas(5, 4);
+	cp = create_raw_canvas(5, 4);
 	canvas_draw_hline(cp, 0, 2, 4);
 	canvas_draw_vline(cp, 2, 0, 3);
 	canvas_draw_hline(cp, 2, 0, 3);

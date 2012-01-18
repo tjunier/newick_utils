@@ -401,6 +401,7 @@ char *xml_transform_ornaments(const char *ornaments, double angle_deg, double x,
 
 /* Embeds the ornaments in an SVG <g> tag, performing some crude transforms
  * (rotation, etc). Returns an SVG snippet, or NULL in case of error. */
+// TODO: is this f() ever used, with/without LibXML?
 
 static char *embed_transform_ornaments(const char *svg_ornaments, double angle_deg,
 		double x, double y)
@@ -703,6 +704,7 @@ static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 }
 
 /* Prints an SVG comment block with some run parameters. Useful for debugging */
+// TODO: is this f() ever used, with/without LibXML?
 
 static void params_as_svg_comment (struct h_data hd, double node_area_width,
 		double r_scale)
