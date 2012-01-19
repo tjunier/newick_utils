@@ -50,6 +50,6 @@ enum text_graph_style;
  */
 
 enum display_status display_tree(struct rooted_tree *tree,
-		int width, bool align_leaves, enum inner_lbl_pos lbl_pos,
+		double width, bool align_leaves, enum inner_lbl_pos lbl_pos,
 		bool with_scalebar, char *units, bool scale_zero_at_root,
 		enum text_graph_style style);
