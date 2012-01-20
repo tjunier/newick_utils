@@ -9,7 +9,7 @@ foresee every way in which one may need to process a tree, and with this we hit
 a limit to specialization. In some cases, a more general-purpose program may
 offer a solution.
 
-As an analogy, consider the task of finding lines in a text file that match a
+As an analogy, consider the task of finding lines in a text that match a
 given pattern. This can be done, for example, in the following ways, from the
 general to the specific:
 \begin{itemize}
@@ -27,8 +27,8 @@ task in question.\footnote{The name "grep" comes from the {\tt sed} expression
 {\tt grep} to be the most efficient, but we should not expect it to be able to
 perform any significantly different task.  By contrast, Perl may be (I haven't
 checked!) less efficient than {\tt grep}, but it can handle pretty much any
-task. Sed will lie in between. The programs we have seen so far are {\tt
-grep}-like: they are specialized for one task (and hopefully, they are
+task. Sed will lie in between. The \nutils{} programs we have seen so far are
+{\tt grep}-like: they are specialized for one task (and hopefully, they are
 efficient).
 
 The programs described in this section are more {\tt sed}-like: they are less
