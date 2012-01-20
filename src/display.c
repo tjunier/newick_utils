@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <termios.h>
+#include <sys/ioctl.h>
 
 #include "config.h"
 #include "common.h"
@@ -197,14 +199,14 @@ void help(char* argv[])
 "    -v <number>: number of pixels between leaves (default: 40) [only SVG\n"
 "       orthogonal]\n"
 "    -w <number>: set width or scale (exclusive or...)\n"
-"       o If <number> is poditive, then it fixes the width - the graph will\n"
-"       no wider than <number>, measured in columns for text and pixels\n"
-"       for SVG. Defaults: 80 columns (text) | 300 px (SVG).\n"
+"       o If <number> is positive, then it fixes the width - the graph will\n"
+"         be no wider than <number>, measured in columns for text and pixels\n"
+"         for SVG. Defaults: 80 columns (text) or 300 px (SVG).\n"
 "       o If <number> is _negative_, then its absolute value is used as a\n"
-"       fixed scale, expressed in pixels/length units (SVG), or in\n"
-"       columns/length units (text), in which length units are usually\n"
-"       substitutions/site (but see option -u). If there are more than one\n"
-"       tree, then this fixed scale is applied to all of them.\n"
+"         fixed scale, expressed in pixels/length units (SVG), or in\n"
+"         columns/length units (text), in which length units are usually\n"
+"         substitutions/site (but see option -u). If there are more than\n"
+"         one tree, then this fixed scale is applied to all of them.\n"
 "    -W <number>: use this as an estimate of the width of a leaf label\n"
 "       character (in pixels) [only SVG]. This affects the space left for\n"
 "       the tree nodes. Default: 5.0 You will probably need this if you\n"
@@ -413,8 +415,17 @@ struct parameters get_params(int argc, char *argv[])
 	if (0.0 == params.width) {
 		if (params.svg) 
 			params.width = DEFAULT_WIDTH_PIXELS;
-		else
+		else {
 			params.width = DEFAULT_WIDTH_CHARS;
+
+			/* try to find screen width, in that case override
+			 * default */
+			struct winsize winsz;
+			if (ioctl(1, TIOCGWINSZ, &winsz) >= 0)
+				if (winsz.ws_col)
+					params.width = winsz.ws_col;
+
+		}
 	}
 	/* check arguments */
 	if (1 == (argc - optind)) {

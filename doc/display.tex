@@ -11,8 +11,8 @@ see by looking \eg{} at a tree of Old World primates:
 \verbatiminput{display_12_txt.out}
 \end{samepage}
 
-\noindent{}So we want to make a graphical representation from it. This is the purpose of
-the \display{} program. 
+\noindent{}So we want to make a graphical representation from it. This is the
+purpose of the \display{} program. 
 
 \subsection{As Text}
 \label{sct_display_text}
@@ -25,10 +25,33 @@ At its simplest, \display{} just outputs a text graph. Here is the primates tree
 That's pretty low-tech compared to interactive, colorful graphical displays,
 but if you use the shell a lot (like I do), you may find it useful.
 
+\subsubsection{Styles}
+
+Even lowly text graphics can have style! Option \texttt{-e} allows you to
+change the way text graphs look:
+
+\begin{tabular}{cl}
+Argument to \texttt{-e} & Effect \\
+\hline 
+\texttt{r} & (raw) use just \texttt{|}, \texttt{-}, and \texttt{+} \\
+\texttt{c} & (commas) corners are marked with \texttt{'} and \texttt{,} \\
+\texttt{s} & (slashes) corners are marked with \texttt{/} and \texttt{\textbackslash} \\
+\texttt{v} & (VT100) use VT100 pseudo-graphical characters
+\end{tabular}
+
+By default, uses slashes, unless overridden by environment variable
+\texttt{NW\_DISPLAY\_TEXT\_STYLE}. This should have a value of \texttt{raw},
+\texttt{commas}, \texttt{slashes}, or \texttt{VT100} (case is irrelevant, and
+actually only the first character is read, so you can abbreviate to \texttt{r},
+\texttt{c}, \texttt{s}, or \texttt{u}).
+
 \subsubsection{Fixing Width}
 
-You can use option \texttt{-w} to set the number of columns
-available for display (the default is 80):
+By default, \display{} will try to find the width of the terminal and
+use that many columns when drawing the tree. If the output is not a terminal
+(but, say, a file or pipe), or if for some reason the width cannot be found or
+is not defined, then the program uses a default of 80 characters. You can use
+option \texttt{-w} to override the defaults.
 
 \begin{samepage}
 \verbatiminput{display_2_txt.cmd}
