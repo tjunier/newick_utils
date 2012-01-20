@@ -50,10 +50,10 @@ static const int LBL_SPACE = 2;
 static const int ROOT_SPACE = 1;
 static const int SCALEBAR_SPACE = 4;
 
-static const char UPPER_ANGLE = ',';
-static const char LOWER_ANGLE = '\'';
-static const char NODE_TO_EDGE = '#';
-static const char EDGE_TO_NODE= '%';
+static const char COMMAS_UPPER_ANGLE = ',';
+static const char COMMAS_LOWER_ANGLE = '\'';
+static const char SLASHES_UPPER_ANGLE = '/';
+static const char SLASHES_LOWER_ANGLE = '\\';
 
 static const int MAX_NB_TICKS = 10; 	/* never more than 10 ticks (see tick_interval()) */
 
@@ -81,10 +81,32 @@ void decorate_edge(struct canvas *canvas, struct rnode *node,
 	if (is_leaf(node))
 		canvas_decorate_leaf(canvas, h_pos, mid);
 
+	char upper_angle, lower_angle;
+	// Ideally, this should be computed once per run instead of once per
+	// node...
+	switch(style) {
+	case TEXT_STYLE_COMMAS:
+		upper_angle = COMMAS_UPPER_ANGLE;
+		lower_angle = COMMAS_LOWER_ANGLE;
+		break;
+	case TEXT_STYLE_SLASHES:
+		upper_angle = SLASHES_UPPER_ANGLE;
+		lower_angle = SLASHES_LOWER_ANGLE;
+		break;
+	case TEXT_STYLE_VT100:
+		upper_angle = '\0';	/* ignored in VT100 mode */
+		lower_angle = '\0';
+		break;
+	default:
+		assert(0);
+	}
+
 	if (node == node->parent->first_child)
-		canvas_draw_upper_corner(canvas, parent_h_pos, mid, '/'); 
+		canvas_draw_upper_corner(canvas, parent_h_pos, mid, 
+				upper_angle); 
 	else if (node == node->parent->last_child)
-		canvas_draw_lower_corner(canvas, parent_h_pos, mid, '\\');
+		canvas_draw_lower_corner(canvas, parent_h_pos, mid, 
+				lower_angle);
 	else if (mid == parent_mid)
 		canvas_draw_cross(canvas, parent_h_pos, mid);
 	else

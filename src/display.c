@@ -315,11 +315,11 @@ struct parameters get_params(int argc, char *argv[])
 	params.label_space_correction = 0;	/* px */
 	// params.text_st = false;
 
-	char *nw_display_raw_env = getenv("NW_DISPLAY_RAW");
-	if (NULL == nw_display_raw_env)
+	char *nw_display_text_style = getenv("NW_DISPLAY_TEXT_STYLE");
+	if (NULL == nw_display_text_style)
 		params.txt_graph_style = TEXT_STYLE_SLASHES;
 	else 
-		params.txt_graph_style = get_graph_style(nw_display_raw_env);
+		params.txt_graph_style = get_graph_style(nw_display_text_style);
 
 	int opt_char;
 	const int DEFAULT_WIDTH_PIXELS = 300;
