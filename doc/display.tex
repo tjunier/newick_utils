@@ -25,29 +25,9 @@ At its simplest, \display{} just outputs a text graph. Here is the primates tree
 That's pretty low-tech compared to interactive, colorful graphical displays,
 but if you use the shell a lot (like I do), you may find it useful.
 
-\subsubsection{Styles}
-
-Even lowly text graphics can have style! Option \texttt{-e} allows you to
-change the way text graphs look:
-
-\begin{tabular}{cl}
-Argument to \texttt{-e} & Effect \\
-\hline 
-\texttt{r} & (raw) use just \texttt{|}, \texttt{-}, and \texttt{+} \\
-\texttt{c} & (commas) corners are marked with \texttt{'} and \texttt{,} \\
-\texttt{s} & (slashes) corners are marked with \texttt{/} and \texttt{\textbackslash} \\
-\texttt{v} & (VT100) use VT100 pseudo-graphical characters
-\end{tabular}
-
-By default, uses slashes, unless overridden by environment variable
-\texttt{NW\_DISPLAY\_TEXT\_STYLE}. This should have a value of \texttt{raw},
-\texttt{commas}, \texttt{slashes}, or \texttt{VT100} (case is irrelevant, and
-actually only the first character is read, so you can abbreviate to \texttt{r},
-\texttt{c}, \texttt{s}, or \texttt{u}).
-
 \subsubsection{Fixing Width}
 
-By default, \display{} will try to find the width of the terminal and
+\display{} will try to find the width of the terminal and
 use that many columns when drawing the tree. If the output is not a terminal
 (but, say, a file or pipe), or if for some reason the width cannot be found or
 is not defined, then the program uses a default of 80 characters. You can use
@@ -91,6 +71,49 @@ backwards" (option \texttt{-t}), \ie{} the scale bar's zero is aligned with the
 leaves and units increase towards the root. This is handy when the units are
 ages, \eg{} in millions of years ago, but it only makes much sense if the leaves
 themselves are aligned. See \ref{sct_duration} for an example.
+
+\subsubsection{Styles}
+
+Even lowly text graphics can have style! Option \texttt{-e} allows you to
+change the way text graphs look:
+
+\begin{center}
+\begin{tabular}{cl}
+Argument to \texttt{-e} & Effect \\
+\hline 
+\texttt{r} & (raw) use just \texttt{|}, \texttt{-}, and \texttt{+}, and \texttt{=} for the root. \\
+\texttt{c} & (commas) corners are marked with \texttt{'} and \texttt{,} \\
+\texttt{s} & (slashes) corners are marked with \texttt{/} and \texttt{\textbackslash} \\
+\texttt{v} & (VT100) use VT100 pseudo-graphical characters
+\end{tabular}
+\end{center}
+
+\noindent{}Here are some examples:
+
+\begin{center}
+{\footnotesize
+\begin{tabular}{p{0.4\textwidth}p{0.1\textwidth}p{0.4\textwidth}}
+\verbatiminput{display_21_txt.cmd}
+\verbatiminput{display_21_txt.out}
+& &
+\verbatiminput{display_22_txt.cmd}
+\verbatiminput{display_22_txt.out}
+\\
+\verbatiminput{display_23_txt.cmd}
+\verbatiminput{display_23_txt.out}
+& &
+\verbatiminput{display_24_txt.cmd}
+\includegraphics[width=0.5\textwidth]{display_24_txt.png}
+This is a screenshot because I don't know how to show VT100 special characters in \LaTeX{} :-)
+\end{tabular}
+}
+\end{center}
+
+\noindent{}By default, \display{} uses "slashes", unless overridden by
+environment variable \texttt{NW\_DISPLAY\_TEXT\_STYLE}. This should have a
+value of \texttt{raw}, \texttt{commas}, \texttt{slashes}, or \texttt{VT100}
+(case is irrelevant, and actually only the first character is read, so you can
+abbreviate to \texttt{r}, \texttt{c}, \texttt{s}, or \texttt{u}).
 
 \subsubsection{Placement of Inner Node Labels}
 
