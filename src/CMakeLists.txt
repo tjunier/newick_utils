@@ -4,4 +4,6 @@ add_executable(nw_labels labels.c newick_scanner.c newick_parser.c
 	tree.c rnode.c list.c rnode_iterator.c hash.c nodemap.c
 	masprintf.c link.c parser.c)
 
-add_executable(nw_display display.c text_graph.c canvas.c newick_scanner.c newick_parser.c parser.c tree.c rnode.c list.c hash.c masprintf.c rnode_iterator.c nodemap.c link.c)
+add_executable(nw_display display.c text_graph.c canvas.c newick_scanner.c newick_parser.c parser.c tree.c rnode.c list.c hash.c masprintf.c rnode_iterator.c nodemap.c link.c concat.c node_pos_alloc.c simple_node_pos.c graph_common.c svg_graph.c svg_graph_radial.c svg_graph_ortho.c lca.c error.c readline.c xml_utils.c)
+
+target_link_libraries(nw_display m xml2)
