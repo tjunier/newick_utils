@@ -32,9 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <masprintf.h>
-#include <concat.h>
 
+#include "masprintf.h"
+#include "concat.h"
 #include "text_graph_common.h"
 
 // TODO: 'canvasp' is the name I used years ago when I wanted to give special
