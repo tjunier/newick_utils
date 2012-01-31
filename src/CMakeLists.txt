@@ -1,3 +1,5 @@
+include_directories(${NUTILS_SOURCE_DIR} /usr/include/libxml2)
+
 add_executable(nw_indent indent.c indent_lex.c)
 
 add_executable(nw_labels labels.c newick_scanner.c newick_parser.c
