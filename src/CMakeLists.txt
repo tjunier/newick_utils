@@ -1,4 +1,16 @@
-include_directories(${NUTILS_SOURCE_DIR} /usr/include/libxml2)
+# TODO: remove libxml2 stuff below, and use the proper way, i.e. find_package()
+# etc.
+include_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}	# needed for Flex and Bison below
+	/usr/include/libxml2		# deleatur
+	)
+
+FLEX_TARGET(IndScanner indent_lex.l
+	${CMAKE_CURRENT_BINARY_DIR}/indent_lex.c)
+BISON_TARGET(NwParser newick_parser.y
+	${CMAKE_CURRENT_BINARY_DIR}/newick_parser.c)
+FLEX_TARGET(NwScanner newick_scanner.l
+	${CMAKE_CURRENT_BINARY_DIR}/newick_scanner.c)
 
 add_executable(nw_indent indent.c indent_lex.c)
 

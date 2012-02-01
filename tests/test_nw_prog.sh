@@ -64,6 +64,7 @@ fi
 prog=`echo $0 | sed -e 's|\.sh$||' -e 's/^.*test_//'`
 TEST_SRC_DIR=$1
 TEST_OUT_DIR=$2
+PROG_BIN_DIR=$3
 args_file=$TEST_SRC_DIR/test_${prog}_args
 
 # nw_sched is only tested if Guile is being used
@@ -84,13 +85,9 @@ if [ "$prog" = "nw_luaed" ] ; then
 	fi
 fi
 
-# Ok, try to test $prog.
-# TODO: check for prog here instead of setting PATH as below. If $prog is
-# found, prefix it with the relative path (e.g. ../src/$prog).
-
 echo "Testing program: $prog"
 
-if [ !  -x ../src/$prog ] ; then
+if [ !  -x ${PROG_BIN_DIR}/$prog ] ; then
 	echo "$prog not found or not executable."
 	exit 1
 fi
@@ -110,7 +107,7 @@ while IFS=':' read name args ; do
 		echo "Skipping $name"
 		continue
 	fi
-	IFS='' cmd="$prog $args"
+	IFS='' cmd="${PROG_BIN_DIR}/$prog $args"
 	echo -n "test '$name': '$cmd' - "
 	outfile=$TEST_OUT_DIR/test_${prog}_$name.out
 	(cd $TEST_SRC_DIR; eval $cmd > $outfile)

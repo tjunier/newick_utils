@@ -7,6 +7,9 @@ enable_testing()
 option(USE_LIBXML "Use libXML" ON)
 option(USE_LUA	  "Use Lua" ON)
 
+find_package(BISON)
+find_package(FLEX)
+
 if(USE_LIBXML)
 	find_package(LibXml2)
 endif(USE_LIBXML)

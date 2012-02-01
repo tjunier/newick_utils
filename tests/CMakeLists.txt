@@ -20,8 +20,10 @@ add_test(rnode test_rnode)
 # location of bin dir.
 
 foreach(test nw_labels nw_luaed)
-	add_test(${test} ${TESTS_SRC_DIR}/test_${test}.sh
+	add_test(${test}
+			${TESTS_SRC_DIR}/test_${test}.sh
 			${TESTS_SRC_DIR}
 			${CMAKE_CURRENT_BINARY_DIR}
+			${CMAKE_BINARY_DIR}/src
 			)
 endforeach(test)
