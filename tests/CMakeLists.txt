@@ -15,7 +15,13 @@ add_executable(test_rnode test_rnode.c tree_stubs.c
 
 
 add_test(rnode test_rnode)
-add_test(nw_labels ${TESTS_SRC_DIR}/test_nw_labels.sh
-		${TESTS_SRC_DIR}
-		${CMAKE_CURRENT_BINARY_DIR}
-		)
+
+# TODO: test script currently still run in-source executables, need to pass
+# location of bin dir.
+
+foreach(test nw_labels nw_luaed)
+	add_test(${test} ${TESTS_SRC_DIR}/test_${test}.sh
+			${TESTS_SRC_DIR}
+			${CMAKE_CURRENT_BINARY_DIR}
+			)
+endforeach(test)
