@@ -13,13 +13,25 @@ add_executable(test_rnode test_rnode.c tree_stubs.c
 	${SRC_DIR}/link.c
 	)
 
+add_executable(test_link test_link.c tree_stubs.c
+	${SRC_DIR}/link.c
+	${SRC_DIR}/list.c
+	${SRC_DIR}/rnode.c
+	${SRC_DIR}/rnode_iterator.c
+	${SRC_DIR}/masprintf.c
+	${SRC_DIR}/hash.c
+	${SRC_DIR}/nodemap.c
+	${SRC_DIR}/to_newick.c
+	${SRC_DIR}/concat.c
+	)
 
 add_test(rnode test_rnode)
+add_test(link test_link)
 
 # TODO: test script currently still run in-source executables, need to pass
 # location of bin dir.
 
-foreach(test nw_labels nw_luaed)
+foreach(test nw_clade nw_labels nw_luaed nw_reroot)
 	add_test(${test}
 			${TESTS_SRC_DIR}/test_${test}.sh
 			${TESTS_SRC_DIR}

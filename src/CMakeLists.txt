@@ -13,10 +13,22 @@ FLEX_TARGET(NwScanner newick_scanner.l
 
 # nw_clade
 
-add_executable(nw_clade subtree.c
+add_executable(nw_clade clade.c subtree.c
+	newick_scanner.c
+	newick_parser.c
+	parser.c
 	nodemap.c
 	rnode_iterator.c
 	hash.c
+	masprintf.c
+	list.c
+	rnode.c
+	link.c
+	lca.c
+	error.c
+	tree.c
+	to_newick.c
+	concat.c
 	)
 
 # nw_display
@@ -95,3 +107,22 @@ if(LUA51_FOUND)
 	target_link_libraries(nw_luaed lua)
 endif(LUA51_FOUND)
 
+# nw_reroot
+
+add_executable(nw_reroot reroot.c
+	newick_scanner.c
+	newick_parser.c
+	parser.c
+	list.c
+	rnode.c
+	link.c
+	tree.c
+	to_newick.c
+	hash.c
+	lca.c
+	nodemap.c
+	masprintf.c
+	concat.c
+	error.c
+	rnode_iterator.c
+	)
