@@ -1,8 +1,7 @@
-# TODO: remove libxml2 stuff below, and use the proper way, i.e. find_package()
-# etc.
+# Newick parser: Flex and Bison targets
+
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}	# needed for Flex and Bison below
-	/usr/include/libxml2		# deleatur
 	)
 
 FLEX_TARGET(IndScanner indent_lex.l
@@ -12,19 +11,19 @@ BISON_TARGET(NwParser newick_parser.y
 FLEX_TARGET(NwScanner newick_scanner.l
 	${CMAKE_CURRENT_BINARY_DIR}/newick_scanner.c)
 
-add_executable(nw_indent indent.c indent_lex.c)
+# nw_clade
 
-add_executable(nw_labels labels.c
-	newick_scanner.c
-	newick_parser.c
-	tree.c
-	rnode.c
-	list.c
+add_executable(nw_clade subtree.c
+	nodemap.c
 	rnode_iterator.c
-	hash.c nodemap.c
-	masprintf.c
-	link.c
-	parser.c)
+	hash.c
+	)
+
+# nw_display
+
+if(LIBXML2_FOUND)
+	include_directories(${LIBXML2_INCLUDE_DIRS})
+endif(LIBXML2_FOUND)
 
 add_executable(nw_display display.c text_graph.c canvas.c
 	newick_scanner.c
@@ -51,8 +50,30 @@ add_executable(nw_display display.c text_graph.c canvas.c
 	xml_utils.c
 	)
 
-target_link_libraries(nw_display m xml2)
+target_link_libraries(nw_display m)
+if(LIBXML2_FOUND)
+	target_link_libraries(nw_display ${LIBXML2_LIBRARIES})
+endif(LIBXML2_FOUND)
 
+# nw_indent
+
+add_executable(nw_indent indent.c indent_lex.c)
+
+# nw_labels
+
+add_executable(nw_labels labels.c
+	newick_scanner.c
+	newick_parser.c
+	tree.c
+	rnode.c
+	list.c
+	rnode_iterator.c
+	hash.c nodemap.c
+	masprintf.c
+	link.c
+	parser.c)
+
+# nw_luaed
 
 if(LUA51_FOUND)
 	include_directories(${LUA51_INCLUDE_DIRS})
