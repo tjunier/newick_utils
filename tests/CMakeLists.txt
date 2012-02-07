@@ -87,9 +87,25 @@ add_test(xml_utils test_xml_utils)
 set(TESTS_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(APP_TESTS
 	nw_clade
+	nw_condense
+	nw_display
+	nw_distance
+	nw_duration
+	nw_ed
+	nw_gen
+	nw_indent
 	nw_labels
 	nw_luaed
+	nw_match
+	nw_order
+	nw_prune
+	nw_rename
 	nw_reroot
+	nw_sched
+	nw_stats
+	nw_support
+	nw_topology
+	nw_trim
 	)
 
 foreach(app_test ${APP_TESTS})
