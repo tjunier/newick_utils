@@ -1,6 +1,9 @@
 include_directories(${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src)
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/slash_and_space.nw
+	DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Unit (=function) tests
 
 set(UNIT_TESTS
