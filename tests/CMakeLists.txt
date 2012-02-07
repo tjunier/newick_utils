@@ -1,7 +1,10 @@
 include_directories(${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src)
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/slash_and_space.nw
+file(COPY
+	${CMAKE_CURRENT_SOURCE_DIR}/slash_and_space.nw
+	${CMAKE_CURRENT_SOURCE_DIR}/readline_test.txt
+	${CMAKE_CURRENT_SOURCE_DIR}/color.map
 	DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Unit (=function) tests
