@@ -55,10 +55,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "xml_utils.h"
 #include "error.h"
 
-enum { INDIVIDUAL, CLADE, UNKNOWN };
+enum { INDIVIDUAL, CLADE, LABEL, UNKNOWN };
 
 struct css_map_element {
-	int group_type;	/* INDIVIDUAL or CLADE */
+	int group_type;	/* INDIVIDUAL, LABEL or CLADE */
 	int group_nb;	
 	char *style;	/* a CSS specification */
 	struct llist *labels;
@@ -162,11 +162,14 @@ static int get_group_type(const char *type)
 	 * "CLADE", but also to abbreviate to "ind" or even "I" or "C". */
 	char *clade = "clade";
 	char *indiv = "individual";
+	char *label = "label";
 	int result = UNKNOWN;
 	if (strstr(clade, t) == clade) 
 		result = CLADE;
 	else if (strstr(indiv, t) == indiv)
 		result = INDIVIDUAL;
+	else if (strstr(label, t) == label)
+		result = LABEL;
 	
 	free(t);
 
@@ -417,6 +420,15 @@ static struct hash *read_url_map()
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
+// More important TODO: refactor the loops in this f() into helper f(), as it
+// is much too long.
+// To consider: how do we deal with the new LABEL type (CSS class for labels?)
+// Could be a label->label_group_nb map. OTOH, why use a different mechanism
+// for text CSS from the one used for lines? Could as well add a 'lbl_group_nb'
+// field to struct svg_data, and fill this here for each node that has a LABEL
+// specification in the CSS map file. I lean toward the second solution.
+// Probably somewhat more wasteful of memory, but simpler code.
+
 static int set_group_numbers(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -472,7 +484,7 @@ static int set_group_numbers(struct rooted_tree *tree)
 	/* Now iterate through the INDIVIDUAL style map elements. They also
 	 * contain a list of labels. Each label is matched by at least 1 node.
 	 * All of these nodes get the map element's number (cf above, in which
-	 * te LCA gets the number, which is then propagated to all descendants)
+	 * the LCA gets the number, which is then propagated to all descendants)
 	 * */
 	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
 	if (NULL == map) return FAILURE;
