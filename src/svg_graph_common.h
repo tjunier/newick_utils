@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define INNER_LBL_SPACE 4		/* pixels */
 #define edge_length_v_offset -4 	/* pixels */
 #define URL_MAP_SIZE 100		/* bins */
-#define UNSTYLED_CLADE 0
+#define UNSTYLED_CLADE 0	// TODO: rename to UNSTYLED_SET (or _GROUP, etc - used not only for clades)
 
 extern struct hash *url_map;
 extern char *leaf_label_class;
@@ -56,11 +56,12 @@ extern int label_space;
  * pointed to by struct rnode's \a data member. */
 
 struct svg_data {
-	double top;	/**< top of node (ortho) or leftmost angle (radial) */
-	double bottom;	/**< bottom of node (ortho) or rightmost most angle (radial) */
-	double depth;	/**< depth in tree */
-	int group_nb;	/**< For attributing styles */
-	char *ornament;	/**< SVG decorations */
+	double top;		/**< top of node (ortho) or leftmost angle (radial) */
+	double bottom;		/**< bottom of node (ortho) or rightmost most angle (radial) */
+	double depth;		/**< depth in tree */
+	int group_nb;		/**< For attributing CSS styles (class=...) to lines */
+	int lbl_group_nb;	/**< For attributing styles to labels */ 
+	char *ornament;		/**< SVG decorations */
 	/* ... other node properties ... */
 };
 

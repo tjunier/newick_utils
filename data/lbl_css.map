@@ -1,3 +1,3 @@
-stroke:blue LABEL Homo Pan
-stroke:red LABEL Cercopithecus Macaca Papio
-stroke:green LABEL Macaca Simias
+fill:blue LABEL Homo Pan
+fill:red LABEL Cercopithecus Macaca Papio
+fill:green LABEL Macaca Simias

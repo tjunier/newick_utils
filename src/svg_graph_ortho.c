@@ -217,6 +217,9 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 			class = leaf_label_class;
 		else
 			class = inner_label_class;
+		// TODO: override class iff node->svg_data has lbl_group_nb !=
+		// UNSTYLED_CLADE; mind th fact that in that case class is
+		// malloc()d
 
 		/* draw label IFF it is nonempty */
 
