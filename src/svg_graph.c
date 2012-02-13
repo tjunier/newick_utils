@@ -497,6 +497,9 @@ static int set_group_numbers(struct rooted_tree *tree)
 		struct list_elem *el;
 		for (el = labels->head; NULL != el; el = el->next) {
 			char *label = el->data;
+			// TODO: why do we need a separate list? Can't we
+			// process the nodes within this loop, as we do for
+			// LABEL, below?
 			struct llist *nodes_of_label;
 			nodes_of_label = hash_get(map, label);
 			if (NULL == nodes_of_label) {
@@ -544,8 +547,10 @@ static int set_group_numbers(struct rooted_tree *tree)
 			}
 			/* Set the label group number for all nodes of this group */
 			struct list_elem *n_el;
-			for (n_el = nodes_of_label->head; NULL != n_el; n_el = n_el->next)  {
-				struct svg_data *node_data = ((struct rnode *) n_el->data)->data;
+			for (n_el = nodes_of_label->head; NULL != n_el;
+					n_el = n_el->next)  {
+				struct svg_data *node_data =
+					((struct rnode *) n_el->data)->data;
 				node_data->lbl_group_nb = css_el->group_nb;
 			}
 		}

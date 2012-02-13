@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "node_pos_alloc.h"
 #include "graph_common.h"
 #include "svg_graph_common.h"
+#include "masprintf.h"
 
 extern enum inner_lbl_pos inner_label_pos;
 static const int whole_v_shift = 20; 	/* Vertical translation of whole graph */
@@ -212,21 +213,25 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 		char *url = NULL;
 		if (url_map) url = hash_get(url_map, node->label);
 
-		char *class;
-		if (is_leaf(node))
-			class = leaf_label_class;
-		else
-			class = inner_label_class;
-		// TODO: override class iff node->svg_data has lbl_group_nb !=
-		// UNSTYLED_CLADE; mind th fact that in that case class is
-		// malloc()d
+		if (0 != strcmp(node->label, "")) {
+			char *class;
+			if (is_leaf(node))
+				class = leaf_label_class;
+			else
+				class = inner_label_class;
+			
+			/* override 'class' iff node has lbl style */
+			if (UNSTYLED_CLADE != node_data->lbl_group_nb)
+				class = masprintf("clade_%d",
+						node_data->lbl_group_nb);
 
-		/* draw label IFF it is nonempty */
-
-		if (0 != strcmp(node->label, "")) 
 			draw_label(svg_h_pos, svg_mid_pos, h_scale,
-					node, class, url);
+				node, class, url);
 
+			/* free iff was dynamically allocated */
+			if (UNSTYLED_CLADE != node_data->lbl_group_nb)
+				free (class);
+		}
 		/* Branch lengths */
 
 		if (! is_root(node)) {
