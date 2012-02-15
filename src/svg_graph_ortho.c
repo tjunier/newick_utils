@@ -222,7 +222,8 @@ void draw_text_ortho (struct rooted_tree *tree, const double h_scale,
 			
 			/* override 'class' iff node has lbl style */
 			if (UNSTYLED_CLADE != node_data->lbl_group_nb)
-				class = masprintf("clade_%d",
+				class = masprintf("%s clade_%d",
+						class,
 						node_data->lbl_group_nb);
 
 			draw_label(svg_h_pos, svg_mid_pos, h_scale,
