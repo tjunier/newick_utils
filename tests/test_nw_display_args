@@ -17,6 +17,7 @@ svg_mlbl1: -sr -w 450 -c falc_css.map falc_families.nw
 css_multi: -s -c bacteria_css.map bacteria.nw
 css_multi_def: -s -c bacteria_css.map -d 'stroke:grey' bacteria.nw
 css_lbl: -s -c lbl_css.map catarrhini.nw
+css_wl: -s -c css_wl.map catarrhini.nw
 rl: -sr -R 50 -w 500 -b 'visibility:hidden' catarrhini.nw
 sbar: -s simiiformes.nw
 multi_svg:-s forest.nw

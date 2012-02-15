@@ -1,0 +1,8 @@
+stroke-width:2;stroke:blue 	CLADE Homo Pan
+stroke:red 			C	Macaca Cercopithecus
+stroke:#fa7 			C	Homo Hylobates 
+stroke:green	INDIV	Colobus Cercopithecus
+# labels can have their own CSS
+font-style:italic;fill:blue LABEL Homo Pan
+font-style:italic;fill:red LABEL Cercopithecus Macaca Papio
+font-style:italic;fill:green LABEL Macaca Simias
