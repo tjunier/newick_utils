@@ -125,8 +125,6 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 
 	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
 
-	// TODO: the graph- and label-drawing loops should be refactored into separate f()
-
 	/* The edges and nodes are drawn first, in reverse Newick order (makes
 	 * fixing edges easier) */
 	for (elem = rev_nodes->head; NULL != elem; elem = elem->next) {
@@ -147,8 +145,13 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		canvas_draw_vline(canvas, h_pos, top, bottom);
 		if (is_root(node)) {
 			parent_data = NULL;
-			parent_h_pos = 0;
 			parent_mid = -1;
+			/* parent H pos is ROOT_SPACE if root has length, or
+			 * 0 otherwise. */
+			if (0 == pos->depth) 
+				parent_h_pos = 0;
+			else
+				parent_h_pos = ROOT_SPACE;
 		} else {
 			parent_data = node->parent->data;
 			parent_h_pos = rint(ROOT_SPACE +
