@@ -1,3 +1,4 @@
+nw_display: fix prob with scale values (see file 'prob')
 
 nw_display: add CSS to labels (in CSS map) 
 
