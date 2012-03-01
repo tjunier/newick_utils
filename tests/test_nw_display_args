@@ -49,3 +49,5 @@ fix_sc_svg_1: -s -w -1 catarrhini_scaled.nw
 fix_sc_svg_3: -s -w -3 catarrhini_scaled.nw 
 fix_sc_txt: -e r -w -0.5 catarrhini_scaled.nw
 apos: -e r apos.nw
+# checks for rounding error
+round_zero: -t HEV.nw
