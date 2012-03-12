@@ -226,12 +226,12 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 	int h_start = ROOT_SPACE;
 	int h_end = ROOT_SPACE + rint(scale * dmax);
 	canvas_draw_hline(canvas, v_pos, h_start, h_end);
-	float interval = tick_interval(dmax);
+	double interval = tick_interval(dmax);
 	int tick_mark_pos[MAX_NB_TICKS];
 	char* tick_mark_lbl[MAX_NB_TICKS];
 	if (scale_zero_at_root) {
 		/* store tick positions and labels in arrays */
-		float x = 0;
+		double x = 0;
 		int i = 0;
 		while (x <= dmax) {
 			int tick_h_pos = ROOT_SPACE + rint(scale * x);
