@@ -1,3 +1,6 @@
+nw_display: honor root length [done for ortho; let -I position root label in
+root edge if not null. While we're at it, allow leaf labels to be in the edge's
+middle as well.
 
 nw_display: add CSS to labels (in CSS map) 
 
