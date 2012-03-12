@@ -1,3 +1,5 @@
+nw_trim: seems to bug when root edge length != 0
+
 nw_display: fix prob with scale values (see file 'prob')
 
 nw_display: add CSS to labels (in CSS map) 
