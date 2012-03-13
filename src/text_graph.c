@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <string.h>
 
+#include <stdio.h>	// TODO: rm when done debugging
+
 #include "canvas.h"
 #include "tree.h"
 #include "list.h"
@@ -49,6 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static const int LBL_SPACE = 2;
 static const int ROOT_SPACE = 1;
 static const int SCALEBAR_SPACE = 4;
+
+static const double EPSILON = 0.0001; /* for determining identity of doubles */
 
 static const char COMMAS_UPPER_ANGLE = ',';
 static const char COMMAS_LOWER_ANGLE = '\'';
@@ -236,14 +240,17 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 		/* store tick positions and labels in arrays */
 		double x = 0;
 		int i = 0;
-		while (x <= dmax) {
+		/* Note: x <= dmax does not always work, due to rounding
+		 * errors. Therefore, we want dmax - x > EPSILON, where EPSILON
+		 * is a tolerance value. */
+		while (dmax - x + EPSILON > 0) {
 			int tick_h_pos = ROOT_SPACE + rint(scale * x);
 			tick_mark_pos[i] = tick_h_pos;
 			char *tick_lbl = masprintf("%g", x);
 			tick_mark_lbl[i] = tick_lbl;
 			x += interval;
 			i++;
-			if (dmax == 0) break;
+			if (dmax == 0) break; // TODO is this useful?
 		}
 		for (i = i-1; i >= 0; i--) {
 			int tick_h_pos = tick_mark_pos[i];
