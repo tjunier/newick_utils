@@ -622,6 +622,13 @@ static void draw_label(struct rnode *node, double radius,
 		radius += INNER_LBL_SPACE;
 		class = inner_label_class;
 	}
+			
+	/* override 'class' iff node has lbl style */
+	struct svg_data *node_data = node->data;
+	if (UNSTYLED_CLADE != node_data->lbl_group_nb)
+		class = masprintf("%s clade_%d",
+				class,
+				node_data->lbl_group_nb);
 
 	char *url = NULL;
 	if (url_map) url = hash_get(url_map, node->label);
@@ -660,6 +667,10 @@ static void draw_label(struct rnode *node, double radius,
 	place_label(node->label, radius, mid_angle, nudge, class);
 
 	if (url) printf("</a>");
+
+	/* free iff was dynamically allocated */
+	if (UNSTYLED_CLADE != node_data->lbl_group_nb)
+		free (class);
 }
 
 

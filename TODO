@@ -5,7 +5,7 @@ $ nw_luaed data/HEV.nw 'l' 'N.L = N.L + 1' | nw_trim - 0.4
 
 nw_display: fix prob with scale values (see file 'prob')
 
-nw_display: add CSS to labels (in CSS map) 
+nw_display: add CSS to labels (in CSS map) [done, just add to manual]
 
 nw_display: add branch lengths to radial trees.
 
