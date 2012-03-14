@@ -250,7 +250,7 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 			tick_mark_lbl[i] = tick_lbl;
 			x += interval;
 			i++;
-			if (dmax == 0) break; // TODO is this useful?
+			if (dmax == 0) break; /* 1-node trees */
 		}
 		for (i = i-1; i >= 0; i--) {
 			int tick_h_pos = tick_mark_pos[i];
