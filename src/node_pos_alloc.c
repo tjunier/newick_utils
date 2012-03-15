@@ -90,7 +90,7 @@ struct h_data set_node_depth_cb(struct rooted_tree *tree,
 	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
 	if (NULL == nodes_in_reverse_order) return result; /* fails! */
 
-	/* set the root's depth to 0 */
+	/* set the root's depth */
 	elem = nodes_in_reverse_order->head;
 	node = (struct rnode *) elem->data;
 	if (0 == strcmp("", node->edge_length_as_string))
