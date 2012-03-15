@@ -35,8 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <string.h>
 
-#include <stdio.h>	// TODO: rm when done debugging
-
 #include "canvas.h"
 #include "tree.h"
 #include "list.h"
@@ -252,6 +250,8 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 			i++;
 			if (dmax == 0) break; /* 1-node trees */
 		}
+		// TODO: do we really need 2 loops? With zero at max depth we
+		// don't (see below)
 		for (i = i-1; i >= 0; i--) {
 			int tick_h_pos = tick_mark_pos[i];
 			canvas_write(canvas, tick_h_pos, v_pos, "|");
@@ -265,7 +265,7 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 		}
 	} else {
 		/* scale zero at max depth */
-		float x = dmax;
+		double x = dmax;
 		while (x >= 0) {
 			int tick_h_pos = ROOT_SPACE + rint(scale * x);
 			canvas_write(canvas, tick_h_pos, v_pos, "|");
