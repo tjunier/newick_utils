@@ -50,6 +50,8 @@ static const int LBL_SPACE = 2;
 static const int ROOT_SPACE = 1;
 static const int SCALEBAR_SPACE = 4;
 
+static const double EPSILON = 0.0001; /* for determining identity of doubles */
+
 static const char COMMAS_UPPER_ANGLE = ',';
 static const char COMMAS_LOWER_ANGLE = '\'';
 static const char SLASHES_UPPER_ANGLE = '/';
@@ -125,8 +127,6 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 
 	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
 
-	// TODO: the graph- and label-drawing loops should be refactored into separate f()
-
 	/* The edges and nodes are drawn first, in reverse Newick order (makes
 	 * fixing edges easier) */
 	for (elem = rev_nodes->head; NULL != elem; elem = elem->next) {
@@ -147,8 +147,13 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		canvas_draw_vline(canvas, h_pos, top, bottom);
 		if (is_root(node)) {
 			parent_data = NULL;
-			parent_h_pos = 0;
 			parent_mid = -1;
+			/* parent H pos is ROOT_SPACE if root has length, or
+			 * 0 otherwise. */
+			if (0 == pos->depth) 
+				parent_h_pos = 0;
+			else
+				parent_h_pos = ROOT_SPACE;
 		} else {
 			parent_data = node->parent->data;
 			parent_h_pos = rint(ROOT_SPACE +
@@ -226,22 +231,27 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 	int h_start = ROOT_SPACE;
 	int h_end = ROOT_SPACE + rint(scale * dmax);
 	canvas_draw_hline(canvas, v_pos, h_start, h_end);
-	float interval = tick_interval(dmax);
+	double interval = tick_interval(dmax);
 	int tick_mark_pos[MAX_NB_TICKS];
 	char* tick_mark_lbl[MAX_NB_TICKS];
 	if (scale_zero_at_root) {
 		/* store tick positions and labels in arrays */
-		float x = 0;
+		double x = 0;
 		int i = 0;
-		while (x <= dmax) {
+		/* Note: x <= dmax does not always work, due to rounding
+		 * errors. Therefore, we want dmax - x > EPSILON, where EPSILON
+		 * is a tolerance value. */
+		while (dmax - x + EPSILON > 0) {
 			int tick_h_pos = ROOT_SPACE + rint(scale * x);
 			tick_mark_pos[i] = tick_h_pos;
 			char *tick_lbl = masprintf("%g", x);
 			tick_mark_lbl[i] = tick_lbl;
 			x += interval;
 			i++;
-			if (dmax == 0) break;
+			if (dmax == 0) break; /* 1-node trees */
 		}
+		// TODO: do we really need 2 loops? With zero at max depth we
+		// don't (see below)
 		for (i = i-1; i >= 0; i--) {
 			int tick_h_pos = tick_mark_pos[i];
 			canvas_write(canvas, tick_h_pos, v_pos, "|");
@@ -255,7 +265,7 @@ void draw_scalebar(struct canvas *canvas, const double scale,
 		}
 	} else {
 		/* scale zero at max depth */
-		float x = dmax;
+		double x = dmax;
 		while (x >= 0) {
 			int tick_h_pos = ROOT_SPACE + rint(scale * x);
 			canvas_write(canvas, tick_h_pos, v_pos, "|");

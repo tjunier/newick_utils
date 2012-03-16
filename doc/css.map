@@ -6,3 +6,5 @@ stroke:#fa7 			C 	Homo Hylobates
 stroke:green	Individual	Colobus Cercopithecus
 # Hominines in thick blue
 "stroke-width:2; stroke:blue" 	Clade Homo Pan
+# Labels in color as well
+fill:blue	L	Pan Homo Hominini

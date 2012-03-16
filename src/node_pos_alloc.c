@@ -31,10 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdlib.h>
 #include <string.h>
-/*
-#include <stdio.h>
 
-*/
 #include "rnode.h"
 #include "tree.h"
 #include "list.h"
@@ -93,10 +90,13 @@ struct h_data set_node_depth_cb(struct rooted_tree *tree,
 	nodes_in_reverse_order = llist_reverse(tree->nodes_in_order);
 	if (NULL == nodes_in_reverse_order) return result; /* fails! */
 
-	/* set the root's depth to 0 */
+	/* set the root's depth */
 	elem = nodes_in_reverse_order->head;
 	node = (struct rnode *) elem->data;
-	set_node_depth(node, 0.0);
+	if (0 == strcmp("", node->edge_length_as_string))
+		set_node_depth(node, 0.0);
+	else
+		set_node_depth(node, atof(node->edge_length_as_string));
 
 	/* now traverse node list, setting each node's depth to the sum of its
 	 * parent edge's length and its parent node's depth. */

@@ -37,7 +37,7 @@ all: nwutils_tutorial.pdf
 
 %_svg.pdf : %_svg
 	sh < $< > $<.svg
-	inkscape -f $<.svg -A $@
+	inkscape -f $<.svg -D -A $@
 
 ################################################################
 # Variables
@@ -75,7 +75,7 @@ show:
 	echo $(PATH)
 
 nwutils_tutorial.pdf: *.tex *.bib \
-	$(regular_pdfs) \
+	$(regular_pdfs) css.map \
 	$(regular_svg_command_strings) \
 	$(newick_command_outputs) \
 	$(newick_command_strings) \

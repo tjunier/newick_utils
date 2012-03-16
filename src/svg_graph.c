@@ -55,10 +55,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "xml_utils.h"
 #include "error.h"
 
-enum { INDIVIDUAL, CLADE, UNKNOWN };
+enum { INDIVIDUAL, CLADE, LABEL, UNKNOWN };
 
 struct css_map_element {
-	int group_type;	/* INDIVIDUAL or CLADE */
+	int group_type;	/* INDIVIDUAL, LABEL or CLADE */
 	int group_nb;	
 	char *style;	/* a CSS specification */
 	struct llist *labels;
@@ -133,6 +133,7 @@ static void svg_CSS_stylesheet()
 	if (css_map) {
 		for (el = css_map->head; NULL != el; el = el->next) {
 			struct css_map_element *css_el = el->data;
+			// TODO: this should no longer be called 'calde' but m.b. 'set' or 'group'
 			printf(" .clade_%d {%s}\n", css_el->group_nb,
 					css_el->style);
 		}
@@ -162,11 +163,14 @@ static int get_group_type(const char *type)
 	 * "CLADE", but also to abbreviate to "ind" or even "I" or "C". */
 	char *clade = "clade";
 	char *indiv = "individual";
+	char *label = "label";
 	int result = UNKNOWN;
 	if (strstr(clade, t) == clade) 
 		result = CLADE;
 	else if (strstr(indiv, t) == indiv)
 		result = INDIVIDUAL;
+	else if (strstr(label, t) == label)
+		result = LABEL;
 	
 	free(t);
 
@@ -417,6 +421,9 @@ static struct hash *read_url_map()
 // not be traversed twice. But all in all it will likely not make a big
 // difference, so I'll keep it for later :-) 
 
+// More important TODO: refactor the loops in this f() into helper f(), as it
+// is much too long.
+
 static int set_group_numbers(struct rooted_tree *tree)
 {
 	struct list_elem *elem;
@@ -424,7 +431,8 @@ static int set_group_numbers(struct rooted_tree *tree)
 
 	/* Iterate through the CLADE style map elements. Each one contains
 	 * (among others) a list of labels. Find the LCA of those labels (which
-	 * can be matched by >1 node), and set its number to that of the css
+	 * ( can be matched by >1 node), and set the group_nb field of its
+	 * svg_data to that of the css
 	 * element. */
 
 	for (elem = css_map->head; NULL != elem; elem = elem->next) {
@@ -469,13 +477,15 @@ static int set_group_numbers(struct rooted_tree *tree)
 	}
 	destroy_llist(nodes_in_reverse_order);
 
+	/* INDIVIDUAL and LABEL need a label->node map */
+	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
+	if (NULL == map) return FAILURE;
+
 	/* Now iterate through the INDIVIDUAL style map elements. They also
 	 * contain a list of labels. Each label is matched by at least 1 node.
 	 * All of these nodes get the map element's number (cf above, in which
-	 * te LCA gets the number, which is then propagated to all descendants)
+	 * the LCA gets the number, which is then propagated to all descendants)
 	 * */
-	struct hash *map = create_label2node_list_map(tree->nodes_in_order);
-	if (NULL == map) return FAILURE;
 	for (elem = css_map->head; NULL != elem; elem = elem->next) {
 		css_el = elem->data;
 		if (INDIVIDUAL != css_el->group_type) continue;
@@ -487,6 +497,9 @@ static int set_group_numbers(struct rooted_tree *tree)
 		struct list_elem *el;
 		for (el = labels->head; NULL != el; el = el->next) {
 			char *label = el->data;
+			// TODO: why do we need a separate list? Can't we
+			// process the nodes within this loop, as we do for
+			// LABEL, below?
 			struct llist *nodes_of_label;
 			nodes_of_label = hash_get(map, label);
 			if (NULL == nodes_of_label) {
@@ -509,6 +522,40 @@ static int set_group_numbers(struct rooted_tree *tree)
 		}
 		destroy_llist(group_nodes);
 	}
+
+	/* Now iterate through the LABEL style map elements. They also
+	 * contain a list of labels. Each label is matched by at least 1 node.
+	 * All of these nodes get the map element's number, but in the
+	 * svg_data's lbl_group_nb instead of group_nb.
+	 * */
+	for (elem = css_map->head; NULL != elem; elem = elem->next) {
+		css_el = elem->data;
+		if (LABEL != css_el->group_type) continue;
+		struct llist *labels = css_el->labels;
+		/* Iterate over all labels of this element, setting the label group number
+		 * of corresponding nodes to the CSS element's number. */
+		struct list_elem *el;
+		for (el = labels->head; NULL != el; el = el->next) {
+			char *label = el->data;
+			struct llist *nodes_of_label;
+			nodes_of_label = hash_get(map, label);
+			if (NULL == nodes_of_label) {
+				fprintf (stderr, "WARNING: label '%s' "
+						"not found - ignored.\n",
+						label);
+				continue;
+			}
+			/* Set the label group number for all nodes of this group */
+			struct list_elem *n_el;
+			for (n_el = nodes_of_label->head; NULL != n_el;
+					n_el = n_el->next)  {
+				struct svg_data *node_data =
+					((struct rnode *) n_el->data)->data;
+				node_data->lbl_group_nb = css_el->group_nb;
+			}
+		}
+	}
+
 	destroy_label2node_list_map(map);
 
 	return SUCCESS;
@@ -602,6 +649,7 @@ int svg_alloc_node_pos(struct rooted_tree *tree)
 		if (NULL == svgd) return FAILURE;
 		svgd->top = svgd->bottom = svgd->depth = -1.0;
 		svgd->group_nb = UNSTYLED_CLADE;	
+		svgd->lbl_group_nb = UNSTYLED_CLADE;
 		svgd->ornament = NULL;
 		node->data = svgd;
 	}
