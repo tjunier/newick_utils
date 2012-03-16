@@ -212,14 +212,16 @@ The syntax of the \css{} map file is as follows:
 	\item The first element of the line is the style, and it is a snippet of
 	\css{} code. 
 	\item The second element states whether the following nodes are to be treated
-	individually or as a clade. It is either \texttt{Clade} or
-	\texttt{Individual} (which can be abbreviated to \texttt{C} or \texttt{I},
-	respectively). TODO: add \texttt{Label}\ldots
+	individually or as a clade. It is either \texttt{Clade},
+	\texttt{Individual}, or \texttt{Leaf} (which can be abbreviated to \texttt{C},
+	\texttt{I}, or \texttt{L}, respectively). 
 	\item The remaining element(s) are node labels and specify the nodes to which
-	the style must be applied: if the second element was \texttt{Clade}, the
+	the style must be applied: if the second element is \texttt{Clade}, the
 	program finds the last common ancestor of the nodes and applies the style to
-	that node and all its descendants. If the second element was
+	that node and all its descendants. If the second element is
 	\texttt{Individual}, then the style is only applied to the nodes themselves.
+	If the second element is \texttt{Leaf}, then the style is applied to the leaf
+	labels.
 \end{itemize}
 
 \noindent{}In our example, \texttt{css.map}:

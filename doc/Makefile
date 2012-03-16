@@ -75,7 +75,7 @@ show:
 	echo $(PATH)
 
 nwutils_tutorial.pdf: *.tex *.bib \
-	$(regular_pdfs) \
+	$(regular_pdfs) css.map \
 	$(regular_svg_command_strings) \
 	$(newick_command_outputs) \
 	$(newick_command_strings) \
