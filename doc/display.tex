@@ -22,8 +22,7 @@ At its simplest, \display{} just outputs a text graph. Here is the primates tree
 \verbatiminput{display_1_txt.cmd}
 \verbatiminput{display_1_txt.out}
 \end{samepage}
-That's pretty low-tech compared to interactive, colorful graphical displays,
-but if you use the shell a lot (like I do), you may find it useful.
+That's pretty low-tech compared to interactive, colorful, high-resolution displays, but if you use the shell a lot (like I do), you may find it useful.
 
 \subsubsection{Fixing Width}
 
@@ -56,11 +55,6 @@ Homo\footnote{To know the length of an edge, you can use \distance{} \texttt{-m
 p -n} -- see \ref{sct:distance}.}) occupies five characters (up to rounding
 error). And to use two columns per unit length, one would pass \texttt{-w -2},
 etc.
-
-\begin{samepage}
-\verbatiminput{display_20_txt.cmd}
-\verbatiminput{display_20_txt.out}
-\end{samepage}
 
 \subsubsection{Scale Bar}
 
@@ -148,18 +142,18 @@ To produce \svg, pass option \texttt{-s}:
 $ nw_display -s catarrhini > catarrhini.svg
 \end{verbatim}
 Now you can visualize the result using any \svg-enabled tool (all good Web
-browsers can do it), or convert it to another format with, say \texttt{rsvg} or
-Inkscape (\url{http://www.inkscape.org}).  The \svg{} produced by \display{} is
-designed to be easy to edit in an interactive editor (Inkscape, Adobe
-Illustrator, etc.): for example, the tree edges are in one group, and the text
-in another, so it is easy to change the line width of the edges, or the font
-family of the text (you can also do this from \display{} using a \css{} map,
-see \ref{sct_display_svg_css}).
+browsers can do it), or convert it to another format with, say Inkscape
+(\url{http://www.inkscape.org}).  The \svg{} produced by \display{} is designed
+to be easy to edit in an interactive editor (Inkscape, Adobe Illustrator,
+etc.): for example, the tree edges are in one group, and the text in another,
+so it is easy to change the line width of the edges, or the font family of the
+text (you can also do this from \display{} using a \css{} map, see
+\ref{sct_display_svg_css}).
 
 The following \pdf{} image was produced like this:
 
 \begin{verbatim}
-$ inkscape -f catarrhini.svg -A catarrhini.pdf
+$ inkscape -f catarrhini.svg -D -A catarrhini.pdf
 \end{verbatim}
 
 \begin{center}
@@ -171,7 +165,7 @@ and omit the \svg{}-to-\textsc{pdf} conversion step.
 
 \subsubsection{Text-mode options}
 
-Options for \ascii{} trees also work for \svg{}: \texttt{-S} suppresses the
+Many options for \ascii{} trees also work for \svg{}: \texttt{-S} suppresses the
 scale bar\footnote{The positioning of the scale bar is a bit crude in \svg{}
 mode, especially for radial trees. This is mainly because of the "\svg{} string
 length curse", that is, the impossibility of finding out the length of a text
@@ -220,7 +214,7 @@ The syntax of the \css{} map file is as follows:
 	\item The second element states whether the following nodes are to be treated
 	individually or as a clade. It is either \texttt{Clade} or
 	\texttt{Individual} (which can be abbreviated to \texttt{C} or \texttt{I},
-	respectively).
+	respectively). TODO: add \texttt{Label}\ldots
 	\item The remaining element(s) are node labels and specify the nodes to which
 	the style must be applied: if the second element was \texttt{Clade}, the
 	program finds the last common ancestor of the nodes and applies the style to
