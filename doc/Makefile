@@ -37,7 +37,7 @@ all: nwutils_tutorial.pdf
 
 %_svg.pdf : %_svg
 	sh < $< > $<.svg
-	inkscape -f $<.svg -A $@
+	inkscape -f $<.svg -D -A $@
 
 ################################################################
 # Variables

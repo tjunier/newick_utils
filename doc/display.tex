@@ -187,9 +187,10 @@ You can make radial trees by passing the \texttt{-r} switch:
 \subsubsection{Using CSS}
 \label{sct_display_svg_css}
 
-You can modify node style using \css. This is done by specifying a
-\textit{\css{} map}, which is just a text file that says which style should be
-applied to which node. If file \texttt{css.map} contains the following
+You can modify node style using Cascading Style Sheets (\css,
+(\url{www.w3.org/Style/CSS}). This is done by specifying a \textit{\css{} map},
+which is just a text file that says which style should be applied to which node.
+For example, if file \texttt{css.map} contains the following
 \begin{quote}
 \verbatiminput{css.map}
 \end{quote} we can apply the style map to
@@ -213,37 +214,40 @@ The syntax of the \css{} map file is as follows:
 	\css{} code. 
 	\item The second element states whether the following nodes are to be treated
 	individually or as a clade. It is either \texttt{Clade},
-	\texttt{Individual}, or \texttt{Leaf} (which can be abbreviated to \texttt{C},
-	\texttt{I}, or \texttt{L}, respectively). 
+	\texttt{Individual}, or \texttt{Label} (which can be abbreviated to
+	\texttt{C}, \texttt{I}, or \texttt{L}, respectively). 
 	\item The remaining element(s) are node labels and specify the nodes to which
 	the style must be applied: if the second element is \texttt{Clade}, the
 	program finds the last common ancestor of the nodes and applies the style to
 	that node and all its descendants. If the second element is
 	\texttt{Individual}, then the style is only applied to the nodes themselves.
-	If the second element is \texttt{Leaf}, then the style is applied to the leaf
+	If the second element is \texttt{Label}, then the style is applied to the
 	labels.
 \end{itemize}
 
 \noindent{}In our example, \texttt{css.map}:
 \begin{itemize}
-	\item the first line states that the style \texttt{stroke:red} must be applied
+	\item line 2 states that the style \texttt{stroke:red} must be applied
 		to the \texttt{Clade} defined by \texttt{Macaca} and
 		\texttt{Cercopithecus}, which consists of these two nodes, their ancestor
 		\texttt{Cercopithecinae}, and \texttt{Papio}. 
-	\item Line 2 prescribes that style \texttt{stroke:\#fa7} (an \svg{}
+	\item Line 4 prescribes that style \texttt{stroke:\#fa7} (an \svg{}
 		hexadecimal color specification) must be applied to the clade defined by
 		\texttt{Homo} and \texttt{Hylobates}, which consists of these two nodes,
 		their last common ancestor (unlabeled), and all its descendants (that is,
 		\texttt{Homo}, \texttt{Pan}, \texttt{Gorilla}, \texttt{Pongo}, and
 		\texttt{Hylobates}, as well as the inner nodes \texttt{Hominini},
 		\texttt{Homininae} and \texttt{Hominidae}). 
-	\item Line 3 instructs that the style \texttt{stroke:green} be applied
+	\item Line 6 instructs that the style \texttt{stroke:green} be applied
 		individually to nodes \texttt{Colobus} and \texttt{Cercopithecus}, and only
 		these nodes - not to the clade that they define.  
-	\item Line 4 says that style \texttt{stroke-width:2;~stroke:blue} should be
+	\item Line 8 says that style \texttt{stroke-width:2;~stroke:blue} should be
 		applied to the clade defined by \texttt{Homo} and \texttt{Pan} - note that
 		the quotes have been removed: they are not part of the style, rather they
 		allow us to improve readability by adding some whitespace.
+	\item Line 10 specifies color \texttt{blue} for labels \texttt{Homo},
+		\texttt{Pan},
+		and \texttt{Hominini}.
 \end{itemize}
 
 The style of an inner clade overrides that of an outer clade, \textit{e.g.},
@@ -255,10 +259,10 @@ width).  Likewise, \texttt{Individual} overrides \texttt{Clade}, which is why
 
 \bigskip
 
-Styles can also be applied to labels. Option \texttt{-l} (lowercase l) specifies
-the leaf label style, option \texttt{-i} the inner node label style, and option
-\texttt{-b} the branch length style. For example, the following tree, which was
-produced using defaults, could be improved a bit:
+Label styles can also be applied globally. Option \texttt{-l} (lowercase l)
+specifies the leaf label style, option \texttt{-i} the inner node label style,
+and option \texttt{-b} the branch length style. For example, the following tree,
+which was produced using defaults, could be improved a bit:
 
 \verbatiminput{display_6_svg.cmd}
 \begin{center}
