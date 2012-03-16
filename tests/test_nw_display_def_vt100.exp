@@ -56,22 +56,22 @@
 (0 (B0(0            (B25(0           (B50(0            (B75(0          (B100(0           (B125(0          (B
 (0 (Bsubstitutions/site(0                                                             (B
 (0                                                                                (B
-(0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BBovine(0                               (B
-(0 x                                                                              (B
-(0 x                               lqqqqqqqqqqqqqqqqqqqq (BGibbon(0                   (B
-(0 x                               x                                              (B
-(0 tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu       lqqqqqqqqqqqqqqqqqqqq (BOrang(0            (B
-(0 x                               x       x                                      (B
-(0qu                               mqqqqqqqu   lqqqqqqqqqq (BGorilla(0                (B
-(0 x                                       x   x                                  (B
-(0 x                                       mqqqu    lqqqqqqqqqqq (BChimp(0            (B
-(0 x                                           mqqqqu                             (B
-(0 x                                                mqqqqqqq (BHuman(0                (B
-(0 x                                                                              (B
-(0 mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BMouse(0  (B
+(0      lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BBovine(0                             (B
+(0      x                                                                         (B
+(0      x                             lqqqqqqqqqqqqqqqqqqq (BGibbon(0                 (B
+(0      x                             x                                           (B
+(0      tqqqqqqqqqqqqqqqqqqqqqqqqqqqqqu       lqqqqqqqqqqqqqqqqqq (BOrang(0           (B
+(0      x                             x       x                                   (B
+(0 qqqqqu                             mqqqqqqqu  lqqqqqqqqq (BGorilla(0               (B
+(0      x                                     x  x                                (B
+(0      x                                     mqqu   lqqqqqqqqqqq (BChimp(0           (B
+(0      x                                        mqqqu                            (B
+(0      x                                            mqqqqqqq (BHuman(0               (B
+(0      x                                                                         (B
+(0      mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BMouse(0  (B
 (0                                                                                (B
-(0 (B|(0qqqqqqqqqqq(B|(0qqqqqqqqqq(B|(0qqqqqqqqqqq(B|(0qqqqqqqqqq(B|(0qqqqqqqqqqq(B|(0qqqqqqqqqq(B|(0q        (B
-(0 (B0(0         (B0.2(0        (B0.4(0         (B0.6(0        (B0.8(0           (B1(0        (B1.2(0         (B
+(0 (B|(0qqqqqqqqqqqq(B|(0qqqqqqqqqqqqq(B|(0qqqqqqqqqqqq(B|(0qqqqqqqqqqqq(B|(0qqqqqqqqqqqqq(B|(0qqq        (B
+(0 (B0(0         (B0.25(0           (B0.5(0         (B0.75(0            (B1(0          (B1.25(0           (B
 (0 (Bsubstitutions/site(0                                                             (B
 (0                                                                                (B
 (0 lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq (BBovine(0                                 (B

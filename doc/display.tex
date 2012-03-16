@@ -22,8 +22,7 @@ At its simplest, \display{} just outputs a text graph. Here is the primates tree
 \verbatiminput{display_1_txt.cmd}
 \verbatiminput{display_1_txt.out}
 \end{samepage}
-That's pretty low-tech compared to interactive, colorful graphical displays,
-but if you use the shell a lot (like I do), you may find it useful.
+That's pretty low-tech compared to interactive, colorful, high-resolution displays, but if you use the shell a lot (like I do), you may find it useful.
 
 \subsubsection{Fixing Width}
 
@@ -56,11 +55,6 @@ Homo\footnote{To know the length of an edge, you can use \distance{} \texttt{-m
 p -n} -- see \ref{sct:distance}.}) occupies five characters (up to rounding
 error). And to use two columns per unit length, one would pass \texttt{-w -2},
 etc.
-
-\begin{samepage}
-\verbatiminput{display_20_txt.cmd}
-\verbatiminput{display_20_txt.out}
-\end{samepage}
 
 \subsubsection{Scale Bar}
 
@@ -148,18 +142,18 @@ To produce \svg, pass option \texttt{-s}:
 $ nw_display -s catarrhini > catarrhini.svg
 \end{verbatim}
 Now you can visualize the result using any \svg-enabled tool (all good Web
-browsers can do it), or convert it to another format with, say \texttt{rsvg} or
-Inkscape (\url{http://www.inkscape.org}).  The \svg{} produced by \display{} is
-designed to be easy to edit in an interactive editor (Inkscape, Adobe
-Illustrator, etc.): for example, the tree edges are in one group, and the text
-in another, so it is easy to change the line width of the edges, or the font
-family of the text (you can also do this from \display{} using a \css{} map,
-see \ref{sct_display_svg_css}).
+browsers can do it), or convert it to another format with, say Inkscape
+(\url{http://www.inkscape.org}).  The \svg{} produced by \display{} is designed
+to be easy to edit in an interactive editor (Inkscape, Adobe Illustrator,
+etc.): for example, the tree edges are in one group, and the text in another,
+so it is easy to change the line width of the edges, or the font family of the
+text (you can also do this from \display{} using a \css{} map, see
+\ref{sct_display_svg_css}).
 
 The following \pdf{} image was produced like this:
 
 \begin{verbatim}
-$ inkscape -f catarrhini.svg -A catarrhini.pdf
+$ inkscape -f catarrhini.svg -D -A catarrhini.pdf
 \end{verbatim}
 
 \begin{center}
@@ -171,7 +165,7 @@ and omit the \svg{}-to-\textsc{pdf} conversion step.
 
 \subsubsection{Text-mode options}
 
-Options for \ascii{} trees also work for \svg{}: \texttt{-S} suppresses the
+Many options for \ascii{} trees also work for \svg{}: \texttt{-S} suppresses the
 scale bar\footnote{The positioning of the scale bar is a bit crude in \svg{}
 mode, especially for radial trees. This is mainly because of the "\svg{} string
 length curse", that is, the impossibility of finding out the length of a text
@@ -193,9 +187,10 @@ You can make radial trees by passing the \texttt{-r} switch:
 \subsubsection{Using CSS}
 \label{sct_display_svg_css}
 
-You can modify node style using \css. This is done by specifying a
-\textit{\css{} map}, which is just a text file that says which style should be
-applied to which node. If file \texttt{css.map} contains the following
+You can modify node style using Cascading Style Sheets (\css,
+(\url{www.w3.org/Style/CSS}). This is done by specifying a \textit{\css{} map},
+which is just a text file that says which style should be applied to which node.
+For example, if file \texttt{css.map} contains the following
 \begin{quote}
 \verbatiminput{css.map}
 \end{quote} we can apply the style map to
@@ -218,36 +213,41 @@ The syntax of the \css{} map file is as follows:
 	\item The first element of the line is the style, and it is a snippet of
 	\css{} code. 
 	\item The second element states whether the following nodes are to be treated
-	individually or as a clade. It is either \texttt{Clade} or
-	\texttt{Individual} (which can be abbreviated to \texttt{C} or \texttt{I},
-	respectively).
+	individually or as a clade. It is either \texttt{Clade},
+	\texttt{Individual}, or \texttt{Label} (which can be abbreviated to
+	\texttt{C}, \texttt{I}, or \texttt{L}, respectively). 
 	\item The remaining element(s) are node labels and specify the nodes to which
-	the style must be applied: if the second element was \texttt{Clade}, the
+	the style must be applied: if the second element is \texttt{Clade}, the
 	program finds the last common ancestor of the nodes and applies the style to
-	that node and all its descendants. If the second element was
+	that node and all its descendants. If the second element is
 	\texttt{Individual}, then the style is only applied to the nodes themselves.
+	If the second element is \texttt{Label}, then the style is applied to the
+	labels.
 \end{itemize}
 
 \noindent{}In our example, \texttt{css.map}:
 \begin{itemize}
-	\item the first line states that the style \texttt{stroke:red} must be applied
+	\item line 2 states that the style \texttt{stroke:red} must be applied
 		to the \texttt{Clade} defined by \texttt{Macaca} and
 		\texttt{Cercopithecus}, which consists of these two nodes, their ancestor
 		\texttt{Cercopithecinae}, and \texttt{Papio}. 
-	\item Line 2 prescribes that style \texttt{stroke:\#fa7} (an \svg{}
+	\item Line 4 prescribes that style \texttt{stroke:\#fa7} (an \svg{}
 		hexadecimal color specification) must be applied to the clade defined by
 		\texttt{Homo} and \texttt{Hylobates}, which consists of these two nodes,
 		their last common ancestor (unlabeled), and all its descendants (that is,
 		\texttt{Homo}, \texttt{Pan}, \texttt{Gorilla}, \texttt{Pongo}, and
 		\texttt{Hylobates}, as well as the inner nodes \texttt{Hominini},
 		\texttt{Homininae} and \texttt{Hominidae}). 
-	\item Line 3 instructs that the style \texttt{stroke:green} be applied
+	\item Line 6 instructs that the style \texttt{stroke:green} be applied
 		individually to nodes \texttt{Colobus} and \texttt{Cercopithecus}, and only
 		these nodes - not to the clade that they define.  
-	\item Line 4 says that style \texttt{stroke-width:2;~stroke:blue} should be
+	\item Line 8 says that style \texttt{stroke-width:2;~stroke:blue} should be
 		applied to the clade defined by \texttt{Homo} and \texttt{Pan} - note that
 		the quotes have been removed: they are not part of the style, rather they
 		allow us to improve readability by adding some whitespace.
+	\item Line 10 specifies color \texttt{blue} for labels \texttt{Homo},
+		\texttt{Pan},
+		and \texttt{Hominini}.
 \end{itemize}
 
 The style of an inner clade overrides that of an outer clade, \textit{e.g.},
@@ -259,10 +259,10 @@ width).  Likewise, \texttt{Individual} overrides \texttt{Clade}, which is why
 
 \bigskip
 
-Styles can also be applied to labels. Option \texttt{-l} (lowercase l) specifies
-the leaf label style, option \texttt{-i} the inner node label style, and option
-\texttt{-b} the branch length style. For example, the following tree, which was
-produced using defaults, could be improved a bit:
+Label styles can also be applied globally. Option \texttt{-l} (lowercase l)
+specifies the leaf label style, option \texttt{-i} the inner node label style,
+and option \texttt{-b} the branch length style. For example, the following tree,
+which was produced using defaults, could be improved a bit:
 
 \verbatiminput{display_6_svg.cmd}
 \begin{center}
@@ -397,7 +397,9 @@ and mapped it into a gradient that goes from {\color{Blue} blue} (33.3\%) to
 the gradient. Then:
 
 \verbatiminput{display_10_svg.cmd}
+\begin{center}
 \includegraphics{display_10_svg.pdf}
+\end{center}
 \bigskip{}
 
 \noindent{}As we can see, the high-\gc{} sequences are all found in the same

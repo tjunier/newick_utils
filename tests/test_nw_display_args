@@ -16,6 +16,9 @@ svgurl: -s -r -b 'visibility:hidden' -l 'font-size:7pt' -W 3.5 -w 500 -c dg_colo
 svg_mlbl1: -sr -w 450 -c falc_css.map falc_families.nw
 css_multi: -s -c bacteria_css.map bacteria.nw
 css_multi_def: -s -c bacteria_css.map -d 'stroke:grey' bacteria.nw
+css_lbl: -s -c lbl_css.map catarrhini.nw
+css_wl: -s -c css_wl.map catarrhini.nw
+css_wlr: -sr -w 600 -c css_wl.map catarrhini.nw
 rl: -sr -R 50 -w 500 -b 'visibility:hidden' catarrhini.nw
 sbar: -s simiiformes.nw
 multi_svg:-s forest.nw
@@ -49,3 +52,5 @@ fix_sc_svg_1: -s -w -1 catarrhini_scaled.nw
 fix_sc_svg_3: -s -w -3 catarrhini_scaled.nw 
 fix_sc_txt: -e r -w -0.5 catarrhini_scaled.nw
 apos: -e r apos.nw
+# checks for rounding error
+round_zero: -t HEV.nw
