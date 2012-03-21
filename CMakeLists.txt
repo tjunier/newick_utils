@@ -4,6 +4,16 @@ project(NUTILS C)
 
 enable_testing()
 
+# Packaging
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Shell tools for processing phylogenies")
+set(CPACK_PACKAGE_FILE_NAME "Newick_Utils-1.6")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Thomas Junier")
+set(CPACK_DEBIAN_VERSION_MAJOR 1)
+set(CPACK_DEBIAN_VERSION_MINOR 6)
+set(CPACK_GENERATOR "TGZ;TBZ2;DEB;RPM")
+
+include(CPack)
+
 option(USE_LIBXML "Use libXML" ON)
 option(USE_LUA	  "Use Lua" ON)
 
@@ -19,6 +29,7 @@ if(USE_LUA)
 endif(USE_LUA)
 
 # this must go _before_ any add_subdirectory that needs it...
+# TODO actually this may no longer be needed
 include_directories(${NUTILS_SOURCE_DIR} /usr/include/libxml2)
 add_subdirectory(src)
 add_subdirectory(tests)

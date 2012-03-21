@@ -138,3 +138,14 @@ target_link_libraries(nw_rename nutils)
 
 add_executable(nw_support support.c node_set.c)
 target_link_libraries(nw_support m nutils)
+
+# TODO: add nw_sched, nw_luaed, etc iff Scheme, Lua, etc used.
+set(PROGRAMS nw_clade nw_condense nw_display nw_distance nw_duration nw_ed
+	nw_gen nw_indent nw_labels nw_luaed nw_match nw_order
+	nw_prune nw_rename nw_reroot nw_stats nw_support nw_topology
+	nw_trim)
+
+install(TARGETS ${PROGRAMS} nutils
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib
+	)
