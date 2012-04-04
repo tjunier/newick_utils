@@ -4,6 +4,8 @@ project(NUTILS C)
 
 enable_testing()
 
+set(BUILD_SHARED_LIBS OFF)
+
 # Packaging
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Shell tools for processing phylogenies")
 set(CPACK_PACKAGE_FILE_NAME "Newick_Utils-1.6")

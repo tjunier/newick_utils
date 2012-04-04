@@ -23,7 +23,7 @@ BISON_TARGET(AddrParser address_parser.y
 
 # newick utilities library
 
-add_library(nutils SHARED
+add_library(nutils
 	newick_scanner.c 
 	newick_parser.c
 	parser.c
@@ -148,4 +148,5 @@ set(PROGRAMS nw_clade nw_condense nw_display nw_distance nw_duration nw_ed
 install(TARGETS ${PROGRAMS} nutils
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
 	)
