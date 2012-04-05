@@ -8,9 +8,10 @@ endif(NOT DEFINED BUILD_SHARED_LIBS)
 
 set(CMAKE_C_FLAGS_DEBUG "-O0 -g")
 
-#if(CMAKE_BUILD_TYPE EQUAL Debug)
-#set(BUILD_SHARED_LIBS OFF)
-#endif(CMAKE_BUILD_TYPE EQUAL Debug)
+# this doesn't seem to work...
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set(BUILD_SHARED_LIBS OFF)
+endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 enable_testing()
 
