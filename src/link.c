@@ -236,7 +236,7 @@ int remove_child(struct rnode *child)
 	if (parent->last_child == previous->next_sibling)
 			parent->last_child = previous;
 
-	/* Skip 'child', effectively removing if from children list */
+	/* Skip 'child', effectively removing it from children list */
 	previous->next_sibling = previous->next_sibling->next_sibling;
 
 	parent->child_count --;
