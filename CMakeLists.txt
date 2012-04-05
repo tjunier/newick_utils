@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 2.8)
 
 project(NUTILS C)
 
+if (NOT DEFINED BUILD_SHARED_LIBS)
+	set(BUILD_SHARED_LIBS ON)
+endif(NOT DEFINED BUILD_SHARED_LIBS)
+
+set(CMAKE_C_FLAGS_DEBUG "-O0 -g")
+
+#if(CMAKE_BUILD_TYPE EQUAL Debug)
+#set(BUILD_SHARED_LIBS OFF)
+#endif(CMAKE_BUILD_TYPE EQUAL Debug)
+
 enable_testing()
 
 # Packaging
