@@ -1,3 +1,7 @@
+BUG:  nw_prune -v HRV_FMDV.nw HRV37 HRV3 HRV14 HRV52 HRV17 HRV93 HRV27 POLIO3 POLIO2 POLIO1A COXA18 COXA17 COXA1 segfaults.
+
+request: display unrooted trees
+
 nw_trim: seems to bug when root edge length != 0
 
 nw_display: honor root length [done for ortho; let -I position root label in
@@ -7,7 +11,7 @@ middle as well.
 doc: add trick to make a tree with nodes aligned, but without being a phylogram. Add extra length to all leaf edges, then trim to desired tree depth, e.g.
 $ nw_luaed data/HEV.nw 'l' 'N.L = N.L + 1' | nw_trim - 0.4
 
-nw_display: fix prob with scale values (see file 'prob')
+doc: ad example of huge tree (mail from mid-march)
 
 nw_display: add CSS to labels (in CSS map) [done, just add to manual]
 
@@ -18,7 +22,7 @@ nw_rename: add example to -h about 3-arg form; also discuss in tutorial.
 nw_scheme: sync man, help w/ actual code; add example of numbering inner nodes
 (EK question).
 
-doc: write a ยง about artifacts due to compression (use e.g. last tree in
+doc: write a ง about artifacts due to compression (use e.g. last tree in
 HRV.nw), and how they're unavoidable in text, and how they can be mitigated my
 showing topology or drwing SVG.
 
@@ -595,3 +599,5 @@ implementation of other nutils (nw_topology, nw_label, nw_trim?);
 [done] use curses-like charcters for nw_display (ASCII version)
 
 [done] automatically determine screen width (ASCII) and use this.
+
+[done] nw_display: fix prob with scale values (see file 'prob')
