@@ -231,9 +231,9 @@ int remove_child(struct rnode *child)
 	dummy_head.data = NULL;
 	dummy_head.parent = parent;
 	dummy_head.first_child = dummy_head.last_child = NULL;
+	dummy_head.child_count = 0;
 	dummy_head.next_sibling = parent->first_child;
 
-	// DEBUG: apparently crashes at 1st iteration - look at node list
 	for (n = 0, previous = &dummy_head;
 		NULL != previous->next_sibling;
 		n++, previous = previous->next_sibling) 
