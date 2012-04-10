@@ -1,3 +1,5 @@
+BUG: echo '(A,B);' | nw_prune - B returns 'B;' - should give error.
+
 BUG:  nw_prune -v HRV_FMDV.nw HRV37 HRV3 HRV14 HRV52 HRV17 HRV93 HRV27 POLIO3 POLIO2 POLIO1A COXA18 COXA17 COXA1 segfaults.
 
 request: display unrooted trees
