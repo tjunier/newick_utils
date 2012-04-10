@@ -1,14 +1,15 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "set.h"
 
 int test_create()
 {
-	char *test_name = __func__;
+	const char *test_name = __func__;
 
-	set *s = create_set();
+	set_t *s = create_set();
 
 
 	if (0 != set_cardinal(s)) {
@@ -17,15 +18,15 @@ int test_create()
 		return 1;
 	}
 
-	printf("%s passed.\n");
+	printf("%s passed.\n", test_name);
 	return 0;
 }
 
 int test_add()
 {
-	char *test_name = __func__;
+	const char *test_name = __func__;
 
-	set s = create_set();
+	set_t *s = create_set();
 
 	set_add(s, "Zorg");
 
@@ -35,24 +36,24 @@ int test_add()
 		return 1;
 	}
 	
-	printf("%s passed.\n");
+	printf("%s passed.\n", test_name);
 	return 0;
 }
 
 int test_has_element()
 {
-	char *test_name = __func__;
+	const char *test_name = __func__;
 
-	set s = create_set();
+	set_t *s = create_set();
 
 	set_add(s, "Zorg");
 
-	if (false = set_has_element(s, "Zorg")) {
+	if (false == set_has_element(s, "Zorg")) {
 		printf ("%s: set should have element 'Zorg', but hasn't\n", test_name);
 		return 1;
 	}
 	
-	printf("%s passed.\n");
+	printf("%s passed.\n", test_name);
 	return 0;
 }
 

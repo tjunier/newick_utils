@@ -22,7 +22,6 @@ set(UNIT_TESTS
 	nodemap
 	rnode
 	rnode_iterator
-	set
 	to_newick
 	tree
 	)
@@ -59,6 +58,10 @@ add_test(order_tree test_order_tree)
 add_executable(test_readline test_readline.c ${SRC_DIR}/readline.c tree_stubs.c)
 target_link_libraries(test_readline nutils m)
 add_test(readline test_readline)
+
+add_executable(test_set test_set.c ${SRC_DIR}/set.c)
+target_link_libraries(test_set nutils)
+add_test(set test_set)
 
 add_executable(test_subtree test_subtree.c ${SRC_DIR}/subtree.c tree_stubs.c)
 target_link_libraries(test_subtree nutils m)
