@@ -42,12 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "to_newick.h"
 #include "rnode.h"
 #include "link.h"
-#include "hash.h"
+#include "set.h"
 #include "list.h"
 
+
 struct parameters {
-	struct llist 	*labels;
-	bool		reverse;
+	// TODO: Use set
+	struct  list 	*labels;
+	bool	reverse;
 };
 
 void help(char *argv[])
@@ -250,8 +252,6 @@ int main(int argc, char *argv[])
 	struct parameters params;
 	
 	params = get_params(argc, argv);
-
-	struct hash *goner_labels = create_hash();
 
 	while (NULL != (tree = parse_tree())) {
 		if (params.reverse) {

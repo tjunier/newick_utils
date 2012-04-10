@@ -22,6 +22,7 @@ set(UNIT_TESTS
 	nodemap
 	rnode
 	rnode_iterator
+	set
 	to_newick
 	tree
 	)
