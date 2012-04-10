@@ -222,8 +222,18 @@ int remove_child(struct rnode *child)
 		return 0;
 	}
 
-	/* Find node previous to child */
+	/* Find node previous to child. We need a dummy head node, in case the
+	 * child to remove is the list's head (and there is therefore no real
+	 * previous node) */
+	dummy_head.label = "DUMMY";
+	dummy_head.edge_length_as_string = "-1";
+	dummy_head.edge_length = -1;
+	dummy_head.data = NULL;
+	dummy_head.parent = parent;
+	dummy_head.first_child = dummy_head.last_child = NULL;
 	dummy_head.next_sibling = parent->first_child;
+
+	// DEBUG: apparently crashes at 1st iteration - look at node list
 	for (n = 0, previous = &dummy_head;
 		NULL != previous->next_sibling;
 		n++, previous = previous->next_sibling) 
