@@ -251,6 +251,8 @@ int main(int argc, char *argv[])
 	
 	params = get_params(argc, argv);
 
+	struct hash *goner_labels = create_hash();
+
 	while (NULL != (tree = parse_tree())) {
 		if (params.reverse) {
 			struct llist *rev_labels = reverse_labels(tree,
