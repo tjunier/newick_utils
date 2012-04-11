@@ -14,7 +14,10 @@ int set_cardinal(set_t *s) { return s->count; }
 
 int set_add(set_t *s, const char *key)
 {
-	hash_set(s, key, &MEMBER);
+	if (hash_set(s, key, &MEMBER))
+		return set_cardinal(s);
+	else
+		return SET_ADD_ERROR;
 }
 
 bool set_has_element(set_t *s, const char *key)
@@ -25,3 +28,4 @@ bool set_has_element(set_t *s, const char *key)
 		return true;
 }
 
+void destroy_set(set_t *s) { destroy_hash(s); }

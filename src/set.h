@@ -2,7 +2,8 @@
 
 #include "hash.h"
 
-static int MEMBER = 1;
+const int SET_ADD_ERROR;
+const int MEMBER;
 
 typedef struct hash set_t;
 
@@ -21,3 +22,8 @@ int set_cardinal(set_t *s);
 /* Returns true IFF set has the given key */
 
 bool set_has_element(set_t *s, const char *key);
+
+/* Destroys a set (but not the data ot contains) */
+
+void destroy_set(set_t *s);
+

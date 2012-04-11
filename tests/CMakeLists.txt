@@ -59,7 +59,7 @@ add_executable(test_readline test_readline.c ${SRC_DIR}/readline.c tree_stubs.c)
 target_link_libraries(test_readline nutils m)
 add_test(readline test_readline)
 
-add_executable(test_set test_set.c ${SRC_DIR}/set.c)
+add_executable(test_set test_set.c)
 target_link_libraries(test_set nutils)
 add_test(set test_set)
 
