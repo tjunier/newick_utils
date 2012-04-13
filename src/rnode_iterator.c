@@ -71,6 +71,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
+// TODO is this stuff about "seen" still true? Seems to me we now rely only on
+// node->current_child. If so, remove "seen" from struct rnode.
+
 /* NOTE: functions in this module now rely on the 'seen' member of struct
  * rnode. The former approach, namely to 'remember' visited nodes with hash
  * tables, proved too slow. It is implicitly assumed that the 'seen' member of
@@ -193,6 +196,21 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *iter)
 			iter->current->current_child->next_sibling;
 
 	iter->current = iter->current->current_child;	
+	SHOW;
+	return iter->current;
+}
+
+/* Returns the current node's next sibling (which becomes the new current
+ * node). If the current node has no next sibling, then returns NULL (and the
+ * current node does not change). */
+
+struct rnode *rnode_iterator_next_sibling(struct rnode_iterator *iter)
+{
+	if (NULL == iter->current->next_sibling)
+		return NULL;
+
+	iter->current = iter->current->next_sibling;
+	iter->current->parent->current_child = iter->current;
 	SHOW;
 	return iter->current;
 }
