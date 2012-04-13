@@ -157,13 +157,7 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-// TODO: currently we build a hash of labels for every tree. We should just
-// build a hash of the passed labels, and go through the tree in reverse Newick
-// order, unlinking nodes as needed (and preventing further visiting, as in
-// nw_ed. This will entail at most one passage through the tree, ensure that
-// descendants of removed nodes are not processed, and allow a single hash to
-// be constructed for all the trees. In fact, if the labels list is short, one
-// does not need a hash at all.
+/* Iterate through nodes (reverse order), unlinking as required. Descendants of a pruned node are not considered. */
 
 void process_tree(struct rooted_tree *tree, set_t *cl_labels, bool reverse)
 {
