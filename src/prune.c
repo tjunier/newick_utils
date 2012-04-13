@@ -176,13 +176,13 @@ void process_tree(struct rooted_tree *tree, set_t *cl_labels, bool reverse)
 		bool current_in_cl = set_has_element(cl_labels,
 				current_node->label);
 
+		/* Skip this node if its label is empty */
+		if (0 == strcmp(current_node->label, "")) continue;
 		/* Skip this node if its label was passed but we're in reverse
 		 * mode, OR if the label was NOT passed and we're in direct
 		 * mode */
-		if (current_in_cl && reverse)
-			continue;
-		if (!current_in_cl && !reverse)
-			continue;
+		if (current_in_cl && reverse) continue;
+		if (!current_in_cl && !reverse) continue;
 
 		enum unlink_rnode_status result = unlink_rnode(current_node);
 
