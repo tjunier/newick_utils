@@ -212,6 +212,8 @@ int remove_child(struct rnode *child)
 	struct rnode *previous;
 	int n;
 
+	// TODO: why this? Try to run tests without this. This may cause an
+	// inner node do pass for the root.
 	child->parent = NULL;
 
 	/* Easy special case: parent has exactly one child. */
