@@ -42,12 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "to_newick.h"
 #include "rnode.h"
 #include "link.h"
-#include "hash.h"
+#include "set.h"
 #include "list.h"
 
+
 struct parameters {
-	struct llist 	*labels;
-	bool		reverse;
+	set_t 	*cl_labels;
+	bool	reverse;
 };
 
 void help(char *argv[])
@@ -137,16 +138,16 @@ struct parameters get_params(int argc, char *argv[])
 			}
 			nwsin = fin;
 		}
-		struct llist *lbl_list = create_llist();
-		if (NULL == lbl_list) { perror(NULL); exit(EXIT_FAILURE); }
+		set_t *cl_labels = create_set();
+		if (NULL == cl_labels) { perror(NULL); exit(EXIT_FAILURE); }
 		optind++;	/* optind is now index of 1st label */
 		for (; optind < argc; optind++) {
-			if (! append_element(lbl_list, argv[optind])) {
+			if (set_add(cl_labels, argv[optind]) < 0) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
 		}
-		params.labels = lbl_list;
+		params.cl_labels = cl_labels;
 	} else {
 		fprintf(stderr, "Usage: %s [-h] <filename|-> <label> [label+]\n",
 				argv[0]);
@@ -156,23 +157,35 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-void process_tree(struct rooted_tree *tree, struct llist *labels)
+// TODO: currently we build a hash of labels for every tree. We should just
+// build a hash of the passed labels, and go through the tree in reverse Newick
+// order, unlinking nodes as needed (and preventing further visiting, as in
+// nw_ed. This will entail at most one passage through the tree, ensure that
+// descendants of removed nodes are not processed, and allow a single hash to
+// be constructed for all the trees. In fact, if the labels list is short, one
+// does not need a hash at all.
+
+void process_tree(struct rooted_tree *tree, set_t *cl_labels, bool reverse)
 {
-	struct hash *lbl2node_map = create_label2node_map(tree->nodes_in_order);
 	struct list_elem *elem;
 
-	for (elem = labels->head; NULL != elem; elem = elem->next) {
-		char *label = elem->data;
-		struct rnode *goner = hash_get(lbl2node_map, label);
-		if (NULL == goner) {
-			fprintf (stderr, "WARNING: label '%s' not found.\n",
-					label);
+	for (elem = tree->nodes_in_order->head; NULL != elem;
+			elem = elem->next) {
+		struct rnode *current_node = elem->data;
+		
+		bool current_in_cl = set_has_element(cl_labels,
+				current_node->label);
+
+		/* Skip this node if its label was passed but we're in reverse
+		 * mode, OR if the label was NOT passed and we're in direct
+		 * mode */
+		if (current_in_cl && reverse)
 			continue;
-		}
-		/* parent may have been unlinked already, so let's check */
-		if (NULL == goner->parent)
+		if (!current_in_cl && !reverse)
 			continue;
-		enum unlink_rnode_status result = unlink_rnode(goner);
+
+		enum unlink_rnode_status result = unlink_rnode(current_node);
+
 		struct rnode *root_child;
 		switch(result) {
 		case UNLINK_RNODE_DONE:
@@ -189,51 +202,6 @@ void process_tree(struct rooted_tree *tree, struct llist *labels)
 			assert(0); /* programmer error */
 		}
 	}
-
-	destroy_hash(lbl2node_map);
-}
-
-/* Produces a new list with all labels in the tree that are NOT in 'labels'. */
-
-struct llist *reverse_labels(struct rooted_tree *tree, struct llist *labels)
-{
-	struct llist *rev_labels = create_llist();
-	/* We use a hash for looking up labels, instead of going over the list
-	 * of labels every time (see below) */
-	struct hash *labels_h = create_hash(labels->count);
-	if (NULL == labels_h) {
-		fprintf(stderr, "Memory error -exiting.\n");
-		exit(EXIT_FAILURE);
-	}
-
-	struct list_elem *elem;
-
-	/* fill label hash with the labels */
-	char *PRESENT = "present";
-	for (elem = labels->head; NULL != elem; elem = elem->next) {
-		char *label = elem->data;
-		if (! hash_set(labels_h, label, PRESENT)) {
-			fprintf(stderr, "Memory error -exiting.\n");
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	/* Now iterate over all nodes in the tree and see if their labels are
-	 * found in the labels hash. If not, add them to the 'rev_labels' list.
-	 * */
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		char *label = ((struct rnode*) elem->data)->label;
-		if (0 == strcmp("", label)) continue;
-		if (NULL == hash_get(labels_h, label)) {
-			if (! append_element(rev_labels, label)) {
-				fprintf(stderr, "Memory error -exiting.\n");
-				exit(EXIT_FAILURE);
-			}
-		}
-	}
-	destroy_hash(labels_h);
-
-	return rev_labels;
 }
 
 int main(int argc, char *argv[])
@@ -244,14 +212,7 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		if (params.reverse) {
-			struct llist *rev_labels = reverse_labels(tree,
-					params.labels);
-			process_tree(tree, rev_labels);
-			destroy_llist(rev_labels);
-		} else {
-			process_tree(tree, params.labels);
-		}
+		process_tree(tree, params.cl_labels, params.reverse);
 		dump_newick(tree->root);
 		/* NOTE: the tree was modified, but no nodes were added so 
 		 * we can use destroy_tree() */
@@ -259,7 +220,7 @@ int main(int argc, char *argv[])
 		destroy_tree(tree);
 	}
 
-	destroy_llist(params.labels);
+	destroy_set(params.cl_labels);
 
 	return 0;
 }

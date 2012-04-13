@@ -37,6 +37,7 @@ add_library(nutils
 	lca.c
 	error.c
 	tree.c
+	set.c
 	to_newick.c
 	concat.c
 	)
