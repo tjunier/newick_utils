@@ -78,7 +78,8 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	 * is not defined (as in cladograms). */
 	node->edge_length = -1;	
 	node->current_child = NULL;
-	node->seen = 0;
+	node->seen = false;
+	node->linked = false;
 
 #ifdef SHOW_RNODE_CREATE
 	fprintf(stderr, "creating rnode %p '%s'\n", node, node->label);

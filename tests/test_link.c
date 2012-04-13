@@ -117,6 +117,18 @@ int test_add_3_children()
 		printf("%s: length should be %s.\n", test_name, length3);
 		return 1;
 	}
+	if (! kid1->linked) {
+		printf("%s: kid1 should be linked.\n", test_name);
+		return 1;
+	}
+	if (! kid2->linked) {
+		printf("%s: kid2 should be linked.\n", test_name);
+		return 1;
+	}
+	if (! kid3->linked) {
+		printf("%s: kid3 should be linked.\n", test_name);
+		return 1;
+	}
 
 	printf("%s ok.\n", test_name);
 	return 0;
@@ -244,6 +256,10 @@ int test_insert_node_above()
 		printf ("%s: node k must have a parent.\n", test_name);
 		return 1;
 	}
+	if (! node_k->linked) {
+		printf ("%s: node k should be linked.\n");
+		return 1;
+	}
 	if (root != node_k->parent) {
 		printf ("%s: node k's parent is '%p', should be '%p'.\n",
 				test_name, node_k->parent, root);
@@ -315,6 +331,10 @@ int test_insert_node_above_wlen()
 		printf ("%s: node k must have a parent.\n", test_name);
 		return 1;
 	}
+	if (! node_k->linked) {
+		printf ("%s: node k should be linked.\n");
+		return 1;
+	}
 	if (root != node_k->parent) {
 		printf ("%s: node k's parent is '%p', should be '%p'.\n",
 				test_name, node_k->parent, root);
@@ -363,10 +383,20 @@ int test_replace_child()
 			test_name, exp, to_newick(parent));
 		return 1;
 	}
+	if (!new_child->linked) {
+		printf("%s: new child should be linked.\n");
+		return 1;
+	}
+	if (child3->linked) {
+		printf("%s: child 3 should not be linked.\n");
+		return 1;
+	}
 
 	printf("%s ok.\n", test_name);
 	return 0;
 }
+
+// TODO: add tests for linked status (rnode->linked) after each link operation
 
 int test_replace_child_wlen()
 {
@@ -492,6 +522,11 @@ int test_unlink_rnode()
 
 	if (strcmp(exp, obt) != 0) {
 		printf ("%s: expected %s, got %s\n", test_name, exp, obt);
+		return 1;
+	}
+
+	if (node_A->linked) {
+		printf ("%s: node_A should not be liked anymore.\n", test_name);
 		return 1;
 	}
 
