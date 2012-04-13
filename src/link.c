@@ -205,13 +205,15 @@ int splice_out_rnode(struct rnode *this)
 
 int remove_child(struct rnode *child)
 {
-	if (is_root(child)) return RM_CHILD_IS_ROOT;;
+	if (is_root(child)) return RM_CHILD_HAS_NO_PARENT;
 
 	struct rnode *parent = child->parent;
 	struct rnode dummy_head;
 	struct rnode *previous;
 	int n;
 
+	// TODO: why this? Try to run tests without this. This may cause an
+	// inner node do pass for the root.
 	child->parent = NULL;
 
 	/* Easy special case: parent has exactly one child. */
@@ -303,7 +305,11 @@ int unlink_rnode(struct rnode *node)
 {
 	struct rnode *parent = node->parent;
 	/* Remove this node from its parent's list of children.  */
-	remove_child(node);
+	enum remove_child_status status = remove_child(node);
+	/* If node already has no parent, it is because it has already been
+	 * unlinked */
+	if (RM_CHILD_HAS_NO_PARENT == status)
+		return UNLINK_RNODE_DONE;
 
 	/* If deleting this node results in the parent having only one child,
 	 * we splice the parent out (unless it's the root, in which case we
