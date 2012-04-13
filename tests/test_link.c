@@ -582,6 +582,72 @@ int test_unlink_rnode_3sibs()
 
 }
 
+int test_unlink_idempotent()
+{
+	const char *test_name = __func__;
+	struct hash *map;
+	struct rnode *node_A;
+	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
+	struct rooted_tree t = tree_3();
+
+	const char * exp = "(B:3,(C:1,(D:1,E:1)g:2)h:3)i;";
+	char * obt;
+
+	map = create_label2node_map(t.nodes_in_order);
+	node_A = hash_get(map, "A");
+
+	/* Unlinking should be idempotent, i.e. unlinking a node more than once
+	 * should be a no-op (instead of causing a Segv) */
+
+	enum unlink_rnode_status result = unlink_rnode(node_A);
+	switch(result) {
+	case UNLINK_RNODE_DONE:
+		break;
+	case UNLINK_RNODE_ROOT_CHILD:
+		printf ("%s: unlink_rnode should return UNLINK_RNODE_DONE, "
+			"as node A's parent is not the root\n", test_name);
+		return 1;
+	case UNLINK_RNODE_ERROR:
+		fprintf (stderr, "Memory error -\n");
+		exit(EXIT_FAILURE);
+	default:
+		assert(0); /* programmer error */
+	}
+
+	obt = to_newick(t.root);
+
+	if (strcmp(exp, obt) != 0) {
+		printf ("%s: expected %s, got %s\n", test_name, exp, obt);
+		return 1;
+	}
+
+	/* Scond unlink */
+	result = unlink_rnode(node_A);
+	switch(result) {
+	case UNLINK_RNODE_DONE:
+		break;
+	case UNLINK_RNODE_ROOT_CHILD:
+		printf ("%s: unlink_rnode should return UNLINK_RNODE_DONE, "
+			"as node A's parent is not the root\n", test_name);
+		return 1;
+	case UNLINK_RNODE_ERROR:
+		fprintf (stderr, "Memory error -\n");
+		exit(EXIT_FAILURE);
+	default:
+		assert(0); /* programmer error */
+	}
+
+	obt = to_newick(t.root);
+
+	if (strcmp(exp, obt) != 0) {
+		printf ("%s: expected %s, got %s\n", test_name, exp, obt);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int test_remove_children()
 {
 	const char *test_name = __func__;
@@ -1084,6 +1150,7 @@ int main()
 	failures += test_unlink_rnode();
 	failures += test_unlink_rnode_rad_leaf();
 	failures += test_unlink_rnode_3sibs();
+	failures += test_unlink_idempotent();
 	failures += test_siblings();
 	failures += test_remove_children();
 	failures += test_insert_remove_child_noop();

@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* remove_child() returns negative values on error (and only then). We start
  * at -10, that should allow for enough kinds of errors... */
-enum remove_child_status {  RM_CHILD_IS_ROOT = -10, RM_CHILD_MEM_ERROR };
+enum remove_child_status {  RM_CHILD_HAS_NO_PARENT = -10, RM_CHILD_MEM_ERROR };
 
 /* NOTE: Tree properties such as 'nodes_in_order' will generally be invalidated
  * by these methods. You will need either to recompute them, or to avoid
