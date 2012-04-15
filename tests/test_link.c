@@ -1066,10 +1066,18 @@ int test_insert_remove_child_tail()
 		printf("%s: expected index 2, got %d\n", test_name, index);
 		return 1;
 	}
+	if (kid3->linked) {
+		printf ("%s: kid3 should no longer be linked.\n", test_name);
+		return 1;
+	}
 	insert_child(mum, kid4, 2);
 	node = mum->last_child;
 	if (node != kid4) {
 		printf("%s: expected node %p, got %p.\n", test_name, kid4, node);
+		return 1;
+	}
+	if (! kid4->linked) {
+		printf ("%s: kid4 should be linjked.\n", test_name);
 		return 1;
 	}
 	if (kid2->next_sibling != kid4) {
@@ -1133,6 +1141,14 @@ int test_swap_nodes()
 	if (strcmp(node_i->edge_length_as_string, h_length) != 0) {
 		printf ("%s: i's length should be %s, but is %s\n", test_name,
 				h_length, node_i->edge_length_as_string);
+		return 1;
+	}
+	if (! node_i->linked) {
+		printf ("%s: node_i should be linked.\n", test_name);
+		return 1;
+	}
+	if (node_h->linked) {
+		printf ("%s: node_h should be linked.\n", test_name);
 		return 1;
 	}
 

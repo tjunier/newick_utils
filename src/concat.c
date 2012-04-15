@@ -66,7 +66,7 @@ char *append_to(char *s1, char *s2)
 char *str_splice(char *src, char *ins, int pos, int len)
 {
 	assert (pos >= 0);
-	assert (pos + len <= strlen(src));
+	assert (pos + len <= (unsigned int) strlen(src));
 
 	int insert_len = strlen(ins);
 	int result_len = strlen(src) + insert_len - len;
