@@ -59,6 +59,7 @@ void add_child(struct rnode *parent, struct rnode *child)
 
 	parent->child_count++;
 	parent->last_child = child;
+	child->linked = true;
 }
 
 /* Returns half the length passed as a parameter (as char *), or "". */
@@ -317,10 +318,13 @@ int unlink_rnode(struct rnode *node)
 		else {
 			if (! splice_out_rnode(parent))
 				return UNLINK_RNODE_ERROR;
-			else
+			else {
+				node->linked = false;
 				return UNLINK_RNODE_DONE;
+			}
 		}
 	}
+	node->linked = false;
 	return UNLINK_RNODE_DONE;
 }
 
