@@ -257,7 +257,7 @@ int test_insert_node_above()
 		return 1;
 	}
 	if (! node_k->linked) {
-		printf ("%s: node k should be linked.\n");
+		printf ("%s: node k should be linked.\n", test_name);
 		return 1;
 	}
 	if (root != node_k->parent) {
@@ -332,7 +332,7 @@ int test_insert_node_above_wlen()
 		return 1;
 	}
 	if (! node_k->linked) {
-		printf ("%s: node k should be linked.\n");
+		printf ("%s: node k should be linked.\n", test_name);
 		return 1;
 	}
 	if (root != node_k->parent) {
@@ -387,8 +387,8 @@ int test_replace_child()
 		printf("%s: new child should be linked.\n");
 		return 1;
 	}
-	if (child3->linked) {
-		printf("%s: child 3 should not be linked.\n");
+	if (child_3->linked) {
+		printf("%s: child_3 should not be linked.\n");
 		return 1;
 	}
 
@@ -565,7 +565,7 @@ int test_unlink_rnode_rad_leaf()
 		assert(0); /* programmer error */
 	}
 	if (node_D->linked) {
-		printf ("%s: node_D should not be liked anymore.\n", test_name);
+		printf ("%s: node_D should not be linked anymore.\n", test_name);
 		return 1;
 	}
 
@@ -647,7 +647,7 @@ int test_remove_children()
 		return 1;
 	}
 	if (node_f->child_count != 0) {
-		printf ("%s: children cound should be 0\n", test_name);
+		printf ("%s: children count should be 0\n", test_name);
 		return 1;
 	}
 	if (node_A->linked) {
@@ -925,7 +925,7 @@ int test_insert_remove_child_head()
 	}
 	if (kid1->linked) {
 		printf ("%s: kid1 should no longer be linked.\n", test_name);
-		return 1,
+		return 1;
 	}
 	insert_child(mum, kid4, 0);
 	node = mum->first_child;
@@ -935,7 +935,7 @@ int test_insert_remove_child_head()
 	}
 	if (! kid4->linked) {
 		printf ("%s: kid4 should be linked.\n", test_name);
-		return;
+		return 1;
 	}
 	if (kid4->next_sibling != kid2) {
 		printf("%s: expected kid2 as next sib, got %s.\n", test_name,
@@ -995,7 +995,7 @@ int test_insert_remove_child_middle()
 		return 1;
 	}
 	if (kid2->linked) {
-		printd("%s: kid2 should no longer be linked\n", test_name);
+		printf("%s: kid2 should no longer be linked\n", test_name);
 		return 1;
 	}
 	if (children_count(mum) != 2) {

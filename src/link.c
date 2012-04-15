@@ -84,13 +84,10 @@ char * compute_new_edge_length(char * length_as_string)
 
 int insert_node_above(struct rnode *this, char *label)
 {
-	struct rnode *parent;
 	struct rnode *new;
 	char * new_edge_length;	/* both new edges have 1/2 the length of the
 				   old one */
 
-	/* find parent edge and parent node */
-	parent = this->parent;
 	new_edge_length = compute_new_edge_length(this->edge_length_as_string);
 	if (NULL == new_edge_length) return FAILURE;
 	/* create new node */
@@ -133,6 +130,7 @@ void replace_child (struct rnode *old, struct rnode *new)
 	if (dad->last_child == old)
 		dad->last_child = new;
 	new->parent = dad;
+	new->linked = true;
 }
 
 char *add_len_strings(char *ls1, char *ls2)
@@ -305,6 +303,7 @@ int unlink_rnode(struct rnode *node)
 	struct rnode *parent = node->parent;
 	/* Remove this node from its parent's list of children.  */
 	remove_child(node);
+	node->linked = false;
 
 	/* If deleting this node results in the parent having only one child,
 	 * we splice the parent out (unless it's the root, in which case we
@@ -324,7 +323,6 @@ int unlink_rnode(struct rnode *node)
 			}
 		}
 	}
-	node->linked = false;
 	return UNLINK_RNODE_DONE;
 }
 
@@ -347,6 +345,7 @@ struct llist *siblings(struct rnode *node)
 
 void remove_children(struct rnode *node)
 {
+	// TODO: iterate through children, setting their 'link' member to false.
 	node->first_child = NULL;
 	node->last_child = NULL;
 	node->child_count = 0;
