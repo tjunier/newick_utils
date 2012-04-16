@@ -248,6 +248,7 @@ int remove_child(struct rnode *child)
 	if (parent->last_child == previous->next_sibling)
 			parent->last_child = previous;
 
+	// TODO: SEGV around here. GDB: set bp here iff label is 22
 	/* Skip 'child', effectively removing it from children list */
 	previous->next_sibling = previous->next_sibling->next_sibling;
 
