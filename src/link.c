@@ -199,6 +199,9 @@ int splice_out_rnode(struct rnode *this)
 	/* Update parent's children count */
 	parent->child_count += this->child_count - 1;
 
+	/* Mark as no longer linked */
+	this->linked = false;
+
 	return SUCCESS;
 }
 
