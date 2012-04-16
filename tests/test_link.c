@@ -117,6 +117,18 @@ int test_add_3_children()
 		printf("%s: length should be %s.\n", test_name, length3);
 		return 1;
 	}
+	if (! kid1->linked) {
+		printf("%s: kid1 should be linked.\n", test_name);
+		return 1;
+	}
+	if (! kid2->linked) {
+		printf("%s: kid2 should be linked.\n", test_name);
+		return 1;
+	}
+	if (! kid3->linked) {
+		printf("%s: kid3 should be linked.\n", test_name);
+		return 1;
+	}
 
 	printf("%s ok.\n", test_name);
 	return 0;
@@ -244,6 +256,10 @@ int test_insert_node_above()
 		printf ("%s: node k must have a parent.\n", test_name);
 		return 1;
 	}
+	if (! node_k->linked) {
+		printf ("%s: node k should be linked.\n", test_name);
+		return 1;
+	}
 	if (root != node_k->parent) {
 		printf ("%s: node k's parent is '%p', should be '%p'.\n",
 				test_name, node_k->parent, root);
@@ -315,6 +331,10 @@ int test_insert_node_above_wlen()
 		printf ("%s: node k must have a parent.\n", test_name);
 		return 1;
 	}
+	if (! node_k->linked) {
+		printf ("%s: node k should be linked.\n", test_name);
+		return 1;
+	}
 	if (root != node_k->parent) {
 		printf ("%s: node k's parent is '%p', should be '%p'.\n",
 				test_name, node_k->parent, root);
@@ -363,10 +383,20 @@ int test_replace_child()
 			test_name, exp, to_newick(parent));
 		return 1;
 	}
+	if (!new_child->linked) {
+		printf("%s: new child should be linked.\n");
+		return 1;
+	}
+	if (child_3->linked) {
+		printf("%s: child_3 should not be linked.\n");
+		return 1;
+	}
 
 	printf("%s ok.\n", test_name);
 	return 0;
 }
+
+// TODO: add tests for linked status (rnode->linked) after each link operation
 
 int test_replace_child_wlen()
 {
@@ -495,6 +525,11 @@ int test_unlink_rnode()
 		return 1;
 	}
 
+	if (node_A->linked) {
+		printf ("%s: node_A should not be liked anymore.\n", test_name);
+		return 1;
+	}
+
 	printf("%s ok.\n", test_name);
 	return 0;
 }
@@ -528,6 +563,10 @@ int test_unlink_rnode_rad_leaf()
 		exit(EXIT_FAILURE);
 	default:
 		assert(0); /* programmer error */
+	}
+	if (node_D->linked) {
+		printf ("%s: node_D should not be linked anymore.\n", test_name);
+		return 1;
 	}
 
 	char * exp = "(A:1,B:1,C:1)e:1;";
@@ -567,6 +606,10 @@ int test_unlink_rnode_3sibs()
 		exit(EXIT_FAILURE);
 	default:
 		assert(0); /* programmer error */
+	}
+	if (node_B->linked) {
+		printf ("%s: node_B should not be liked anymore.\n", test_name);
+		return 1;
 	}
 	
 	char * exp = "((A:1,C:1)e:1,D:2)f;";
@@ -652,9 +695,12 @@ int test_remove_children()
 {
 	const char *test_name = __func__;
 
+	/* ((A,B)f,(C,(D,E)g)h)i; */
 	struct rooted_tree tree2 = tree_2();
 	struct hash *map = create_label2node_map(tree2.nodes_in_order);
 	struct rnode *node_f = hash_get(map, "f");
+	struct rnode *node_A = hash_get(map, "A");
+	struct rnode *node_B = hash_get(map, "B");
 
 	remove_children(node_f);
 
@@ -667,7 +713,15 @@ int test_remove_children()
 		return 1;
 	}
 	if (node_f->child_count != 0) {
-		printf ("%s: children cound should be 0\n", test_name);
+		printf ("%s: children count should be 0\n", test_name);
+		return 1;
+	}
+	if (node_A->linked) {
+		printf ("%s: node_A should not be linked anymore.\n", test_name);
+		return 1;
+	}
+	if (node_B->linked) {
+		printf ("%s: node_B should not be linked anymore.\n", test_name);
 		return 1;
 	}
 
@@ -859,6 +913,10 @@ int test_insert_remove_child_noop()
 			"last child\n", test_name);
 		return 1;
 	}
+	if (kid4->linked) {
+		printf ("%s: kid4 should not be linked.\n", test_name);
+		return 1;
+	}
 
 	/* Insertion at index > #kids should fail */
 	status = insert_child(mum, kid4, 4);
@@ -896,6 +954,10 @@ int test_insert_remove_child_noop()
 			"last child\n", test_name);
 		return 1;
 	}
+	if (kid4->linked) {
+		printf ("%s: kid4 should not be linked.\n", test_name);
+		return 1;
+	}
 
 	printf("%s ok.\n", test_name);
 	return 0;
@@ -927,10 +989,18 @@ int test_insert_remove_child_head()
 		printf("%s: expected index 0, got %d\n", test_name, index);
 		return 1;
 	}
+	if (kid1->linked) {
+		printf ("%s: kid1 should no longer be linked.\n", test_name);
+		return 1;
+	}
 	insert_child(mum, kid4, 0);
 	node = mum->first_child;
 	if (node != kid4) {
 		printf("%s: expected node %p, got %p.\n", test_name, kid4, node);
+		return 1;
+	}
+	if (! kid4->linked) {
+		printf ("%s: kid4 should be linked.\n", test_name);
 		return 1;
 	}
 	if (kid4->next_sibling != kid2) {
@@ -988,6 +1058,10 @@ int test_insert_remove_child_middle()
 	index = remove_child(kid2);
 	if (index != 1) {
 		printf("%s: expected index 1, got %d\n", test_name, index);
+		return 1;
+	}
+	if (kid2->linked) {
+		printf("%s: kid2 should no longer be linked\n", test_name);
 		return 1;
 	}
 	if (children_count(mum) != 2) {
@@ -1058,10 +1132,18 @@ int test_insert_remove_child_tail()
 		printf("%s: expected index 2, got %d\n", test_name, index);
 		return 1;
 	}
+	if (kid3->linked) {
+		printf ("%s: kid3 should no longer be linked.\n", test_name);
+		return 1;
+	}
 	insert_child(mum, kid4, 2);
 	node = mum->last_child;
 	if (node != kid4) {
 		printf("%s: expected node %p, got %p.\n", test_name, kid4, node);
+		return 1;
+	}
+	if (! kid4->linked) {
+		printf ("%s: kid4 should be linjked.\n", test_name);
 		return 1;
 	}
 	if (kid2->next_sibling != kid4) {
@@ -1125,6 +1207,14 @@ int test_swap_nodes()
 	if (strcmp(node_i->edge_length_as_string, h_length) != 0) {
 		printf ("%s: i's length should be %s, but is %s\n", test_name,
 				h_length, node_i->edge_length_as_string);
+		return 1;
+	}
+	if (! node_i->linked) {
+		printf ("%s: node_i should be linked.\n", test_name);
+		return 1;
+	}
+	if (node_h->linked) {
+		printf ("%s: node_h should be linked.\n", test_name);
 		return 1;
 	}
 

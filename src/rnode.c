@@ -80,7 +80,8 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	/* These are used when iterating on the tree structure. See
 	 * rnode_iterator.c */
 	node->current_child = NULL;
-	node->seen = 0;
+	node->seen = false;
+	node->linked = false;
 
 #ifdef SHOW_RNODE_CREATE
 	fprintf(stderr, "creating rnode %p '%s'\n", node, node->label);
