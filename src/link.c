@@ -303,18 +303,12 @@ int swap_nodes(struct rnode *node)
 
 int unlink_rnode(struct rnode *node)
 {
+	if (! node->linked) return UNLINK_RNODE_DONE;
+
 	struct rnode *parent = node->parent;
 	/* Remove this node from its parent's list of children.  */
-<<<<<<< HEAD
-	enum remove_child_status status = remove_child(node);
-	/* If node already has no parent, it is because it has already been
-	 * unlinked */
-	if (RM_CHILD_HAS_NO_PARENT == status)
-		return UNLINK_RNODE_DONE;
-=======
 	remove_child(node);
 	node->linked = false;
->>>>>>> b2140121f7c985f611f3f210763ac82a195be6f6
 
 	/* If deleting this node results in the parent having only one child,
 	 * we splice the parent out (unless it's the root, in which case we
