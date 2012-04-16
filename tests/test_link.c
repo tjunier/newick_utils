@@ -651,11 +651,11 @@ int test_remove_children()
 		return 1;
 	}
 	if (node_A->linked) {
-		printf ("%s: node_A should not be liked anymore.\n", test_name);
+		printf ("%s: node_A should not be linked anymore.\n", test_name);
 		return 1;
 	}
 	if (node_B->linked) {
-		printf ("%s: node_B should not be liked anymore.\n", test_name);
+		printf ("%s: node_B should not be linked anymore.\n", test_name);
 		return 1;
 	}
 

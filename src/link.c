@@ -211,7 +211,9 @@ int remove_child(struct rnode *child)
 	struct rnode *previous;
 	int n;
 
+	// TODO: prolly better to keep parent, now that we have the 'linked' flag.
 	child->parent = NULL;
+	child->linked = false;
 
 	/* Easy special case: parent has exactly one child. */
 	if (1 == parent->child_count) {
@@ -345,7 +347,10 @@ struct llist *siblings(struct rnode *node)
 
 void remove_children(struct rnode *node)
 {
-	// TODO: iterate through children, setting their 'link' member to false.
+	struct rnode *child = node->first_child;
+	for (; NULL != child; child = child->next_sibling) {
+		child->linked = false;
+	}
 	node->first_child = NULL;
 	node->last_child = NULL;
 	node->child_count = 0;
