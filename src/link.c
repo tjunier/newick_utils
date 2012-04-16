@@ -273,6 +273,7 @@ int insert_child(struct rnode *parent, struct rnode *insert, int index)
 	insert->next_sibling = current->next_sibling;
 	current->next_sibling = insert;
 	insert->parent = parent;
+	insert->linked = true;
 
 	/* Update parent's child pointers */
 	if (0 == index)
