@@ -40,8 +40,8 @@ enum remove_child_status {  RM_CHILD_HAS_NO_PARENT = -10, RM_CHILD_MEM_ERROR };
  * nodes in the tree structure will still contain the spliced-out node (which
  * is good anyway since you need it to free the spliced-out node).*/
 
-enum unlink_rnode_status { UNLINK_RNODE_DONE, UNLINK_RNODE_ROOT_CHILD,
-	UNLINK_RNODE_ERROR };
+enum unlink_rnode_status { UNLINK_RNODE_DONE, UNLINK_RNODE_ROOT,
+	UNLINK_RNODE_ROOT_CHILD, UNLINK_RNODE_ERROR };
 
 struct rnode;
 

@@ -308,6 +308,12 @@ int swap_nodes(struct rnode *node)
 
 int unlink_rnode(struct rnode *node)
 {
+	if (is_root(node)) 
+		return UNLINK_RNODE_ROOT;
+
+	/* Don't unlink a node twice. This is both a waste of time and a risk
+	 * of bugs, because the code assumes that a node to be unlinked is
+	 * still linked. */
 	if (! node->linked) return UNLINK_RNODE_DONE;
 
 	struct rnode *parent = node->parent;

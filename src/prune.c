@@ -198,6 +198,9 @@ void process_tree(struct rooted_tree *tree, set_t *cl_labels, bool reverse)
 		case UNLINK_RNODE_ERROR:
 			fprintf (stderr, "Memory error - exiting.\n");
 			exit(EXIT_FAILURE);
+		case UNLINK_RNODE_ROOT:
+			fprintf(stderr, "WARNING: root cannot be pruned.\n");
+			break;
 		default:
 			assert(0); /* programmer error */
 		}
