@@ -214,9 +214,6 @@ int remove_child(struct rnode *child)
 	struct rnode *previous;
 	int n;
 
-	// TODO: why this? Try to run tests without this. This may cause an
-	// inner node do pass for the root.
-	child->parent = NULL;
 	child->linked = false;
 
 	/* Easy special case: parent has exactly one child. */
@@ -296,6 +293,7 @@ int swap_nodes(struct rnode *node)
 	struct rnode *parent = node->parent;
 	char *length = strdup(node->edge_length_as_string);
 	if(remove_child(node) < 0) return FAILURE;
+	node->parent = NULL;
 	add_child(node, parent);
 
 	free(node->edge_length_as_string);

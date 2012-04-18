@@ -1069,7 +1069,7 @@ int test_insert_remove_child_middle()
 				children_count(mum));
 		return 1;
 	}
-	if (kid2->parent != NULL) {
+	if (kid2->linked) {
 		printf("%s: kid2 should have no parent (has %p)\n", test_name,
 				kid2->parent);
 		return 1;
