@@ -45,10 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "set.h"
 #include "list.h"
 
+enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
 
 struct parameters {
 	set_t 	*cl_labels;
-	bool	reverse;
+	enum prune_mode mode;
 };
 
 void help(char *argv[])
@@ -110,7 +111,7 @@ void help(char *argv[])
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
-	params.reverse = false;
+	params.mode = PRUNE_DIRECT;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
@@ -119,7 +120,7 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit (EXIT_SUCCESS);
 		case 'v':
-			params.reverse = true;
+			params.mode = PRUNE_REVERSE;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -157,15 +158,15 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-// TODO: currently we build a hash of labels for every tree. We should just
-// build a hash of the passed labels, and go through the tree in reverse Newick
-// order, unlinking nodes as needed (and preventing further visiting, as in
-// nw_ed. This will entail at most one passage through the tree, ensure that
-// descendants of removed nodes are not processed, and allow a single hash to
-// be constructed for all the trees. In fact, if the labels list is short, one
-// does not need a hash at all.
+/* We build a hash of the passed labels, and go through the tree in reverse
+ * Newick order, unlinking nodes as needed (and [eventually] preventing further
+ * visiting, as in nw_ed). This will entail at most one passage through the
+ * tree, ensure that descendants of removed nodes are not processed, and allow
+ * a single hash to be constructed for all the trees. In fact, if the labels
+ * list is short, one does not need a hash at all.  */
 
-void process_tree(struct rooted_tree *tree, set_t *cl_labels, bool reverse)
+void process_tree(struct rooted_tree *tree, set_t *cl_labels,
+		enum prune_mode mode)
 {
 	struct list_elem *elem;
 
@@ -173,16 +174,31 @@ void process_tree(struct rooted_tree *tree, set_t *cl_labels, bool reverse)
 			elem = elem->next) {
 		struct rnode *current_node = elem->data;
 		
+		/* true IFF label is passed in the command line */
 		bool current_in_cl = set_has_element(cl_labels,
 				current_node->label);
 
-		/* Skip this node if its label is empty */
+		/* Ignore nodes with empty labels */
 		if (0 == strcmp(current_node->label, "")) continue;
-		/* Skip this node if its label was passed but we're in reverse
-		 * mode, OR if the label was NOT passed and we're in direct
-		 * mode */
-		if (current_in_cl && reverse) continue;
-		if (!current_in_cl && !reverse) continue;
+		/* In direct mode, prune nodes NOT passed as arg... */ 
+		if (PRUNE_DIRECT == mode && !current_in_cl) {
+			continue;
+		}
+		/* ...but in reverse mode... */
+		if (PRUNE_REVERSE == mode) {
+			if (current_in_cl) {
+				/* prune nodes that ARE passed... */
+				continue;
+			}
+			else if (is_inner_node(current_node)) {
+				/* unless they're inner nodes */
+				continue;
+			}
+		}
+
+		/* any node that "falls through" gets pruned (or at least, the
+		 * program tries to - if it would result in pruning the root or
+		 * some other invalid operation, it does nothing). */
 
 		enum unlink_rnode_status result = unlink_rnode(current_node);
 
@@ -215,7 +231,7 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, params.cl_labels, params.reverse);
+		process_tree(tree, params.cl_labels, params.mode);
 		dump_newick(tree->root);
 		/* NOTE: the tree was modified, but no nodes were added so 
 		 * we can use destroy_tree() */
