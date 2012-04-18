@@ -140,14 +140,38 @@ target_link_libraries(nw_rename nutils)
 add_executable(nw_support support.c node_set.c)
 target_link_libraries(nw_support m nutils)
 
-# TODO: add nw_sched, nw_luaed, etc iff Scheme, Lua, etc used.
-set(PROGRAMS nw_clade nw_condense nw_display nw_distance nw_duration nw_ed
-	nw_gen nw_indent nw_labels nw_luaed nw_match nw_order
-	nw_prune nw_rename nw_reroot nw_stats nw_support nw_topology
-	nw_trim)
+# TODO: add nw_sched, nw_luaed, etc iff Scheme, Lua, etc used (see e.g. below
+# for Lua)
 
-install(TARGETS ${PROGRAMS} nutils
+set(INCONDITIONAL_PROGRAMS
+	nw_clade
+	nw_condense
+	nw_display
+	nw_distance
+	nw_duration
+	nw_ed
+	nw_gen
+	nw_indent
+	nw_labels
+	nw_match
+	nw_order
+	nw_prune
+	nw_rename
+	nw_reroot
+	nw_stats
+	nw_support
+	nw_topology
+	nw_trim
+	)
+
+install(TARGETS ${INCONDITIONAL_PROGRAMS} nutils
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	)
+
+if (LUA51_FOUND)
+	install(lua_ed RUNTIME DESTINATION bin)
+endif (LUA51_FOUND)
+
+
