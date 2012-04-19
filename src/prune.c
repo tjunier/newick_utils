@@ -46,7 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 
 enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
-enum rev_inner_label_mode { PRUNE_IGNORE_ALL, PRUNE_IGNORE_NUMERIC, PRUNE_IGNORE_NONE }
+enum rev_inner_label_mode { PRUNE_IGNORE_ALL, PRUNE_IGNORE_NUMERIC,
+	PRUNE_IGNORE_NONE };
 
 struct parameters {
 	set_t 	*cl_labels;
@@ -62,7 +63,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hv] <newick trees filename|-> <label> [label+]\n"
+"%s [-hi:v] <newick trees filename|-> <label> [label+]\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -79,13 +80,24 @@ void help(char *argv[])
 "spliced out and the remaining child is attached to its grandparent,\n"
 "preserving length.\n"
 "\n"
+"Only labeled nodes are considered for pruning.\n"
+"\n"
 "Options\n"
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
+"    -i <t|a>: changes the handling of inner nodes in reverse mode (see -v).\n"
+"       If argument is 't' (text), inner nodes whose label is not passed\n" 
+"       get pruned if the label is text (i.e., not numeric). If argument\n"
+"       is 'a' (all), any internal node not specified on the command line\n"
+"       is pruned, provided its label is not empty.\n"
+"       This option allows the user to keep selected clades by specifying\n"
+"       the name of their ancestor (see examples).\n"
 "    -v: reverse: prune nodes whose labels are NOT passed on the command\n"
-"        line. NOTE: this will also drop internal nodes if their labels\n"
-"        are not passed. A future option will modify this.\n"
+"        line. Inner nodes are not pruned, unless -i is also set (see\n"
+"        above). This allows pruning of trees with support values, which\n"
+"        syntactically are node labels, without inner nodes disappearing\n"
+"        because their 'label' was not passed on the command line.\n"
 "\n"
 "Assumptions and Limitations\n"
 "---------------------------\n"
@@ -102,7 +114,16 @@ void help(char *argv[])
 "$ %s data/catarrhini Homo Gorilla Pan\n"
 "\n"
 "# the same, but using the clade's label\n"
+"$ %s data/catarrhini Homininae\n"
+"\n"
+"# keep great apes and Colobines:\n"
+"$ %s -v data/catarrhini Gorilla Pan Homo Pongo Simias Colobus\n"
+"\n"
+"# same, using clade labels:\n"
+"$ %s -v -i t data/catarrhini Hominidae Colobinae\n"
 "$ %s data/catarrhini Homininae\n",
+	argv[0],
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
@@ -123,7 +144,16 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit (EXIT_SUCCESS);
 		case 'i':
-
+			switch(tolower(optarg[0])) {
+			case 't':
+				params.ilbl_mode = PRUNE_IGNORE_NUMERIC;
+				break;
+			default:
+				fprintf(stderr,
+					"Invalid argument '%s' to -i.\n",
+						optarg);
+				exit(EXIT_FAILURE);
+			}
 			break;
 		case 'v':
 			params.mode = PRUNE_REVERSE;
@@ -237,7 +267,8 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, params.cl_labels, params.mode);
+		process_tree(tree, params.cl_labels, params.mode, 
+				params.ilbl_mode);
 		dump_newick(tree->root);
 		/* NOTE: the tree was modified, but no nodes were added so 
 		 * we can use destroy_tree() */
