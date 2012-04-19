@@ -6,3 +6,4 @@ rev: -v fagales.nw Fagaceae Myricaceae Juglandaceae Betulaceae
 bug1: -v prune_segv.nw COXA18
 bug2: -v HRV_FMDV.nw HRV37 HRV3 HRV14 HRV52 HRV17 HRV93 HRV27 POLIO3 POLIO2 POLIO1A COXA18 COXA17 COXA1
 rev_ilbl: -v prune_rev.nw POLIO1A POLIO2 POLIO3
+rev_iname: -v catarrhini.nw Homininae Colobinae

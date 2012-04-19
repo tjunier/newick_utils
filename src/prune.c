@@ -46,10 +46,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "list.h"
 
 enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
+enum rev_inner_label_mode { PRUNE_IGNORE_ALL, PRUNE_IGNORE_NUMERIC, PRUNE_IGNORE_NONE }
 
 struct parameters {
 	set_t 	*cl_labels;
 	enum prune_mode mode;
+	enum rev_inner_label_mode ilbl_mode;
 };
 
 void help(char *argv[])
@@ -112,13 +114,17 @@ struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 	params.mode = PRUNE_DIRECT;
+	params.ilbl_mode = PRUNE_IGNORE_ALL;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hi:v")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit (EXIT_SUCCESS);
+		case 'i':
+
+			break;
 		case 'v':
 			params.mode = PRUNE_REVERSE;
 			break;
@@ -166,7 +172,7 @@ struct parameters get_params(int argc, char *argv[])
  * list is short, one does not need a hash at all.  */
 
 void process_tree(struct rooted_tree *tree, set_t *cl_labels,
-		enum prune_mode mode)
+		enum prune_mode mode, enum rev_inner_label_mode ilbl_mode)
 {
 	struct list_elem *elem;
 

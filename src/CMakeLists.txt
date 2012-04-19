@@ -171,7 +171,7 @@ install(TARGETS ${INCONDITIONAL_PROGRAMS} nutils
 	)
 
 if (LUA51_FOUND)
-	install(lua_ed RUNTIME DESTINATION bin)
+	install(TARGETS nw_luaed RUNTIME DESTINATION bin)
 endif (LUA51_FOUND)
 
 
