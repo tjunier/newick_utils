@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "tree.h"
 #include "nodemap.h"
@@ -194,6 +195,17 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+/* Return true IFF string is numeric (incl. float), see http://rosettacode.org/wiki/Determine_if_a_string_is_numeric#C */
+
+static bool is_numeric (const char * s)
+{
+	if (NULL == s || '\0' ==  *s  || isspace(*s))
+		return 0;
+	char * p;
+	strtod (s, &p);
+	return *p == '\0';
+}
+
 /* We build a hash of the passed labels, and go through the tree in reverse
  * Newick order, unlinking nodes as needed (and [eventually] preventing further
  * visiting, as in nw_ed). This will entail at most one passage through the
@@ -201,7 +213,7 @@ struct parameters get_params(int argc, char *argv[])
  * a single hash to be constructed for all the trees. In fact, if the labels
  * list is short, one does not need a hash at all.  */
 
-void process_tree(struct rooted_tree *tree, set_t *cl_labels,
+static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 		enum prune_mode mode, enum rev_inner_label_mode ilbl_mode)
 {
 	struct list_elem *elem;
@@ -227,8 +239,19 @@ void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 				continue;
 			}
 			else if (is_inner_node(current_node)) {
-				/* unless they're inner nodes */
-				continue;
+				fprintf (stderr, "inner: %s\n", current_node->label);
+				/* unless they're inner nodes... */
+				switch (ilbl_mode) {
+				case PRUNE_IGNORE_ALL: continue;
+				case PRUNE_IGNORE_NUMERIC:
+					if (is_numeric(current_node->label))
+						continue;
+					else
+						break;
+				case PRUNE_IGNORE_NONE: break;
+				default:
+					assert(0);
+				}
 			}
 		}
 
