@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "tree.h"
 #include "nodemap.h"
@@ -44,6 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "link.h"
 #include "set.h"
 #include "list.h"
+
+/* define this to enable debugging of the decision process */
+#define DEBUG_PRUNE_DECISION 1
 
 enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
 
@@ -60,7 +64,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hv] <newick trees filename|-> <label> [label+]\n"
+"%s [-hi:v] <newick trees filename|-> <label> [label+]\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -77,13 +81,24 @@ void help(char *argv[])
 "spliced out and the remaining child is attached to its grandparent,\n"
 "preserving length.\n"
 "\n"
+"Only labeled nodes are considered for pruning.\n"
+"\n"
 "Options\n"
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
+"    -i <t|a>: changes the handling of inner nodes in reverse mode (see -v).\n"
+"       If argument is 't' (text), inner nodes whose label is not passed\n" 
+"       get pruned if the label is text (i.e., not numeric). If argument\n"
+"       is 'a' (all), any internal node not specified on the command line\n"
+"       is pruned, provided its label is not empty.\n"
+"       This option allows the user to keep selected clades by specifying\n"
+"       the name of their ancestor (see examples).\n"
 "    -v: reverse: prune nodes whose labels are NOT passed on the command\n"
-"        line. NOTE: this will also drop internal nodes if their labels\n"
-"        are not passed. A future option will modify this.\n"
+"        line. Inner nodes are not pruned, unless -i is also set (see\n"
+"        above). This allows pruning of trees with support values, which\n"
+"        syntactically are node labels, without inner nodes disappearing\n"
+"        because their 'label' was not passed on the command line.\n"
 "\n"
 "Assumptions and Limitations\n"
 "---------------------------\n"
@@ -100,7 +115,16 @@ void help(char *argv[])
 "$ %s data/catarrhini Homo Gorilla Pan\n"
 "\n"
 "# the same, but using the clade's label\n"
+"$ %s data/catarrhini Homininae\n"
+"\n"
+"# keep great apes and Colobines:\n"
+"$ %s -v data/catarrhini Gorilla Pan Homo Pongo Simias Colobus\n"
+"\n"
+"# same, using clade labels:\n"
+"$ %s -v -i t data/catarrhini Hominidae Colobinae\n"
 "$ %s data/catarrhini Homininae\n",
+	argv[0],
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
@@ -158,6 +182,17 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+/* Return true IFF string is numeric (incl. float), see http://rosettacode.org/wiki/Determine_if_a_string_is_numeric#C */
+
+static bool is_numeric (const char * s)
+{
+	if (NULL == s || '\0' ==  *s  || isspace(*s))
+		return 0;
+	char * p;
+	strtod (s, &p);
+	return *p == '\0';
+}
+
 /* We build a hash of the passed labels, and go through the tree in reverse
  * Newick order, unlinking nodes as needed (and [eventually] preventing further
  * visiting, as in nw_ed). This will entail at most one passage through the
@@ -165,62 +200,8 @@ struct parameters get_params(int argc, char *argv[])
  * a single hash to be constructed for all the trees. In fact, if the labels
  * list is short, one does not need a hash at all.  */
 
-void process_tree(struct rooted_tree *tree, set_t *cl_labels,
-		enum prune_mode mode)
+static void process_tree(struct rooted_tree *tree, set_t *cl_labels, enum prune_mode mode)
 {
-	struct list_elem *elem;
-
-	for (elem = tree->nodes_in_order->head; NULL != elem;
-			elem = elem->next) {
-		struct rnode *current_node = elem->data;
-		
-		/* true IFF label is passed in the command line */
-		bool current_in_cl = set_has_element(cl_labels,
-				current_node->label);
-
-		/* Ignore nodes with empty labels */
-		if (0 == strcmp(current_node->label, "")) continue;
-		/* In direct mode, prune nodes NOT passed as arg... */ 
-		if (PRUNE_DIRECT == mode && !current_in_cl) {
-			continue;
-		}
-		/* ...but in reverse mode... */
-		if (PRUNE_REVERSE == mode) {
-			if (current_in_cl) {
-				/* prune nodes that ARE passed... */
-				continue;
-			}
-			else if (is_inner_node(current_node)) {
-				/* unless they're inner nodes */
-				continue;
-			}
-		}
-
-		/* any node that "falls through" gets pruned (or at least, the
-		 * program tries to - if it would result in pruning the root or
-		 * some other invalid operation, it does nothing). */
-
-		enum unlink_rnode_status result = unlink_rnode(current_node);
-
-		struct rnode *root_child;
-		switch(result) {
-		case UNLINK_RNODE_DONE:
-			break;
-		case UNLINK_RNODE_ROOT_CHILD:
-			root_child = get_unlink_rnode_root_child();
-			root_child->parent = NULL;
-			tree->root = root_child;
-			break;
-		case UNLINK_RNODE_ERROR:
-			fprintf (stderr, "Memory error - exiting.\n");
-			exit(EXIT_FAILURE);
-		case UNLINK_RNODE_ROOT:
-			fprintf(stderr, "WARNING: root cannot be pruned.\n");
-			break;
-		default:
-			assert(0); /* programmer error */
-		}
-	}
 }
 
 int main(int argc, char *argv[])
