@@ -46,9 +46,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "set.h"
 #include "list.h"
 
+/* define this to enable debugging of the decision process */
+#define DEBUG_PRUNE_DECISION 1
+
 enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
 enum rev_inner_label_mode { PRUNE_IGNORE_ALL, PRUNE_IGNORE_NUMERIC,
 	PRUNE_IGNORE_NONE };
+enum prune_action { PRUNE_KEEP, PRUNE_PRUNE };
 
 struct parameters {
 	set_t 	*cl_labels;
@@ -206,6 +210,50 @@ static bool is_numeric (const char * s)
 	return *p == '\0';
 }
 
+static enum prune_action decide_action(struct rnode *node, set_t cl_labels,
+		enum prune_mode mode))
+{
+		
+	/* true IFF label is passed in the command line */
+	bool current_in_cl = set_has_element(cl_labels,
+			node->label);
+
+	/* Keep nodes with empty labels */
+	if (0 == strcmp(node->label, "")) {
+		return PRUNE_KEEP;
+	}
+
+	/* In direct mode, keep nodes NOT passed as arg... */ 
+	if (PRUNE_DIRECT == mode && !current_in_cl) {
+		return PRUNE_KEEP;
+	}
+	/* ...but in reverse mode... */
+	if (PRUNE_REVERSE == mode) {
+		if (current_in_cl) {
+			/* keep nodes that ARE passed... */
+			return PRUNE_KEEP;
+		}
+		else if (is_inner_node(current_node)) {
+			/* unless they're inner nodes... */
+			switch (ilbl_mode) {
+			case PRUNE_IGNORE_ALL: continue;
+			case PRUNE_IGNORE_NUMERIC:
+				if (is_numeric(current_node->label))
+					continue;
+				else
+					break;
+			case PRUNE_IGNORE_NONE: break;
+			default:
+				assert(0);
+			}
+		}
+	}
+
+		
+	/* any node that "falls through" gets pruned  */
+	return PRUNE_PRUNE;
+}
+
 /* We build a hash of the passed labels, and go through the tree in reverse
  * Newick order, unlinking nodes as needed (and [eventually] preventing further
  * visiting, as in nw_ed). This will entail at most one passage through the
@@ -221,43 +269,8 @@ static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 	for (elem = tree->nodes_in_order->head; NULL != elem;
 			elem = elem->next) {
 		struct rnode *current_node = elem->data;
-		
-		/* true IFF label is passed in the command line */
-		bool current_in_cl = set_has_element(cl_labels,
-				current_node->label);
 
-		/* Ignore nodes with empty labels */
-		if (0 == strcmp(current_node->label, "")) continue;
-		/* In direct mode, prune nodes NOT passed as arg... */ 
-		if (PRUNE_DIRECT == mode && !current_in_cl) {
-			continue;
-		}
-		/* ...but in reverse mode... */
-		if (PRUNE_REVERSE == mode) {
-			if (current_in_cl) {
-				/* prune nodes that ARE passed... */
-				continue;
-			}
-			else if (is_inner_node(current_node)) {
-				fprintf (stderr, "inner: %s\n", current_node->label);
-				/* unless they're inner nodes... */
-				switch (ilbl_mode) {
-				case PRUNE_IGNORE_ALL: continue;
-				case PRUNE_IGNORE_NUMERIC:
-					if (is_numeric(current_node->label))
-						continue;
-					else
-						break;
-				case PRUNE_IGNORE_NONE: break;
-				default:
-					assert(0);
-				}
-			}
-		}
-
-		/* any node that "falls through" gets pruned (or at least, the
-		 * program tries to - if it would result in pruning the root or
-		 * some other invalid operation, it does nothing). */
+		enum prune_action action = prune_action(current_rnode);
 
 		enum unlink_rnode_status result = unlink_rnode(current_node);
 
