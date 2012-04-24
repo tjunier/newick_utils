@@ -38,16 +38,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctype.h>
 
 #include "tree.h"
-#include "nodemap.h"
 #include "parser.h"
 #include "to_newick.h"
 #include "rnode.h"
 #include "link.h"
 #include "set.h"
 #include "list.h"
-
-/* define this to enable debugging of the decision process */
-#define DEBUG_PRUNE_DECISION 1
 
 enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
 
@@ -182,17 +178,6 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-/* Return true IFF string is numeric (incl. float), see http://rosettacode.org/wiki/Determine_if_a_string_is_numeric#C */
-
-static bool is_numeric (const char * s)
-{
-	if (NULL == s || '\0' ==  *s  || isspace(*s))
-		return 0;
-	char * p;
-	strtod (s, &p);
-	return *p == '\0';
-}
-
 /* We build a hash of the passed labels, and go through the tree in reverse
  * Newick order, unlinking nodes as needed (and [eventually] preventing further
  * visiting, as in nw_ed). This will entail at most one passage through the
@@ -200,8 +185,11 @@ static bool is_numeric (const char * s)
  * a single hash to be constructed for all the trees. In fact, if the labels
  * list is short, one does not need a hash at all.  */
 
-static void process_tree(struct rooted_tree *tree, set_t *cl_labels, enum prune_mode mode)
+static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
+		enum prune_mode mode)
 {
+	// TODO: forget about iterator; do it with reversed nodes-in-order and
+	// set some node data to keep track of processed status, as in nw_*ed.
 }
 
 int main(int argc, char *argv[])

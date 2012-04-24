@@ -92,3 +92,9 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *);
 /* Returns true IFF there are more children to visit on the current node. */
 
 bool more_children_to_visit (struct rnode_iterator *);
+
+/* Returns (and set the iterator's current node to) the node's next sibling. If
+ * there is no such node, returns NULL and does not change the iterator's
+ * state. */
+
+struct rnode *rnode_iterator_next_sibling(struct rnode_iterator *iter);
