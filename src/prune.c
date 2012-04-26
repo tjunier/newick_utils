@@ -188,8 +188,32 @@ struct parameters get_params(int argc, char *argv[])
 static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 		enum prune_mode mode)
 {
-	// TODO: forget about iterator; do it with reversed nodes-in-order and
-	// set some node data to keep track of processed status, as in nw_*ed.
+	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
+	struct list_elem *el = rev_nodes->head;
+	
+	for (; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+
+		/* skip this node iff parent is marked ("seen") */
+		if (!is_root(current) && current->parent->seen) {
+			current->seen = true;	/* inherit mark */
+			fprintf(stderr, "skipped: %s\n", current->label);
+			continue;
+		}
+
+		if (PRUNE_DIRECT == mode) {
+			if (set_has_element(cl_labels, current->label)) {
+				unlink_rnode(current);
+				current->seen = true;
+				fprintf(stderr, "goner: %s\n", current->label);
+			}
+		} else if (PRUNE_REVERSE == mode) {
+		} else {
+			assert(0);
+		}
+	}
+
+	destroy_llist(rev_nodes);
 }
 
 int main(int argc, char *argv[])
