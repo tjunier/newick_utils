@@ -178,12 +178,12 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-/* We build a hash of the passed labels, and go through the tree in reverse
- * Newick order, unlinking nodes as needed (and [eventually] preventing further
- * visiting, as in nw_ed). This will entail at most one passage through the
- * tree, ensure that descendants of removed nodes are not processed, and allow
- * a single hash to be constructed for all the trees. In fact, if the labels
- * list is short, one does not need a hash at all.  */
+/* We buld a hash of the passed labels, and visit the tree, unlinking nodes as
+ * needed. In Direct mode, we traverse in reverse order, unlinking nodes to
+ * prune. In Reverse mode, things are a bit more hairy because we need to keep
+ * not just the nodes passed as argument, but also their ancestors. So we pass
+ * through th etree first in direct order, marking nodes to keep and their
+ * ancestors. Then we go back in reverse order, pruning. */
 
 static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 		enum prune_mode mode)
@@ -201,6 +201,7 @@ static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 			continue;
 		}
 
+		// TODO: Reverse mode not as described above yet.
 		if (PRUNE_DIRECT == mode) {
 			if (set_has_element(cl_labels, label)) {
 				unlink_rnode(current);
@@ -224,6 +225,7 @@ static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 	}
 
 	destroy_llist(rev_nodes);
+	reset_seen(tree);
 }
 
 int main(int argc, char *argv[])
