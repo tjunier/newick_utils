@@ -320,6 +320,46 @@ int test_nodes_from_regexp()
 	return 0;
 }
 
+int test_reset_seen()
+{
+	const char *test_name = __func__;
+	struct rooted_tree tree = tree_3();	/* ((A:1,B:1.0)f:2.0,(C:1,(D:1,E:1)g:2)h:3)i; */
+	struct hash *map = create_label2node_map(tree.nodes_in_order);	
+	struct rnode *node_A = hash_get(map, "A");
+	struct rnode *node_g = hash_get(map, "g");
+	struct rnode *node_i = hash_get(map, "i");
+
+	node_A->seen = node_g->seen = node_i->seen = true;
+
+	if (! node_A->seen) {
+		printf("%s: node A should be seen\n", test_name);
+		return 1;
+	}
+	if (! node_g->seen) {
+		printf("%s: node g should be seen\n", test_name);
+		return 1;
+	}
+	if (! node_i->seen) {
+		printf("%s: node i should be seen\n", test_name);
+		return 1;
+	}
+
+	reset_seen(&tree);
+
+	struct list_elem *el = tree.nodes_in_order->head;
+	for (; NULL != el; el = el->next) {
+		struct rnode *node = el->data;
+		if (node->seen) {
+			printf("%s: node %p ('%s') should not be seen.\n",
+				test_name, node, node->label);
+			return 1;
+		}
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -333,6 +373,7 @@ int main()
 	failures += test_is_cladogram();
 	failures += test_nodes_from_labels();
 	failures += test_nodes_from_regexp();
+	failures += test_reset_seen();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

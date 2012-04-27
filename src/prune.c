@@ -193,21 +193,31 @@ static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 	
 	for (; NULL != el; el = el->next) {
 		struct rnode *current = el->data;
-
+		char *label = current->label;
 		/* skip this node iff parent is marked ("seen") */
 		if (!is_root(current) && current->parent->seen) {
 			current->seen = true;	/* inherit mark */
-			fprintf(stderr, "skipped: %s\n", current->label);
+			fprintf(stderr, "skipped: %s\n", label);
 			continue;
 		}
 
 		if (PRUNE_DIRECT == mode) {
-			if (set_has_element(cl_labels, current->label)) {
+			if (set_has_element(cl_labels, label)) {
 				unlink_rnode(current);
 				current->seen = true;
-				fprintf(stderr, "goner: %s\n", current->label);
+				fprintf(stderr, "goner: %s\n", label);
 			}
 		} else if (PRUNE_REVERSE == mode) {
+			if (strcmp("", label)) {
+				if (!set_has_element(cl_labels, label)) {
+					unlink_rnode(current);
+					current->seen = true;
+					fprintf(stderr, "goner: %s\n", label);
+				} else {
+					fprintf(stderr, "kept: %s\n", label);
+					current->seen = true;
+				}
+			}
 		} else {
 			assert(0);
 		}

@@ -114,3 +114,7 @@ struct rooted_tree *clone_subtree(struct rnode *);
 
 /* Returns the tree's type (Cladogram, Phylogram, etc) */
 enum tree_type get_tree_type(struct rooted_tree *tree);
+
+/* Resets the "seen" attribute of all nodes in the tree. */
+
+void reset_seen(struct rooted_tree *tree);

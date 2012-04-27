@@ -244,3 +244,13 @@ struct llist *nodes_from_regexp(struct rooted_tree *tree, regex_t *preg)
 
 	return result;
 }
+
+void reset_seen(struct rooted_tree *tree)
+{
+	struct list_elem *el = tree->nodes_in_order->head;
+
+	for (; NULL != el; el = el->next) {
+		struct rnode *node = el->data;
+		node->seen = false;
+	}
+}
