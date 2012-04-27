@@ -35,9 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "tree.h"
-#include "nodemap.h"
 #include "parser.h"
 #include "to_newick.h"
 #include "rnode.h"
@@ -45,10 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "set.h"
 #include "list.h"
 
+enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
 
 struct parameters {
 	set_t 	*cl_labels;
-	bool	reverse;
+	enum prune_mode mode;
 };
 
 void help(char *argv[])
@@ -59,7 +60,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hv] <newick trees filename|-> <label> [label+]\n"
+"%s [-hi:v] <newick trees filename|-> <label> [label+]\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -76,13 +77,24 @@ void help(char *argv[])
 "spliced out and the remaining child is attached to its grandparent,\n"
 "preserving length.\n"
 "\n"
+"Only labeled nodes are considered for pruning.\n"
+"\n"
 "Options\n"
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
+"    -i <t|a>: changes the handling of inner nodes in reverse mode (see -v).\n"
+"       If argument is 't' (text), inner nodes whose label is not passed\n" 
+"       get pruned if the label is text (i.e., not numeric). If argument\n"
+"       is 'a' (all), any internal node not specified on the command line\n"
+"       is pruned, provided its label is not empty.\n"
+"       This option allows the user to keep selected clades by specifying\n"
+"       the name of their ancestor (see examples).\n"
 "    -v: reverse: prune nodes whose labels are NOT passed on the command\n"
-"        line. NOTE: this will also drop internal nodes if their labels\n"
-"        are not passed. A future option will modify this.\n"
+"        line. Inner nodes are not pruned, unless -i is also set (see\n"
+"        above). This allows pruning of trees with support values, which\n"
+"        syntactically are node labels, without inner nodes disappearing\n"
+"        because their 'label' was not passed on the command line.\n"
 "\n"
 "Assumptions and Limitations\n"
 "---------------------------\n"
@@ -99,7 +111,16 @@ void help(char *argv[])
 "$ %s data/catarrhini Homo Gorilla Pan\n"
 "\n"
 "# the same, but using the clade's label\n"
+"$ %s data/catarrhini Homininae\n"
+"\n"
+"# keep great apes and Colobines:\n"
+"$ %s -v data/catarrhini Gorilla Pan Homo Pongo Simias Colobus\n"
+"\n"
+"# same, using clade labels:\n"
+"$ %s -v -i t data/catarrhini Hominidae Colobinae\n"
 "$ %s data/catarrhini Homininae\n",
+	argv[0],
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
@@ -110,16 +131,16 @@ void help(char *argv[])
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
-	params.reverse = false;
+	params.mode = PRUNE_DIRECT;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hi:v")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit (EXIT_SUCCESS);
 		case 'v':
-			params.reverse = true;
+			params.mode = PRUNE_REVERSE;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -157,45 +178,42 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-/* Iterate through nodes (reverse order), unlinking as required. Descendants of a pruned node are not considered. */
+/* We build a hash of the passed labels, and go through the tree in reverse
+ * Newick order, unlinking nodes as needed (and [eventually] preventing further
+ * visiting, as in nw_ed). This will entail at most one passage through the
+ * tree, ensure that descendants of removed nodes are not processed, and allow
+ * a single hash to be constructed for all the trees. In fact, if the labels
+ * list is short, one does not need a hash at all.  */
 
-void process_tree(struct rooted_tree *tree, set_t *cl_labels, bool reverse)
+static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
+		enum prune_mode mode)
 {
-	struct list_elem *elem;
+	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
+	struct list_elem *el = rev_nodes->head;
+	
+	for (; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
 
-	for (elem = tree->nodes_in_order->head; NULL != elem;
-			elem = elem->next) {
-		struct rnode *current_node = elem->data;
-		
-		bool current_in_cl = set_has_element(cl_labels,
-				current_node->label);
+		/* skip this node iff parent is marked ("seen") */
+		if (!is_root(current) && current->parent->seen) {
+			current->seen = true;	/* inherit mark */
+			fprintf(stderr, "skipped: %s\n", current->label);
+			continue;
+		}
 
-		/* Skip this node if its label is empty */
-		if (0 == strcmp(current_node->label, "")) continue;
-		/* Skip this node if its label was passed but we're in reverse
-		 * mode, OR if the label was NOT passed and we're in direct
-		 * mode */
-		if (current_in_cl && reverse) continue;
-		if (!current_in_cl && !reverse) continue;
-
-		enum unlink_rnode_status result = unlink_rnode(current_node);
-
-		struct rnode *root_child;
-		switch(result) {
-		case UNLINK_RNODE_DONE:
-			break;
-		case UNLINK_RNODE_ROOT_CHILD:
-			root_child = get_unlink_rnode_root_child();
-			root_child->parent = NULL;
-			tree->root = root_child;
-			break;
-		case UNLINK_RNODE_ERROR:
-			fprintf (stderr, "Memory error - exiting.\n");
-			exit(EXIT_FAILURE);
-		default:
-			assert(0); /* programmer error */
+		if (PRUNE_DIRECT == mode) {
+			if (set_has_element(cl_labels, current->label)) {
+				unlink_rnode(current);
+				current->seen = true;
+				fprintf(stderr, "goner: %s\n", current->label);
+			}
+		} else if (PRUNE_REVERSE == mode) {
+		} else {
+			assert(0);
 		}
 	}
+
+	destroy_llist(rev_nodes);
 }
 
 int main(int argc, char *argv[])
@@ -206,10 +224,8 @@ int main(int argc, char *argv[])
 	params = get_params(argc, argv);
 
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, params.cl_labels, params.reverse);
+		process_tree(tree, params.cl_labels, params.mode);
 		dump_newick(tree->root);
-		/* NOTE: the tree was modified, but no nodes were added so 
-		 * we can use destroy_tree() */
 		destroy_all_rnodes(NULL);
 		destroy_tree(tree);
 	}

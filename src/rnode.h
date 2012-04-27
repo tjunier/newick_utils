@@ -62,7 +62,7 @@ struct rnode {
 	/** Used by rnode_iterator to find next node to visit. */
 	struct rnode *current_child;
 	/** Used by lua_ed to skip nodes */
-	bool seen;	
+	bool seen;	// TODO: rename to 'marked' (more multi-purpose)'
 	bool linked;
 
 };

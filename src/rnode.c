@@ -117,7 +117,6 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void *))
 	free(node);
 }
 
-
 void destroy_all_rnodes(void (*free_data)(void *))
 {
 	while (rnode_count > 0)

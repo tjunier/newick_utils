@@ -199,6 +199,9 @@ int splice_out_rnode(struct rnode *this)
 	/* Update parent's children count */
 	parent->child_count += this->child_count - 1;
 
+	/* Mark as no longer linked */
+	this->linked = false;
+
 	return SUCCESS;
 }
 
@@ -211,9 +214,6 @@ int remove_child(struct rnode *child)
 	struct rnode *previous;
 	int n;
 
-	// TODO: why this? Try to run tests without this. This may cause an
-	// inner node do pass for the root.
-	child->parent = NULL;
 	child->linked = false;
 
 	/* Easy special case: parent has exactly one child. */
@@ -293,6 +293,7 @@ int swap_nodes(struct rnode *node)
 	struct rnode *parent = node->parent;
 	char *length = strdup(node->edge_length_as_string);
 	if(remove_child(node) < 0) return FAILURE;
+	node->parent = NULL;
 	add_child(node, parent);
 
 	free(node->edge_length_as_string);
@@ -305,6 +306,12 @@ int swap_nodes(struct rnode *node)
 
 int unlink_rnode(struct rnode *node)
 {
+	if (is_root(node)) 
+		return UNLINK_RNODE_ROOT;
+
+	/* Don't unlink a node twice. This is both a waste of time and a risk
+	 * of bugs, because the code assumes that a node to be unlinked is
+	 * still linked. */
 	if (! node->linked) return UNLINK_RNODE_DONE;
 
 	struct rnode *parent = node->parent;
