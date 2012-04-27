@@ -189,39 +189,48 @@ static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 		enum prune_mode mode)
 {
 	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
-	struct list_elem *el = rev_nodes->head;
-	
-	for (; NULL != el; el = el->next) {
-		struct rnode *current = el->data;
-		char *label = current->label;
-		/* skip this node iff parent is marked ("seen") */
-		if (!is_root(current) && current->parent->seen) {
-			current->seen = true;	/* inherit mark */
-			fprintf(stderr, "skipped: %s\n", label);
-			continue;
-		}
+	struct list_elem *el;
+	struct rnode *current;
+	char *label;
 
-		// TODO: Reverse mode not as described above yet.
-		if (PRUNE_DIRECT == mode) {
+	// TODO: Reverse mode not as described above yet.
+	if (PRUNE_DIRECT == mode) {
+		for (el = rev_nodes->head; NULL != el; el = el->next) {
+			current = el->data;
+			label = current->label;
+			/* skip this node iff parent is marked ("seen") */
+			if (!is_root(current) && current->parent->seen) {
+				current->seen = true;	/* inherit mark */
+				fprintf(stderr, "skipped: %s\n", label);
+				continue;
+			}
 			if (set_has_element(cl_labels, label)) {
 				unlink_rnode(current);
 				current->seen = true;
 				fprintf(stderr, "goner: %s\n", label);
 			}
-		} else if (PRUNE_REVERSE == mode) {
-			if (strcmp("", label)) {
-				if (!set_has_element(cl_labels, label)) {
-					unlink_rnode(current);
-					current->seen = true;
-					fprintf(stderr, "goner: %s\n", label);
-				} else {
-					fprintf(stderr, "kept: %s\n", label);
-					current->seen = true;
-				}
-			}
-		} else {
-			assert(0);
 		}
+	} else if (PRUNE_REVERSE == mode) {
+		for (el=tree->nodes_in_order->head; NULL!=el; el=el->next) {
+			current = el->data;
+			label = current->label;
+			if (set_has_element(cl_labels, label)) {
+				current->seen = true;
+			}
+			if (!is_root(current) && current->seen) {
+				current->parent->seen = true;
+			}
+		}
+		for (el = rev_nodes->head; NULL != el; el = el->next) {
+			current = el->data;
+			label = current->label;
+			fprintf(stderr, "%s", label);
+			if (current->seen) fprintf(stderr, " kept");
+			fprintf(stderr, "\n");
+			// TODO: now get rid of the unseen nodes...
+		}
+	} else {
+		assert(0);
 	}
 
 	destroy_llist(rev_nodes);
