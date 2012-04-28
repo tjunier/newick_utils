@@ -211,6 +211,8 @@ static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 			}
 		}
 	} else if (PRUNE_REVERSE == mode) {
+		/* First pass: mark nodes to keep, i.e. nodes passed as arg and
+		 * their ancestors */
 		for (el=tree->nodes_in_order->head; NULL!=el; el=el->next) {
 			current = el->data;
 			label = current->label;
@@ -221,13 +223,17 @@ static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
 				current->parent->seen = true;
 			}
 		}
+		/* Second pass: unlink nodes not kept. */
 		for (el = rev_nodes->head; NULL != el; el = el->next) {
 			current = el->data;
 			label = current->label;
 			fprintf(stderr, "%s", label);
-			if (current->seen) fprintf(stderr, " kept");
-			fprintf(stderr, "\n");
-			// TODO: now get rid of the unseen nodes...
+			fflush(stderr);
+			if (current->seen) fprintf(stderr, " kept\n");
+			else {
+				unlink_rnode(current);
+				fprintf (stderr, " goner\n");
+			}
 		}
 	} else {
 		assert(0);
