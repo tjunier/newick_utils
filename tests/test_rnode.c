@@ -713,7 +713,7 @@ int test_clone_rnode_wkids()
 		return;
 	}
 	len_s = clone->edge_length_as_string;
-	if (strcmp("", len_s != 0)) {
+	if (strcmp("", len_s) != 0) {
 		printf("%s: clone's edge length (as string)"
 			" should be '', got '%s'\n", len_s);
 		return;
@@ -727,7 +727,7 @@ int test_clone_rnode_wkids()
 		return;
 	}
 	len_s = clone->first_child->edge_length_as_string;
-	if (strcmp("4", len_s != 0)) {
+	if (strcmp("4", len_s) != 0) {
 		printf("%s: clone->kid1's edge length (as string)"
 			" should be '4', got '%s'\n", len_s);
 		return;
@@ -741,7 +741,7 @@ int test_clone_rnode_wkids()
 		return;
 	}
 	len_s = clone->first_child->next_sibling->edge_length_as_string;
-	if (strcmp("3", len_s != 0)) {
+	if (strcmp("3", len_s) != 0) {
 		printf("%s: clone->kid2's edge length (as string)"
 			" should be '3', got '%s'\n", len_s);
 		return;
@@ -755,7 +755,7 @@ int test_clone_rnode_wkids()
 		return;
 	}
 	len_s = clone->last_child->edge_length_as_string;
-	if (strcmp("1.1", len_s != 0)) {
+	if (strcmp("1.1", len_s) != 0) {
 		printf("%s: clone->kid3's edge length (as string)"
 			" should be '1.1', got '%s'\n", len_s);
 		return;
@@ -769,7 +769,7 @@ int test_clone_rnode_wkids()
 		return;
 	}
 	len_s = clone->first_child->next_sibling->first_child->edge_length_as_string;
-	if (strcmp("1.0", len_s != 0)) {
+	if (strcmp("1.0", len_s) != 0) {
 		printf("%s: clone->kid2->kid1's edge length (as string)"
 			" should be '1.0', got '%s'\n", len_s);
 		return;
@@ -783,7 +783,7 @@ int test_clone_rnode_wkids()
 		return;
 	}
 	len_s = clone->first_child->next_sibling->last_child->edge_length_as_string;
-	if (strcmp("2.5", len_s != 0)) {
+	if (strcmp("2.5", len_s) != 0) {
 		printf("%s: clone->kid2->kid2's edge length (as string)"
 			" should be '2.5', got '%s'\n", len_s);
 		return;

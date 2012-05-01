@@ -274,7 +274,16 @@ struct llist *get_nodes_in_order(struct rnode *root)
 
 struct rnode *clone_rnode(struct rnode *target)
 {
-}
+	struct rnode *result = create_rnode(target->label,
+			target->edge_length_as_string);
+	if (NULL == result) return NULL;
+	struct rnode *kid = target->first_child;
+	for (; NULL != kid; kid = kid->next_sibling) {
+		struct rnode *kid_clone = clone_rnode(kid);
+		add_child(result, kid_clone);
+	}
 
+	return result;
+}
 
 int _get_rnode_count() { return rnode_count; }
