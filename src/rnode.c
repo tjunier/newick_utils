@@ -272,4 +272,9 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	return nodes_in_order;
 }
 
+struct rnode *clone_rnode(struct rnode *target)
+{
+}
+
+
 int _get_rnode_count() { return rnode_count; }

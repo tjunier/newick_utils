@@ -625,6 +625,171 @@ int test_children_array()
 	return 0;
 }
 
+int test_clone_rnode()
+{
+	const char *test_name = __func__;
+	struct rnode *node, *clone;
+	char *label = "test";
+	char *length = "2.0456";
+	node = create_rnode(label,length);
+	clone = clone_rnode(node);
+
+	if (0 != strcmp(clone->label, label)) {
+		printf("%s: expected label '%s' (got '%s')\n",
+				test_name, label, clone->label);
+		return 1;
+	}
+	if (0 != strcmp(clone->edge_length_as_string, length)) {
+		printf("%s: expected length '%s', got '%s'\n",
+			test_name, length, clone->edge_length_as_string);
+		return 1;
+	}
+	if (NULL != clone->parent) {
+		printf ("%s: parent should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != clone->next_sibling) {
+		printf ("%s: next_sibling should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != clone->first_child) {
+		printf ("%s: first_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (NULL != clone->last_child) {
+		printf ("%s: last_child should be NULL.\n", test_name);
+		return 1;
+	}
+	if (0 != clone->child_count) {
+		printf("%s: 'child_count' should be 0 (got %d)\n", test_name,
+				clone->child_count);
+		return 1;
+	}
+	if (0 != clone->seen) {
+		printf("%s: 'seen' should be 0 (got %d)\n", test_name,
+				clone->seen);
+		return 1;
+	}
+	if (false != clone->linked) {
+		printf("%s: 'linked' should be false\n", test_name);
+		return 1;
+	}
+	if (NULL != clone->current_child) {
+		printf("%s: 'current_child_elem' should be NULL (got %p)\n", test_name,
+				clone->current_child);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
+int test_clone_rnode_wkids()
+{
+	const char *test_name = __func__;
+	struct rnode *node, *clone, *kid1, *kid2, *kid3, *grandkid1, *grandkid2;
+	grandkid1 = create_rnode("gk1", "1.0");
+	grandkid2 = create_rnode("gk2", "2.5");
+	kid3 = create_rnode("k3", "1.1");
+	kid2 = create_rnode("k2", "3");
+	kid1 = create_rnode("k1", "4");
+	node = create_rnode("n", "");
+
+	add_child(kid2, grandkid1);
+	add_child(kid2, grandkid2);
+	add_child(node, kid1);
+	add_child(node, kid2);
+	add_child(node, kid3);
+
+	clone = clone_rnode(node);
+
+	char *len_s, *label = NULL;
+
+	/* clone */
+	label = clone->label;
+	if (strcmp("n", label) != 0) {
+		printf("%s: clone's label should be 'n',"
+				" got '%s'\n", label);
+		return;
+	}
+	len_s = clone->edge_length_as_string;
+	if (strcmp("", len_s != 0)) {
+		printf("%s: clone's edge length (as string)"
+			" should be '', got '%s'\n", len_s);
+		return;
+	}
+
+	/* clone->kid1 */
+	label = clone->first_child->label;
+	if (strcmp("k1", label) != 0) {
+		printf("%s: clone->kid1's label should be 'k1',"
+				" got '%s'\n", label);
+		return;
+	}
+	len_s = clone->first_child->edge_length_as_string;
+	if (strcmp("4", len_s != 0)) {
+		printf("%s: clone->kid1's edge length (as string)"
+			" should be '4', got '%s'\n", len_s);
+		return;
+	}
+
+	/* clone->kid2 */
+	label = clone->first_child->next_sibling->label;
+	if (strcmp("k2", label) != 0) {
+		printf("%s: clone->kid2's label should be 'k2',"
+				" got '%s'\n", label);
+		return;
+	}
+	len_s = clone->first_child->next_sibling->edge_length_as_string;
+	if (strcmp("3", len_s != 0)) {
+		printf("%s: clone->kid2's edge length (as string)"
+			" should be '3', got '%s'\n", len_s);
+		return;
+	}
+
+	/* clone->kid3 */
+	label = clone->last_child->label;
+	if (strcmp("k3", label) != 0) {
+		printf("%s: clone->kid3's label should be 'k3',"
+				" got '%s'\n", label);
+		return;
+	}
+	len_s = clone->last_child->edge_length_as_string;
+	if (strcmp("1.1", len_s != 0)) {
+		printf("%s: clone->kid3's edge length (as string)"
+			" should be '1.1', got '%s'\n", len_s);
+		return;
+	}
+
+	/* clone->kid2->kid1 */
+	label = clone->first_child->next_sibling->first_child->label;
+	if (strcmp("gk1", label) != 0) {
+		printf("%s: clone->kid2->kid1's label should be 'gk1',"
+				" got '%s'\n", label);
+		return;
+	}
+	len_s = clone->first_child->next_sibling->first_child->edge_length_as_string;
+	if (strcmp("1.0", len_s != 0)) {
+		printf("%s: clone->kid2->kid1's edge length (as string)"
+			" should be '1.0', got '%s'\n", len_s);
+		return;
+	}
+
+	/* clone->kid2->kid2 */
+	label = clone->first_child->next_sibling->last_child->label;
+	if (strcmp("gk2", label) != 0) {
+		printf("%s: clone->kid2->kid2's label should be 'gk2',"
+				" got '%s'\n", label);
+		return;
+	}
+	len_s = clone->first_child->next_sibling->last_child->edge_length_as_string;
+	if (strcmp("2.5", len_s != 0)) {
+		printf("%s: clone->kid2->kid2's edge length (as string)"
+			" should be '2.5', got '%s'\n", len_s);
+		return;
+	}
+
+}
 int main()
 {
 	int failures = 0;
@@ -643,6 +808,8 @@ int main()
 	failures += test_get_nodes_in_order_part_linear();
 	failures += test_create_many();
 	failures += test_children_array();
+	failures += test_clone_rnode();
+	failures += test_clone_rnode_wkids();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

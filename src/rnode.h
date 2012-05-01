@@ -130,6 +130,11 @@ struct rnode** children_array(struct rnode *node);
  * rooted_tree. */
 /* Returns NULL in case of malloc() problems. */
 
+/* CLones a node (and descendants). A new rnode structure is allocated for each
+ * node in the target. */
+
+struct rnode *clone_rnode(struct rnode *target);
+
 struct llist *get_nodes_in_order(struct rnode *);
 
 /* Gets the number of rnodes in rnode_array. These are the rnodes created since

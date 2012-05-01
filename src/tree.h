@@ -118,3 +118,8 @@ enum tree_type get_tree_type(struct rooted_tree *tree);
 /* Resets the "seen" attribute of all nodes in the tree. */
 
 void reset_seen(struct rooted_tree *tree);
+
+/* Clones a tree. All memory is newly allocated. The original tree is untouched
+ * */
+
+struct rooted_tree *clone_tree(struct rooted_tree *tree);
