@@ -130,12 +130,21 @@ struct rnode** children_array(struct rnode *node);
  * rooted_tree. */
 /* Returns NULL in case of malloc() problems. */
 
+struct llist *get_nodes_in_order(struct rnode *);
+
 /* CLones a node (and descendants). A new rnode structure is allocated for each
  * node in the target. */
 
 struct rnode *clone_rnode(struct rnode *target);
 
-struct llist *get_nodes_in_order(struct rnode *);
+/* A variant of clone_rnode() that accepts a predicate function. A _child_ node
+ * is cloned IFF the predicate returns true. This ensures that at least one
+ * node is cloned, which is usually a tree's root. If only one child of a
+ * cloned node gets copied, then this function returns that child instead, with
+ * corrected branch lengths. */
+
+struct rnode *clone_rnode_cond(struct rnode *target,
+		bool (*predicate)(struct rnode *));
 
 /* Gets the number of rnodes in rnode_array. These are the rnodes created since
  * the beginning of the run, or since destroy_all_rnodes() was last called.

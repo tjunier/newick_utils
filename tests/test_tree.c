@@ -654,6 +654,84 @@ int test_clone_tree_original()
 	return 0;
 
 }
+
+/* a predicate function for conditional cloning. In this case, will return true
+ * unless node's label is 'f' or 'B' Not fascinating, I admit, but serves for
+ * testing*/
+
+bool predicate_f (struct rnode *node)
+{
+	if (strcmp("B", node->label) == 0)
+		return false;
+	if (strcmp("f", node->label) == 0)
+		return false;
+	return true;
+}
+
+int test_clone_tree_cond()
+{
+	const char *test_name = __func__;
+	/* (A:3,B:3,(C:2,(D:1,E:1)f:1)g:1)h; */
+	struct rooted_tree tree = tree_5();
+
+	struct rooted_tree *clone = clone_tree_cond(&tree, predicate_f);
+	/* clone should be: (A:3,C:3)h; */
+	struct rnode *node = NULL;
+	struct llist *orig_nodes_in_order = get_nodes_in_order(tree.root);
+	struct list_elem *el = orig_nodes_in_order->head;
+
+	/* A */
+	node = el->data;
+	if (strcmp("A", node->label) != 0) {
+		printf ("%s: expected label 'A', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("3", node->edge_length_as_string) != 0) {
+		printf ("%s: node A's edge length (as string) should be 3,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* C */
+	el = el->next;
+	node = el->data;
+	if (strcmp("C", node->label) != 0) {
+		printf ("%s: expected label 'C', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("3", node->edge_length_as_string) != 0) {
+		printf ("%s: node C's edge length (as string) should be 3,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* h */
+	el = el->next;
+	node = el->data;
+	if (strcmp("h", node->label) != 0) {
+		printf ("%s: expected label 'h', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("", node->edge_length_as_string) != 0) {
+		printf ("%s: node h's edge length (as string) should be '',"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: expecting end of list.\n");
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+
+}
+
 int main()
 {
 	int failures = 0;
@@ -670,6 +748,7 @@ int main()
 	failures += test_reset_seen();
 	failures += test_clone_tree_result();
 	failures += test_clone_tree_original();
+	failures += test_clone_tree_cond();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hash.h"
 #include "common.h"
 #include "list.h"
+#include "link.h"
 
 /* These variables are for keeping track of all allocated rnodes, so that we
  * can free them all (one call to free them all :-) */
@@ -272,6 +273,9 @@ struct llist *get_nodes_in_order(struct rnode *root)
 	return nodes_in_order;
 }
 
+/* One could get this one by passing a constantly true predicate to
+ * clone_rnode_cond() - but this will be a bit faster. */
+
 struct rnode *clone_rnode(struct rnode *target)
 {
 	struct rnode *result = create_rnode(target->label,
@@ -280,7 +284,41 @@ struct rnode *clone_rnode(struct rnode *target)
 	struct rnode *kid = target->first_child;
 	for (; NULL != kid; kid = kid->next_sibling) {
 		struct rnode *kid_clone = clone_rnode(kid);
+		if (NULL == kid_clone) return NULL;
 		add_child(result, kid_clone);
+	}
+
+	return result;
+}
+
+struct rnode *clone_rnode_cond(struct rnode *target,
+		bool (*predicate)(struct rnode *))
+{
+	struct rnode *result = create_rnode(target->label,
+			target->edge_length_as_string);
+	if (NULL == result) return NULL;
+
+	struct rnode *kid = target->first_child;
+	for (; NULL != kid; kid = kid->next_sibling) {
+		if (predicate(kid)) {
+			fprintf(stderr, "keeping %s\n", kid->label);
+			struct rnode *kid_clone = clone_rnode(kid);
+			add_child(result, kid_clone);
+		}
+		else
+			fprintf(stderr, "keeping %s\n", kid->label);
+	}
+
+	if (1 == children_count(result) &&
+	    1 != children_count(target))
+	{
+		char *new_edge_len_s = add_len_strings(
+			result->first_child->edge_length_as_string,
+			result->edge_length_as_string);
+		if (NULL == new_edge_len_s) return NULL;
+		free(result->first_child->edge_length_as_string);
+		result->first_child->edge_length_as_string = new_edge_len_s;
+		return result->first_child;
 	}
 
 	return result;
