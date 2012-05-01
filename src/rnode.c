@@ -301,12 +301,9 @@ struct rnode *clone_rnode_cond(struct rnode *target,
 	struct rnode *kid = target->first_child;
 	for (; NULL != kid; kid = kid->next_sibling) {
 		if (predicate(kid)) {
-			fprintf(stderr, "keeping %s\n", kid->label);
-			struct rnode *kid_clone = clone_rnode(kid);
+			struct rnode *kid_clone = clone_rnode_cond(kid, predicate);
 			add_child(result, kid_clone);
 		}
-		else
-			fprintf(stderr, "keeping %s\n", kid->label);
 	}
 
 	if (1 == children_count(result) &&

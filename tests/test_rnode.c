@@ -790,6 +790,7 @@ int test_clone_rnode_wkids()
 	}
 
 }
+
 int main()
 {
 	int failures = 0;

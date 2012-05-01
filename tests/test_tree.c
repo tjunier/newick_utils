@@ -661,10 +661,12 @@ int test_clone_tree_original()
 
 bool predicate_f (struct rnode *node)
 {
-	if (strcmp("B", node->label) == 0)
+	if (strcmp("B", node->label) == 0) {
 		return false;
-	if (strcmp("f", node->label) == 0)
+	}
+	if (strcmp("f", node->label) == 0) {
 		return false;
+	}
 	return true;
 }
 
@@ -677,8 +679,7 @@ int test_clone_tree_cond()
 	struct rooted_tree *clone = clone_tree_cond(&tree, predicate_f);
 	/* clone should be: (A:3,C:3)h; */
 	struct rnode *node = NULL;
-	struct llist *orig_nodes_in_order = get_nodes_in_order(tree.root);
-	struct list_elem *el = orig_nodes_in_order->head;
+	struct list_elem *el = clone->nodes_in_order->head;
 
 	/* A */
 	node = el->data;
