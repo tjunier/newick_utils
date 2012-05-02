@@ -292,7 +292,7 @@ struct rnode *clone_rnode(struct rnode *target)
 }
 
 struct rnode *clone_rnode_cond(struct rnode *target,
-		bool (*predicate)(struct rnode *))
+		bool (*predicate)(struct rnode *, void *param), void *param)
 {
 	struct rnode *result = create_rnode(target->label,
 			target->edge_length_as_string);
@@ -300,8 +300,9 @@ struct rnode *clone_rnode_cond(struct rnode *target,
 
 	struct rnode *kid = target->first_child;
 	for (; NULL != kid; kid = kid->next_sibling) {
-		if (predicate(kid)) {
-			struct rnode *kid_clone = clone_rnode_cond(kid, predicate);
+		if (predicate(kid, param)) {
+			struct rnode *kid_clone =
+				clone_rnode_cond(kid, predicate, param);
 			add_child(result, kid_clone);
 		}
 	}

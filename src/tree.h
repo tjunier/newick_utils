@@ -124,8 +124,8 @@ void reset_seen(struct rooted_tree *tree);
 
 struct rooted_tree *clone_tree(struct rooted_tree *tree);
 
-/* A variant of clone_tree() that accepts a predicate function. A child node is
- * cloned IFF the predicate returns true. */
+/* A variant of clone_tree() that accepts a predicate function. Calls
+ * clone_rnode_cond() (q.v.) on the tree's root. */
 
 struct rooted_tree *clone_tree_cond(struct rooted_tree *tree,
-		bool (*predicate)(struct rnode *));
+		bool (*predicate)(struct rnode *, void * param), void *param);

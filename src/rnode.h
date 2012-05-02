@@ -141,10 +141,13 @@ struct rnode *clone_rnode(struct rnode *target);
  * is cloned IFF the predicate returns true. This ensures that at least one
  * node is cloned, which is usually a tree's root. If only one child of a
  * cloned node gets copied, then this function returns that child instead, with
- * corrected branch lengths. */
+ * corrected branch lengths. The predicate takes a struct rnode and a void
+ * pointer to allow passing arbitrary parameters, this is also passed around by
+ * clone_rnode_cond() - this avoids using globals, which are EVIL :-) */
 
 struct rnode *clone_rnode_cond(struct rnode *target,
-		bool (*predicate)(struct rnode *));
+		bool (*predicate)(struct rnode *, void * param),
+		void *param);
 
 /* Gets the number of rnodes in rnode_array. These are the rnodes created since
  * the beginning of the run, or since destroy_all_rnodes() was last called.
