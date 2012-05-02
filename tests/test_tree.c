@@ -655,19 +655,18 @@ int test_clone_tree_original()
 
 }
 
-/* a predicate function for conditional cloning. In this case, will return true
- * unless node's label is 'f' or 'B' Not fascinating, I admit, but serves for
- * testing*/
+/* a predicate function for conditional cloning. Takes the first char of the
+ * node's label, and returns false IFF the char is found in "param", cast to a
+ * char*. I.e., clones nodes NOT listed in the string. Not fascinating, I
+ * admit, but serves for testing purposes. */
 
-bool predicate_f (struct rnode *node)
+bool predicate_f (struct rnode *node, void *param)
 {
-	if (strcmp("B", node->label) == 0) {
+	char l = node->label[0];
+	if (NULL == strchr((char *) param, l))
+		return true;
+	else
 		return false;
-	}
-	if (strcmp("f", node->label) == 0) {
-		return false;
-	}
-	return true;
 }
 
 int test_clone_tree_cond()
@@ -676,7 +675,7 @@ int test_clone_tree_cond()
 	/* (A:3,B:3,(C:2,(D:1,E:1)f:1)g:1)h; */
 	struct rooted_tree tree = tree_5();
 
-	struct rooted_tree *clone = clone_tree_cond(&tree, predicate_f);
+	struct rooted_tree *clone = clone_tree_cond(&tree, predicate_f, "fB");
 	/* clone should be: (A:3,C:3)h; */
 	struct rnode *node = NULL;
 	struct list_elem *el = clone->nodes_in_order->head;
