@@ -212,7 +212,11 @@ static void process_tree_direct(struct rooted_tree *tree, set_t *cl_labels)
 	reset_seen(tree);
 }
 
-static bool prune_predicate(){}
+static bool prune_predicate(struct rnode *, void *param)
+{
+	set_t *cl_labels = (set_t *) param;
+	
+}
 
 static void process_tree_reverse(struct rooted_tree *tree, set_t *cl_labels)
 {
