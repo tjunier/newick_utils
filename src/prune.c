@@ -217,19 +217,24 @@ static struct rooted_tree * process_tree_direct(
 /* Prune predicate: returns true iff child node must be _kept_. In our case,
  * this means iff the node's label is in the command-line label set. */
 
-static bool prune_predicate(struct rnode *node, void *param)
+bool prune_predicate(struct rnode *node, void *param)
 {
-	fprintf (stderr, "Considering: '%s'\n", node->label);
 	set_t *cl_labels = (set_t *) param;
 	if (0 == strcmp("", node->label)) {
 		fprintf(stderr, "empty label -> true.\n");
 		return true;
 	} else if (set_has_element(cl_labels, node->label)) {
-		fprintf(stderr, "found %s -> true.\n");
+		fprintf(stderr, "%s found -> true.\n", node->label);
 		return true;
 	} else {
-		fprintf(stderr, "not found %s -> false.\n");
-		return false;
+		fprintf(stderr, "%s not found, ", node->label);
+		if (is_inner_node(node)) {
+			fprintf(stderr, "inner -> true\n");
+			return true;
+		} else {
+			fprintf(stderr, "not inner -> false\n");
+			return false;
+		}
 	}
 }
 
@@ -246,7 +251,7 @@ int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params;
-	static struct return_tree * (*process_tree)(struct rooted_tree *, set_t *);
+	static struct rooted_tree * (*process_tree)(struct rooted_tree *, set_t *);
 	
 	params = get_params(argc, argv);
 
