@@ -360,6 +360,378 @@ int test_reset_seen()
 	return 0;
 }
 
+int test_clone_tree_result()
+{
+	const char *test_name = __func__;
+	/* ((A:1,:1.0)f:2.0,(C:1,(D:1,E:1):2)h:3)i; */
+	struct rooted_tree tree = tree_7();
+
+	struct rooted_tree *clone = clone_tree(&tree);
+	struct rnode *node = NULL;
+	struct list_elem *el = clone->nodes_in_order->head;
+
+	/* A */
+	node = el->data;
+	if (strcmp("A", node->label) != 0) {
+		printf ("%s: expected label 'A', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1", node->edge_length_as_string) != 0) {
+		printf ("%s: node A's edge length (as string) should be 1,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* anonymous */
+	el = el->next;
+	node = el->data;
+	if (strcmp("", node->label) != 0) {
+		printf ("%s: expected label '', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1.0", node->edge_length_as_string) != 0) {
+		printf ("%s: anonymous node's edge length (as string) should be 1.0,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* f */
+	el = el->next;
+	node = el->data;
+	if (strcmp("f", node->label) != 0) {
+		printf ("%s: expected label 'f', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("2.0", node->edge_length_as_string) != 0) {
+		printf ("%s: node f's edge length (as string) should be 2.0,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* C */
+	el = el->next;
+	node = el->data;
+	if (strcmp("C", node->label) != 0) {
+		printf ("%s: expected label 'C', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1", node->edge_length_as_string) != 0) {
+		printf ("%s: node C's edge length (as string) should be 1,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* D */
+	el = el->next;
+	node = el->data;
+	if (strcmp("D", node->label) != 0) {
+		printf ("%s: expected label 'D', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1", node->edge_length_as_string) != 0) {
+		printf ("%s: node D's edge length (as string) should be 1,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* E */
+	el = el->next;
+	node = el->data;
+	if (strcmp("E", node->label) != 0) {
+		printf ("%s: expected label 'E', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1", node->edge_length_as_string) != 0) {
+		printf ("%s: node E's edge length (as string) should be 1,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* anonymous */
+	el = el->next;
+	node = el->data;
+	if (strcmp("", node->label) != 0) {
+		printf ("%s: expected label '', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("2", node->edge_length_as_string) != 0) {
+		printf ("%s: anonymous node's edge length (as string) should be 2,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* h */
+	el = el->next;
+	node = el->data;
+	if (strcmp("h", node->label) != 0) {
+		printf ("%s: expected label 'h', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("3", node->edge_length_as_string) != 0) {
+		printf ("%s: node h's edge length (as string) should be 3,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* i */
+	el = el->next;
+	node = el->data;
+	if (strcmp("i", node->label) != 0) {
+		printf ("%s: expected label 'i', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("", node->edge_length_as_string) != 0) {
+		printf ("%s: node i's edge length (as string) should be '',"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: expecting end of list.\n");
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+
+}
+
+/* Tests that the cloning does not alter the original */
+
+int test_clone_tree_original()
+{
+	const char *test_name = __func__;
+	/* ((A:1,:1.0)f:2.0,(C:1,(D:1,E:1):2)h:3)i; */
+	struct rooted_tree tree = tree_7();
+
+	struct rooted_tree *clone = clone_tree(&tree);
+	struct rnode *node = NULL;
+	struct llist *orig_nodes_in_order = get_nodes_in_order(tree.root);
+	struct list_elem *el = orig_nodes_in_order->head;
+
+	/* A */
+	node = el->data;
+	if (strcmp("A", node->label) != 0) {
+		printf ("%s: expected label 'A', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1", node->edge_length_as_string) != 0) {
+		printf ("%s: node A's edge length (as string) should be 1,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* anonymous */
+	el = el->next;
+	node = el->data;
+	if (strcmp("", node->label) != 0) {
+		printf ("%s: expected label '', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1.0", node->edge_length_as_string) != 0) {
+		printf ("%s: anonymous node's edge length (as string) should be 1.0,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* f */
+	el = el->next;
+	node = el->data;
+	if (strcmp("f", node->label) != 0) {
+		printf ("%s: expected label 'f', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("2.0", node->edge_length_as_string) != 0) {
+		printf ("%s: node f's edge length (as string) should be 2.0,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* C */
+	el = el->next;
+	node = el->data;
+	if (strcmp("C", node->label) != 0) {
+		printf ("%s: expected label 'C', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1", node->edge_length_as_string) != 0) {
+		printf ("%s: node C's edge length (as string) should be 1,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* D */
+	el = el->next;
+	node = el->data;
+	if (strcmp("D", node->label) != 0) {
+		printf ("%s: expected label 'D', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1", node->edge_length_as_string) != 0) {
+		printf ("%s: node D's edge length (as string) should be 1,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* E */
+	el = el->next;
+	node = el->data;
+	if (strcmp("E", node->label) != 0) {
+		printf ("%s: expected label 'E', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("1", node->edge_length_as_string) != 0) {
+		printf ("%s: node E's edge length (as string) should be 1,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* anonymous */
+	el = el->next;
+	node = el->data;
+	if (strcmp("", node->label) != 0) {
+		printf ("%s: expected label '', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("2", node->edge_length_as_string) != 0) {
+		printf ("%s: anonymous node's edge length (as string) should be 2,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* h */
+	el = el->next;
+	node = el->data;
+	if (strcmp("h", node->label) != 0) {
+		printf ("%s: expected label 'h', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("3", node->edge_length_as_string) != 0) {
+		printf ("%s: node h's edge length (as string) should be 3,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* i */
+	el = el->next;
+	node = el->data;
+	if (strcmp("i", node->label) != 0) {
+		printf ("%s: expected label 'i', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("", node->edge_length_as_string) != 0) {
+		printf ("%s: node i's edge length (as string) should be '',"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: expecting end of list.\n");
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+
+}
+
+/* a predicate function for conditional cloning. Takes the first char of the
+ * node's label, and returns false IFF the char is found in "param", cast to a
+ * char*. I.e., clones nodes NOT listed in the string. Not fascinating, I
+ * admit, but serves for testing purposes. */
+
+bool predicate_f (struct rnode *node, void *param)
+{
+	char l = node->label[0];
+	if (NULL == strchr((char *) param, l))
+		return true;
+	else
+		return false;
+}
+
+int test_clone_tree_cond()
+{
+	const char *test_name = __func__;
+	/* (A:3,B:3,(C:2,(D:1,E:1)f:1)g:1)h; */
+	struct rooted_tree tree = tree_5();
+
+	struct rooted_tree *clone = clone_tree_cond(&tree, predicate_f, "fB");
+	/* clone should be: (A:3,C:3)h; */
+	struct rnode *node = NULL;
+	struct list_elem *el = clone->nodes_in_order->head;
+
+	/* A */
+	node = el->data;
+	if (strcmp("A", node->label) != 0) {
+		printf ("%s: expected label 'A', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("3", node->edge_length_as_string) != 0) {
+		printf ("%s: node A's edge length (as string) should be 3,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* C */
+	el = el->next;
+	node = el->data;
+	if (strcmp("C", node->label) != 0) {
+		printf ("%s: expected label 'C', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("3", node->edge_length_as_string) != 0) {
+		printf ("%s: node C's edge length (as string) should be 3,"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	/* h */
+	el = el->next;
+	node = el->data;
+	if (strcmp("h", node->label) != 0) {
+		printf ("%s: expected label 'h', got '%s'.\n", test_name, 
+				node->label);
+		return 1;
+	}
+	if (strcmp("", node->edge_length_as_string) != 0) {
+		printf ("%s: node h's edge length (as string) should be '',"
+			"got %s.\n", test_name, node->edge_length_as_string);
+		return 1;
+	}
+
+	el = el->next;
+	if (NULL != el) {
+		printf ("%s: expecting end of list.\n");
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+
+}
+
 int main()
 {
 	int failures = 0;
@@ -374,6 +746,9 @@ int main()
 	failures += test_nodes_from_labels();
 	failures += test_nodes_from_regexp();
 	failures += test_reset_seen();
+	failures += test_clone_tree_result();
+	failures += test_clone_tree_original();
+	failures += test_clone_tree_cond();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

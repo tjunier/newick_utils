@@ -254,3 +254,27 @@ void reset_seen(struct rooted_tree *tree)
 		node->seen = false;
 	}
 }
+
+struct rooted_tree *clone_tree(struct rooted_tree *target)
+{
+	struct rooted_tree *result = malloc(sizeof(struct rooted_tree));
+	if (NULL == result) return NULL;
+
+	result->root = clone_rnode(target->root);
+	result->nodes_in_order = get_nodes_in_order(result->root);
+
+	return result;
+}
+
+struct rooted_tree *clone_tree_cond(struct rooted_tree *target,
+		bool (*predicate)(struct rnode *, void *param),
+		void *param)
+{
+	struct rooted_tree *result = malloc(sizeof(struct rooted_tree));
+	if (NULL == result) return NULL;
+
+	result->root = clone_rnode_cond(target->root, predicate, param);
+	result->nodes_in_order = get_nodes_in_order(result->root);
+
+	return result;
+}

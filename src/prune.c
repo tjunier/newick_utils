@@ -185,73 +185,84 @@ struct parameters get_params(int argc, char *argv[])
  * through th etree first in direct order, marking nodes to keep and their
  * ancestors. Then we go back in reverse order, pruning. */
 
-static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
-		enum prune_mode mode)
+static struct rooted_tree * process_tree_direct(
+		struct rooted_tree *tree, set_t *cl_labels)
 {
 	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
 	struct list_elem *el;
 	struct rnode *current;
 	char *label;
 
-	// TODO: Reverse mode not as described above yet.
-	if (PRUNE_DIRECT == mode) {
-		for (el = rev_nodes->head; NULL != el; el = el->next) {
-			current = el->data;
-			label = current->label;
-			/* skip this node iff parent is marked ("seen") */
-			if (!is_root(current) && current->parent->seen) {
-				current->seen = true;	/* inherit mark */
-				fprintf(stderr, "skipped: %s\n", label);
-				continue;
-			}
-			if (set_has_element(cl_labels, label)) {
-				unlink_rnode(current);
-				current->seen = true;
-				fprintf(stderr, "goner: %s\n", label);
-			}
+	for (el = rev_nodes->head; NULL != el; el = el->next) {
+		current = el->data;
+		label = current->label;
+		/* skip this node iff parent is marked ("seen") */
+		if (!is_root(current) && current->parent->seen) {
+			current->seen = true;	/* inherit mark */
+			fprintf(stderr, "skipped: %s\n", label);
+			continue;
 		}
-	} else if (PRUNE_REVERSE == mode) {
-		/* First pass: mark nodes to keep, i.e. nodes passed as arg and
-		 * their ancestors */
-		for (el=tree->nodes_in_order->head; NULL!=el; el=el->next) {
-			current = el->data;
-			label = current->label;
-			if (set_has_element(cl_labels, label)) {
-				current->seen = true;
-			}
-			if (!is_root(current) && current->seen) {
-				current->parent->seen = true;
-			}
+		if (set_has_element(cl_labels, label)) {
+			unlink_rnode(current);
+			current->seen = true;
+			fprintf(stderr, "goner: %s\n", label);
 		}
-		/* Second pass: unlink nodes not kept. */
-		for (el = rev_nodes->head; NULL != el; el = el->next) {
-			current = el->data;
-			label = current->label;
-			fprintf(stderr, "%s", label);
-			fflush(stderr);
-			if (current->seen) fprintf(stderr, " kept\n");
-			else {
-				unlink_rnode(current);
-				fprintf (stderr, " goner\n");
-			}
-		}
-	} else {
-		assert(0);
 	}
 
 	destroy_llist(rev_nodes);
 	reset_seen(tree);
+	return tree;
+}
+
+/* Prune predicate: returns true iff child node must be _kept_. In our case,
+ * this means iff the node's label is in the command-line label set. */
+
+static bool prune_predicate(struct rnode *node, void *param)
+{
+	fprintf (stderr, "Considering: '%s'\n", node->label);
+	set_t *cl_labels = (set_t *) param;
+	if (0 == strcmp("", node->label)) {
+		fprintf(stderr, "empty label -> true.\n");
+		return true;
+	} else if (set_has_element(cl_labels, node->label)) {
+		fprintf(stderr, "found %s -> true.\n");
+		return true;
+	} else {
+		fprintf(stderr, "not found %s -> false.\n");
+		return false;
+	}
+}
+
+static struct rooted_tree * process_tree_reverse(
+		struct rooted_tree *tree, set_t *cl_labels)
+{
+	struct rooted_tree *pruned = clone_tree_cond(tree,
+			prune_predicate, cl_labels);	
+	//destroy_tree(tree);
+	return pruned;
 }
 
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params;
+	static struct return_tree * (*process_tree)(struct rooted_tree *, set_t *);
 	
 	params = get_params(argc, argv);
 
+	switch (params.mode) {
+	case PRUNE_DIRECT:
+		process_tree = process_tree_direct;
+		break;
+	case PRUNE_REVERSE:
+		process_tree = process_tree_reverse;
+		break;
+	default:
+		assert (0);
+	}
+
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, params.cl_labels, params.mode);
+		tree = process_tree(tree, params.cl_labels);
 		dump_newick(tree->root);
 		destroy_all_rnodes(NULL);
 		destroy_tree(tree);
