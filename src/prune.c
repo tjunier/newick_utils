@@ -241,6 +241,8 @@ bool prune_predicate(struct rnode *node, void *param)
 static struct rooted_tree * process_tree_reverse(
 		struct rooted_tree *tree, set_t *cl_labels)
 {
+	// TODO: do a "mark pass" through the tree to mark kept nodes and their
+	// ancestors. Then use the mark in the predicate function.
 	struct rooted_tree *pruned = clone_tree_cond(tree,
 			prune_predicate, cl_labels);	
 	//destroy_tree(tree);
