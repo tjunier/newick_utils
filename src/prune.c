@@ -47,6 +47,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
 
+struct prune_data {
+	bool kept_ancestor;
+	bool kept_descendant;
+}
+
 struct parameters {
 	set_t 	*cl_labels;
 	enum prune_mode mode;
