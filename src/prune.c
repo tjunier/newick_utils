@@ -48,9 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
 
 struct prune_data {
-	bool kept_ancestor;
 	bool kept_descendant;
-}
+};
 
 struct parameters {
 	set_t 	*cl_labels;
@@ -219,12 +218,50 @@ static struct rooted_tree * process_tree_direct(
 	return tree;
 }
 
-/* Prune predicate: returns true iff child node must be _kept_. In our case,
- * this means iff the node's label is in the command-line label set. */
+/* Prune predicate: retains the nodes passed on CL, but discards their
+ * children. */
 
-bool prune_predicate(struct rnode *node, void *param)
+bool prune_predicate_trim_kids(struct rnode *node, void *param)
 {
-	return node->seen;
+	if (node->seen) {
+		/* ancestor of a passed node */
+		fprintf (stderr, "seen %s -> true\n", node->label);
+		return true;
+	}
+}
+
+/* Prune predicate: retains the nodes passed on CL and their children. */
+
+bool prune_predicate_keep_clade(struct rnode *node, void *param)
+{
+	set_t *cl_labels = (set_t *) param;
+
+	if (node->seen) {
+		fprintf (stderr, "seen: %s -> true\n", node->label);
+		return true;
+	}
+	/* Node isn't an ancestor of a passed node. Node can be a _descendant_
+	 * of a passed node, though, in which case we must keep it as well. */
+	if (!is_root(node)) {
+		if (NULL != node->parent->data) {
+			struct prune_data *pdata = node->parent->data;
+			if (pdata->kept_descendant) {
+				fprintf (stderr, "desc: %s -> true\n",
+						node->label);
+				struct prune_data *pdata =
+					malloc(sizeof(struct prune_data));
+				if (NULL == pdata) {
+					perror(NULL); exit(EXIT_FAILURE);
+				}
+				pdata->kept_descendant = true;
+				node->data = pdata;
+				return true;
+			}
+		}
+	}
+	
+	/* neither an ancestor nor a descendant of a passed node - drop. */
+	return false;
 }
 
 static struct rooted_tree * process_tree_reverse(
@@ -241,16 +278,23 @@ static struct rooted_tree * process_tree_reverse(
 		/* mark this node (to keep it) if its label is on the CL */
 		if (set_has_element(cl_labels, label)) {
 			current->seen = true;
-			fprintf(stderr, "marked: %s\n", label);
+			fprintf(stderr, "marked (both): %s\n", label);
+			struct prune_data *pdata =
+				malloc(sizeof(struct prune_data));
+			if (NULL == pdata) {perror(NULL); exit(EXIT_FAILURE); }
+			pdata->kept_descendant = true;
+			current->data = pdata;
 		}
-		/* skip this node iff parent is marked ("seen") */
+		/* and propagate 'seen' to parent (kept_descendant is
+		 * propagated to children (not parents), see
+		 * prune_predicate_keep_clade() */
 		if (current->seen) {
 			current->parent->seen = true;	/* inherit mark */
 		}
 	}
 
 	struct rooted_tree *pruned = clone_tree_cond(tree,
-			prune_predicate, cl_labels);	
+			prune_predicate_keep_clade, cl_labels);	
 	//destroy_tree(tree);
 	return pruned;
 }
