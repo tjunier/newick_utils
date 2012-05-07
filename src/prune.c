@@ -87,13 +87,6 @@ void help(char *argv[])
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
-"    -i <t|a>: changes the handling of inner nodes in reverse mode (see -v).\n"
-"       If argument is 't' (text), inner nodes whose label is not passed\n" 
-"       get pruned if the label is text (i.e., not numeric). If argument\n"
-"       is 'a' (all), any internal node not specified on the command line\n"
-"       is pruned, provided its label is not empty.\n"
-"       This option allows the user to keep selected clades by specifying\n"
-"       the name of their ancestor (see examples).\n"
 "    -v: reverse: prune nodes whose labels are NOT passed on the command\n"
 "        line. Inner nodes are not pruned, unless -i is also set (see\n"
 "        above). This allows pruning of trees with support values, which\n"
@@ -121,7 +114,7 @@ void help(char *argv[])
 "$ %s -v data/catarrhini Gorilla Pan Homo Pongo Simias Colobus\n"
 "\n"
 "# same, using clade labels:\n"
-"$ %s -v -i t data/catarrhini Hominidae Colobinae\n"
+"$ %s -v data/catarrhini Hominidae Colobinae\n"
 "$ %s data/catarrhini Homininae\n",
 	argv[0],
 	argv[0],
@@ -138,7 +131,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.mode = PRUNE_DIRECT;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hi:v")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
