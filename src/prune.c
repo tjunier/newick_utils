@@ -219,30 +219,31 @@ static struct rooted_tree * process_tree_direct(
 
 bool prune_predicate(struct rnode *node, void *param)
 {
-	set_t *cl_labels = (set_t *) param;
-	if (0 == strcmp("", node->label)) {
-		fprintf(stderr, "empty label -> true.\n");
-		return true;
-	} else if (set_has_element(cl_labels, node->label)) {
-		fprintf(stderr, "%s found -> true.\n", node->label);
-		return true;
-	} else {
-		fprintf(stderr, "%s not found, ", node->label);
-		if (is_inner_node(node)) {
-			fprintf(stderr, "inner -> true\n");
-			return true;
-		} else {
-			fprintf(stderr, "not inner -> false\n");
-			return false;
-		}
-	}
+	return node->seen;
 }
 
 static struct rooted_tree * process_tree_reverse(
 		struct rooted_tree *tree, set_t *cl_labels)
 {
-	// TODO: do a "mark pass" through the tree to mark kept nodes and their
-	// ancestors. Then use the mark in the predicate function.
+	struct list_elem *el = tree->nodes_in_order->head;
+	struct rnode *current;
+	char *label;
+
+	for (; NULL != el; el = el->next) {
+		current = el->data;
+		if (is_root(current)) break;
+		label = current->label;
+		/* mark this node (to keep it) if its label is on the CL */
+		if (set_has_element(cl_labels, label)) {
+			current->seen = true;
+			fprintf(stderr, "marked: %s\n", label);
+		}
+		/* skip this node iff parent is marked ("seen") */
+		if (current->seen) {
+			current->parent->seen = true;	/* inherit mark */
+		}
+	}
+
 	struct rooted_tree *pruned = clone_tree_cond(tree,
 			prune_predicate, cl_labels);	
 	//destroy_tree(tree);
