@@ -196,13 +196,11 @@ static struct rooted_tree * process_tree_direct(
 		/* skip this node iff parent is marked ("seen") */
 		if (!is_root(current) && current->parent->seen) {
 			current->seen = true;	/* inherit mark */
-			fprintf(stderr, "skipped: %s\n", label);
 			continue;
 		}
 		if (set_has_element(cl_labels, label)) {
 			unlink_rnode(current);
 			current->seen = true;
-			fprintf(stderr, "goner: %s\n", label);
 		}
 	}
 
@@ -214,11 +212,12 @@ static struct rooted_tree * process_tree_direct(
 /* Prune predicate: retains the nodes passed on CL, but discards their
  * children. */
 
+// TODO: this might be a useful prune predicate, add option to use it.
+
 bool prune_predicate_trim_kids(struct rnode *node, void *param)
 {
 	if (node->seen) {
 		/* ancestor of a passed node */
-		fprintf (stderr, "seen %s -> true\n", node->label);
 		return true;
 	}
 }
@@ -230,7 +229,6 @@ bool prune_predicate_keep_clade(struct rnode *node, void *param)
 	set_t *cl_labels = (set_t *) param;
 
 	if (node->seen) {
-		fprintf (stderr, "seen: %s -> true\n", node->label);
 		return true;
 	}
 	/* Node isn't an ancestor of a passed node. Node can be a _descendant_
@@ -239,8 +237,6 @@ bool prune_predicate_keep_clade(struct rnode *node, void *param)
 		if (NULL != node->parent->data) {
 			struct prune_data *pdata = node->parent->data;
 			if (pdata->kept_descendant) {
-				fprintf (stderr, "desc: %s -> true\n",
-						node->label);
 				struct prune_data *pdata =
 					malloc(sizeof(struct prune_data));
 				if (NULL == pdata) {
@@ -271,7 +267,6 @@ static struct rooted_tree * process_tree_reverse(
 		/* mark this node (to keep it) if its label is on the CL */
 		if (set_has_element(cl_labels, label)) {
 			current->seen = true;
-			fprintf(stderr, "marked (both): %s\n", label);
 			struct prune_data *pdata =
 				malloc(sizeof(struct prune_data));
 			if (NULL == pdata) {perror(NULL); exit(EXIT_FAILURE); }
