@@ -114,3 +114,18 @@ struct rooted_tree *clone_subtree(struct rnode *);
 
 /* Returns the tree's type (Cladogram, Phylogram, etc) */
 enum tree_type get_tree_type(struct rooted_tree *tree);
+
+/* Resets the "seen" attribute of all nodes in the tree. */
+
+void reset_seen(struct rooted_tree *tree);
+
+/* Clones a tree. All memory is newly allocated. The original tree is untouched
+ * */
+
+struct rooted_tree *clone_tree(struct rooted_tree *tree);
+
+/* A variant of clone_tree() that accepts a predicate function. Calls
+ * clone_rnode_cond() (q.v.) on the tree's root. */
+
+struct rooted_tree *clone_tree_cond(struct rooted_tree *tree,
+		bool (*predicate)(struct rnode *, void * param), void *param);
