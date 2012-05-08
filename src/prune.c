@@ -283,7 +283,7 @@ static struct rooted_tree * process_tree_reverse(
 
 	struct rooted_tree *pruned = clone_tree_cond(tree,
 			prune_predicate_keep_clade, cl_labels);	
-	//destroy_tree(tree);
+	destroy_tree(tree);
 	return pruned;
 }
 
