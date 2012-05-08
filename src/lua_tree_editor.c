@@ -71,8 +71,8 @@ const char *STOP = "stop_run";
 
 enum order { POST_ORDER, PRE_ORDER };
 
-enum node_field { UNKNOWN_FIELD, NODE_LABEL, NODE_SUPPORT, NODE_LENGTH,
-	NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT,
+enum node_field { UNKNOWN_FIELD, NODE_ADDRESS, NODE_LABEL, NODE_SUPPORT,
+	NODE_LENGTH, NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT,
 	NODE_FIRST_CHILD, NODE_CHILDREN, NODE_LAST_CHILD, NODE_CHILD_COUNT};
 
 struct parameters {
@@ -235,6 +235,7 @@ static void help(char *argv[])
 "\n"
 "	Name			Arg type	Meaning\n"
 "	---------------------------------------------------------\n"
+"       id                      hex number	unique id\n"
 "    	lbl			string		label\n"
 "    	b			number		support value\n"
 "    	len,L			number		parent edge length\n"
@@ -762,6 +763,7 @@ static void run_user_hooks_file(lua_State * L, char *user_hooks_filename)
 
 static enum node_field field_string2code (const char *fld_str)
 {
+	if (strcmp("id", fld_str) == 0) return NODE_ADDRESS;
 	if (strcmp("lbl", fld_str) == 0) return NODE_LABEL;
 	if (strcmp("b", fld_str) == 0) return NODE_SUPPORT;
 	if (strcmp("len", fld_str) == 0) return NODE_LENGTH;
@@ -858,6 +860,9 @@ static int lua_node_get(lua_State *L)
 	struct rnode *orig = lnode->orig;
 
 	switch (field_code) {
+	case NODE_ADDRESS:
+		lua_pushfstring(L, "%p", orig);
+		return 1;
 	case NODE_LABEL:
 		lua_pushstring(L, orig->label);
 		return 1;
