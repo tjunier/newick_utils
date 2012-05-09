@@ -8,7 +8,11 @@ function start_tree()
 end
 
 function node()
-	node_string = string.format("N%s [label=\"%s\"]", N.id, lbl)
+	if l then
+		node_string = string.format("N%s [shape=plaintext,label=\"%s\"]", N.id, lbl)
+	else
+		node_string = string.format("N%s [shape=point]", N.id, lbl)
+	end
 	table.insert(nodes, node_string)
 	if not r then
 		edge_string = string.format("N%s -- N%s", N.id, N.par.id)
