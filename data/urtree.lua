@@ -15,7 +15,8 @@ function node()
 	end
 	table.insert(nodes, node_string)
 	if not r then
-		edge_string = string.format("N%s -- N%s", N.id, N.par.id)
+		edge_string = string.format("N%s -- N%s [len=%f]",
+			N.id, N.par.id, N.len)
 		table.insert(edges, edge_string)
 	end
 	n = n + 1 
