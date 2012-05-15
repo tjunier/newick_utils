@@ -1,6 +1,9 @@
 
 nodes = {}
 edges = {}
+if nil == len_factor then
+	len_factor = 1
+end
 
 function start_tree()
 	n = 0
@@ -15,8 +18,8 @@ function node()
 	end
 	table.insert(nodes, node_string)
 	if not r then
-		edge_string = string.format("N%s -- N%s [len=%f]",
-			N.id, N.par.id, N.len)
+		edge_string = string.format("N%s -- N%s [len=%f,weight=3]",
+			N.id, N.par.id, N.len * len_factor)
 		table.insert(edges, edge_string)
 	end
 	n = n + 1 
