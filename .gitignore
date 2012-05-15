@@ -14,3 +14,7 @@ stamp-h1
 tags
 *.tar.gz
 ylwrap
+html
+latex
+INSTALL
+install-sh
