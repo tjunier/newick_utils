@@ -23,3 +23,5 @@ mkinstalldirs
 ylwrap
 html
 latex
+INSTALL
+install-sh
