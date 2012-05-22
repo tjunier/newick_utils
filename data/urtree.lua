@@ -8,6 +8,7 @@ end
 function start_tree()
 	n = 0
 	print("strict graph tree {")
+	print("graph [mode=KK,dimen=2]")
 end
 
 function node()
@@ -18,7 +19,7 @@ function node()
 	end
 	table.insert(nodes, node_string)
 	if not r then
-		edge_string = string.format("N%s -- N%s [len=%f,weight=3]",
+		edge_string = string.format("N%s -- N%s [len=%f,weight=10]",
 			N.id, N.par.id, N.len * len_factor)
 		table.insert(edges, edge_string)
 	end
