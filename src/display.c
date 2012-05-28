@@ -532,6 +532,13 @@ int main(int argc, char *argv[])
 		/* User can also suppress scale bar */
 		if (params.no_scale_bar) with_scale_bar = false;
 
+		if (strcmp("", tree->root->edge_length_as_string) &&
+			0 == params.root_length) {
+			free(tree->root->edge_length_as_string);
+			tree->root->edge_length_as_string =
+				strdup("");
+		}
+
 		if (params.svg) {
 
 			/* set node positions - these are a property of the

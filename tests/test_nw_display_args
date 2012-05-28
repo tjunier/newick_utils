@@ -54,3 +54,6 @@ fix_sc_txt: -e r -w -0.5 catarrhini_scaled.nw
 apos: -e r apos.nw
 # checks for rounding error
 round_zero: -e s -t HEV.nw
+empty_root: -R 0 hominidae.nw 
+empty_root_s: -s -R 0 hominidae.nw 
+empty_root_sr: -sr -R 0 hominidae.nw 
