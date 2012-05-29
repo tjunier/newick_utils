@@ -6,6 +6,10 @@ request: display unrooted trees
 
 nw_trim: seems to bug when root edge length != 0
 
+nw_display: honor root length [done for ortho; let -I position root label in
+root edge if not null. While we're at it, allow leaf labels to be in the edge's
+middle as well.
+
 doc: add trick to make a tree with nodes aligned, but without being a phylogram. Add extra length to all leaf edges, then trim to desired tree depth, e.g.
 $ nw_luaed data/HEV.nw 'l' 'N.L = N.L + 1' | nw_trim - 0.4
 
