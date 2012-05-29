@@ -127,3 +127,7 @@ struct llist *siblings(struct rnode *);
  * */ 
 
 void remove_children(struct rnode *);
+
+/* takes 2 lengths (as strings), and return their sum (as a string) */
+
+char *add_len_strings(char *ls1, char *ls2);

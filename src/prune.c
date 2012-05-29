@@ -47,6 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
 
+struct prune_data {
+	bool kept_descendant;
+};
+
 struct parameters {
 	set_t 	*cl_labels;
 	enum prune_mode mode;
@@ -178,29 +182,144 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-/* We build a hash of the passed labels, and go through the tree in reverse
- * Newick order, unlinking nodes as needed (and [eventually] preventing further
- * visiting, as in nw_ed). This will entail at most one passage through the
- * tree, ensure that descendants of removed nodes are not processed, and allow
- * a single hash to be constructed for all the trees. In fact, if the labels
- * list is short, one does not need a hash at all.  */
+/* We buld a hash of the passed labels, and visit the tree, unlinking nodes as
+ * needed. In Direct mode, we traverse in reverse order, unlinking nodes to
+ * prune. In Reverse mode, things are a bit more hairy because we need to keep
+ * not just the nodes passed as argument, but also their ancestors. So we pass
+ * through th etree first in direct order, marking nodes to keep and their
+ * ancestors. Then we go back in reverse order, pruning. */
 
-static void process_tree(struct rooted_tree *tree, set_t *cl_labels,
-		enum prune_mode mode)
+static struct rooted_tree * process_tree_direct(
+		struct rooted_tree *tree, set_t *cl_labels)
 {
-	// TODO: forget about iterator; do it with reversed nodes-in-order and
-	// set some node data to keep track of processed status, as in nw_*ed.
+	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
+	struct list_elem *el;
+	struct rnode *current;
+	char *label;
+
+	for (el = rev_nodes->head; NULL != el; el = el->next) {
+		current = el->data;
+		label = current->label;
+		/* skip this node iff parent is marked ("seen") */
+		if (!is_root(current) && current->parent->seen) {
+			current->seen = true;	/* inherit mark */
+			fprintf(stderr, "skipped: %s\n", label);
+			continue;
+		}
+		if (set_has_element(cl_labels, label)) {
+			unlink_rnode(current);
+			current->seen = true;
+			fprintf(stderr, "goner: %s\n", label);
+		}
+	}
+
+	destroy_llist(rev_nodes);
+	reset_seen(tree);
+	return tree;
+}
+
+/* Prune predicate: retains the nodes passed on CL, but discards their
+ * children. */
+
+bool prune_predicate_trim_kids(struct rnode *node, void *param)
+{
+	if (node->seen) {
+		/* ancestor of a passed node */
+		fprintf (stderr, "seen %s -> true\n", node->label);
+		return true;
+	}
+}
+
+/* Prune predicate: retains the nodes passed on CL and their children. */
+
+bool prune_predicate_keep_clade(struct rnode *node, void *param)
+{
+	set_t *cl_labels = (set_t *) param;
+
+	if (node->seen) {
+		fprintf (stderr, "seen: %s -> true\n", node->label);
+		return true;
+	}
+	/* Node isn't an ancestor of a passed node. Node can be a _descendant_
+	 * of a passed node, though, in which case we must keep it as well. */
+	if (!is_root(node)) {
+		if (NULL != node->parent->data) {
+			struct prune_data *pdata = node->parent->data;
+			if (pdata->kept_descendant) {
+				fprintf (stderr, "desc: %s -> true\n",
+						node->label);
+				struct prune_data *pdata =
+					malloc(sizeof(struct prune_data));
+				if (NULL == pdata) {
+					perror(NULL); exit(EXIT_FAILURE);
+				}
+				pdata->kept_descendant = true;
+				node->data = pdata;
+				return true;
+			}
+		}
+	}
+	
+	/* neither an ancestor nor a descendant of a passed node - drop. */
+	return false;
+}
+
+static struct rooted_tree * process_tree_reverse(
+		struct rooted_tree *tree, set_t *cl_labels)
+{
+	struct list_elem *el = tree->nodes_in_order->head;
+	struct rnode *current;
+	char *label;
+
+	for (; NULL != el; el = el->next) {
+		current = el->data;
+		if (is_root(current)) break;
+		label = current->label;
+		/* mark this node (to keep it) if its label is on the CL */
+		if (set_has_element(cl_labels, label)) {
+			current->seen = true;
+			fprintf(stderr, "marked (both): %s\n", label);
+			struct prune_data *pdata =
+				malloc(sizeof(struct prune_data));
+			if (NULL == pdata) {perror(NULL); exit(EXIT_FAILURE); }
+			pdata->kept_descendant = true;
+			current->data = pdata;
+		}
+		/* and propagate 'seen' to parent (kept_descendant is
+		 * propagated to children (not parents), see
+		 * prune_predicate_keep_clade() */
+		if (current->seen) {
+			current->parent->seen = true;	/* inherit mark */
+		}
+	}
+
+	struct rooted_tree *pruned = clone_tree_cond(tree,
+			prune_predicate_keep_clade, cl_labels);	
+	//destroy_tree(tree);
+	return pruned;
 }
 
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params;
+	static struct rooted_tree * (*process_tree)(struct rooted_tree *, set_t *);
 	
 	params = get_params(argc, argv);
 
+	switch (params.mode) {
+	case PRUNE_DIRECT:
+		process_tree = process_tree_direct;
+		break;
+	case PRUNE_REVERSE:
+		process_tree = process_tree_reverse;
+		break;
+	default:
+		assert (0);
+	}
+
 	while (NULL != (tree = parse_tree())) {
-		process_tree(tree, params.cl_labels, params.mode);
+		tree = process_tree(tree, params.cl_labels);
 		dump_newick(tree->root);
 		destroy_all_rnodes(NULL);
 		destroy_tree(tree);
