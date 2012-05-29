@@ -176,7 +176,10 @@ void help(char* argv[])
 "       will draw a red circle of radius 5 at the root of the clade defined\n"
 "       by nodes A, B, and C. Keyword 'Individual' is also accepted and\n"
 "       works like for CSS.\n"
-"    -R <integer>: use that many pixels for the root [only SVG]\n"
+"    -R <integer>: if <integer> is > 0, use that many pixels for the root\n"
+"       if it has no length[only SVG]; if it is 0, suppress the root's edge\n"
+"       length, if it has a length.\n"
+"       The default is 10 pixels (SVG) or 1 character (text).\n"
 "    -r: draw a radial tree (default: orthogonal) [only SVG]\n"
 "    -s: output graph as SVG (default: ASCII graphics). All output is on\n"
 "       stdout, so if there is more than one tree, stdout will be a\n"
@@ -528,6 +531,13 @@ int main(int argc, char *argv[])
 		with_scale_bar = !align_leaves;
 		/* User can also suppress scale bar */
 		if (params.no_scale_bar) with_scale_bar = false;
+
+		if (strcmp("", tree->root->edge_length_as_string) &&
+			0 == params.root_length) {
+			free(tree->root->edge_length_as_string);
+			tree->root->edge_length_as_string =
+				strdup("");
+		}
 
 		if (params.svg) {
 

@@ -87,13 +87,6 @@ void help(char *argv[])
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
-"    -i <t|a>: changes the handling of inner nodes in reverse mode (see -v).\n"
-"       If argument is 't' (text), inner nodes whose label is not passed\n" 
-"       get pruned if the label is text (i.e., not numeric). If argument\n"
-"       is 'a' (all), any internal node not specified on the command line\n"
-"       is pruned, provided its label is not empty.\n"
-"       This option allows the user to keep selected clades by specifying\n"
-"       the name of their ancestor (see examples).\n"
 "    -v: reverse: prune nodes whose labels are NOT passed on the command\n"
 "        line. Inner nodes are not pruned, unless -i is also set (see\n"
 "        above). This allows pruning of trees with support values, which\n"
@@ -121,7 +114,7 @@ void help(char *argv[])
 "$ %s -v data/catarrhini Gorilla Pan Homo Pongo Simias Colobus\n"
 "\n"
 "# same, using clade labels:\n"
-"$ %s -v -i t data/catarrhini Hominidae Colobinae\n"
+"$ %s -v data/catarrhini Hominidae Colobinae\n"
 "$ %s data/catarrhini Homininae\n",
 	argv[0],
 	argv[0],
@@ -138,7 +131,7 @@ struct parameters get_params(int argc, char *argv[])
 	params.mode = PRUNE_DIRECT;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hi:v")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
@@ -203,13 +196,11 @@ static struct rooted_tree * process_tree_direct(
 		/* skip this node iff parent is marked ("seen") */
 		if (!is_root(current) && current->parent->seen) {
 			current->seen = true;	/* inherit mark */
-			fprintf(stderr, "skipped: %s\n", label);
 			continue;
 		}
 		if (set_has_element(cl_labels, label)) {
 			unlink_rnode(current);
 			current->seen = true;
-			fprintf(stderr, "goner: %s\n", label);
 		}
 	}
 
@@ -221,11 +212,12 @@ static struct rooted_tree * process_tree_direct(
 /* Prune predicate: retains the nodes passed on CL, but discards their
  * children. */
 
+// TODO: this might be a useful prune predicate, add option to use it.
+
 bool prune_predicate_trim_kids(struct rnode *node, void *param)
 {
 	if (node->seen) {
 		/* ancestor of a passed node */
-		fprintf (stderr, "seen %s -> true\n", node->label);
 		return true;
 	}
 }
@@ -237,7 +229,6 @@ bool prune_predicate_keep_clade(struct rnode *node, void *param)
 	set_t *cl_labels = (set_t *) param;
 
 	if (node->seen) {
-		fprintf (stderr, "seen: %s -> true\n", node->label);
 		return true;
 	}
 	/* Node isn't an ancestor of a passed node. Node can be a _descendant_
@@ -246,8 +237,6 @@ bool prune_predicate_keep_clade(struct rnode *node, void *param)
 		if (NULL != node->parent->data) {
 			struct prune_data *pdata = node->parent->data;
 			if (pdata->kept_descendant) {
-				fprintf (stderr, "desc: %s -> true\n",
-						node->label);
 				struct prune_data *pdata =
 					malloc(sizeof(struct prune_data));
 				if (NULL == pdata) {
@@ -278,7 +267,6 @@ static struct rooted_tree * process_tree_reverse(
 		/* mark this node (to keep it) if its label is on the CL */
 		if (set_has_element(cl_labels, label)) {
 			current->seen = true;
-			fprintf(stderr, "marked (both): %s\n", label);
 			struct prune_data *pdata =
 				malloc(sizeof(struct prune_data));
 			if (NULL == pdata) {perror(NULL); exit(EXIT_FAILURE); }
@@ -295,7 +283,7 @@ static struct rooted_tree * process_tree_reverse(
 
 	struct rooted_tree *pruned = clone_tree_cond(tree,
 			prune_predicate_keep_clade, cl_labels);	
-	//destroy_tree(tree);
+	destroy_tree(tree);
 	return pruned;
 }
 

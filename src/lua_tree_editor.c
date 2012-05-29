@@ -71,11 +71,12 @@ const char *STOP = "stop_run";
 
 enum order { POST_ORDER, PRE_ORDER };
 
-enum node_field { UNKNOWN_FIELD, NODE_LABEL, NODE_SUPPORT, NODE_LENGTH,
-	NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT,
+enum node_field { UNKNOWN_FIELD, NODE_ADDRESS, NODE_LABEL, NODE_SUPPORT,
+	NODE_LENGTH, NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT,
 	NODE_FIRST_CHILD, NODE_CHILDREN, NODE_LAST_CHILD, NODE_CHILD_COUNT};
 
 struct parameters {
+	char *lua_options;
 	char *lua_action;	
 	char *lua_condition;	
 	char *user_hooks_filename;
@@ -98,7 +99,7 @@ static void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hnor] <newick trees filename|-> <selector> <action>\n"
+"%s [-f:hnoL:r] <newick trees filename|-> <Lua expression>\n"
 "\n"
 "or\n"
 "\n"
@@ -235,6 +236,7 @@ static void help(char *argv[])
 "\n"
 "	Name			Arg type	Meaning\n"
 "	---------------------------------------------------------\n"
+"       id                      hex number	unique id\n"
 "    	lbl			string		label\n"
 "    	b			number		support value\n"
 "    	len,L			number		parent edge length\n"
@@ -250,7 +252,22 @@ static void help(char *argv[])
 "Options\n"
 "-------\n"
 "\n"
+"    -f <filename>: execute filename before processing input. The file can\n"
+"        contain any Lua code, in particular, you can define functions.\n"
+"        Some functions names have a predefined meaning and are called\n"
+"        on predefined events (think of them as 'hooks'):\n"
+"          function     event\n"
+"          ------------------\n"
+"          start_run    before processing any tree\n"
+"          start_tree   before visiting each tree\n"
+"          node         for every tree node\n"
+"          stop_tree    after visiting each tree\n"
+"          stop_run     after processing all trees\n"
+"        You do not have to define all (or indeed, any) of them.\n"
 "    -h: print this help text, and exit\n"
+"    -L <string>: execute this before the run. Similar to -f, but easier\n"
+"        to change on invocation (typically used to pass options to the\n"
+"        script passed with -f).\n"
 "    -n: do not print the (possibly modified) tree at the end of the run \n"
 "        (modeled after sed -n)\n"
 "    -r: visit tree in preorder (starting at root, and visiting a node\n"
@@ -316,6 +333,7 @@ static struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 
+	params.lua_options = NULL;
 	params.lua_condition = NULL;
 	params.lua_action = NULL;
 	params.user_hooks_filename = NULL;
@@ -325,7 +343,7 @@ static struct parameters get_params(int argc, char *argv[])
 	params.single = true;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "f:hnor")) != -1) {
+	while ((opt_char = getopt(argc, argv, "f:hL:nor")) != -1) {
 		switch (opt_char) {
 		case 'f':
 			params.user_hooks_filename = optarg;
@@ -334,6 +352,9 @@ static struct parameters get_params(int argc, char *argv[])
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
+		case 'L':
+			params.lua_options = optarg;
+			break;
 		case 'n':
 			params.show_tree = false;
 			break;
@@ -762,6 +783,7 @@ static void run_user_hooks_file(lua_State * L, char *user_hooks_filename)
 
 static enum node_field field_string2code (const char *fld_str)
 {
+	if (strcmp("id", fld_str) == 0) return NODE_ADDRESS;
 	if (strcmp("lbl", fld_str) == 0) return NODE_LABEL;
 	if (strcmp("b", fld_str) == 0) return NODE_SUPPORT;
 	if (strcmp("len", fld_str) == 0) return NODE_LENGTH;
@@ -858,6 +880,9 @@ static int lua_node_get(lua_State *L)
 	struct rnode *orig = lnode->orig;
 
 	switch (field_code) {
+	case NODE_ADDRESS:
+		lua_pushfstring(L, "%p", orig);
+		return 1;
 	case NODE_LABEL:
 		lua_pushstring(L, orig->label);
 		return 1;
@@ -986,6 +1011,10 @@ int main(int argc, char* argv[])
 
 
 	luaopen_lnode(L);
+
+	if (NULL != params.lua_options) {
+		luaL_dostring(L, params.lua_options);
+	}
 
 	if (NULL != params.user_hooks_filename) {
 		run_user_hooks_file(L, params.user_hooks_filename);

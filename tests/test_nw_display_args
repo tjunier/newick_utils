@@ -1,5 +1,5 @@
 def: -e r def.nw
-def_s: def.nw
+def_s: -e s def.nw
 def_vt100: -e v def.nw
 def_c: -e c def.nw
 multiple: -e r forest.nw
@@ -53,4 +53,7 @@ fix_sc_svg_3: -s -w -3 catarrhini_scaled.nw
 fix_sc_txt: -e r -w -0.5 catarrhini_scaled.nw
 apos: -e r apos.nw
 # checks for rounding error
-round_zero: -t HEV.nw
+round_zero: -e s -t HEV.nw
+empty_root: -R 0 hominidae.nw 
+empty_root_s: -s -R 0 hominidae.nw 
+empty_root_sr: -sr -R 0 hominidae.nw 

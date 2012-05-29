@@ -1,30 +1,34 @@
-BUG:  nw_prune -v HRV_FMDV.nw HRV37 HRV3 HRV14 HRV52 HRV17 HRV93 HRV27 POLIO3 POLIO2 POLIO1A COXA18 COXA17 COXA1 segfaults.
-
-request: display unrooted trees
+nw_clade: by default, set root length to zero; add option to override.
 
 nw_trim: seems to bug when root edge length != 0
-
-nw_display: honor root length [done for ortho; let -I position root label in
-root edge if not null. While we're at it, allow leaf labels to be in the edge's
-middle as well.
 
 doc: add trick to make a tree with nodes aligned, but without being a phylogram. Add extra length to all leaf edges, then trim to desired tree depth, e.g.
 $ nw_luaed data/HEV.nw 'l' 'N.L = N.L + 1' | nw_trim - 0.4
 
 doc: ad example of huge tree (mail from mid-march)
 
-nw_display: add CSS to labels (in CSS map) [done, just add to manual]
-
-nw_display: add branch lengths to radial trees.
+doc: nw_display: add CSS to labels (in CSS map) [done, just add to manual]
 
 nw_rename: add example to -h about 3-arg form; also discuss in tutorial.
+
+valgrind
+
+RELEASE
+
+request: display unrooted trees
+
+nw_display: honor root length [done for ortho; let -I position root label in
+root edge if not null. While we're at it, allow leaf labels to be in the edge's
+middle as well.
+
+nw_display: add branch lengths to radial trees.
 
 nw_scheme: sync man, help w/ actual code; add example of numbering inner nodes
 (EK question).
 
 doc: write a § about artifacts due to compression (use e.g. last tree in
-HRV.nw), and how they're unavoidable in text, and how they can be mitigated my
-showing topology or drwing SVG.
+HRV.nw), and how they're unavoidable in text, and how they can be mitigated by
+showing topology or drawing SVG.
 
 nw_condense: condense clades with bootstrap value greater than some threshold.
 
@@ -601,3 +605,5 @@ implementation of other nutils (nw_topology, nw_label, nw_trim?);
 [done] automatically determine screen width (ASCII) and use this.
 
 [done] nw_display: fix prob with scale values (see file 'prob')
+
+[done] BUG:  nw_prune -v HRV_FMDV.nw HRV37 HRV3 HRV14 HRV52 HRV17 HRV93 HRV27 POLIO3 POLIO2 POLIO1A COXA18 COXA17 COXA1 segfaults.
