@@ -77,8 +77,11 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	 * length_as_string, which will be an empty string ("") if the length
 	 * is not defined (as in cladograms). */
 	node->edge_length = -1;	
+	/* These are used when iterating on the tree structure. See
+	 * rnode_iterator.c */
 	node->current_child = NULL;
-	node->seen = 0;
+	node->seen = false;
+	node->linked = false;
 
 #ifdef SHOW_RNODE_CREATE
 	fprintf(stderr, "creating rnode %p '%s'\n", node, node->label);
@@ -113,7 +116,6 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void *))
 		free(node->data);
 	free(node);
 }
-
 
 void destroy_all_rnodes(void (*free_data)(void *))
 {

@@ -61,8 +61,10 @@ struct rnode {
 
 	/** Used by rnode_iterator to find next node to visit. */
 	struct rnode *current_child;
-	/** Used by rnode_iterator to mark visited nodes. */
+	/** Used by lua_ed to skip nodes */
 	bool seen;	
+	bool linked;
+
 };
 
 /* allocates a rnode and returns a pointer to it, or exits. If 'label' is NULL

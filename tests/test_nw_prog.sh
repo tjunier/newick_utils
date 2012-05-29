@@ -57,16 +57,15 @@ else
 	check_nw_luaed='off'
 fi
 
-# When this is run through the Makefile, SRCDIR is set. Otherwise, we set it
-# here.
-SRCDIR=${SRCDIR:-.}
-
 # I can't use these in strict Bourne shell, so I use a sed command
 #prog=${0%.sh}	# derive tested program's name from own name
 #prog=${prog#*_}
 
 prog=`echo $0 | sed -e 's|\.sh$||' -e 's/^.*test_//'`
-args_file=$SRCDIR/test_${prog}_args
+TEST_SRC_DIR=$1
+TEST_OUT_DIR=$2
+PROG_BIN_DIR=$3
+args_file=$TEST_SRC_DIR/test_${prog}_args
 
 # nw_sched is only tested if Guile is being used
 
@@ -86,13 +85,9 @@ if [ "$prog" = "nw_luaed" ] ; then
 	fi
 fi
 
-# Ok, try to test $prog.
-# TODO: check for prog here instead of setting PATH as below. If $prog is
-# found, prefix it with the relative path (e.g. ../src/$prog).
-
 echo "Testing program: $prog"
 
-if [ !  -x ../src/$prog ] ; then
+if [ !  -x ${PROG_BIN_DIR}/$prog ] ; then
 	echo "$prog not found or not executable."
 	exit 1
 fi
@@ -101,12 +96,6 @@ if [ ! -r $args_file ] ; then
 	echo "can't find arguments file $args_file"
 	exit 1
 fi
-
-# Each test case in on one line. Line structure is <case name>:<prog
-# arguments>. The expected result is in a file named test_<prog name>_<case
-# name>.exp Lines starting with '#' are ignored.
-
-export PATH=../src:../_build/src:$PATH
 
 pass=TRUE
 while IFS=':' read name args ; do
@@ -118,15 +107,15 @@ while IFS=':' read name args ; do
 		echo "Skipping $name"
 		continue
 	fi
-	IFS='' cmd="$prog $args"
+	IFS='' cmd="${PROG_BIN_DIR}/$prog $args"
 	echo -n "test '$name': '$cmd' - "
-	outfile=./test_${prog}_$name.out
-	(cd $SRCDIR; eval $cmd > $outfile)
+	outfile=$TEST_OUT_DIR/test_${prog}_$name.out
+	(cd $TEST_SRC_DIR; eval $cmd > $outfile)
 	if [ "$?" -ne "0" ] ; then
 		pass=FALSE
 		break
 	fi
-	if diff $outfile $SRCDIR/test_${prog}_$name.exp ; then
+	if diff $outfile $TEST_SRC_DIR/test_${prog}_$name.exp ; then
 		echo "pass"
 		rm $outfile
 	else

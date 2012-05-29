@@ -52,6 +52,10 @@ int test_create_rnode()
 				node->seen);
 		return 1;
 	}
+	if (false != node->linked) {
+		printf("%s: 'linked' should be false\n", test_name);
+		return 1;
+	}
 	if (NULL != node->current_child) {
 		printf("%s: 'current_child_elem' should be NULL (got %p)\n", test_name,
 				node->current_child);

@@ -155,6 +155,10 @@ int test_readline_1()
 	const char *test_name = "test_readline_1";
 
 	FILE *input = fopen("readline_test.txt", "r");
+	if (NULL == input) {
+		perror(NULL);
+		return 1;
+	}
 
 	char *line, *exp;
 
@@ -182,6 +186,10 @@ int test_readline_2()
 	const char *test_name = "test_readline_2";
 
 	FILE *input = fopen("color.map", "r");
+	if (NULL == input) {
+		perror(NULL);
+		return 1;
+	}
 
 	char *line, *exp;
 
