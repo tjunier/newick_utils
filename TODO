@@ -1,4 +1,3 @@
-nw_trim: seems to bug when root edge length != 0
 
 doc: add trick to make a tree with nodes aligned, but without being a phylogram. Add extra length to all leaf edges, then trim to desired tree depth, e.g.
 $ nw_luaed data/HEV.nw 'l' 'N.L = N.L + 1' | nw_trim - 0.4
@@ -608,3 +607,4 @@ implementation of other nutils (nw_topology, nw_label, nw_trim?);
 
 [changed] nw_clade: by default, set root length to zero; add option to override. -- behaviour now in nw_display (-R 0)
 
+[changed] nw_trim: seems to bug when root edge length != 0 -- nw_trim now has 1-arg form which trims root

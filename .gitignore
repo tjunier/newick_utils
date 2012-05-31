@@ -24,3 +24,7 @@ config.h.in
 configure
 install-sh
 ltmain.sh
+config.guess
+config.sub
+depcomp
+missing
