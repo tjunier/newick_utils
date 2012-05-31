@@ -62,9 +62,14 @@ fi
 #prog=${prog#*_}
 
 prog=`echo $0 | sed -e 's|\.sh$||' -e 's/^.*test_//'`
-TEST_SRC_DIR=$1
-TEST_OUT_DIR=$2
-PROG_BIN_DIR=$3
+
+# These variables are set differently depending on the build system. With GNU
+# autotools, we use defaults; with CMake they are passed as arguments.
+
+TEST_SRC_DIR=${1:-.}
+TEST_OUT_DIR=${2:-.}
+PROG_BIN_DIR=${3:-../src}
+
 args_file=$TEST_SRC_DIR/test_${prog}_args
 
 # nw_sched is only tested if Guile is being used

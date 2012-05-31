@@ -18,3 +18,9 @@ html
 latex
 INSTALL
 install-sh
+Makefile.in
+aclocal.m4
+config.h.in
+configure
+install-sh
+ltmain.sh
