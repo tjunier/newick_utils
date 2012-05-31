@@ -1,5 +1,3 @@
-nw_clade: by default, set root length to zero; add option to override.
-
 nw_trim: seems to bug when root edge length != 0
 
 doc: add trick to make a tree with nodes aligned, but without being a phylogram. Add extra length to all leaf edges, then trim to desired tree depth, e.g.
@@ -607,3 +605,6 @@ implementation of other nutils (nw_topology, nw_label, nw_trim?);
 [done] nw_display: fix prob with scale values (see file 'prob')
 
 [done] BUG:  nw_prune -v HRV_FMDV.nw HRV37 HRV3 HRV14 HRV52 HRV17 HRV93 HRV27 POLIO3 POLIO2 POLIO1A COXA18 COXA17 COXA1 segfaults.
+
+[changed] nw_clade: by default, set root length to zero; add option to override. -- behaviour now in nw_display (-R 0)
+
