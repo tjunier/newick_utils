@@ -85,6 +85,7 @@ AS_IF([test "x$with_guile" = xyes],
 		AC_CHECK_HEADERS([libguile.h], [], [with_guile=no_hdr])
 		#AS_IF([test "x$with_guile_libdir" != xno], [LDFLAGS="$LDFLAGS -L$with_guile_libdir"])
 		AC_CHECK_LIB([guile], [scm_with_guile], [], [with_guile=no_lib])
+		AC_CHECK_LIB([pthread], [pthread_create], [], [with_guile=no_lib])
 	]
 )
 
