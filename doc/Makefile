@@ -106,7 +106,7 @@ $(homino_pdfs) : %.pdf : %.svg
 
 # removes auxiliary and intermediary files (including SVG and EPS)
 clean:
-	$(RM) $(text_command_outputs) $(newick_command_outputs) $(text_command_strings) $(regular_svg_command_strings) $(newick_command_strings) *.aux *.log *.dvi *.toc *.eps *.bbl *.blg *_svg.svg HRV_ingrp.svg
+	$(RM) $(text_command_outputs) $(newick_command_outputs) $(text_command_strings) $(regular_svg_command_strings) $(newick_command_strings) *.aux *.log *.dvi *.toc *.eps *.bbl *.blg *_svg.svg HRV_ingrp.svg *.{plt,cvd}
 
 # like clean, plus removes all PDFs except the main target
 clean-images: clean
