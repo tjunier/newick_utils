@@ -409,6 +409,7 @@ static void vt100_canvas_write(struct canvas *canvasp, int col, int line, char *
 	char *insert = masprintf("%s%s%s", VT_END, text, VT_BEG);
 	char *line_str = canvasp->lines[line];
 	char *buffer = str_splice(line_str, insert, col, strlen(text));
+	free(insert);
 	free(canvasp->lines[line]);
 	canvasp->lines[line] = buffer;
 }
