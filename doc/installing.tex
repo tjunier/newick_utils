@@ -3,9 +3,24 @@
 
 \section{For the impatient}
 
-\verb+./configure && make && sudo make install+
+\verb+$ ./configure && make && sudo make install+
+
+or try CMake (see below).
+
+
 
 \section{From source}
+
+\paragraph{New: CMake as an alternative to the Autotools}
+Up to now, the \nutils{} have used the \gnu{} autotools as a build system. Since
+version 1.7 I have experimented with CMake (\url{http://www.cmake.org}), and
+found that I could understand how it works much more easily than I understand
+the Autotools. I could get the whole thing to build in no time and with very
+little fuss. Of course, you need CMake on your system, while for the \gnu{}
+system you only need Make, \texttt{sh}, GCC, \etc{} That said, CMake is freely
+available for Linux, Windows (including Cygwin) and MacOS.
+
+\subsection{\gnu{} Autotools}
 
 \subsection{Prerequisites}
 
