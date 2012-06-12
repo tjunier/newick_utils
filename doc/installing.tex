@@ -165,6 +165,15 @@ $ sudo /sbin/ldconfig /usr/local/lib
 The last step is done automatically by the Autotools, but apparently not by
 \cmake.
 
+\cmake{} will automatically look for libxml and Lua, and use them if found (see
+above). If you want to explicitly disable any optional feature, set the
+corresponding \texttt{USE\_} variable to \texttt{OFF}, \eg{} to disable Lua (and
+not build \luaed), do:
+
+%\begin{verbatim}
+%$ cmake -D USE_LUA=OFF ../newick_utilities-1.7
+%\end{verbatim}
+
 
 \section{As binaries}
 
