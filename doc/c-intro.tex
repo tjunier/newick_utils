@@ -1,0 +1,87 @@
+\chapter{Introduction}
+
+The \nutils{} are a set of \unix{} (including Mac OS X) and \unix-like (Cygwin) shell programs for working with phylogenetic trees. Their main features are:
+\startitemize
+ \item they require no user interaction\footnote{Why this is a good thing is not the focus of this document: I shall assume that if you are reading this, you already know when a command-line interface is better than an interactive interface.}
+ \item they can work on any number of trees at a time
+ \item they perform well with large trees
+ \item they are implemented as filters\footnote{In \unix{} jargon, a
+ \newconcept{filter} is a program that reads input from standard input and writes
+ output to standard output.}
+ \item they read and write text
+\stopitemize
+They are not tools for \em{making} phylogenies. Rather, they are for
+processing existing ones, by which I mean manipulating the tree or extracting
+information from it: rerooting, simplifying, extracting subtrees, printing
+branch lengths and distances, etc - see table \ref{tbl_prog_list}; a glance
+at the table of contents should also give you an idea.
+
+Each of the programs performs one task (with some variants). For example, here
+is how you would reroot a series of phylograms contained in file
+\texttt{mytrees.nw} using node \texttt{Dmelano} as the outgroup:
+
+\begin{verbatim}
+$ nw_reroot mytrees.nw Dmelano
+\end{verbatim} 
+Now, you might want to make cladograms from the rerooted trees. Program
+\topology{} does the job, and since the utilities are filters, you can do it
+all in a single command:
+\begin{verbatim}
+$ nw_reroot mytrees.nw Dmelano | nw_topology -
+\end{verbatim}
+As you can see, it is straightforward to pipe \nutils{} together, and of course they can be mixed freely with any other shell program (see e.g. \ref{sct_counting_leaves}).
+
+\subsection*{About This Document}
+
+This tutorial is organized as follows: chapter \ref{chap_general} discusses
+common features of the \nutils, chapter \ref{chap_simple} shows examples of
+simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks. 
+
+It is not necessary to read this material in order: you can pretty much jump to
+any section in chapters \ref{chap_simple} and \ref{chap_adv}, they do not
+require reading previous sections. I would suggest reading chapter
+\ref{chap_general}, then section \ref{sct_display} because it explains how all
+the tree graphics were produced.
+
+The files for all the examples in this tutorial can be found in
+subdirectory \texttt{data}.
+
+All the program outputs are generated on-the-fly just before the document is run
+through \LaTeX{}, so they represent the actual output of the latest version of
+the utilities.
+
+\begin{table}[t]
+\begin{tabular}{ll}
+{\bf Program} & {\bf Function } \\
+\hline
+\clade		&	Extracts subtrees specified by node labels\\
+\condense	&	Condenses (simplifies) trees \\
+\display	&	Shows trees as graphs (\ascii{} graphics or \svg) \\
+\duration	&	Convert node ages into duration \\
+\distance	&	Prints distances between nodes, in various ways \\
+\ed				&	Stream editor (\foreign{\`{a} la} \texttt{sed} or \texttt{awk}); see also \luaed{} and \sched \\
+\gen			&	Random tree generator \\
+\nwindent	&	Shows Newick in indented form \\ 
+\labels		&	Prints node labels \\
+\luaed				&	Like \ed, but uses Lua\\
+\match		&	Finds matches of a tree in another one \\
+\order		&	Orders tree (preserving topology) \\
+\prune		&	Removes branches based on labels \\ 
+\rename		&	Changes node labels according to a mapping \\
+\reroot		&	(Re)roots the tree \\
+\sched				&	Like \luaed, but uses Scheme\\
+\stats		&	Prints tree statistics and properties \\
+\support	&	Computes bootstrap support of a tree given replicate trees \\
+\topology	&	Alters branch properties, preserving topology \\
+\trim		&	Trims a tree at a specified depth
+\end{tabular}	
+\caption{The \nutils{} and their functions}
+\label{tbl_prog_list}
+\end{table}
+
+\subsection*{Citing the \nutils}
+
+If you use the \nutils{} for published work, please cite:
+\bibentry{Junier_2010}
+
+
