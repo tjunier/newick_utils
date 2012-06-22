@@ -1,11 +1,33 @@
 \startenvironment nuenv
 
-\define \nutils{Newick Utilities}
-\define \unix{Unix}
+% higher-level (semantic) formatting
 \define[1] \newconcept{{\em #1}}
 \define[1] \foreign{{\it #1}}
 \define[1] \code{{\tt #1}}
 \define[1] \progname{{\tt #1}}
+
+% frequent acronyms, abbreviations, aliases, etc.
+\define \ascii{\cap{ascii}}
+\define \cmake{\cap{cm}ake}
+\define \css{\cap{css}}
+\define \eg{\textit{e.g.}}
+\define \etc{etc.}
+\define \gc{\cap{gc}}
+\define \gnu{\cap{gnu}}
+\define \ie{\textit{i.e.}}
+\define \lca{\cap{lca}}
+\define \libxml{libxml}
+\define \no{Newick order}
+\define \nutils{Newick Utilities}
+\define \nw{Newick}
+\define \pdf{\cap{pdf}}
+\define \phylip{\cap{phylip}}
+\define \stderr{standard error}
+\define \stdin{standard input}
+\define \stdout{standard output}
+\define \svg{\cap{svg}}
+\define \unix{\cap{Unix}}
+\define \xml{\cap{xml}}
 
 % names of programs
 \define \clade{\progname{nw\_clade}}
@@ -21,11 +43,11 @@
 \define \nwindent{\progname{nw\_indent}} % \indent already exists
 \define \order{\progname{nw\_order}}
 \define \prune{\progname{nw\_prune}} 
-\define \reroot{\progname{nw\_reroot}}
 \define \rename{\progname{nw\_rename}}
-\define \support{\progname{nw\_support}}
+\define \reroot{\progname{nw\_reroot}}
 \define \sched{\progname{nw\_sched}}
 \define \stats{\progname{nw\_stats}}
+\define \support{\progname{nw\_support}}
 \define \topology{\progname{nw\_topology}}
 \define \trim{\progname{nw\_trim}}
 
