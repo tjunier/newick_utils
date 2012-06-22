@@ -11,3 +11,6 @@
 *.toc
 *.pdf
 *.bak
+*.mp
+*.tmp
+*.tui

@@ -18,65 +18,67 @@ at the table of contents should also give you an idea.
 
 Each of the programs performs one task (with some variants). For example, here
 is how you would reroot a series of phylograms contained in file
-\texttt{mytrees.nw} using node \texttt{Dmelano} as the outgroup:
+\code{mytrees.nw} using node \code{Dmelano} as the outgroup:
 
-\begin{verbatim}
+\starttyping
 $ nw_reroot mytrees.nw Dmelano
-\end{verbatim} 
+\stoptyping 
 Now, you might want to make cladograms from the rerooted trees. Program
 \topology{} does the job, and since the utilities are filters, you can do it
 all in a single command:
-\begin{verbatim}
+\starttyping
 $ nw_reroot mytrees.nw Dmelano | nw_topology -
-\end{verbatim}
-As you can see, it is straightforward to pipe \nutils{} together, and of course they can be mixed freely with any other shell program (see e.g. \ref{sct_counting_leaves}).
+\stoptyping
+As you can see, it is straightforward to pipe \nutils{} together, and of course they can be mixed freely with any other shell program (see e.g. \in{}[sct_counting_leaves]).
 
 \subsection*{About This Document}
 
-This tutorial is organized as follows: chapter \ref{chap_general} discusses
-common features of the \nutils, chapter \ref{chap_simple} shows examples of
-simple tasks, and chapter \ref{chap_adv} has examples of more advanced tasks. 
+This tutorial is organized as follows: chapter \in{}[chap_general] discusses
+common features of the \nutils, chapter \in{}[chap_simple] shows examples of
+simple tasks, and chapter \in{}[chap_adv] has examples of more advanced tasks. 
 
 It is not necessary to read this material in order: you can pretty much jump to
-any section in chapters \ref{chap_simple} and \ref{chap_adv}, they do not
+any section in chapters \in{}[chap_simple] and \in{}[chap_adv], they do not
 require reading previous sections. I would suggest reading chapter
-\ref{chap_general}, then \in{section}[sct_display] because it explains how all
+\in{}[chap_general], then \in{section}[sct_display] because it explains how all
 the tree graphics were produced.
 
 The files for all the examples in this tutorial can be found in
-subdirectory \texttt{data}.
+subdirectory \code{data}.
 
 All the program outputs are generated on-the-fly just before the document is run
 through \LaTeX{}, so they represent the actual output of the latest version of
 the utilities.
 
 \begin{table}[t]
-\begin{tabular}{ll}
-{\bf Program} & {\bf Function } \\
-\hline
-\clade		&	Extracts subtrees specified by node labels\\
-\condense	&	Condenses (simplifies) trees \\
-\display	&	Shows trees as graphs (\ascii{} graphics or \svg) \\
-\duration	&	Convert node ages into duration \\
-\distance	&	Prints distances between nodes, in various ways \\
-\ed				&	Stream editor (\foreign{\`{a} la} \texttt{sed} or \texttt{awk}); see also \luaed{} and \sched \\
-\gen			&	Random tree generator \\
-\nwindent	&	Shows Newick in indented form \\ 
-\labels		&	Prints node labels \\
-\luaed				&	Like \ed, but uses Lua\\
-\match		&	Finds matches of a tree in another one \\
-\order		&	Orders tree (preserving topology) \\
-\prune		&	Removes branches based on labels \\ 
-\rename		&	Changes node labels according to a mapping \\
-\reroot		&	(Re)roots the tree \\
-\sched				&	Like \luaed, but uses Scheme\\
-\stats		&	Prints tree statistics and properties \\
-\support	&	Computes bootstrap support of a tree given replicate trees \\
-\topology	&	Alters branch properties, preserving topology \\
-\trim		&	Trims a tree at a specified depth
-\end{tabular}	
+
+\starttable[here][]{}{ll}
+{\bf Program} \NC {\bf Function } \MR
+\HL
+\clade		\NC	Extracts subtrees specified by node labels\MR
+\condense	\NC	Condenses (simplifies) trees \MR
+\display	\NC	Shows trees as graphs (\ascii{} graphics or \svg) \MR
+\duration	\NC	Convert node ages into duration \MR
+\distance	\NC	Prints distances between nodes, in various ways \MR
+\ed				\NC	Stream editor (\foreign{\`{a} la} \code{sed} or \code{awk}); see also \luaed{} and \sched \MR
+\gen			\NC	Random tree generator \MR
+\nwindent	\NC	Shows Newick in indented form \MR 
+\labels		\NC	Prints node labels \MR
+\luaed				\NC	Like \ed, but uses Lua\MR
+\match		\NC	Finds matches of a tree in another one \MR
+\order		\NC	Orders tree (preserving topology) \MR
+\prune		\NC	Removes branches based on labels \MR 
+\rename		\NC	Changes node labels according to a mapping \MR
+\reroot		\NC	(Re)roots the tree \MR
+\sched				\NC	Like \luaed, but uses Scheme\MR
+\stats		\NC	Prints tree statistics and properties \MR
+\support	\NC	Computes bootstrap support of a tree given replicate trees \MR
+\topology	\NC	Alters branch properties, preserving topology \MR
+\trim		\NC	Trims a tree at a specified depth
+\stoptable	
 \caption{The \nutils{} and their functions}
 \label{tbl_prog_list}
+
 \end{table}
 
 \subsection*{Citing the \nutils}
