@@ -82,10 +82,7 @@ nwutils_tutorial.pdf: *.tex *.bib \
 	$(text_command_strings) \
 	$(text_command_outputs) \
 	$(homino_pdfs) $(nodes_vs_depth_pdfs) bootscan_1.pdf
-	pdflatex nwutils_tutorial.tex
-	bibtex   nwutils_tutorial.aux
-	pdflatex nwutils_tutorial.tex
-	pdflatex nwutils_tutorial.tex
+	context manual
 
 HRV_3UTR.dna.bscan.eps:
 	bootscan.sh HRV_3UTR.dna HRV-93 CL073908

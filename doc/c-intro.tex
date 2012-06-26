@@ -10,7 +10,7 @@ The \nutils{} are a set of \unix{} (including Mac OS X) and \unix-like (Cygwin) 
  output to standard output.}
  \item they read and write text
 \stopitemize
-They are not tools for \em{making} phylogenies. Rather, they are for
+They are not tools for {\em making} phylogenies. Rather, they are for
 processing existing ones, by which I mean manipulating the tree or extracting
 information from it: rerooting, simplifying, extracting subtrees, printing
 branch lengths and distances, etc - see \in{table}[tbl_prog_list]; a glance
@@ -31,7 +31,7 @@ $ nw_reroot mytrees.nw Dmelano | nw_topology -
 \stoptyping
 As you can see, it is straightforward to pipe \nutils{} together, and of course they can be mixed freely with any other shell program (see e.g. \in{}[sct_counting_leaves]).
 
-\subsection*{About This Document}
+\subsection{About This Document}
 
 This tutorial is organized as follows: chapter \in{}[chap_general] discusses
 common features of the \nutils, chapter \in{}[chap_simple] shows examples of
@@ -77,7 +77,10 @@ the utilities.
 \NC \trim		\NC	Trims a tree at a specified depth
 \stoptabulate
 
-\subsection*{Citing the \nutils}
+\subsection{Citing the \nutils}
+
+\setupbibtex[database={citation},sort=author]
+\setuppublications[alternative=apa]
 
 If you use the \nutils{} for published work, please cite:
 \placepublications[criterium=all]

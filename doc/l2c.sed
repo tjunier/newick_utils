@@ -3,6 +3,8 @@
 
 # Sectioning 
 s/\\chapter\*/\\chapter/
+s/\\section\*/\\section/
+s/\\subsection\*/\\subsection/
 
 # Environments
 s/\\begin{itemize}/\\startitemize/
@@ -11,7 +13,7 @@ s/\\begin{verbatim}/\\starttyping/
 s/\\end{verbatim}/\\stoptyping/
 
 # Formatting, fonts, etc.
-s/\\emph/\\em/g
+s/\\emph{/{\\em /g
 
 # Cross-references
 s/section \\ref{\([A-Za-z0-9_-]\+\)}/\\in{section}[\1]/g
