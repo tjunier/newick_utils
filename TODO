@@ -5,7 +5,7 @@ doc: nw_display: add CSS to labels (in CSS map) [done, just add to manual]
 
 nw_rename: add example to -h about 3-arg form; also discuss in tutorial.
 
-valgrind
+[done] valgrind
 
 RELEASE
 
