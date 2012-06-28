@@ -1,32 +1,88 @@
 \startenvironment nuenv
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \defines
+
+% Typographical tropes (not sure whether or not to keep emphasis)
+\define \adhoc{{\em ad hoc}}
+\define \apriori{{\em a priori}}
+\define \ie{{\em i.e.}}
+\define \eg{{\em e.g.}}
+\define \vs{{\em vs.}}
+\define \vv{{\em vice versa}}
+\define \etc{etc.}
+
 % higher-level (semantic) formatting
 \define[1] \newconcept{{\em #1}}
 \define[1] \foreign{{\it #1}}
 \define[1] \code{{\tt #1}}
 \define[1] \progname{{\tt #1}}
+\define[1] \sciname{{\em #1}}	% Scientific name in italics
+%\define[1] \degC{$#1\,^{\circ}{\rm C}$}
 
 % frequent acronyms, abbreviations, aliases, etc.
+\define \aids{\cap{aids}}
 \define \ascii{\cap{ascii}}
+\define \bincons{BinCons}  
+%\define \blast{\cap{blast}}
+%\define \blastx{\cap{blastx}}
+%\define \blastz{\cap{blastz}}
+%\define \blat{\cap{blat}}
+\define \cegg{\cap{cegg}}
+\define \cli{\cap{cli}}
 \define \cmake{\cap{cm}ake}
+%\define \cnc{\cap{cnc}}
+%\define \cncs{\cap{cnc}s}
+%\define \cnv{\cap{cnv}}
+\define \cpu{\cap{cpu}}
 \define \css{\cap{css}}
-\define \eg{\textit{e.g.}}
-\define \etc{etc.}
-\define \gc{\cap{gc}}
+\define \dna{\cap{dna}}
+\define \emboss{\cap{emboss}}
+%\define \encode{\cap{encode}}
+%\define \enredo{Enredo}
+%\define \ensembl{Ens\cap{embl}}
+%\define \gc{\cap{gc}}
+%\define \gerp{\cap{gerp}}
 \define \gnu{\cap{gnu}}
-\define \ie{\textit{i.e.}}
+%\define \gtf{\cap{gtf}}
+%\define \gtr{\cap{gtr}}
+\define \hev{\cap{hev}}
+\define \hiv{\cap{hiv}}
+%\define \hmm{\cap{hmm}}
+\define \hrv{\cap{hrv}}
+%\define \lagan{\cap{lagan}}	
 \define \lca{\cap{lca}}
 \define \libxml{libxml}
+%\define \mlagan{\cap{mlagan}}	
+\define \ml{\cap{ml}}	
+\define \MP{\cap{mp}}	% \mp is already defined (-+)
+%\define \multiz{\cap{multiz}}	
+\define \nj{\cap{nj}}
 \define \no{Newick order}
 \define \nutils{Newick Utilities}
 \define \nw{Newick}
+%\define \orf{\cap{orf}}
+%\define \pcr{\cap{pcr}}
 \define \pdf{\cap{pdf}}
+%\define \pecan{Pecan}
 \define \phylip{\cap{phylip}}
+\define \picornaviridae{\sciname{Picornaviridae}} % apparently virus familiy names take italics
+\define \rna{\cap{rna}}
+%\define \scone{\cap{scone}}
+%\define \sine{\cap{sine}}
+%\define \slagan{\cap{slagan}}
+%\define \snp{\cap{snp}}
+%\define \sql{\cap{sql}}
 \define \stderr{standard error}
 \define \stdin{standard input}
 \define \stdout{standard output}
 \define \svg{\cap{svg}}
+%\define \tba{\cap{tba}}
+%\define \uce{\cap{uce}}
+%\define \ucsc{\cap{ucsc}}
 \define \unix{\cap{Unix}}
+\define \upgma{\cap{upgma}}
+%\define \utr{\cap{utr}}
 \define \xml{\cap{xml}}
 
 % names of programs
@@ -51,6 +107,124 @@
 \define \topology{\progname{nw\_topology}}
 \define \trim{\progname{nw\_trim}}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+
 \setuppublications[alternative=apa]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fonts
+
+% This is the best parametrization I've found so far (though to be
+% honest I still don't understand all the details :-)). It allows Palatino as a
+% main font while still allowing capital Gamma and monospace style for URLs -
+% at least on Ubuntu...
+
+\definetypeface [mainface] [rm] [serif] [palatino] [default] [features=default]
+\definetypeface [mainface] [ss] [sans]  [delicious] [default] [features=default,
+rscale=1.1]
+\definetypeface [mainface] [tt] [mono]  [modern] [default] [features=default,
+rscale=1.1]
+\definetypeface [mainface] [mm] [math]  [palatino] [default] [encoding=texnansi]
+% Euler fonts don't display the % sign (alas, poor Euler, and I am writing this
+% in Basel).
+%\definetypeface [mainface] [mm] [math]  [euler] [euler] [encoding=texnansi, rscale=1.03]
+
+\setupbodyfont[mainface,12pt]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Layout
+
+% Defaults:
+% textwidth: 15cm
+% leftmargin: 2.6 cm
+% rightmargin: 2.6 cm
+% \setuplayout[leftmargin=3.1cm,rightmargin=3.1cm,textwidth=14cm]
+% \setuppagenumbering[alternative=doublesided,location=footer]
+% \setupwhitespace[medium]
+
+% \setupheadertexts
+% [] [\setups{text:header:1}]
+% [\setups{text:header:2}] []
+% \startsetups text:header:1
+% \getmarking[part][current]
+% \quad
+% \stopsetups
+% \startsetups text:header:2
+% \quad
+% \getmarking[part][current]
+% \stopsetups
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Sectioning
+\setuphead[subsubsubsection][number=no,style={\switchtobodyfont[14pt]\bf}]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lengths
+
+\define \pubscale{950}	% for included publications
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Math functions
+% \newcommand{\argmax}{\mathop{\rm{arg\,max}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% URLs
+%
+\setupurl[style=type]
+% \useURL[ensembl][http://www.ensembl.org/index.html]
+% \useURL[viralzone][http://expasy.org/viralzone]
+% \useURL[ictvdb][http://www.ictvdb.org]
+% \useURL[cdc-non-polio][http://www.cdc.gov/ncidod/dvrd/revb/enterovirus/non-polio_entero.htm]
+\useURL[newick-format][http://evolution.genetics.washington.edu/phylip/newicktree.html]
+% \useURL[ToL][http://www.tolweb.org]
+% \useURL[GOLD][http://genomesonline.org/gold\_statistics.htm]
+% \useURL[unit-tests][http://www.extremeprogramming.org/rules/unittests.html]
+% \useURL[XP][http://www.extremeprogramming.org/index.html]
+% \useURL[vista][http://genome.lbl.gov/vista/index.shtml]
+% \useURL[ecr][http://ecrbrowser.dcode.org/]
+% \useURL[ucsc][http://genome.ucsc.edu/]
+% \useURL[GOTM][http://bioinfo.vanderbilt.edu/webgestalt/]
+
+	
+% NOTE: I use this to wrap URLs (using '||' to mark breakpoints at slashes). On
+% my Fedora box it works (i.e., it inserts a '/' when needed), but it seems to
+% fail under Ubuntu.
+\setuphyphenmark[sign=/]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Floats
+\setupcaptions[style=small]
+
+
+% for my own marginalia
+\setupinmargin[style=\slx,align=inner,width=3.5cm,location=flushright]
+% To suppress all margin notes, use:
+% \define[1] \marg{}
+\define[1] \marg{\margintext{#1}}
+
+% For floating remarks
+\definefloat[remark][remarks]
+\setupfloat[remark][strut=yes,frame=off,bottomframe=on,leftframe=on,rightframe=on,framecorner=round,background=screen]
+\setupcaption[remark][frame=on,location=top]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lists
+
+\definedescription[definition][location=left,headstyle=bold]
+\setupcombinedlist[content][alternative=b]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Footnotes
+\setupfootnotes[width=\textwidth]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Indenting
+\setupindenting[2em,yes]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Interaction
+\setupcombinedlist[content][interaction=all]	% ToC
+\setupinteraction[state=start]
 
 \stopenvironment
