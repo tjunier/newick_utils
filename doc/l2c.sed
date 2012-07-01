@@ -23,7 +23,7 @@ s/\\begin{samepage}/\\page[no]/
 s/\\end{samepage}//
 
 # Other commands
-s/\\verbatiminput{\(.*\)}/\\starttyping\n\\input \1\n\\stoptyping/
+s/\\verbatiminput{/\\typefile{/
 
 # Formatting, fonts, etc.
 s/\\emph{/{\\em /g
