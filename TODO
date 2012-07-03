@@ -5,6 +5,9 @@ doc: nw_display: add CSS to labels (in CSS map) [done, just add to manual]
 
 nw_rename: add example to -h about 3-arg form; also discuss in tutorial.
 
+test nw_display with fixed scale (-w <negative num>) on trees with small
+lengths, e.g. whole tree depth less than 0.1. Try e.g. 3_clusters.nw.
+
 valgrind
 
 RELEASE
