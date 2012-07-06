@@ -4,7 +4,7 @@
 # \NRs.
 
 s/\\begin{table}.*/\\placetable[here][]{}/
-s/\\begin{tabular}/\\starttabulate[]/
+s/\\begin{tabular}{\(.*\)}/\\starttabulate[\1]/
 s/\\hline/\\HL/
 s/&/\\NC/g
 s/\\\\/\\NC\\NR/

@@ -71,37 +71,33 @@ themselves are aligned. See \in{}[sct_duration] for an example.
 Even lowly text graphics can have style! Option \code{-e} allows you to
 change the way text graphs look:
 
-\begin{center}
-\begin{tabular}{cl}
-Argument to \code{-e} & Effect \\
-\hline 
-\code{r} & (raw) use just \type{|}, \type{-}, and \type{+}, and \type{=} for the root. \\
-\code{c} & (commas) corners are marked with \type{'} and \type{,} \\
-\code{s} & (slashes) corners are marked with \type{/} and \type{\textbackslash} \\
-\code{v} & (VT100) use VT100 pseudo-graphical characters
-\end{tabular}
-\end{center}
+\startalignment[center]
+\starttabulate[|c|l|]
+\NC Argument to \code{-e} \NC Effect \NC\NR
+\HL 
+\NC \code{r} \NC (raw) use just \type{|}, \type{-}, and \type{+}, and \type{=} for the root. \NC\NR
+\NC \code{c} \NC (commas) corners are marked with \type{'} and \type{,} \NC\NR
+\NC \code{s} \NC (slashes) corners are marked with \type{/} and \type{\textbackslash} \NC\NR
+\NC \code{v} \NC (VT100) use VT100 pseudo-graphical characters \NC\NR
+\stoptabulate
+\stopalignment[center]
 
 \noindent{}Here are some examples:
 
-\begin{center}
-{\footnotesize
-\begin{tabular}{p{0.4\textwidth}p{0.1\textwidth}p{0.4\textwidth}}
-\typefile{display_21_txt.cmd}
-\typefile{display_21_txt.out}
-& &
-\typefile{display_22_txt.cmd}
-\typefile{display_22_txt.out}
-\\
-\typefile{display_23_txt.cmd}
-\typefile{display_23_txt.out}
-& &
+\startalignment[center]
+{\tfx
+\starttabulate[p{0.4\textwidth}p{0.1\textwidth}p{0.4\textwidth}]
+\typefile{display_21_txt.cmd} \typefile{display_21_txt.out}
+\NC \NC
+\typefile{display_22_txt.cmd} \typefile{display_22_txt.out} \NC\NR
+\typefile{display_23_txt.cmd} \typefile{display_23_txt.out} \NC \NC
 \typefile{display_24_txt.cmd}
 \includegraphics[width=0.5\textwidth]{display_24_txt.png}
 This is a screenshot because I don't know how to show VT100 special characters in \LaTeX{} :-)
-\end{tabular}
+\stoptabulate
 }
-\end{center}
+
+\stopalignment[center]
 
 \noindent{}By default, \display{} uses "slashes", unless overridden by
 environment variable \code{NW\_DISPLAY\_TEXT\_STYLE}. This should have a
@@ -155,9 +151,9 @@ The following \pdf{} image was produced like this:
 $ inkscape -f catarrhini.svg -D -A catarrhini.pdf
 \stoptyping
 
-\begin{center}
+\startalignment[center]
  \includegraphics{display_3_svg.pdf}
-\end{center}
+\stopalignment[center]
 All \svg{} images shown in this tutorial were processed in the same way. In the
 rest of the document we will usually skip the redirection into an \svg{} file
 and omit the \svg{}-to-\cap{pdf} conversion step.
@@ -179,9 +175,9 @@ columns; \code{-I} controls the placement of inner node labels.
 
 You can make radial trees by passing the \code{-r} switch:
 \typefile{display_4_svg.cmd}
-\begin{center}
+\startalignment[center]
 \includegraphics{display_4_svg.pdf}
-\end{center}
+\stopalignment[center]
 
 \subsubsection[sct_display_svg_css]{Using CSS}
 
@@ -196,9 +192,9 @@ the tree above by passing \code{-c}, which takes the name of the \css{} file
 as argument:
 
 \typefile{display_5_svg.cmd}
-\begin{center}
+\startalignment[center]
  \includegraphics{display_5_svg.pdf}
-\end{center}
+\stopalignment[center]
 
 The syntax of the \css{} map file is as follows:
 \startitemize
@@ -263,18 +259,18 @@ and option \code{-b} the branch length style. For example, the following tree,
 which was produced using defaults, could be improved a bit:
 
 \typefile{display_6_svg.cmd}
-\begin{center}
+\startalignment[center]
   \includegraphics{display_6_svg.pdf}
-\end{center}
+\stopalignment[center]
 
 \noindent{}Let's remove the branch length labels, reduce
 the vertical spacing, reduce the size of inner node labels (bootstrap values),
 and write the leaf labels in italics, using a font with serifs:
 
 \typefile{display_7_svg.cmd}
-\begin{center}
+\startalignment[center]
   \includegraphics{display_7_svg.pdf}
-\end{center}
+\stopalignment[center]
 
 \noindent{}Still not perfect, but much better. Option \code{-v} specifies the
 vertical spacing, in pixels, between two successive leaves (the default is 40).
@@ -289,9 +285,9 @@ What if we want to change the default style? Say we want the branches in blue,
 and two pixels wide? That's option \code{-d}:
 
 \typefile{display_13_svg.cmd}
-\begin{center}
+\startalignment[center]
   \includegraphics{display_13_svg.pdf}
-\end{center}
+\stopalignment[center]
 
 \subsection{Ornaments}
 
@@ -319,16 +315,16 @@ specified with option \code{-o}:
  \typefile{ornament.map}
 \end{quote}
 \typefile{display_8_svg.cmd}
-\begin{center}
+\startalignment[center]
  \includegraphics{display_8_svg.pdf}
-\end{center}
+\stopalignment[center]
 
 \noindent{}Ornaments and \css{} can be combined:
 
 \typefile{display_9_svg.cmd}
-\begin{center}
+\startalignment[center]
  \includegraphics{display_9_svg.pdf}
-\end{center}
+\stopalignment[center]
 
 \subsubsection[sct:display:libxml]{\libxml}
 
@@ -363,9 +359,9 @@ values are perpendicular to the $x$ axis.
 This gives the following:
 
 \typefile{display_18_svg.cmd}
-\begin{center}
+\startalignment[center]
 \includegraphics{display_18_svg.pdf}
-\end{center}
+\stopalignment[center]
 
 As hinted above, \libxml{} also allows handling of images:
 
@@ -374,9 +370,9 @@ As hinted above, \libxml{} also allows handling of images:
 This gives the following (credits: all images are from Wikipedia):
 
 \typefile{display_19_svg.cmd}
-\begin{center}
+\startalignment[center]
 \includegraphics{display_19_svg.pdf}
-\end{center}
+\stopalignment[center]
 
 \subsubsection[sct_display_ornament_xpl_gc]{Example: Mapping GC Content}
 
@@ -393,9 +389,9 @@ and mapped it into a gradient that goes from {\color{Blue} blue} (33.3\%) to
 the gradient. Then:
 
 \typefile{display_10_svg.cmd}
-\begin{center}
+\startalignment[center]
 \includegraphics{display_10_svg.pdf}
-\end{center}
+\stopalignment[center]
 \bigskip{}
 
 \noindent{}As we can see, the high-\gc{} sequences are all found in the same

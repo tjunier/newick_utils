@@ -21,6 +21,8 @@ s/\\begin{verbatim}/\\starttyping/
 s/\\end{verbatim}/\\stoptyping/
 s/\\begin{samepage}/\\page[no]/
 s/\\end{samepage}//
+s/\\begin{center}/\\startalignment[center]/
+s/\\end{center}/\\stopalignment[center]/
 
 # Other commands
 s/\\verbatiminput{/\\typefile{/
@@ -28,6 +30,7 @@ s/\\verbatiminput{/\\typefile{/
 # Formatting, fonts, etc.
 s/\\emph{/{\\em /g
 s/\\textsc/\\cap/g
+s/\\footnotesize/\\tfx/g
 
 # Cross-references
 s/section \\ref{\([A-Za-z0-9_-]\+\)}/\\in{section}[\1]/g
