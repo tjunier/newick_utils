@@ -1,6 +1,5 @@
 
-\section{Displaying Trees}
-\label{sct_display}
+\section[sct_display]{Displaying Trees}
 
 Perhaps the simplest and most common operation on a \nw{} tree is just to look
 at it. But a \nw{} tree is not very intuitive for us humans, as we can quickly
@@ -14,8 +13,7 @@ see by looking \eg{} at a tree of Old World primates:
 \noindent{}So we want to make a graphical representation from it. This is the
 purpose of the \display{} program. 
 
-\subsection{As Text}
-\label{sct_display_text}
+\subsection[sct_display_text]{As Text}
 
 At its simplest, \display{} just outputs a text graph. Here is the primates tree, shown with \display{}:
 \page[no]
@@ -30,7 +28,7 @@ That's pretty low-tech compared to interactive, colorful, high-resolution displa
 use that many columns when drawing the tree. If the output is not a terminal
 (but, say, a file or pipe), or if for some reason the width cannot be found or
 is not defined, then the program uses a default of 80 characters. You can use
-option \texttt{-w} to override the defaults.
+option \code{-w} to override the defaults.
 
 \page[no]
 \typefile{display_2_txt.cmd}
@@ -39,7 +37,7 @@ option \texttt{-w} to override the defaults.
 
 \subsubsection{Fixing Scale}
 
-Option \texttt{-w} can also be used to fix the scale (in columns/branch length
+Option \code{-w} can also be used to fix the scale (in columns/branch length
 units). To do so, just pass a negative number\footnote{This way it is
 impossible to specify both width and scale, which would be absurd as one is
 always derived from the other.}. For example, to use half a column per unit
@@ -51,9 +49,9 @@ length, do:
 
 
 \noindent{} So a branch of length 10 (such as the parent branch of
-Homo\footnote{To know the length of an edge, you can use \distance{} \texttt{-m
+Homo\footnote{To know the length of an edge, you can use \distance{} \code{-m
 p -n} -- see \ref{sct:distance}.}) occupies five characters (up to rounding
-error). And to use two columns per unit length, one would pass \texttt{-w -2},
+error). And to use two columns per unit length, one would pass \code{-w -2},
 etc.
 
 If there is more than one tree in the input, they will all be drawn at the same scale, which makes them easier to compare visually.
@@ -61,26 +59,26 @@ If there is more than one tree in the input, they will all be drawn at the same 
 \subsubsection{Scale Bar}
 
 If the tree is a phylogram, \display{} prints a scale bar. Its units can be
-specified with option \texttt{-u}, the default is substitutions per site. To
-suppress the scale bar, pass the \texttt{-S} switch. The scale bar can also "go
-backwards" (option \texttt{-t}), \ie{} the scale bar's zero is aligned with the
+specified with option \code{-u}, the default is substitutions per site. To
+suppress the scale bar, pass the \code{-S} switch. The scale bar can also "go
+backwards" (option \code{-t}), \ie{} the scale bar's zero is aligned with the
 leaves and units increase towards the root. This is handy when the units are
 ages, \eg{} in millions of years ago, but it only makes much sense if the leaves
 themselves are aligned. See \in{}[sct_duration] for an example.
 
 \subsubsection{Styles}
 
-Even lowly text graphics can have style! Option \texttt{-e} allows you to
+Even lowly text graphics can have style! Option \code{-e} allows you to
 change the way text graphs look:
 
 \begin{center}
 \begin{tabular}{cl}
-Argument to \texttt{-e} & Effect \\
+Argument to \code{-e} & Effect \\
 \hline 
-\texttt{r} & (raw) use just \texttt{|}, \texttt{-}, and \texttt{+}, and \texttt{=} for the root. \\
-\texttt{c} & (commas) corners are marked with \texttt{'} and \texttt{,} \\
-\texttt{s} & (slashes) corners are marked with \texttt{/} and \texttt{\textbackslash} \\
-\texttt{v} & (VT100) use VT100 pseudo-graphical characters
+\code{r} & (raw) use just \type{|}, \type{-}, and \type{+}, and \type{=} for the root. \\
+\code{c} & (commas) corners are marked with \type{'} and \type{,} \\
+\code{s} & (slashes) corners are marked with \type{/} and \type{\textbackslash} \\
+\code{v} & (VT100) use VT100 pseudo-graphical characters
 \end{tabular}
 \end{center}
 
@@ -106,17 +104,17 @@ This is a screenshot because I don't know how to show VT100 special characters i
 \end{center}
 
 \noindent{}By default, \display{} uses "slashes", unless overridden by
-environment variable \texttt{NW\_DISPLAY\_TEXT\_STYLE}. This should have a
-value of \texttt{raw}, \texttt{commas}, \texttt{slashes}, or \texttt{VT100}
+environment variable \code{NW\_DISPLAY\_TEXT\_STYLE}. This should have a
+value of \code{raw}, \code{commas}, \code{slashes}, or \code{VT100}
 (case is irrelevant, and actually only the first character is read, so you can
-abbreviate to \texttt{r}, \texttt{c}, \texttt{s}, or \texttt{v}).
+abbreviate to \code{r}, \code{c}, \code{s}, or \code{v}).
 
 \subsubsection{Placement of Inner Node Labels}
 
-Option \texttt{-I} controls the placement of inner node labels. It takes an
-argument, which can be \texttt{l} (lowercase l -- towards the leaves),
-\texttt{m} (in the middle), or \texttt{r} (towards the root). The default
-behaviour is \texttt{l}.  Here is the above tree, with inner labels near the
+Option \code{-I} controls the placement of inner node labels. It takes an
+argument, which can be \code{l} (lowercase l -- towards the leaves),
+\code{m} (in the middle), or \code{r} (towards the root). The default
+behaviour is \code{l}.  Here is the above tree, with inner labels near the
 root:
 
 \typefile{display_14_txt.cmd}
@@ -124,8 +122,7 @@ root:
 \typefile{display_14_txt.out}
 
 
-\subsection[As SVG]{As Scalable Vector Graphics}
-\label{sct_display_svg}
+\subsection[sct_display_svg]{As Scalable Vector Graphics}
 
 First, a disclaimer: there are dozens of tools for viewing trees out there, and
 I'm not interested in competing with them. The reasons why I included \svg{}
@@ -139,7 +136,7 @@ popular software I will not name here - either it was painfully slow, or it
 simply crashed, or else the output was unreadable, incomplete, or otherwise
 unsuitable.}
 \stopitemize
-To produce \svg, pass option \texttt{-s}:
+To produce \svg, pass option \code{-s}:
 \starttyping
 $ nw_display -s catarrhini > catarrhini.svg
 \stoptyping
@@ -167,36 +164,35 @@ and omit the \svg{}-to-\cap{pdf} conversion step.
 
 \subsubsection{Text-mode options}
 
-Many options for \ascii{} trees also work for \svg{}: \texttt{-S} suppresses the
+Many options for \ascii{} trees also work for \svg{}: \code{-S} suppresses the
 scale bar\footnote{The positioning of the scale bar is a bit crude in \svg{}
 mode, especially for radial trees. This is mainly because of the "\svg{} string
 length curse", that is, the impossibility of finding out the length of a text
 string in \svg.  This means it is hard to ensure the scale bar will not overlap
 with a node label, unless one places it far away in a corner, which is what I do
-for now. An improvement to this is on my TODO list.}, and \texttt{-u} specifies
-its units; \texttt{-w} governs the tree's width (or fixes the scale if its
+for now. An improvement to this is on my TODO list.}, and \code{-u} specifies
+its units; \code{-w} governs the tree's width (or fixes the scale if its
 argument is negative), except that for \svg{} the value is in pixels instead of
-columns; \texttt{-I} controls the placement of inner node labels. 
+columns; \code{-I} controls the placement of inner node labels. 
 
 \subsubsection{Radial trees}
 
-You can make radial trees by passing the \texttt{-r} switch:
+You can make radial trees by passing the \code{-r} switch:
 \typefile{display_4_svg.cmd}
 \begin{center}
 \includegraphics{display_4_svg.pdf}
 \end{center}
 
-\subsubsection{Using CSS}
-\label{sct_display_svg_css}
+\subsubsection[sct_display_svg_css]{Using CSS}
 
 You can modify node style using Cascading Style Sheets (\css,
 (\url{www.w3.org/Style/CSS}). This is done by specifying a \textit{\css{} map},
 which is just a text file that says which style should be applied to which node.
-For example, if file \texttt{css.map} contains the following
+For example, if file \filename{css.map} contains the following
 \begin{quote}
 \typefile{css.map}
 \end{quote} we can apply the style map to
-the tree above by passing \texttt{-c}, which takes the name of the \css{} file
+the tree above by passing \code{-c}, which takes the name of the \css{} file
 as argument:
 
 \typefile{display_5_svg.cmd}
@@ -206,7 +202,7 @@ as argument:
 
 The syntax of the \css{} map file is as follows:
 \startitemize
-	\item A line that starts with a \texttt{\#} (hash) is a comment, and will be
+	\item A line that starts with a \type{\#} (hash) is a comment, and will be
 	ignored, as will be any line that contains only whitespace (space and TAB),
 	as well as empty lines.
 	\item Each line describes one style and the set of nodes to which it applies.
@@ -215,55 +211,55 @@ The syntax of the \css{} map file is as follows:
 	\item The first element of the line is the style, and it is a snippet of
 	\css{} code. 
 	\item The second element states whether the following nodes are to be treated
-	individually or as a clade. It is either \texttt{Clade},
-	\texttt{Individual}, or \texttt{Label} (which can be abbreviated to
-	\texttt{C}, \texttt{I}, or \texttt{L}, respectively). 
+	individually or as a clade. It is either \code{Clade},
+	\code{Individual}, or \code{Label} (which can be abbreviated to
+	\code{C}, \code{I}, or \code{L}, respectively). 
 	\item The remaining element(s) are node labels and specify the nodes to which
-	the style must be applied: if the second element is \texttt{Clade}, the
+	the style must be applied: if the second element is \code{Clade}, the
 	program finds the last common ancestor of the nodes and applies the style to
 	that node and all its descendants. If the second element is
-	\texttt{Individual}, then the style is only applied to the nodes themselves.
-	If the second element is \texttt{Label}, then the style is applied to the
+	\code{Individual}, then the style is only applied to the nodes themselves.
+	If the second element is \code{Label}, then the style is applied to the
 	labels.
 \stopitemize
 
-\noindent{}In our example, \texttt{css.map}:
+\noindent{}In our example, \filename{css.map}:
 \startitemize
-	\item line 2 states that the style \texttt{stroke:red} must be applied
-		to the \texttt{Clade} defined by \texttt{Macaca} and
-		\texttt{Cercopithecus}, which consists of these two nodes, their ancestor
-		\texttt{Cercopithecinae}, and \texttt{Papio}. 
-	\item Line 4 prescribes that style \texttt{stroke:\#fa7} (an \svg{}
+	\item line 2 states that the style \code{stroke:red} must be applied
+		to the \code{Clade} defined by \code{Macaca} and
+		\code{Cercopithecus}, which consists of these two nodes, their ancestor
+		\code{Cercopithecinae}, and \code{Papio}. 
+	\item Line 4 prescribes that style \code{stroke:\#fa7} (an \svg{}
 		hexadecimal color specification) must be applied to the clade defined by
-		\texttt{Homo} and \texttt{Hylobates}, which consists of these two nodes,
+		\code{Homo} and \code{Hylobates}, which consists of these two nodes,
 		their last common ancestor (unlabeled), and all its descendants (that is,
-		\texttt{Homo}, \texttt{Pan}, \texttt{Gorilla}, \texttt{Pongo}, and
-		\texttt{Hylobates}, as well as the inner nodes \texttt{Hominini},
-		\texttt{Homininae} and \texttt{Hominidae}). 
-	\item Line 6 instructs that the style \texttt{stroke:green} be applied
-		individually to nodes \texttt{Colobus} and \texttt{Cercopithecus}, and only
+		\code{Homo}, \code{Pan}, \code{Gorilla}, \code{Pongo}, and
+		\code{Hylobates}, as well as the inner nodes \code{Hominini},
+		\code{Homininae} and \code{Hominidae}). 
+	\item Line 6 instructs that the style \code{stroke:green} be applied
+		individually to nodes \code{Colobus} and \code{Cercopithecus}, and only
 		these nodes - not to the clade that they define.  
-	\item Line 8 says that style \texttt{stroke-width:2;~stroke:blue} should be
-		applied to the clade defined by \texttt{Homo} and \texttt{Pan} - note that
+	\item Line 8 says that style \code{stroke-width:2;~stroke:blue} should be
+		applied to the clade defined by \code{Homo} and \code{Pan} - note that
 		the quotes have been removed: they are not part of the style, rather they
 		allow us to improve readability by adding some whitespace.
-	\item Line 10 specifies color \texttt{blue} for labels \texttt{Homo},
-		\texttt{Pan},
-		and \texttt{Hominini}.
+	\item Line 10 specifies color \code{blue} for labels \code{Homo},
+		\code{Pan},
+		and \code{Hominini}.
 \stopitemize
 
 The style of an inner clade overrides that of an outer clade, \textit{e.g.},
-although the \texttt{Homo} - \texttt{Pan} clade is nested inside the
-\texttt{Homo} - \texttt{Hylobates} clade, it has its own style (blue, wide
+although the \code{Homo} - \code{Pan} clade is nested inside the
+\code{Homo} - \code{Hylobates} clade, it has its own style (blue, wide
 lines) which overrides the containing clade's style (pinkish with normal
-width).  Likewise, \texttt{Individual} overrides \texttt{Clade}, which is why
-\texttt{Cercopithecus} is green even though it belongs to a "red" clade.
+width).  Likewise, \code{Individual} overrides \code{Clade}, which is why
+\code{Cercopithecus} is green even though it belongs to a "red" clade.
 
 \bigskip
 
-Label styles can also be applied globally. Option \texttt{-l} (lowercase l)
-specifies the leaf label style, option \texttt{-i} the inner node label style,
-and option \texttt{-b} the branch length style. For example, the following tree,
+Label styles can also be applied globally. Option \code{-l} (lowercase l)
+specifies the leaf label style, option \code{-i} the inner node label style,
+and option \code{-b} the branch length style. For example, the following tree,
 which was produced using defaults, could be improved a bit:
 
 \typefile{display_6_svg.cmd}
@@ -280,17 +276,17 @@ and write the leaf labels in italics, using a font with serifs:
   \includegraphics{display_7_svg.pdf}
 \end{center}
 
-\noindent{}Still not perfect, but much better. Option \texttt{-v} specifies the
+\noindent{}Still not perfect, but much better. Option \code{-v} specifies the
 vertical spacing, in pixels, between two successive leaves (the default is 40).
-Option \texttt{-b} sets the style of branch labels, option \texttt{-l} sets the
-style of leaf labels, and option \texttt{-i} sets the style of inner node
+Option \code{-b} sets the style of branch labels, option \code{-l} sets the
+style of leaf labels, and option \code{-i} sets the style of inner node
 labels. Note that we did not {\em discard} the branch lengths (we could do
 this with \topology), because doing so would reduce the tree to a cladogram.
-Instead, we set their \css{} style to \texttt{opacity:0}
-(\texttt{visibility:hidden} also works).
+Instead, we set their \css{} style to \code{opacity:0}
+(\code{visibility:hidden} also works).
 
 What if we want to change the default style? Say we want the branches in blue,
-and two pixels wide? That's option \texttt{-d}:
+and two pixels wide? That's option \code{-d}:
 
 \typefile{display_13_svg.cmd}
 \begin{center}
@@ -302,23 +298,23 @@ and two pixels wide? That's option \texttt{-d}:
 Ornaments are arbitrary snippets of \svg{} code that are displayed at specified
 node positions. Like \css, this is done with a map. The ornament map has the
 same syntax as the \css{} map, except that you specify \svg{} elements rather
-than \css{} styles. The \texttt{Individual} keyword means that all nodes named
-on a given line sport the corresponding ornament, while \texttt{Clade} means
+than \css{} styles. The \code{Individual} keyword means that all nodes named
+on a given line sport the corresponding ornament, while \code{Clade} means
 that only the clade's \lca{} must be adorned. The ornament is translated in
 such a way that its (0,0) coordinate corresponds to the position of the node.
 In radial graphs, text ornaments are rotated like node labels.
 
-The following file, \texttt{ornament.map}, instructs to draw a red circle with
-a black border on \texttt{Homo} and \texttt{Pan}, and a cyan circle with a blue
-border on the root of the \texttt{Homo} - \texttt{Hylobates} clade.
-\texttt{Gorilla} node will be annotated with the word "plains", and
-\texttt{Pongo} with "Borneo" in italics\footnote{In fact, to annotate that these
+The following file, \filename{ornament.map}, instructs to draw a red circle with
+a black border on \code{Homo} and \code{Pan}, and a cyan circle with a blue
+border on the root of the \code{Homo} - \code{Hylobates} clade.
+\code{Gorilla} node will be annotated with the word "plains", and
+\code{Pongo} with "Borneo" in italics\footnote{In fact, to annotate that these
 are the Western gorilla and the Borneo orang-utan, it would be simpler just to
-label the corresponding leaves accordingly, \ie, \texttt{Gorilla\_gorilla} and
-\texttt{Pongo\_pygmaeus}. But this is just an example\ldots}. The \svg{}
+label the corresponding leaves accordingly, \ie, \code{Gorilla\_gorilla} and
+\code{Pongo\_pygmaeus}. But this is just an example\ldots}. The \svg{}
 is enclosed in double quotes because it contains spaces - note that single
 quotes are used for the values of \xml{} attributes. The ornament map is
-specified with option \texttt{-o}:
+specified with option \code{-o}:
 \begin{quote}
  \typefile{ornament.map}
 \end{quote}
@@ -334,17 +330,16 @@ specified with option \texttt{-o}:
  \includegraphics{display_9_svg.pdf}
 \end{center}
 
-\subsubsection{\libxml}
-\label{sct:display:libxml}
+\subsubsection[sct:display:libxml]{\libxml}
 
 If \libxml{} is being used (see Appendix \ref{app:installing}), the handling of ornaments is more elaborate, in that some kinds of elements undergo special treatment. Besides positioning the ornament at the node's location and orienting it along the parent edge, which occur for all elements, the following occurs:
 \startitemize
-	\item \texttt{<text>} elements are nudged a few pixels from the parent edge,
+	\item \code{<text>} elements are nudged a few pixels from the parent edge,
 	to make the text more readable. They are also transformed so that the text
 	is aligned with the node's position, on both sides of the tree (this
 	involves an additional $180^{\circ}$  rotation on the left side of the
 	tree).
-	\item \texttt{<image>} elements are centered so that instead of having
+	\item \code{<image>} elements are centered so that instead of having
 	their top left corner at the node's position, they have the middle of the
 	left side (this corresponds to vertical centering on an orthogonal tree).
 	On the left side of the tree, they are also rotated and shifted so that
@@ -353,13 +348,13 @@ If \libxml{} is being used (see Appendix \ref{app:installing}), the handling of 
 
 If applicable, these transforms must be applied to each element separately.
 This means that the \svg{} snippet must be {\em parsed} (instead of just
-wrapped in a \texttt{<g>} element, as is the case when \libxml{} is not being
+wrapped in a \code{<g>} element, as is the case when \libxml{} is not being
 used), and we use \libxml's \xml{} parser. 
 
-In the following file, the orang-utan (\texttt{Pongo}) and hominines have
+In the following file, the orang-utan (\code{Pongo}) and hominines have
 several ornaments, which are spaced out along the radial axis so that they don't
-overlap. This is done simply by using the \texttt{x} attribute of texts and
-rectangles, as well as the \texttt{cx} attribute of circles and ellipses. Again,
+overlap. This is done simply by using the \code{x} attribute of texts and
+rectangles, as well as the \code{cx} attribute of circles and ellipses. Again,
 the node to be adorned lies at (0,0), $x$ values lie on the radial axis, and $y$
 values are perpendicular to the $x$ axis.
 
@@ -383,19 +378,18 @@ This gives the following (credits: all images are from Wikipedia):
 \includegraphics{display_19_svg.pdf}
 \end{center}
 
-\subsubsection{Example: Mapping GC Content}
-\label{sct_display_ornament_xpl_gc}
+\subsubsection[sct_display_ornament_xpl_gc]{Example: Mapping GC Content}
 
 In a study of human rhinoviruses, I have produced a phylogenetic tree,
-\texttt{HRV\_ingrp.nw}. I have also computed the \gc{} content of the sequences,
+\filename{HRV\_ingrp.nw}. I have also computed the \gc{} content of the sequences,
 and mapped it into a gradient that goes from {\color{Blue} blue} (33.3\%) to
 {\color{Red} red} (44.5\%). I used this gradient to produce a \css{} map,
-\texttt{b2r.map}:
+\filename{b2r.map}:
 
 \typefile{display_11_txt.cmd}
 \typefile{display_11_txt.out}
 
-\noindent{}in which the \texttt{fill} values are hexadecimal color codes along
+\noindent{}in which the \code{fill} values are hexadecimal color codes along
 the gradient. Then:
 
 \typefile{display_10_svg.cmd}
@@ -415,20 +409,20 @@ then we break the rule that every program is a filter and so writes to standard
 output), or one can put all the trees in one \svg{} document (but then we have
 to impose tiling or some other arrangement), or one can just output one \svg{}
 document after another. This is what we do (this may change in the future). So
-if you have many trees in document \texttt{forest.nw}, you can say:
+if you have many trees in document \filename{forest.nw}, you can say:
 \begin{quote}
 \verb+$ nw_display -s forest.nw > forest_svg+
 \end{quote}
-But \texttt{forest\_svg} isn't valid \svg{} -- it is a concatenation of many \svg{} documents. You can just extract them into individual files with \texttt{csplit}:
+But \filename{forest\_svg} isn't valid \svg{} -- it is a concatenation of many \svg{} documents. You can just extract them into individual files with \code{csplit}:
 \begin{quote}
 \verb+$ csplit -sz -f tree_ -b '%02d.svg' forest_svg '/<?xml/' {*}+
 \end{quote}
-This will produce one \svg{} file per tree in \texttt{forest.nw}, named \texttt{tree\_01.svg}, \texttt{tree\_02.svg}, etc.
+This will produce one \svg{} file per tree in \filename{forest.nw}, named \filename{tree\_01.svg}, \filename{tree\_02.svg}, etc.
 
-\subsubsection{\display{} \texttt{-s} stores its arguments}
+\subsubsection{\display{} \code{-s} stores its arguments}
 
 When run in \svg{} mode, \display{} "remembers" its arguments, that is, it puts
-them in an \xml{} comment with the keyword \texttt{arguments}. It is then
+them in an \xml{} comment with the keyword \code{arguments}. It is then
 trivial to retrieve them:
 
 \typefile{display_15_txt.cmd}
@@ -441,6 +435,6 @@ parameters, or which was the input tree, etc.
 \subsection{Options not Covered}
 
 \display{} has many options, and we will not describe them all here - all of
-them are described when you pass option \texttt{-h}. They include support for
+them are described when you pass option \code{-h}. They include support for
 clickable images (with URLs to arbitrary Web pages), nudging labels, changing
 the root length, etc. 
