@@ -85,15 +85,16 @@ change the way text graphs look:
 \noindent{}Here are some examples:
 
 \startalignment[center]
+
 {\tfx
-\starttabulate[p{0.4\textwidth}p{0.1\textwidth}p{0.4\textwidth}]
-\typefile{display_21_txt.cmd} \typefile{display_21_txt.out}
-\NC \NC
-\typefile{display_22_txt.cmd} \typefile{display_22_txt.out} \NC\NR
-\typefile{display_23_txt.cmd} \typefile{display_23_txt.out} \NC \NC
-\typefile{display_24_txt.cmd}
-\includegraphics[width=0.5\textwidth]{display_24_txt.png}
-This is a screenshot because I don't know how to show VT100 special characters in \LaTeX{} :-)
+\starttabulate[|c|c|]
+	\NC A \NC B \NC\NR
+	\NC C \NC D \NC\NR
+%	\NC \typefile{display_21_txt.cmd} \typefile{display_21_txt.out}
+%	\NC \typefile{display_22_txt.cmd} \typefile{display_22_txt.out} \NC\NR
+%	\NC \typefile{display_23_txt.cmd} \typefile{display_23_txt.out} 
+%	\NC \typefile{display_24_txt.cmd} \includegraphics[width=0.5\textwidth]{display_24_txt.png}
+%This is a screenshot because I don't know how to show VT100 special characters in \LaTeX{} :-) \NC\NR
 \stoptabulate
 }
 
@@ -138,7 +139,7 @@ $ nw_display -s catarrhini > catarrhini.svg
 \stoptyping
 Now you can visualize the result using any \svg-enabled tool (all good Web
 browsers can do it), or convert it to another format with, say Inkscape
-(\url{http://www.inkscape.org}).  The \svg{} produced by \display{} is designed
+(\from[URL:inkscape]).  The \svg{} produced by \display{} is designed
 to be easy to edit in an interactive editor (Inkscape, Adobe Illustrator,
 etc.): for example, the tree edges are in one group, and the text in another,
 so it is easy to change the line width of the edges, or the font family of the
@@ -152,7 +153,7 @@ $ inkscape -f catarrhini.svg -D -A catarrhini.pdf
 \stoptyping
 
 \startalignment[center]
- \includegraphics{display_3_svg.pdf}
+ \externalfigure[display_3_svg]
 \stopalignment[center]
 All \svg{} images shown in this tutorial were processed in the same way. In the
 rest of the document we will usually skip the redirection into an \svg{} file
@@ -176,24 +177,24 @@ columns; \code{-I} controls the placement of inner node labels.
 You can make radial trees by passing the \code{-r} switch:
 \typefile{display_4_svg.cmd}
 \startalignment[center]
-\includegraphics{display_4_svg.pdf}
+\externalfigure[display_4_svg]
 \stopalignment[center]
 
 \subsubsection[sct_display_svg_css]{Using CSS}
 
 You can modify node style using Cascading Style Sheets (\css,
-(\url{www.w3.org/Style/CSS}). This is done by specifying a \textit{\css{} map},
+(\from[URL:CSS])). This is done by specifying a \em{\css{} map},
 which is just a text file that says which style should be applied to which node.
 For example, if file \filename{css.map} contains the following
-\begin{quote}
+\startnarrower
 \typefile{css.map}
-\end{quote} we can apply the style map to
+\stopnarrower we can apply the style map to
 the tree above by passing \code{-c}, which takes the name of the \css{} file
 as argument:
 
 \typefile{display_5_svg.cmd}
 \startalignment[center]
- \includegraphics{display_5_svg.pdf}
+ \externalfigure[display_5_svg]
 \stopalignment[center]
 
 The syntax of the \css{} map file is as follows:
@@ -244,7 +245,7 @@ The syntax of the \css{} map file is as follows:
 		and \code{Hominini}.
 \stopitemize
 
-The style of an inner clade overrides that of an outer clade, \textit{e.g.},
+The style of an inner clade overrides that of an outer clade, \eg,
 although the \code{Homo} - \code{Pan} clade is nested inside the
 \code{Homo} - \code{Hylobates} clade, it has its own style (blue, wide
 lines) which overrides the containing clade's style (pinkish with normal
@@ -260,7 +261,7 @@ which was produced using defaults, could be improved a bit:
 
 \typefile{display_6_svg.cmd}
 \startalignment[center]
-  \includegraphics{display_6_svg.pdf}
+  \externalfigure[display_6_svg]
 \stopalignment[center]
 
 \noindent{}Let's remove the branch length labels, reduce
@@ -269,7 +270,7 @@ and write the leaf labels in italics, using a font with serifs:
 
 \typefile{display_7_svg.cmd}
 \startalignment[center]
-  \includegraphics{display_7_svg.pdf}
+  \externalfigure[display_7_svg]
 \stopalignment[center]
 
 \noindent{}Still not perfect, but much better. Option \code{-v} specifies the
@@ -286,7 +287,7 @@ and two pixels wide? That's option \code{-d}:
 
 \typefile{display_13_svg.cmd}
 \startalignment[center]
-  \includegraphics{display_13_svg.pdf}
+  \externalfigure[display_13_svg]
 \stopalignment[center]
 
 \subsection{Ornaments}
@@ -311,24 +312,24 @@ label the corresponding leaves accordingly, \ie, \code{Gorilla\_gorilla} and
 is enclosed in double quotes because it contains spaces - note that single
 quotes are used for the values of \xml{} attributes. The ornament map is
 specified with option \code{-o}:
-\begin{quote}
+\startnarrower
  \typefile{ornament.map}
-\end{quote}
+\stopnarrower
 \typefile{display_8_svg.cmd}
 \startalignment[center]
- \includegraphics{display_8_svg.pdf}
+ \externalfigure[display_8_svg]
 \stopalignment[center]
 
 \noindent{}Ornaments and \css{} can be combined:
 
 \typefile{display_9_svg.cmd}
 \startalignment[center]
- \includegraphics{display_9_svg.pdf}
+ \externalfigure[display_9_svg]
 \stopalignment[center]
 
 \subsubsection[sct:display:libxml]{\libxml}
 
-If \libxml{} is being used (see Appendix \ref{app:installing}), the handling of ornaments is more elaborate, in that some kinds of elements undergo special treatment. Besides positioning the ornament at the node's location and orienting it along the parent edge, which occur for all elements, the following occurs:
+If \libxml{} is being used (see Appendix \in{}[app:installing]), the handling of ornaments is more elaborate, in that some kinds of elements undergo special treatment. Besides positioning the ornament at the node's location and orienting it along the parent edge, which occur for all elements, the following occurs:
 \startitemize
 	\item \code{<text>} elements are nudged a few pixels from the parent edge,
 	to make the text more readable. They are also transformed so that the text
@@ -360,7 +361,7 @@ This gives the following:
 
 \typefile{display_18_svg.cmd}
 \startalignment[center]
-\includegraphics{display_18_svg.pdf}
+\externalfigure[display_18_svg]
 \stopalignment[center]
 
 As hinted above, \libxml{} also allows handling of images:
@@ -371,15 +372,15 @@ This gives the following (credits: all images are from Wikipedia):
 
 \typefile{display_19_svg.cmd}
 \startalignment[center]
-\includegraphics{display_19_svg.pdf}
+\externalfigure[display_19_svg]
 \stopalignment[center]
 
 \subsubsection[sct_display_ornament_xpl_gc]{Example: Mapping GC Content}
 
 In a study of human rhinoviruses, I have produced a phylogenetic tree,
 \filename{HRV\_ingrp.nw}. I have also computed the \gc{} content of the sequences,
-and mapped it into a gradient that goes from {\color{Blue} blue} (33.3\%) to
-{\color{Red} red} (44.5\%). I used this gradient to produce a \css{} map,
+and mapped it into a gradient that goes from {\color[blue] blue} (33.3\%) to
+{\color[red] red} (44.5\%). I used this gradient to produce a \css{} map,
 \filename{b2r.map}:
 
 \typefile{display_11_txt.cmd}
@@ -390,7 +391,7 @@ the gradient. Then:
 
 \typefile{display_10_svg.cmd}
 \startalignment[center]
-\includegraphics{display_10_svg.pdf}
+\externalfigure[display_10_svg]
 \stopalignment[center]
 \bigskip{}
 
@@ -406,13 +407,13 @@ output), or one can put all the trees in one \svg{} document (but then we have
 to impose tiling or some other arrangement), or one can just output one \svg{}
 document after another. This is what we do (this may change in the future). So
 if you have many trees in document \filename{forest.nw}, you can say:
-\begin{quote}
-\verb+$ nw_display -s forest.nw > forest_svg+
-\end{quote}
+\startnarrower
+\type{$ nw_display -s forest.nw > forest_svg}
+\stopnarrower
 But \filename{forest\_svg} isn't valid \svg{} -- it is a concatenation of many \svg{} documents. You can just extract them into individual files with \code{csplit}:
-\begin{quote}
-\verb+$ csplit -sz -f tree_ -b '%02d.svg' forest_svg '/<?xml/' {*}+
-\end{quote}
+\startnarrower
+\type{$ csplit -sz -f tree_ -b '%02d.svg' forest_svg '/<?xml/' {*}}
+\stopnarrower
 This will produce one \svg{} file per tree in \filename{forest.nw}, named \filename{tree\_01.svg}, \filename{tree\_02.svg}, etc.
 
 \subsubsection{\display{} \code{-s} stores its arguments}

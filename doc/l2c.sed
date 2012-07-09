@@ -23,9 +23,16 @@ s/\\begin{samepage}/\\page[no]/
 s/\\end{samepage}//
 s/\\begin{center}/\\startalignment[center]/
 s/\\end{center}/\\stopalignment[center]/
+s/\\begin{quote}/\\startnarrower/
+s/\\end{quote}/\\stopnarrower/
+
+# Fixed expressions
+s/\\textit{e.g.}/\\eg{}/g
 
 # Other commands
 s/\\verbatiminput{/\\typefile{/
+s/\\includegraphics{\([A-Za-z0-9_-]\+\)\....}/\\externalfigure[\1]/g
+s/\\verb+\(.*\)+/\\type{\1}/g
 
 # Formatting, fonts, etc.
 s/\\emph{/{\\em /g
