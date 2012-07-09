@@ -80,7 +80,7 @@ change the way text graphs look:
 \NC \code{s} \NC (slashes) corners are marked with \type{/} and \type{\textbackslash} \NC\NR
 \NC \code{v} \NC (VT100) use VT100 pseudo-graphical characters \NC\NR
 \stoptabulate
-\stopalignment[center]
+\stopalignment
 
 \noindent{}Here are some examples:
 
@@ -98,7 +98,7 @@ change the way text graphs look:
 \stoptabulate
 }
 
-\stopalignment[center]
+\stopalignment
 
 \noindent{}By default, \display{} uses "slashes", unless overridden by
 environment variable \code{NW\_DISPLAY\_TEXT\_STYLE}. This should have a
@@ -152,9 +152,8 @@ The following \pdf{} image was produced like this:
 $ inkscape -f catarrhini.svg -D -A catarrhini.pdf
 \stoptyping
 
-\startalignment[center]
- \externalfigure[display_3_svg]
-\stopalignment[center]
+\externalfigure[display_3_svg.pdf][type=pdf,align=center]
+
 All \svg{} images shown in this tutorial were processed in the same way. In the
 rest of the document we will usually skip the redirection into an \svg{} file
 and omit the \svg{}-to-\cap{pdf} conversion step.
@@ -178,7 +177,7 @@ You can make radial trees by passing the \code{-r} switch:
 \typefile{display_4_svg.cmd}
 \startalignment[center]
 \externalfigure[display_4_svg]
-\stopalignment[center]
+\stopalignment
 
 \subsubsection[sct_display_svg_css]{Using CSS}
 
@@ -195,7 +194,7 @@ as argument:
 \typefile{display_5_svg.cmd}
 \startalignment[center]
  \externalfigure[display_5_svg]
-\stopalignment[center]
+\stopalignment
 
 The syntax of the \css{} map file is as follows:
 \startitemize
@@ -262,7 +261,7 @@ which was produced using defaults, could be improved a bit:
 \typefile{display_6_svg.cmd}
 \startalignment[center]
   \externalfigure[display_6_svg]
-\stopalignment[center]
+\stopalignment
 
 \noindent{}Let's remove the branch length labels, reduce
 the vertical spacing, reduce the size of inner node labels (bootstrap values),
@@ -271,7 +270,7 @@ and write the leaf labels in italics, using a font with serifs:
 \typefile{display_7_svg.cmd}
 \startalignment[center]
   \externalfigure[display_7_svg]
-\stopalignment[center]
+\stopalignment
 
 \noindent{}Still not perfect, but much better. Option \code{-v} specifies the
 vertical spacing, in pixels, between two successive leaves (the default is 40).
@@ -288,7 +287,7 @@ and two pixels wide? That's option \code{-d}:
 \typefile{display_13_svg.cmd}
 \startalignment[center]
   \externalfigure[display_13_svg]
-\stopalignment[center]
+\stopalignment
 
 \subsection{Ornaments}
 
@@ -318,14 +317,14 @@ specified with option \code{-o}:
 \typefile{display_8_svg.cmd}
 \startalignment[center]
  \externalfigure[display_8_svg]
-\stopalignment[center]
+\stopalignment
 
 \noindent{}Ornaments and \css{} can be combined:
 
 \typefile{display_9_svg.cmd}
 \startalignment[center]
  \externalfigure[display_9_svg]
-\stopalignment[center]
+\stopalignment
 
 \subsubsection[sct:display:libxml]{\libxml}
 
@@ -362,7 +361,7 @@ This gives the following:
 \typefile{display_18_svg.cmd}
 \startalignment[center]
 \externalfigure[display_18_svg]
-\stopalignment[center]
+\stopalignment
 
 As hinted above, \libxml{} also allows handling of images:
 
@@ -373,7 +372,7 @@ This gives the following (credits: all images are from Wikipedia):
 \typefile{display_19_svg.cmd}
 \startalignment[center]
 \externalfigure[display_19_svg]
-\stopalignment[center]
+\stopalignment
 
 \subsubsection[sct_display_ornament_xpl_gc]{Example: Mapping GC Content}
 
@@ -392,7 +391,7 @@ the gradient. Then:
 \typefile{display_10_svg.cmd}
 \startalignment[center]
 \externalfigure[display_10_svg]
-\stopalignment[center]
+\stopalignment
 \bigskip{}
 
 \noindent{}As we can see, the high-\gc{} sequences are all found in the same

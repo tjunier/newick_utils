@@ -22,7 +22,7 @@ s/\\end{verbatim}/\\stoptyping/
 s/\\begin{samepage}/\\page[no]/
 s/\\end{samepage}//
 s/\\begin{center}/\\startalignment[center]/
-s/\\end{center}/\\stopalignment[center]/
+s/\\end{center}/\\stopalignment/
 s/\\begin{quote}/\\startnarrower/
 s/\\end{quote}/\\stopnarrower/
 
