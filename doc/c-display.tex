@@ -20,7 +20,8 @@ At its simplest, \display{} just outputs a text graph. Here is the primates tree
 \typefile{display_1_txt.cmd}
 \typefile{display_1_txt.out}
 
-That's pretty low-tech compared to interactive, colorful, high-resolution displays, but if you use the shell a lot (like I do), you may find it useful.
+That's pretty low-tech compared to interactive, colorful, high-resolution
+displays, but if you use the shell a lot (like I do), you may find it useful.
 
 \subsubsection{Fixing Width}
 
@@ -48,11 +49,10 @@ length, do:
 \typefile{display_20_txt.out}
 
 
-\noindent{} So a branch of length 10 (such as the parent branch of
-Homo\footnote{To know the length of an edge, you can use \distance{} \code{-m
-p -n} -- see \ref{sct:distance}.}) occupies five characters (up to rounding
-error). And to use two columns per unit length, one would pass \code{-w -2},
-etc.
+\noindent{} So a branch of length\footnote{To know the length of an edge, you
+can use \distance{} \code{-m p -n} -- see \in{}[sct:distance].  } 10 (such as
+the parent branch of Homo) occupies five characters (up to rounding error). And
+to use two columns per unit length, one would pass \code{-w -2}, etc.
 
 If there is more than one tree in the input, they will all be drawn at the same scale, which makes them easier to compare visually.
 

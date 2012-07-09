@@ -33,7 +33,7 @@ s/\\textsc/\\cap/g
 s/\\footnotesize/\\tfx/g
 
 # Cross-references
-s/section \\ref{\([A-Za-z0-9_-]\+\)}/\\in{section}[\1]/g
-s/figure \\ref{\([A-Za-z0-9_-]\+\)}/\\in{figure}[\1]/g
-s/table \\ref{\([A-Za-z0-9_-]\+\)}/\\in{table}[\1]/g
-s/\\ref{\([A-Za-z0-9_-]\+\)}/\\in{}[\1]/g
+s/section \\ref{\([A-Za-z0-9_:-]\+\)}/\\in{section}[\1]/g
+s/figure \\ref{\([A-Za-z0-9_:-]\+\)}/\\in{figure}[\1]/g
+s/table \\ref{\([A-Za-z0-9_:-]\+\)}/\\in{table}[\1]/g
+s/\\ref{\([A-Za-z0-9_:-]\+\)}/\\in{}[\1]/g
