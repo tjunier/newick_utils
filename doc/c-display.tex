@@ -84,8 +84,7 @@ change the way text graphs look:
 
 \noindent{}Here are some examples:
 
-\startalignment[center]
-
+%\setuplayout[textwidth=10cm]
 {\tfx
 \bTABLE[|c|c|]
 \setupTABLE[column][each][width=0.55\textwidth]
@@ -112,8 +111,7 @@ change the way text graphs look:
 	\eTR
 \eTABLE
 }
-
-\stopalignment
+%\setuplayout[reset]
 
 \noindent{}By default, \display{} uses "slashes", unless overridden by
 environment variable \code{NW\_DISPLAY\_TEXT\_STYLE}. This should have a
