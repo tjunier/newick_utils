@@ -84,11 +84,9 @@ change the way text graphs look:
 
 \noindent{}Here are some examples:
 
-%\setupnarrower[middle=-2cm]
-%\startnarrower[middle]
 {\tfx
-\bTABLE[|c|c|]
-\setupTABLE[column][each][width=0.55\width]
+\setupTABLE[c][each][width=0.55\textwidth]
+\bTABLE
 	\bTR
 		\bTD
 			\typefile{display_21_txt.cmd}
@@ -112,27 +110,7 @@ change the way text graphs look:
 	\eTR
 \eTABLE
 }
-%\stopnarrower
 
-\noindent{}By default, \display{} uses "slashes", unless overridden by
-environment variable \code{NW\_DISPLAY\_TEXT\_STYLE}. This should have a
-value of \code{raw}, \code{commas}, \code{slashes}, or \code{VT100}
-(case is irrelevant, and actually only the first character is read, so you can
-abbreviate to \code{r}, \code{c}, \code{s}, or \code{v}).
-
-% \subsubsection{Placement of Inner Node Labels}
-% 
-% Option \code{-I} controls the placement of inner node labels. It takes an
-% argument, which can be \code{l} (lowercase l -- towards the leaves),
-% \code{m} (in the middle), or \code{r} (towards the root). The default
-% behaviour is \code{l}.  Here is the above tree, with inner labels near the
-% root:
-% 
-% \typefile{display_14_txt.cmd}
-% \page[no]
-% \typefile{display_14_txt.out}
-% 
-% 
 % \subsection[sct_display_svg]{As Scalable Vector Graphics}
 % 
 % First, a disclaimer: there are dozens of tools for viewing trees out there, and
