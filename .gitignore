@@ -28,3 +28,4 @@ config.guess
 config.sub
 depcomp
 missing
+*.fdb_latexmk
