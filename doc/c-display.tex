@@ -264,87 +264,87 @@ and write the leaf labels in italics, using a font with serifs:
 \typefile{display_7_svg.cmd}
 \startalignment[center]
   \externalfigure[display_7_svg]
-% \stopalignment
-% 
-% \noindent{}Still not perfect, but much better. Option \code{-v} specifies the
-% vertical spacing, in pixels, between two successive leaves (the default is 40).
-% Option \code{-b} sets the style of branch labels, option \code{-l} sets the
-% style of leaf labels, and option \code{-i} sets the style of inner node
-% labels. Note that we did not {\em discard} the branch lengths (we could do
-% this with \topology), because doing so would reduce the tree to a cladogram.
-% Instead, we set their \css{} style to \code{opacity:0}
-% (\code{visibility:hidden} also works).
-% 
-% What if we want to change the default style? Say we want the branches in blue,
-% and two pixels wide? That's option \code{-d}:
-% 
-% \typefile{display_13_svg.cmd}
-% \startalignment[center]
-%   \externalfigure[display_13_svg]
-% \stopalignment
-% 
-% \subsection{Ornaments}
-% 
-% Ornaments are arbitrary snippets of \svg{} code that are displayed at specified
-% node positions. Like \css, this is done with a map. The ornament map has the
-% same syntax as the \css{} map, except that you specify \svg{} elements rather
-% than \css{} styles. The \code{Individual} keyword means that all nodes named
-% on a given line sport the corresponding ornament, while \code{Clade} means
-% that only the clade's \lca{} must be adorned. The ornament is translated in
-% such a way that its (0,0) coordinate corresponds to the position of the node.
-% In radial graphs, text ornaments are rotated like node labels.
-% 
-% The following file, \filename{ornament.map}, instructs to draw a red circle with
-% a black border on \code{Homo} and \code{Pan}, and a cyan circle with a blue
-% border on the root of the \code{Homo} - \code{Hylobates} clade.
-% \code{Gorilla} node will be annotated with the word "plains", and
-% \code{Pongo} with "Borneo" in italics\footnote{In fact, to annotate that these
-% are the Western gorilla and the Borneo orang-utan, it would be simpler just to
-% label the corresponding leaves accordingly, \ie, \code{Gorilla\_gorilla} and
-% \code{Pongo\_pygmaeus}. But this is just an example\ldots}. The \svg{}
-% is enclosed in double quotes because it contains spaces - note that single
-% quotes are used for the values of \xml{} attributes. The ornament map is
-% specified with option \code{-o}:
-% \startnarrower
-%  \typefile{ornament.map}
-% \stopnarrower
-% \typefile{display_8_svg.cmd}
-% \startalignment[center]
-%  \externalfigure[display_8_svg]
-% \stopalignment
-% 
-% \noindent{}Ornaments and \css{} can be combined:
-% 
-% \typefile{display_9_svg.cmd}
-% \startalignment[center]
-%  \externalfigure[display_9_svg]
-% \stopalignment
-% 
-% \subsubsection[sct:display:libxml]{\libxml}
-% 
-% If \libxml{} is being used (see Appendix \in{}[app:installing]), the handling of ornaments is more elaborate, in that some kinds of elements undergo special treatment. Besides positioning the ornament at the node's location and orienting it along the parent edge, which occur for all elements, the following occurs:
-% \startitemize
-% 	\item \code{<text>} elements are nudged a few pixels from the parent edge,
-% 	to make the text more readable. They are also transformed so that the text
-% 	is aligned with the node's position, on both sides of the tree (this
-% 	involves an additional $180^{\circ}$  rotation on the left side of the
-% 	tree).
-% 	\item \code{<image>} elements are centered so that instead of having
-% 	their top left corner at the node's position, they have the middle of the
-% 	left side (this corresponds to vertical centering on an orthogonal tree).
-% 	On the left side of the tree, they are also rotated and shifted so that
-% 	they don't show upside-down.
-% \stopitemize
-% 
-% If applicable, these transforms must be applied to each element separately.
-% This means that the \svg{} snippet must be {\em parsed} (instead of just
-% wrapped in a \code{<g>} element, as is the case when \libxml{} is not being
-% used), and we use \libxml's \xml{} parser. 
-% 
-% In the following file, the orang-utan (\code{Pongo}) and hominines have
-% several ornaments, which are spaced out along the radial axis so that they don't
-% overlap. This is done simply by using the \code{x} attribute of texts and
-% rectangles, as well as the \code{cx} attribute of circles and ellipses. Again,
+\stopalignment
+
+\noindent{}Still not perfect, but much better. Option \code{-v} specifies the
+vertical spacing, in pixels, between two successive leaves (the default is 40).
+Option \code{-b} sets the style of branch labels, option \code{-l} sets the
+style of leaf labels, and option \code{-i} sets the style of inner node
+labels. Note that we did not {\em discard} the branch lengths (we could do
+this with \topology), because doing so would reduce the tree to a cladogram.
+Instead, we set their \css{} style to \code{opacity:0}
+(\code{visibility:hidden} also works).
+
+What if we want to change the default style? Say we want the branches in blue,
+and two pixels wide? That's option \code{-d}:
+
+\typefile{display_13_svg.cmd}
+\startalignment[center]
+  \externalfigure[display_13_svg]
+\stopalignment
+
+\subsection{Ornaments}
+
+Ornaments are arbitrary snippets of \svg{} code that are displayed at specified
+node positions. Like \css, this is done with a map. The ornament map has the
+same syntax as the \css{} map, except that you specify \svg{} elements rather
+than \css{} styles. The \code{Individual} keyword means that all nodes named
+on a given line sport the corresponding ornament, while \code{Clade} means
+that only the clade's \lca{} must be adorned. The ornament is translated in
+such a way that its (0,0) coordinate corresponds to the position of the node.
+In radial graphs, text ornaments are rotated like node labels.
+
+The following file, \filename{ornament.map}, instructs to draw a red circle with
+a black border on \code{Homo} and \code{Pan}, and a cyan circle with a blue
+border on the root of the \code{Homo} - \code{Hylobates} clade.
+\code{Gorilla} node will be annotated with the word "plains", and
+\code{Pongo} with "Borneo" in italics\footnote{In fact, to annotate that these
+are the Western gorilla and the Borneo orang-utan, it would be simpler just to
+label the corresponding leaves accordingly, \ie, \code{Gorilla\_gorilla} and
+\code{Pongo\_pygmaeus}. But this is just an example\ldots}. The \svg{}
+is enclosed in double quotes because it contains spaces - note that single
+quotes are used for the values of \xml{} attributes. The ornament map is
+specified with option \code{-o}:
+\startnarrower
+ \typefile{ornament.map}
+\stopnarrower
+\typefile{display_8_svg.cmd}
+\startalignment[center]
+ \externalfigure[display_8_svg]
+\stopalignment
+
+\noindent{}Ornaments and \css{} can be combined:
+
+\typefile{display_9_svg.cmd}
+\startalignment[center]
+ \externalfigure[display_9_svg]
+\stopalignment
+
+\subsubsection[sct:display:libxml]{\libxml}
+
+If \libxml{} is being used (see Appendix \in{}[app:installing]), the handling of ornaments is more elaborate, in that some kinds of elements undergo special treatment. Besides positioning the ornament at the node's location and orienting it along the parent edge, which occur for all elements, the following occurs:
+\startitemize
+	\item \code{<text>} elements are nudged a few pixels from the parent edge,
+	to make the text more readable. They are also transformed so that the text
+	is aligned with the node's position, on both sides of the tree (this
+	involves an additional $180^{\circ}$  rotation on the left side of the
+	tree).
+	\item \code{<image>} elements are centered so that instead of having
+	their top left corner at the node's position, they have the middle of the
+	left side (this corresponds to vertical centering on an orthogonal tree).
+	On the left side of the tree, they are also rotated and shifted so that
+	they don't show upside-down.
+\stopitemize
+
+If applicable, these transforms must be applied to each element separately.
+This means that the \svg{} snippet must be {\em parsed} (instead of just
+wrapped in a \code{<g>} element, as is the case when \libxml{} is not being
+used), and we use \libxml's \xml{} parser. 
+
+In the following file, the orang-utan (\code{Pongo}) and hominines have
+several ornaments, which are spaced out along the radial axis so that they don't
+overlap. This is done simply by using the \code{x} attribute of texts and
+rectangles, as well as the \code{cx} attribute of circles and ellipses. Again,
 % the node to be adorned lies at (0,0), $x$ values lie on the radial axis, and $y$
 % values are perpendicular to the $x$ axis.
 % 
