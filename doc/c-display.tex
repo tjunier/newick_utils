@@ -84,8 +84,10 @@ change the way text graphs look:
 
 \noindent{}Here are some examples:
 
+\define \opteColWidth{0.55\textwidth}
+\define \vtImgWidth{0.54\textwidth}
 {\tfx
-\setupTABLE[c][each][width=0.55\textwidth]
+\setupTABLE[c][each][width=\opteColWidth]
 \bTABLE
 	\bTR
 		\bTD
@@ -104,7 +106,7 @@ change the way text graphs look:
 		\eTD
 		\bTD 
 			\typefile{display_24_txt.cmd}
-			\externalfigure[display_24_txt][width=0.54\textwidth]
+			\externalfigure[display_24_txt][width=\vtImgWidth]
 			This is a screenshot because I don't know how to show VT100 special characters in \ConTeXt{} :-)
 		\eTD
 	\eTR
