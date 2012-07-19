@@ -345,86 +345,86 @@ In the following file, the orang-utan (\code{Pongo}) and hominines have
 several ornaments, which are spaced out along the radial axis so that they don't
 overlap. This is done simply by using the \code{x} attribute of texts and
 rectangles, as well as the \code{cx} attribute of circles and ellipses. Again,
-% the node to be adorned lies at (0,0), $x$ values lie on the radial axis, and $y$
-% values are perpendicular to the $x$ axis.
-% 
-% \typefile{display_17_txt.out}
-% 
-% This gives the following:
-% 
-% \typefile{display_18_svg.cmd}
-% \startalignment[center]
-% \externalfigure[display_18_svg]
-% \stopalignment
-% 
-% As hinted above, \libxml{} also allows handling of images:
-% 
-% \typefile{img_r.map}
-% 
-% This gives the following (credits: all images are from Wikipedia):
-% 
-% \typefile{display_19_svg.cmd}
-% \startalignment[center]
-% \externalfigure[display_19_svg]
-% \stopalignment
-% 
-% \subsubsection[sct_display_ornament_xpl_gc]{Example: Mapping GC Content}
-% 
-% In a study of human rhinoviruses, I have produced a phylogenetic tree,
-% \filename{HRV\_ingrp.nw}. I have also computed the \gc{} content of the sequences,
-% and mapped it into a gradient that goes from {\color[blue] blue} (33.3\%) to
-% {\color[red] red} (44.5\%). I used this gradient to produce a \css{} map,
-% \filename{b2r.map}:
-% 
-% \typefile{display_11_txt.cmd}
-% \typefile{display_11_txt.out}
-% 
-% \noindent{}in which the \code{fill} values are hexadecimal color codes along
-% the gradient. Then:
-% 
-% \typefile{display_10_svg.cmd}
-% \startalignment[center]
-% \externalfigure[display_10_svg]
-% \stopalignment
-% \bigskip{}
-% 
-% \noindent{}As we can see, the high-\gc{} sequences are all found in the same
-% main clade.
-% 
-% \subsubsection{Multiple SVG Trees}
-% 
-% Like all \nutils, \display{} can handle multiple trees, even in \svg{} mode.
-% The best way to do this was not evident: one can generate one file per tree (but
-% then we break the rule that every program is a filter and so writes to standard
-% output), or one can put all the trees in one \svg{} document (but then we have
-% to impose tiling or some other arrangement), or one can just output one \svg{}
-% document after another. This is what we do (this may change in the future). So
-% if you have many trees in document \filename{forest.nw}, you can say:
-% \startnarrower
-% \type{$ nw_display -s forest.nw > forest_svg}
-% \stopnarrower
-% But \filename{forest\_svg} isn't valid \svg{} -- it is a concatenation of many \svg{} documents. You can just extract them into individual files with \code{csplit}:
-% \startnarrower
-% \type{$ csplit -sz -f tree_ -b '%02d.svg' forest_svg '/<?xml/' {*}}
-% \stopnarrower
-% This will produce one \svg{} file per tree in \filename{forest.nw}, named \filename{tree\_01.svg}, \filename{tree\_02.svg}, etc.
-% 
-% \subsubsection{\display{} \code{-s} stores its arguments}
-% 
-% When run in \svg{} mode, \display{} "remembers" its arguments, that is, it puts
-% them in an \xml{} comment with the keyword \code{arguments}. It is then
-% trivial to retrieve them:
-% 
-% \typefile{display_15_txt.cmd}
-% \typefile{display_15_txt.out}
-% 
-% \noindent{}This is handy when one wants to re-use a set of options on another
-% tree, especially after a while when one doesn't remember the exact values of the
-% parameters, or which was the input tree, etc. 
-% 
-% \subsection{Options not Covered}
-% 
-% \display{} has many options, and we will not describe them all here - all of
-% them are described when you pass option \code{-h}. They include support for
-% clickable images (with URLs to arbitrary Web pages), nudging labels, changing
-% the root length, etc. 
+the node to be adorned lies at (0,0), $x$ values lie on the radial axis, and $y$
+values are perpendicular to the $x$ axis.
+
+\typefile{display_17_txt.out}
+
+This gives the following:
+
+\typefile{display_18_svg.cmd}
+\startalignment[center]
+\externalfigure[display_18_svg]
+\stopalignment
+
+As hinted above, \libxml{} also allows handling of images:
+
+\typefile{img_r.map}
+
+This gives the following (credits: all images are from Wikipedia):
+
+\typefile{display_19_svg.cmd}
+\startalignment[center]
+\externalfigure[display_19_svg]
+\stopalignment
+
+\subsubsection[sct_display_ornament_xpl_gc]{Example: Mapping GC Content}
+
+ In a study of human rhinoviruses, I have produced a phylogenetic tree,
+ \filename{HRV\_ingrp.nw}. I have also computed the \gc{} content of the sequences,
+ and mapped it into a gradient that goes from \color[blue]{blue} (33.3\%) to
+\color[red]{red} (44.5\%). I used this gradient to produce a \css{} map,
+\filename{b2r.map}:
+
+\typefile{display_11_txt.cmd}
+\typefile{display_11_txt.out}
+
+\noindent{}in which the \code{fill} values are hexadecimal color codes along
+the gradient. Then:
+
+\typefile{display_10_svg.cmd}
+\startalignment[center]
+\externalfigure[display_10_svg]
+\stopalignment
+\bigskip{}
+
+\noindent{}As we can see, the high-\gc{} sequences are all found in the same
+main clade.
+
+\subsubsection{Multiple SVG Trees}
+
+Like all \nutils, \display{} can handle multiple trees, even in \svg{} mode.
+The best way to do this was not evident: one can generate one file per tree (but
+then we break the rule that every program is a filter and so writes to standard
+output), or one can put all the trees in one \svg{} document (but then we have
+to impose tiling or some other arrangement), or one can just output one \svg{}
+document after another. This is what we do (this may change in the future). So
+if you have many trees in document \filename{forest.nw}, you can say:
+\startnarrower
+\type{$ nw_display -s forest.nw > forest_svg}
+\stopnarrower
+But \filename{forest\_svg} isn't valid \svg{} -- it is a concatenation of many \svg{} documents. You can just extract them into individual files with \code{csplit}:
+\startnarrower
+\type{$ csplit -sz -f tree_ -b '%02d.svg' forest_svg '/<?xml/' {*}}
+\stopnarrower
+This will produce one \svg{} file per tree in \filename{forest.nw}, named \filename{tree\_01.svg}, \filename{tree\_02.svg}, etc.
+
+\subsubsection{\display{} \code{-s} stores its arguments}
+
+When run in \svg{} mode, \display{} "remembers" its arguments, that is, it puts
+them in an \xml{} comment with the keyword \code{arguments}. It is then
+trivial to retrieve them:
+
+\typefile{display_15_txt.cmd}
+\typefile{display_15_txt.out}
+
+\noindent{}This is handy when one wants to re-use a set of options on another
+tree, especially after a while when one doesn't remember the exact values of the
+parameters, or which was the input tree, etc. 
+
+\subsection{Options not Covered}
+
+\display{} has many options, and we will not describe them all here - all of
+them are described when you pass option \code{-h}. They include support for
+clickable images (with URLs to arbitrary Web pages), nudging labels, changing
+the root length, etc. 
