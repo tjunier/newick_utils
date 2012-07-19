@@ -113,157 +113,157 @@ change the way text graphs look:
 \eTABLE
 }
 
-% \subsection[sct_display_svg]{As Scalable Vector Graphics}
-% 
-% First, a disclaimer: there are dozens of tools for viewing trees out there, and
-% I'm not interested in competing with them. The reasons why I included \svg{}
-% capabilities (besides automation, etc.) were:
-% \startitemize
-% \item I wanted to be able to produce reasonably good graphics even if no other
-% tool was at hand
-% \item I wanted to be sure that large trees could be rendered\footnote{I have
-% had serious problems visualising trees of more than 1,000 leaves using some
-% popular software I will not name here - either it was painfully slow, or it
-% simply crashed, or else the output was unreadable, incomplete, or otherwise
-% unsuitable.}
-% \stopitemize
-% To produce \svg, pass option \code{-s}:
-% \starttyping
-% $ nw_display -s catarrhini > catarrhini.svg
-% \stoptyping
-% Now you can visualize the result using any \svg-enabled tool (all good Web
-% browsers can do it), or convert it to another format with, say Inkscape
-% (\from[URL:inkscape]).  The \svg{} produced by \display{} is designed
-% to be easy to edit in an interactive editor (Inkscape, Adobe Illustrator,
-% etc.): for example, the tree edges are in one group, and the text in another,
-% so it is easy to change the line width of the edges, or the font family of the
-% text (you can also do this from \display{} using a \css{} map, see
-% \in{}[sct_display_svg_css]).
-% 
-% The following \pdf{} image was produced like this:
-% 
-% \starttyping
-% $ inkscape -f catarrhini.svg -D -A catarrhini.pdf
-% \stoptyping
-% 
-% \externalfigure[display_3_svg.pdf][type=pdf,align=center]
-% 
-% All \svg{} images shown in this tutorial were processed in the same way. In the
-% rest of the document we will usually skip the redirection into an \svg{} file
-% and omit the \svg{}-to-\cap{pdf} conversion step.
-% 
-% \subsubsection{Text-mode options}
-% 
-% Many options for \ascii{} trees also work for \svg{}: \code{-S} suppresses the
-% scale bar\footnote{The positioning of the scale bar is a bit crude in \svg{}
-% mode, especially for radial trees. This is mainly because of the "\svg{} string
-% length curse", that is, the impossibility of finding out the length of a text
-% string in \svg.  This means it is hard to ensure the scale bar will not overlap
-% with a node label, unless one places it far away in a corner, which is what I do
-% for now. An improvement to this is on my TODO list.}, and \code{-u} specifies
-% its units; \code{-w} governs the tree's width (or fixes the scale if its
-% argument is negative), except that for \svg{} the value is in pixels instead of
-% columns; \code{-I} controls the placement of inner node labels. 
-% 
-% \subsubsection{Radial trees}
-% 
-% You can make radial trees by passing the \code{-r} switch:
-% \typefile{display_4_svg.cmd}
-% \startalignment[center]
-% \externalfigure[display_4_svg]
-% \stopalignment
-% 
-% \subsubsection[sct_display_svg_css]{Using CSS}
-% 
-% You can modify node style using Cascading Style Sheets (\css,
-% (\from[URL:CSS])). This is done by specifying a \em{\css{} map},
-% which is just a text file that says which style should be applied to which node.
-% For example, if file \filename{css.map} contains the following
-% \startnarrower
-% \typefile{css.map}
-% \stopnarrower we can apply the style map to
-% the tree above by passing \code{-c}, which takes the name of the \css{} file
-% as argument:
-% 
-% \typefile{display_5_svg.cmd}
-% \startalignment[center]
-%  \externalfigure[display_5_svg]
-% \stopalignment
-% 
-% The syntax of the \css{} map file is as follows:
-% \startitemize
-% 	\item A line that starts with a \type{\#} (hash) is a comment, and will be
-% 	ignored, as will be any line that contains only whitespace (space and TAB),
-% 	as well as empty lines.
-% 	\item Each line describes one style and the set of nodes to which it applies.
-% 	A line contains elements separated by whitespace (whitespace between quotes
-% 	does not count). 
-% 	\item The first element of the line is the style, and it is a snippet of
-% 	\css{} code. 
-% 	\item The second element states whether the following nodes are to be treated
-% 	individually or as a clade. It is either \code{Clade},
-% 	\code{Individual}, or \code{Label} (which can be abbreviated to
-% 	\code{C}, \code{I}, or \code{L}, respectively). 
-% 	\item The remaining element(s) are node labels and specify the nodes to which
-% 	the style must be applied: if the second element is \code{Clade}, the
-% 	program finds the last common ancestor of the nodes and applies the style to
-% 	that node and all its descendants. If the second element is
-% 	\code{Individual}, then the style is only applied to the nodes themselves.
-% 	If the second element is \code{Label}, then the style is applied to the
-% 	labels.
-% \stopitemize
-% 
-% \noindent{}In our example, \filename{css.map}:
-% \startitemize
-% 	\item line 2 states that the style \code{stroke:red} must be applied
-% 		to the \code{Clade} defined by \code{Macaca} and
-% 		\code{Cercopithecus}, which consists of these two nodes, their ancestor
-% 		\code{Cercopithecinae}, and \code{Papio}. 
-% 	\item Line 4 prescribes that style \code{stroke:\#fa7} (an \svg{}
-% 		hexadecimal color specification) must be applied to the clade defined by
-% 		\code{Homo} and \code{Hylobates}, which consists of these two nodes,
-% 		their last common ancestor (unlabeled), and all its descendants (that is,
-% 		\code{Homo}, \code{Pan}, \code{Gorilla}, \code{Pongo}, and
-% 		\code{Hylobates}, as well as the inner nodes \code{Hominini},
-% 		\code{Homininae} and \code{Hominidae}). 
-% 	\item Line 6 instructs that the style \code{stroke:green} be applied
-% 		individually to nodes \code{Colobus} and \code{Cercopithecus}, and only
-% 		these nodes - not to the clade that they define.  
-% 	\item Line 8 says that style \code{stroke-width:2;~stroke:blue} should be
-% 		applied to the clade defined by \code{Homo} and \code{Pan} - note that
-% 		the quotes have been removed: they are not part of the style, rather they
-% 		allow us to improve readability by adding some whitespace.
-% 	\item Line 10 specifies color \code{blue} for labels \code{Homo},
-% 		\code{Pan},
-% 		and \code{Hominini}.
-% \stopitemize
-% 
-% The style of an inner clade overrides that of an outer clade, \eg,
-% although the \code{Homo} - \code{Pan} clade is nested inside the
-% \code{Homo} - \code{Hylobates} clade, it has its own style (blue, wide
-% lines) which overrides the containing clade's style (pinkish with normal
-% width).  Likewise, \code{Individual} overrides \code{Clade}, which is why
-% \code{Cercopithecus} is green even though it belongs to a "red" clade.
-% 
-% \bigskip
-% 
-% Label styles can also be applied globally. Option \code{-l} (lowercase l)
-% specifies the leaf label style, option \code{-i} the inner node label style,
-% and option \code{-b} the branch length style. For example, the following tree,
-% which was produced using defaults, could be improved a bit:
-% 
-% \typefile{display_6_svg.cmd}
-% \startalignment[center]
-%   \externalfigure[display_6_svg]
-% \stopalignment
-% 
-% \noindent{}Let's remove the branch length labels, reduce
-% the vertical spacing, reduce the size of inner node labels (bootstrap values),
-% and write the leaf labels in italics, using a font with serifs:
-% 
-% \typefile{display_7_svg.cmd}
-% \startalignment[center]
-%   \externalfigure[display_7_svg]
+\subsection[sct_display_svg]{As Scalable Vector Graphics}
+
+First, a disclaimer: there are dozens of tools for viewing trees out there, and
+I'm not interested in competing with them. The reasons why I included \svg{}
+capabilities (besides automation, etc.) were:
+\startitemize
+\item I wanted to be able to produce reasonably good graphics even if no other
+tool was at hand
+\item I wanted to be sure that large trees could be rendered\footnote{I have
+had serious problems visualising trees of more than 1,000 leaves using some
+popular software I will not name here - either it was painfully slow, or it
+simply crashed, or else the output was unreadable, incomplete, or otherwise
+unsuitable.}
+\stopitemize
+To produce \svg, pass option \code{-s}:
+\starttyping
+$ nw_display -s catarrhini > catarrhini.svg
+\stoptyping
+Now you can visualize the result using any \svg-enabled tool (all good Web
+browsers can do it), or convert it to another format with, say Inkscape
+(\from[URL:inkscape]).  The \svg{} produced by \display{} is designed
+to be easy to edit in an interactive editor (Inkscape, Adobe Illustrator,
+etc.): for example, the tree edges are in one group, and the text in another,
+so it is easy to change the line width of the edges, or the font family of the
+text (you can also do this from \display{} using a \css{} map, see
+\in{}[sct_display_svg_css]).
+
+The following \pdf{} image was produced like this:
+
+\starttyping
+$ inkscape -f catarrhini.svg -D -A catarrhini.pdf
+\stoptyping
+
+\externalfigure[display_3_svg.pdf][type=pdf,align=center]
+
+All \svg{} images shown in this tutorial were processed in the same way. In the
+rest of the document we will usually skip the redirection into an \svg{} file
+and omit the \svg{}-to-\cap{pdf} conversion step.
+
+\subsubsection{Text-mode options}
+
+Many options for \ascii{} trees also work for \svg{}: \code{-S} suppresses the
+scale bar\footnote{The positioning of the scale bar is a bit crude in \svg{}
+mode, especially for radial trees. This is mainly because of the "\svg{} string
+length curse", that is, the impossibility of finding out the length of a text
+string in \svg.  This means it is hard to ensure the scale bar will not overlap
+with a node label, unless one places it far away in a corner, which is what I do
+for now. An improvement to this is on my TODO list.}, and \code{-u} specifies
+its units; \code{-w} governs the tree's width (or fixes the scale if its
+argument is negative), except that for \svg{} the value is in pixels instead of
+columns; \code{-I} controls the placement of inner node labels. 
+
+\subsubsection{Radial trees}
+
+You can make radial trees by passing the \code{-r} switch:
+\typefile{display_4_svg.cmd}
+\startalignment[center]
+\externalfigure[display_4_svg]
+\stopalignment
+
+\subsubsection[sct_display_svg_css]{Using CSS}
+
+You can modify node style using Cascading Style Sheets (\css,
+(\from[URL:CSS])). This is done by specifying a \em{\css{} map},
+which is just a text file that says which style should be applied to which node.
+For example, if file \filename{css.map} contains the following
+\startnarrower
+\typefile{css.map}
+\stopnarrower we can apply the style map to
+the tree above by passing \code{-c}, which takes the name of the \css{} file
+as argument:
+
+\typefile{display_5_svg.cmd}
+\startalignment[center]
+ \externalfigure[display_5_svg]
+\stopalignment
+
+The syntax of the \css{} map file is as follows:
+\startitemize
+	\item A line that starts with a \type{\#} (hash) is a comment, and will be
+	ignored, as will be any line that contains only whitespace (space and TAB),
+	as well as empty lines.
+	\item Each line describes one style and the set of nodes to which it applies.
+	A line contains elements separated by whitespace (whitespace between quotes
+	does not count). 
+	\item The first element of the line is the style, and it is a snippet of
+	\css{} code. 
+	\item The second element states whether the following nodes are to be treated
+	individually or as a clade. It is either \code{Clade},
+	\code{Individual}, or \code{Label} (which can be abbreviated to
+	\code{C}, \code{I}, or \code{L}, respectively). 
+	\item The remaining element(s) are node labels and specify the nodes to which
+	the style must be applied: if the second element is \code{Clade}, the
+	program finds the last common ancestor of the nodes and applies the style to
+	that node and all its descendants. If the second element is
+	\code{Individual}, then the style is only applied to the nodes themselves.
+	If the second element is \code{Label}, then the style is applied to the
+	labels.
+\stopitemize
+
+\noindent{}In our example, \filename{css.map}:
+\startitemize
+	\item line 2 states that the style \code{stroke:red} must be applied
+		to the \code{Clade} defined by \code{Macaca} and
+		\code{Cercopithecus}, which consists of these two nodes, their ancestor
+		\code{Cercopithecinae}, and \code{Papio}. 
+	\item Line 4 prescribes that style \code{stroke:\#fa7} (an \svg{}
+		hexadecimal color specification) must be applied to the clade defined by
+		\code{Homo} and \code{Hylobates}, which consists of these two nodes,
+		their last common ancestor (unlabeled), and all its descendants (that is,
+		\code{Homo}, \code{Pan}, \code{Gorilla}, \code{Pongo}, and
+		\code{Hylobates}, as well as the inner nodes \code{Hominini},
+		\code{Homininae} and \code{Hominidae}). 
+	\item Line 6 instructs that the style \code{stroke:green} be applied
+		individually to nodes \code{Colobus} and \code{Cercopithecus}, and only
+		these nodes - not to the clade that they define.  
+	\item Line 8 says that style \code{stroke-width:2;~stroke:blue} should be
+		applied to the clade defined by \code{Homo} and \code{Pan} - note that
+		the quotes have been removed: they are not part of the style, rather they
+		allow us to improve readability by adding some whitespace.
+	\item Line 10 specifies color \code{blue} for labels \code{Homo},
+		\code{Pan},
+		and \code{Hominini}.
+\stopitemize
+
+The style of an inner clade overrides that of an outer clade, \eg,
+although the \code{Homo} - \code{Pan} clade is nested inside the
+\code{Homo} - \code{Hylobates} clade, it has its own style (blue, wide
+lines) which overrides the containing clade's style (pinkish with normal
+width).  Likewise, \code{Individual} overrides \code{Clade}, which is why
+\code{Cercopithecus} is green even though it belongs to a "red" clade.
+
+\bigskip
+
+Label styles can also be applied globally. Option \code{-l} (lowercase l)
+specifies the leaf label style, option \code{-i} the inner node label style,
+and option \code{-b} the branch length style. For example, the following tree,
+which was produced using defaults, could be improved a bit:
+
+\typefile{display_6_svg.cmd}
+\startalignment[center]
+  \externalfigure[display_6_svg]
+\stopalignment
+
+\noindent{}Let's remove the branch length labels, reduce
+the vertical spacing, reduce the size of inner node labels (bootstrap values),
+and write the leaf labels in italics, using a font with serifs:
+
+\typefile{display_7_svg.cmd}
+\startalignment[center]
+  \externalfigure[display_7_svg]
 % \stopalignment
 % 
 % \noindent{}Still not perfect, but much better. Option \code{-v} specifies the
