@@ -160,6 +160,28 @@ rscale=1.1]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Sectioning
+
+\definehead[doctitle][title]
+ 
+\defineframedtext[doctitleframe][
+	width=\textwidth,
+	background=screen,
+	frame=off,
+	topframe=on,
+	%leftframe=on,
+	bottomframe=on,
+	%rightframe=on,
+	rulethickness=0.5mm
+]
+
+\setuphead[doctitle][
+	before=\startdoctitleframe,
+	style={\switchtobodyfont[36pt]\bf},
+	after=\stopdoctitleframe,
+]
+
+%\startframedtext[align=center,width=\textwidth]
+
 \setuphead[subsubsubsection][number=no,style={\switchtobodyfont[14pt]\bf}]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
