@@ -1,24 +1,29 @@
 %&context
 
-\setupframedtexts[background=screen,frame=off,topframe=on,rulethickness=0.5mm]
+\setuppagenumbering[state=stop]
+
+\setupframedtexts[
+	frame=off,
+	topframe=on,
+	bottomframe=on,
+	rulethickness=1mm]
+
+%\startframedtext[align=center,width=\textwidth]
+\title{Newick Utilities Tutorial}
+%\stopframedtext
 
 \startalignment[center]
-
-\startframedtext{
-{\tfa Newick Utilities Tutorial} \\[0.5cm]
-%Version 1.6.0 -- \today \\
-\medskip
-Thomas Junier \texttt{thomas.junier@unine.ch} \\
+Version 1.7.0 -- \currentdate \\
+Thomas Junier \email{thomas.junier@unine.ch} \\
 Swiss Institute of Bioinformatics \\
 and \\
 University of Neuch\^{a}tel, Switzerland \\
-\ding{91} \ding{91} \ding{91} \\
+%\ding{91} \ding{91} \ding{91} \\
+%\showsymbolset[uni]
 but developed (2006-2011) at: \\
 Computational Evolutionary Genomics Group \\
 Department of Genetic Medicine and Development \\
 University of Geneva, Switzerland \\
-%\medskip
-\url{http://cegg.unige.ch/newick_utils}
-\stopframedtext
-\includegraphics[width=0.8\textwidth]{title_svg.pdf}
+\from[URL:CEGG-NU]
+\externalfigure[title_svg][width=0.8\textwidth]
 \stopalignment
