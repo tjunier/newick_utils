@@ -1,1 +1,1 @@
-nw_display -sr -S -w 450 -o b2r.map HRV_ingrp.nw 
+nw_display -sr -S -w 450 -b 'opacity:0;visibility:hidden' -o b2r.map HRV_ingrp.nw 
