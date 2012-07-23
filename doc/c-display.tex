@@ -16,9 +16,10 @@ purpose of the \display{} program.
 
 At its simplest, \display{} just outputs a text graph. Here is the primates tree, shown with \display{}:
 
-\placefigure
+\startsamepage
 \typefile{display_1_txt.cmd}
 \typefile{display_1_txt.out}
+\stopsamepage
 
 That's pretty low-tech compared to interactive, colorful, high-resolution
 displays, but if you use the shell a lot (like I do), you may find it useful.
@@ -31,7 +32,6 @@ use that many columns when drawing the tree. If the output is not a terminal
 is not defined, then the program uses a default of 80 characters. You can use
 option \code{-w} to override the defaults.
 
-\page[no]
 \typefile{display_2_txt.cmd}
 \typefile{display_2_txt.out}
 
