@@ -18,6 +18,7 @@
 \define[1] \code{{\tt #1}}
 \define[1] \progname{{\tt #1}}
 \define[1] \sciname{{\em #1}}	% Scientific name in italics
+\define[1] \email{{\tt #1}}
 %\define[1] \degC{$#1\,^{\circ}{\rm C}$}
 
 % frequent acronyms, abbreviations, aliases, etc.
@@ -159,6 +160,28 @@ rscale=1.1]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Sectioning
+
+\definehead[doctitle][title]
+ 
+\defineframedtext[doctitleframe][
+	width=\textwidth,
+	background=screen,
+	frame=off,
+	topframe=on,
+	%leftframe=on,
+	bottomframe=on,
+	%rightframe=on,
+	rulethickness=0.5mm
+]
+
+\setuphead[doctitle][
+	before=\startdoctitleframe,
+	style={\switchtobodyfont[36pt]\bf},
+	after={\stopdoctitleframe \blank[4*big]},
+]
+
+%\startframedtext[align=center,width=\textwidth]
+
 \setuphead[subsubsubsection][number=no,style={\switchtobodyfont[14pt]\bf}]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -181,6 +204,8 @@ rscale=1.1]
 \useURL[URL:newick-format][http://evolution.genetics.washington.edu/phylip/newicktree.html]
 \useURL[URL:Inkscape][http://www.inkscape.org]
 \useURL[URL:CSS][www.w3.org/Style/CSS]
+\useURL[URL:CEGG-NU][http://cegg.unige.ch/newick_utils]
+\useURL[URL:Github][https://github.com/tjunier/newick_utils/wiki]
 
 % \useURL[ToL][http://www.tolweb.org]
 % \useURL[GOLD][http://genomesonline.org/gold\_statistics.htm]
@@ -233,5 +258,7 @@ rscale=1.1]
 % NOTE: state=start fails with v. 2012.06.26, and causes \externalfigure to cause an emergency stop
 \setupinteraction[state=start]
 
+
+\definestartstop[samepage][before={\vbox}]
 
 \stopenvironment
