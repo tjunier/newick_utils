@@ -1,25 +1,29 @@
 %&context
 
+\showframe
 \setuppagenumbering[state=stop]
 
-\blank[back]
+\setuplayout[title]
+
+\startalignment[middle]
 \doctitle{Newick Utilities Manual}
 
-\startalignment[center]
 Version 1.7.0 -- \currentdate \crlf
 \blank[2*big]
 % for some reason the figure escapes the \startalignment directive
-\midaligned{\externalfigure[title_svg][factor=broad]}
+\midaligned{\externalfigure[title_svg][width=0.8\textwidth]}
 \blank[2*big]
-Thomas Junier \email{thomas.junier@unige.ch} 
-\from[URL:CEGG-NU]
+{\switchtobodyfont[big] Thomas Junier} \crlf
+\email{<thomas.junier@unige.ch>} \crlf
+\from[URL:CEGG-NU] \crlf
 \from[URL:Github]
 \stopalignment
 
 \page
 
-\blank[back]
-\doctitle{Newick Utilities Manual}
+\startdoctitleframe
+{\switchtobodyfont[36pt]\bf\startalignment[center]Newick Utilities \crlf A Manual\stopalignment}
+\stopdoctitleframe
 
 \startalignment[center]
 Version 1.7.0 -- \currentdate \crlf
@@ -39,3 +43,8 @@ University of Geneva, Switzerland \crlf
 \from[URL:CEGG-NU]
 \from[URL:Github]
 \stopalignment
+
+\page
+% NOTE: if \setuplayout occurs on the _same_ page as the above (i.e., not after
+% a \page command), then it effects _this_ page, not the next.
+\setuplayout[reset]
