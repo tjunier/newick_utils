@@ -10,12 +10,14 @@
 
 \startfrontmatter
 	\input c-title
-	\setuppagenumbering[state=start,conversion=Romannumerals]
+	\setuppagenumbering[state=start]
+	\setupuserpagenumber[numberconversion=romannumerals]
 	\completecontent
 	\component c-intro
 \stopfrontmatter
 
 \startbodymatter
+	\setupuserpagenumber[numberconversion=numbers]
 	\component c-general
 	\component c-simple
 	%\component c-advanced
