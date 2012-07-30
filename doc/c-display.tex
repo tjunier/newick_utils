@@ -5,7 +5,7 @@ Perhaps the simplest and most common operation on a \nw{} tree is just to look
 at it. But \nw{} trees are not very intuitive for us humans, as we can quickly
 see by looking \eg{} at a tree of Old World primates:
 
-\txtoutput{display_12_txt}
+\txtoutput{display_12}
 
 \noindent{}So we want to make a graphical representation from it. This is the
 purpose of the \display{} program. 
@@ -15,12 +15,13 @@ purpose of the \display{} program.
 At its simplest, \display{} just outputs a text graph. Here is the primates
 tree, shown with \display{}:
 
-%\startsamepage
-%\typefile{display_1_txt.cmd}
-%\typefile{display_1_txt.out}
-%\stopsamepage
+\startsamepage
+\switchtobodyfont[10pt]{
+\typefile{display_1_txt.cmd}
+\typefile{display_1_txt.out}
+}
+\stopsamepage
 
-{\tfx \txtoutput{display_1_txt}}
 
 That's pretty low-tech compared to interactive, colorful, high-resolution
 displays, but if you use the shell a lot (like I do), you may find it useful.
@@ -33,7 +34,7 @@ use that many columns when drawing the tree. If the output is not a terminal
 is not defined, then the program uses a default of 80 characters. You can use
 option \code{-w} to override the defaults.
 
-\txtoutput{display_2_txt}
+\txtoutput{display_2}
 
 \subsubsection{Fixing Scale}
 
@@ -43,9 +44,7 @@ impossible to specify both width and scale, which would be absurd as one is
 always derived from the other.}. For example, to use half a column per unit
 length, do:
 
-\typefile{display_20_txt.cmd}
-\typefile{display_20_txt.out}
-
+\txtoutput{display_20}
 
 \noindent{} So a branch of length\footnote{To know the length of an edge, you
 can use \distance{} \code{-m p -n} -- see \in{}[sct:distance].  } 10 (such as
