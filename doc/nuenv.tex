@@ -108,6 +108,17 @@
 \define \topology{\progname{nw\_topology}}
 \define \trim{\progname{nw\_trim}}
 
+\define[2] \txtoutput{%
+\startsamepage%
+\typefile{#1.cmd}%
+\typefile{#1.out}%
+\stopsamepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Environments
+
+\definestartstop[samepage][before={\vbox}]
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography
 
@@ -232,7 +243,6 @@ rscale=1.1]
 % Floats
 \setupcaptions[style=small]
 
-
 % for my own marginalia
 \setupinmargin[style=\slx,align=inner,width=3.5cm,location=flushright]
 % To suppress all margin notes, use:
@@ -264,7 +274,5 @@ rscale=1.1]
 % NOTE: state=start fails with v. 2012.06.26, and causes \externalfigure to cause an emergency stop
 \setupinteraction[state=start]
 
-
-\definestartstop[samepage][before={\vbox}]
 
 \stopenvironment

@@ -5,21 +5,22 @@ Perhaps the simplest and most common operation on a \nw{} tree is just to look
 at it. But \nw{} trees are not very intuitive for us humans, as we can quickly
 see by looking \eg{} at a tree of Old World primates:
 
-\typefile{display_12_txt.cmd}
-\typefile{display_12_txt.out}
-
+\txtoutput{display_12_txt}
 
 \noindent{}So we want to make a graphical representation from it. This is the
 purpose of the \display{} program. 
 
 \subsection[sct_display_text]{As Text}
 
-At its simplest, \display{} just outputs a text graph. Here is the primates tree, shown with \display{}:
+At its simplest, \display{} just outputs a text graph. Here is the primates
+tree, shown with \display{}:
 
-\startsamepage
-\typefile{display_1_txt.cmd}
-\typefile{display_1_txt.out}
-\stopsamepage
+%\startsamepage
+%\typefile{display_1_txt.cmd}
+%\typefile{display_1_txt.out}
+%\stopsamepage
+
+{\tfx \txtoutput{display_1_txt}}
 
 That's pretty low-tech compared to interactive, colorful, high-resolution
 displays, but if you use the shell a lot (like I do), you may find it useful.
@@ -32,9 +33,7 @@ use that many columns when drawing the tree. If the output is not a terminal
 is not defined, then the program uses a default of 80 characters. You can use
 option \code{-w} to override the defaults.
 
-\typefile{display_2_txt.cmd}
-\typefile{display_2_txt.out}
-
+\txtoutput{display_2_txt}
 
 \subsubsection{Fixing Scale}
 
@@ -44,7 +43,6 @@ impossible to specify both width and scale, which would be absurd as one is
 always derived from the other.}. For example, to use half a column per unit
 length, do:
 
-\page[no]
 \typefile{display_20_txt.cmd}
 \typefile{display_20_txt.out}
 
