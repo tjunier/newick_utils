@@ -110,10 +110,17 @@
 
 % This puts the command and its output, which normally end in _txt.cmd and
 % _txt.out, respectively, on the same page.
-\define[2] \txtoutput{%
+\define[1] \txtoutput{%
 \startsamepage%
 \typefile{#1_txt.cmd}%
 \typefile{#1_txt.out}%
+\stopsamepage}
+
+% Save for SVGs
+\define[1] \svgoutput{%
+\startsamepage%
+\typefile{#1_svg.cmd}%
+\midaligned{\externalfigure[#1_svg]}%
 \stopsamepage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
