@@ -137,7 +137,7 @@ so it is easy to change the line width of the edges, or the font family of the
 text (you can also do this from \display{} using a \css{} map, see
 \in{}[sct_display_svg_css]).
 
-The following \pdf{} image was produced like this:
+The following \pdf{} image was produced like this from the \svg{} file:
 
 \startsamepage
 \starttyping
@@ -158,7 +158,7 @@ mode, especially for radial trees. This is mainly because of the "\svg{} string
 length curse", that is, the impossibility of finding out the length of a text
 string in \svg.  This means it is hard to ensure the scale bar will not overlap
 with a node label, unless one places it far away in a corner, which is what I do
-for now. An improvement to this is on my TODO list.}, and \code{-u} specifies
+for now. An improvement to this is (still) on my TODO list.}, and \code{-u} specifies
 its units; \code{-w} governs the tree's width (or fixes the scale if its
 argument is negative), except that for \svg{} the value is in pixels instead of
 columns; \code{-I} controls the placement of inner node labels. 
@@ -265,7 +265,7 @@ Instead, we set their \css{} style to \code{opacity:0}
 What if we want to change the default style? Say we want the branches in blue,
 and two pixels wide? That's option \code{-d}:
 
-\svgoutput{display_8}
+\svgoutput{display_13}
 
 \subsection{Ornaments}
 
