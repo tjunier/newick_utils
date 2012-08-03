@@ -10,7 +10,11 @@ lengths, e.g. whole tree depth less than 0.1. Try e.g. 3_clusters.nw.
 
 [done] valgrind
 
+port manual to ConTeXt
+
 RELEASE
+
+test all programs with NCBI taxonomy. In particular, nw_rename is *way* too slow, probably because hash is too small and doesn't grow. Consider growing hashes, or another map implementation.
 
 request: display unrooted trees
 
