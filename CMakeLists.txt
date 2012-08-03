@@ -39,8 +39,13 @@ if(USE_LUA)
 	find_package(Lua51)
 endif(USE_LUA)
 
+configure_file (
+	"${PROJECT_SOURCE_DIR}/CMakeConfig.h.in"
+	"${PROJECT_BINARY_DIR}/config.h"
+)
+
 # this must go _before_ any add_subdirectory that needs it...
 # TODO actually this may no longer be needed
-include_directories(${NUTILS_SOURCE_DIR} /usr/include/libxml2)
+include_directories(${PROJECT_BINARY_DIR} /usr/include/libxml2)
 add_subdirectory(src)
 add_subdirectory(tests)
