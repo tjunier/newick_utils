@@ -1,0 +1,5 @@
+#cmakedefine LIBXML2_FOUND
+
+#ifdef LIBXML2_FOUND
+#define USE_LIBXML2 1
+#endif

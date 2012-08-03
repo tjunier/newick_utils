@@ -224,7 +224,7 @@ void help(char* argv[])
 "\n"
 "If LibXML is being used, the handling of ornaments (-o) is more elaborate.\n"
 "See the tutorial, section 2.2 (displaying) for details.\n"
-#ifdef HAVE_LIBXML2
+#ifdef USE_LIBXML2
 "This executable uses LibXML2.\n"
 #else
 "This executable does NOT use LibXML2.\n"

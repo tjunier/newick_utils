@@ -33,8 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <stdlib.h>
 
-// TODO: use CMake's mechanism instead of GNU autotools to #define USE_LIBXML2
-//#include "config.h" 
+#include "config.h" 
 
 #ifdef USE_LIBXML2
 #include <libxml/tree.h>

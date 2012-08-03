@@ -76,6 +76,9 @@ add_executable(test_svg_graph_radial test_svg_graph_radial.c
 	${SRC_DIR}/xml_utils.c
 	)
 target_link_libraries(test_svg_graph_radial nutils m)
+if(LIBXML2_FOUND)
+	target_link_libraries(test_svg_graph_radial ${LIBXML2_LIBRARIES})
+endif(LIBXML2_FOUND)
 add_test(svg_graph_radial test_svg_graph_radial)
 
 add_executable(test_tree_models test_tree_models.c ${SRC_DIR}/tree_models.c tree_stubs.c)
