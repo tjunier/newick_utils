@@ -5,21 +5,23 @@ Perhaps the simplest and most common operation on a \nw{} tree is just to look
 at it. But \nw{} trees are not very intuitive for us humans, as we can quickly
 see by looking \eg{} at a tree of Old World primates:
 
-\typefile{display_12_txt.cmd}
-\typefile{display_12_txt.out}
-
+\txtoutput{display_12}
 
 \noindent{}So we want to make a graphical representation from it. This is the
 purpose of the \display{} program. 
 
 \subsection[sct_display_text]{As Text}
 
-At its simplest, \display{} just outputs a text graph. Here is the primates tree, shown with \display{}:
+At its simplest, \display{} just outputs a text graph. Here is the primates
+tree, shown with \display{}:
 
 \startsamepage
+\switchtobodyfont[10pt]{
 \typefile{display_1_txt.cmd}
 \typefile{display_1_txt.out}
+}
 \stopsamepage
+
 
 That's pretty low-tech compared to interactive, colorful, high-resolution
 displays, but if you use the shell a lot (like I do), you may find it useful.
@@ -32,9 +34,7 @@ use that many columns when drawing the tree. If the output is not a terminal
 is not defined, then the program uses a default of 80 characters. You can use
 option \code{-w} to override the defaults.
 
-\typefile{display_2_txt.cmd}
-\typefile{display_2_txt.out}
-
+\txtoutput{display_2}
 
 \subsubsection{Fixing Scale}
 
@@ -44,10 +44,7 @@ impossible to specify both width and scale, which would be absurd as one is
 always derived from the other.}. For example, to use half a column per unit
 length, do:
 
-\page[no]
-\typefile{display_20_txt.cmd}
-\typefile{display_20_txt.out}
-
+\txtoutput{display_20}
 
 \noindent{} So a branch of length\footnote{To know the length of an edge, you
 can use \distance{} \code{-m p -n} -- see \in{}[sct:distance].  } 10 (such as
@@ -140,17 +137,18 @@ so it is easy to change the line width of the edges, or the font family of the
 text (you can also do this from \display{} using a \css{} map, see
 \in{}[sct_display_svg_css]).
 
-The following \pdf{} image was produced like this:
+The following \pdf{} image was produced like this from the \svg{} file:
 
+\startsamepage
 \starttyping
 $ inkscape -f catarrhini.svg -D -A catarrhini.pdf
 \stoptyping
-
-\externalfigure[display_3_svg.pdf][type=pdf,align=center]
+\midaligned{\externalfigure[display_3_svg.pdf]}
+\stopsamepage
 
 All \svg{} images shown in this tutorial were processed in the same way. In the
 rest of the document we will usually skip the redirection into an \svg{} file
-and omit the \svg{}-to-\cap{pdf} conversion step.
+and omit the \svg{}-to-\pdf{} conversion step.
 
 \subsubsection{Text-mode options}
 
@@ -160,7 +158,7 @@ mode, especially for radial trees. This is mainly because of the "\svg{} string
 length curse", that is, the impossibility of finding out the length of a text
 string in \svg.  This means it is hard to ensure the scale bar will not overlap
 with a node label, unless one places it far away in a corner, which is what I do
-for now. An improvement to this is on my TODO list.}, and \code{-u} specifies
+for now. An improvement to this is (still) on my TODO list.}, and \code{-u} specifies
 its units; \code{-w} governs the tree's width (or fixes the scale if its
 argument is negative), except that for \svg{} the value is in pixels instead of
 columns; \code{-I} controls the placement of inner node labels. 
@@ -168,10 +166,8 @@ columns; \code{-I} controls the placement of inner node labels.
 \subsubsection{Radial trees}
 
 You can make radial trees by passing the \code{-r} switch:
-\typefile{display_4_svg.cmd}
-\startalignment[center]
-\externalfigure[display_4_svg]
-\stopalignment
+
+\svgoutput{display_4}
 
 \subsubsection[sct_display_svg_css]{Using CSS}
 
@@ -185,10 +181,7 @@ For example, if file \filename{css.map} contains the following
 the tree above by passing \code{-c}, which takes the name of the \css{} file
 as argument:
 
-\typefile{display_5_svg.cmd}
-\startalignment[center]
- \externalfigure[display_5_svg]
-\stopalignment
+\svgoutput{display_5}
 
 The syntax of the \css{} map file is as follows:
 \startitemize
@@ -239,7 +232,7 @@ The syntax of the \css{} map file is as follows:
 \stopitemize
 
 The style of an inner clade overrides that of an outer clade, \eg,
-although the \code{Homo} - \code{Pan} clade is nested inside the
+although the \code{Homo}~-~\code{Pan} clade is nested inside the
 \code{Homo} - \code{Hylobates} clade, it has its own style (blue, wide
 lines) which overrides the containing clade's style (pinkish with normal
 width).  Likewise, \code{Individual} overrides \code{Clade}, which is why
@@ -252,19 +245,13 @@ specifies the leaf label style, option \code{-i} the inner node label style,
 and option \code{-b} the branch length style. For example, the following tree,
 which was produced using defaults, could be improved a bit:
 
-\typefile{display_6_svg.cmd}
-\startalignment[center]
-  \externalfigure[display_6_svg]
-\stopalignment
+\svgoutput{display_6}
 
 \noindent{}Let's remove the branch length labels, reduce
 the vertical spacing, reduce the size of inner node labels (bootstrap values),
 and write the leaf labels in italics, using a font with serifs:
 
-\typefile{display_7_svg.cmd}
-\startalignment[center]
-  \externalfigure[display_7_svg]
-\stopalignment
+\svgoutput{display_7}
 
 \noindent{}Still not perfect, but much better. Option \code{-v} specifies the
 vertical spacing, in pixels, between two successive leaves (the default is 40).
@@ -278,10 +265,7 @@ Instead, we set their \css{} style to \code{opacity:0}
 What if we want to change the default style? Say we want the branches in blue,
 and two pixels wide? That's option \code{-d}:
 
-\typefile{display_13_svg.cmd}
-\startalignment[center]
-  \externalfigure[display_13_svg]
-\stopalignment
+\svgoutput{display_13}
 
 \subsection{Ornaments}
 

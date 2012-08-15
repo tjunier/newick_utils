@@ -108,6 +108,26 @@
 \define \topology{\progname{nw\_topology}}
 \define \trim{\progname{nw\_trim}}
 
+% This puts the command and its output, which normally end in _txt.cmd and
+% _txt.out, respectively, on the same page.
+\define[1] \txtoutput{%
+\startsamepage%
+\typefile{#1_txt.cmd}%
+\typefile{#1_txt.out}%
+\stopsamepage}
+
+% Save for SVGs
+\define[1] \svgoutput{%
+\startsamepage%
+\typefile{#1_svg.cmd}%
+\midaligned{\externalfigure[#1_svg]}%
+\stopsamepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Environments
+
+\definestartstop[samepage][before={\vbox}]
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography
 
@@ -136,6 +156,11 @@ rscale=1.1]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Layout
+
+\setuppapersize[A4][A4]
+
+\definelayout[title][backspace=1.5cm,width=18cm,
+		     topspace=1cm,height=middle]
 
 % Defaults:
 % textwidth: 15cm
@@ -175,7 +200,8 @@ rscale=1.1]
 ]
 
 \setuphead[doctitle][
-	before=\startdoctitleframe,
+	align=center,
+	before={\startdoctitleframe},
 	style={\switchtobodyfont[36pt]\bf},
 	after={\stopdoctitleframe \blank[4*big]},
 ]
@@ -226,7 +252,6 @@ rscale=1.1]
 % Floats
 \setupcaptions[style=small]
 
-
 % for my own marginalia
 \setupinmargin[style=\slx,align=inner,width=3.5cm,location=flushright]
 % To suppress all margin notes, use:
@@ -244,13 +269,15 @@ rscale=1.1]
 \definedescription[definition][location=left,headstyle=bold]
 \setupcombinedlist[content][alternative=b]
 
+\setupitemize[packed]
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Footnotes
 \setupfootnotes[width=\textwidth]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Indenting
-\setupindenting[2em,yes]
+%\setupindenting[2em,yes]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Interaction
@@ -258,7 +285,5 @@ rscale=1.1]
 % NOTE: state=start fails with v. 2012.06.26, and causes \externalfigure to cause an emergency stop
 \setupinteraction[state=start]
 
-
-\definestartstop[samepage][before={\vbox}]
 
 \stopenvironment
