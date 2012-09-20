@@ -1,0 +1,145 @@
+\section[sct_reroot{]Rooting and Rerooting}
+
+Rooting transforms an unrooted tree into a rooted one, and rerooting changes a
+rooted tree's root. Some tree-building methods produce rooted trees (e.g.,
+\cap{upgma}), others produce unrooted ones (neighbor-joining,
+maximum-likelihood).  The Newick format is implicitly rooted, in the sense that
+there is a 'top' node from which all other nodes descend. Some applications
+regard a tree with a trifurcation at the top node as unrooted. 
+
+Rooting a tree is usually done by specifying an \textit{outgroup} (but see
+\in{}[sct:no-outgroup]). In the simplest case, this is a single leaf. The root is
+then placed in such a way that one of its children is the outgroup, while the
+other child is the rest of the tree (sometimes known as the \textit{ingroup}).
+Consider the following primate tree, \texttt{simiiformes\_wrong}:
+
+\startalignment[center]
+\externalfigure[reroot_1_svg]
+\stopalignment
+
+\noindent{}It is wrong because \texttt{Cebus}, which is a New World monkey (capuchin), should be the sister group of all the rest (Old World monkeys and apes, technically Catarrhini), whereas it is shown as the sister group of the macaque-colobus family, Cercopithecidae. We can correct this by re-rooting the tree using \texttt{Cebus} as outgroup:
+\typefile{reroot_2_svg.cmd}
+which produces:
+
+\startalignment[center]
+\externalfigure[reroot_2_svg]
+\stopalignment
+
+\noindent{}Now the tree is correct. Note that the root is placed in the middle of the ingroup-outgroup edge, and that the other branch lengths are conserved.
+
+The outgroup does not need to be a single leaf. The following tree is
+wrong for the same reason as the one before, except that is has three New World
+monkey species instead of one, and they appear as a clade (Platyrrhini) in the
+wrong place:
+
+\startalignment[center]
+\externalfigure[reroot_3_svg]
+\stopalignment
+
+\noindent{}We can correct this by specifying the New World monkey clade as outgroup:
+
+\typefile{reroot_4_svg.cmd}
+
+\startalignment[center]
+\externalfigure[reroot_4_svg]
+\stopalignment
+
+\noindent{}Note that I did not include all three New World monkeys, only \texttt{Cebus} and \texttt{Allouatta}. This is because it is always possible to define a clade using only two leaves. The result would be the same if I had included all three, though. You can use inner labels too, if there are any:
+\starttyping
+$ nw_reroot simiiformes_wrong_3og Platyrrhini
+\stoptyping
+will reroot in the same way (not shown). Beware that inner labels are often
+used for support values (as in bootstrapping), which are generally not useful
+for defining clades.
+
+\subsection{Rerooting on the ingroup}
+
+Sometimes the desired species cannot be used for rooting, as their last common ancestor is the tree's root. For example, consider the following tree:
+
+\startalignment[center]
+\externalfigure[reroot_5_svg]
+\stopalignment
+
+\noindent{}It is wrong because \textit{Danio} (a ray-finned fish) is shown
+closer to tetrapods than to other ray-finned fishes (\textit{Fugu} and
+\textit{Tetraodon}). So we should reroot it, specifying that the fishes should
+form the outgroup. We could try this:
+
+\typefile{reroot_6_txt.cmd}
+
+\noindent{}But this will fail:
+
+\typefile{reroot_6_txt.out}
+
+\noindent{}This fails because the last common ancestor of the two pufferfish is
+the root itself. The workaround in this case is to try the ingroup. This is
+done by passing option \texttt{-l} ("lax"), along with {\em all} species in
+the outgroup (this is because \reroot{} finds the ingroup by complementing the
+outgroup):
+
+\typefile{reroot_7_svg.cmd}
+\startalignment[center]
+\externalfigure[reroot_7_svg]
+\stopalignment
+
+\noindent{}To repeat: all outgroup labels were passed, not just the two
+normally needed to find the last common ancestor -- since, precisely, we can't
+use the \lca.
+
+\subsection{Rooting without an (explicit) outgroup}
+\label{sct:no-outgroup}
+
+\noindent{}Sometimes it is not clear what node(s) should form the outgroup --
+perhaps the phylogeny of the group under study is not clear, or someone forgot
+to include an outgroup in the tree\footnote{This happens regulary in published
+trees}. In that case, one can assume that the root is within the longest branch
+in the tree, and reroot there. Whether this assumption is reasonable is another
+question, indeed there are plenty of possible reasons why this may not be the
+case.
+
+In any case, should you want to reroot on the longest branch, just call
+\reroot{} without specifying any labels. Consider this tree:
+\startalignment[center]
+\externalfigure[reroot_10_svg]
+\stopalignment
+
+As it happens, rerooting on the longest branch gets it right:
+
+\typefile{reroot_11_svg.cmd}
+\startalignment[center]
+\externalfigure[reroot_11_svg]
+\stopalignment
+
+
+
+
+
+
+\subsection{Derooting}
+
+Some programs insist on being passed an unrooted tree, e.g. if you want to
+supply your own tree to PhyML, it has to be "unrooted". Strictly speaking,
+\nw{} trees are always rooted, but there is a convention that if the root has
+three (or more) children, the tree is considered unrooted. You can deroot a
+tree (in this limited sense) by passing option \texttt{-d} to \reroot{}. Here
+is a rooted tree, \texttt{fagales.nw}
+
+\startalignment[center]
+\externalfigure[reroot_8_svg]
+\stopalignment
+
+\noindent{}we can deroot it thus:
+
+\typefile{reroot_9_svg.cmd}
+\startalignment[center]
+\externalfigure[reroot_9_svg]
+\stopalignment
+
+\noindent{}this works as follows. The program finds which of the root's two
+children (it is assumed to have two, otherwise the tree is already considered
+unrooted in the above sense) has more children than the other. This is
+considered the ingroup, and the \lca{} of the ingroup is spliced out from the
+tree, attaching its children directly to the root. In this example, the ingroup
+is the Fagaceae - Casuarinaceae clade, and the derooting results in Fagaceae
+being directly attached to the root, as is its sister clade (Myricaceae -
+Casuarinaceae).

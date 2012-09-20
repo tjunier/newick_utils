@@ -9,6 +9,9 @@
 # \url{} must be changed to\url[], but this takes a name that refers to a URL,
 # which must be defined using \useURL, somewhere before \starttext.
 
+# We don't convert \textit to \it, because it's better to use semantic
+# formatting (see nuenv.tex).
+
 # Sectioning 
 s/\\chapter\*/\\chapter/
 s/\\section\*/\\section/
