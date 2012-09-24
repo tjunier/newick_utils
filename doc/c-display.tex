@@ -292,17 +292,12 @@ specified with option \code{-o}:
 \startnarrower
  \typefile{ornament.map}
 \stopnarrower
-\typefile{display_8_svg.cmd}
-\startalignment[center]
- \externalfigure[display_8_svg]
-\stopalignment
+
+\svgoutput{display_8}
 
 \noindent{}Ornaments and \css{} can be combined:
 
-\typefile{display_9_svg.cmd}
-\startalignment[center]
- \externalfigure[display_9_svg]
-\stopalignment
+\svgoutput{display_9}
 
 \subsubsection[sct:display:libxml]{\libxml}
 
@@ -336,10 +331,7 @@ values are perpendicular to the $x$ axis.
 
 This gives the following:
 
-\typefile{display_18_svg.cmd}
-\startalignment[center]
-\externalfigure[display_18_svg]
-\stopalignment
+\svgoutput{display_18}
 
 As hinted above, \libxml{} also allows handling of images:
 
@@ -347,10 +339,7 @@ As hinted above, \libxml{} also allows handling of images:
 
 This gives the following (credits: all images are from Wikipedia):
 
-\typefile{display_19_svg.cmd}
-\startalignment[center]
-\externalfigure[display_19_svg]
-\stopalignment
+\svgoutput{display_19}
 
 \subsubsection[sct_display_ornament_xpl_gc]{Example: Mapping GC Content}
 
@@ -360,16 +349,13 @@ This gives the following (credits: all images are from Wikipedia):
 \color[red]{red} (44.5\%). I used this gradient to produce a \css{} map,
 \filename{b2r.map}:
 
-\typefile{display_11_txt.cmd}
-\typefile{display_11_txt.out}
+\txtoutput{display_11}
 
 \noindent{}in which the \code{fill} values are hexadecimal color codes along
 the gradient. Then:
 
-\typefile{display_10_svg.cmd}
-\startalignment[center]
-\externalfigure[display_10_svg]
-\stopalignment
+\svgoutput{display_10}
+
 \bigskip{}
 
 \noindent{}As we can see, the high-\gc{} sequences are all found in the same
@@ -399,8 +385,7 @@ When run in \svg{} mode, \display{} "remembers" its arguments, that is, it puts
 them in an \xml{} comment with the keyword \code{arguments}. It is then
 trivial to retrieve them:
 
-\typefile{display_15_txt.cmd}
-\typefile{display_15_txt.out}
+\txtoutput{display_15}
 
 \noindent{}This is handy when one wants to re-use a set of options on another
 tree, especially after a while when one doesn't remember the exact values of the
