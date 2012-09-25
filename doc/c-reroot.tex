@@ -13,7 +13,7 @@ then placed in such a way that one of its children is the outgroup, while the
 other child is the rest of the tree (sometimes known as the \newconcept{ingroup}).
 Consider the following primate tree, \filename{simiiformes\_wrong}:
 
-\svgoutput{reroot_1}
+\svgCmdOutput{reroot_1}
 
 It is wrong because \sciname{Cebus}, which is a New World monkey
 (capuchin), should be the sister taxon of all the rest (Old World monkeys and
@@ -24,7 +24,7 @@ tree using \sciname{Cebus} as outgroup:
 \typefile{reroot_2_svg.cmd}
 which produces:
 
-\svgoutput{reroot_2}
+\svgCmdOutput{reroot_2}
 
 Now the tree is correct. Note that the root is placed in the middle of the ingroup-outgroup edge, and that the other branch lengths are conserved.
 
@@ -33,7 +33,7 @@ wrong for the same reason as the one before, except that is has three New World
 monkey species instead of one, and they appear as a clade (Platyrrhini) in the
 wrong place:
 
-\svgoutput{reroot_3}
+\svgCmdOutput{reroot_3}
 
 We can correct this by specifying the New World monkey clade as outgroup:
 
@@ -70,7 +70,7 @@ done by passing option \code{-l} ("lax"), along with {\em all} species in
 the outgroup (this is because \reroot{} finds the ingroup by complementing the
 outgroup):
 
-\svgoutput{reroot_7}
+\svgCmdOutput{reroot_7}
 
 To repeat: all outgroup labels were passed, not just the two
 normally needed to find the last common ancestor -- since, precisely, we can't
@@ -94,7 +94,7 @@ In any case, should you want to reroot on the longest branch, just call
 
 As it happens, rerooting on the longest branch gets it right:
 
-\svgoutput{reroot_11}
+\svgCmdOutput{reroot_11}
 
 
 \subsection{Derooting}
@@ -110,7 +110,7 @@ is a rooted tree, \filename{fagales.nw}
 
 we can deroot it thus:
 
-\svgoutput{reroot_9}
+\svgCmdOutput{reroot_9}
 
 this works as follows. The program finds which of the root's two children (it
 is assumed to have two, otherwise the tree is already considered unrooted in
