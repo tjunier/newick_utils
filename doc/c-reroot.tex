@@ -51,7 +51,7 @@ useful for defining clades.
 
 Sometimes the desired species cannot be used for rooting, as their last common ancestor is the tree's root. For example, consider the following tree:
 
-\externalfigure{reroot_5}
+\midaligned{\externalfigure[reroot_5_svg]}
 
 It is wrong because \sciname{Danio} (a ray-finned fish) is shown
 closer to tetrapods than to other ray-finned fishes (\sciname{Fugu} and
@@ -89,20 +89,12 @@ case.
 
 In any case, should you want to reroot on the longest branch, just call
 \reroot{} without specifying any labels. Consider this tree:
-\startalignment[center]
-\externalfigure[reroot_10_svg]
-\stopalignment
+
+\midaligned{\externalfigure[reroot_10_svg]}
 
 As it happens, rerooting on the longest branch gets it right:
 
-\typefile{reroot_11_svg.cmd}
-\startalignment[center]
-\externalfigure[reroot_11_svg]
-\stopalignment
-
-
-
-
+\svgoutput{reroot_11}
 
 
 \subsection{Derooting}
@@ -114,22 +106,16 @@ three (or more) children, the tree is considered unrooted. You can deroot a
 tree (in this limited sense) by passing option \code{-d} to \reroot{}. Here
 is a rooted tree, \filename{fagales.nw}
 
-\startalignment[center]
-\externalfigure[reroot_8_svg]
-\stopalignment
+\midaligned{\externalfigure[reroot_8_svg]}
 
 we can deroot it thus:
 
-\typefile{reroot_9_svg.cmd}
-\startalignment[center]
-\externalfigure[reroot_9_svg]
-\stopalignment
+\svgoutput{reroot_9}
 
-this works as follows. The program finds which of the root's two
-children (it is assumed to have two, otherwise the tree is already considered
-unrooted in the above sense) has more children than the other. This is
-considered the ingroup, and the \lca{} of the ingroup is spliced out from the
-tree, attaching its children directly to the root. In this example, the ingroup
-is the Fagaceae - Casuarinaceae clade, and the derooting results in Fagaceae
-being directly attached to the root, as is its sister clade (Myricaceae -
-Casuarinaceae).
+this works as follows. The program finds which of the root's two children (it
+is assumed to have two, otherwise the tree is already considered unrooted in
+the above sense) has more children than the other. This is considered the
+ingroup, and the \lca{} of the ingroup is spliced out from the tree, attaching
+its children directly to the root. In this example, the ingroup is the Fagaceae
+- Casuarinaceae clade, and the derooting results in Fagaceae being directly
+attached to the root, as is its sister clade (Myricaceae - Casuarinaceae).
