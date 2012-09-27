@@ -68,6 +68,7 @@
 \define \pdf{\cap{pdf}}
 %\define \pecan{Pecan}
 \define \phylip{\cap{phylip}}
+\define \phyml{Phy\cap{ml}}
 \define \picornaviridae{\sciname{Picornaviridae}} % apparently virus familiy names take italics
 \define \rna{\cap{rna}}
 %\define \scone{\cap{scone}}
@@ -113,20 +114,27 @@
 % _txt.out, respectively, on the same page.
 \define[1] \txtCmdOutput{%
 \startsamepage%
+\bigskip
 \typefile{#1_txt.cmd}%
 \typefile{#1_txt.out}%
+\bigskip
 \stopsamepage}
 
-% Save for SVGs
+% Same for SVGs
 \define[1] \svgCmdOutput{%
 \startsamepage%
+\bigskip
 \typefile{#1_svg.cmd}%
 \midaligned{\externalfigure[#1_svg]}%
+\bigskip
 \stopsamepage}
 
-\define[1] \svgfigure{
-	\midaligned{\externalfigure[#1_svg]}
-}
+% For SVGs without command line
+\define[1] \svgFigure{%
+\bigskip
+\midaligned{\externalfigure[#1_svg]}%
+\bigskip}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Environments
