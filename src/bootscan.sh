@@ -81,6 +81,9 @@ reroot_trees()
 
 label_data()
 {
+	# NOTE: if there is an error msg about an "undefined variable labels[*]" or
+	# something alike, look for a file named
+	# HRV_3UTR.dna.mfa_slice_*.phy_phyml_tree.rr.nw and remove it.
 	first_tree=$(ls ${MUSCLE_OUT}_slice*.rr.nw | head -1)
 	labels=($(nw_clade -s $first_tree $OUTGROUP | nw_labels -I -))
 	nb_labels=${#labels[*]}
