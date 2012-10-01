@@ -1,0 +1,23 @@
+\section{Computing Bootstrap Support}
+
+\support{} computes bootstrap support values from a target tree and a file of
+replicate trees. Say the target tree is in file \filename{HRV.nw} and the
+replicates (20 of them) are in \filename{HRV\_20reps.nw}. You can attribute
+support values to the target tree like this:
+
+\svgCmdOutput{support_1}
+
+In this case I have colored the support values red. Option \code{-p} uses
+percentages instead of absolute counts.
+
+\subsection{Notes}
+
+There are many tree-building programs that compute bootstrap support. For
+example, PhyML can do it, but for large tasks I typically have to distribute
+the replicates over several jobs (say, 100 jobs of 10 replicates each). I then
+collect all replicates files, concatenate them, and use \support{} to attribute
+the values to the target tree.
+
+\support{} assumes rooted trees (it may as well, since \nw{} is implicitly
+rooted), and the target tree and replicates should be rooted the same way. Use
+\reroot{} to ensure this.
