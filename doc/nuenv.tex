@@ -113,12 +113,12 @@
 % This puts the command and its output, which normally end in _txt.cmd and
 % _txt.out, respectively, on the same page.
 \define[1] \txtCmdOutput{%
+\bigskip%
 \startsamepage%
-\bigskip
 \typefile{#1_txt.cmd}%
 \typefile{#1_txt.out}%
-\bigskip
-\stopsamepage}
+\stopsamepage%
+\bigskip}
 
 % Same for SVGs
 \define[1] \svgCmdOutput{%
@@ -133,6 +133,15 @@
 \define[1] \svgFigure{%
 \bigskip
 \midaligned{\externalfigure[#1_svg]}%
+\bigskip}
+
+% and for text outputs without command line
+\define[1] \txtFigure{%
+\bigskip
+\startsamepage
+\typefile{#1}%
+\stopsamepage
+\bigskip
 \bigskip}
 
 
