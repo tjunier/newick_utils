@@ -197,12 +197,15 @@ int main(int argc, char *argv[])
 		group_map = read_map(params.grp_map_fname);
 
 	// debug
-	if (NULL != group_map) dump_hash(group_map, NULL);
+	// if (NULL != group_map) dump_hash(group_map, NULL);
 
 	while (true) {
 		tree = parse_tree();
 		if (NULL != tree) {
-			collapse_pure_clades(tree);
+			if (NULL == group_map)
+				collapse_pure_clades(tree);
+			else
+				collapse_by_groups(tree, group_map);
 			dump_newick(tree->root);
 			destroy_all_rnodes(NULL);
 			destroy_tree(tree);

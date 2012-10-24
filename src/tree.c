@@ -115,6 +115,35 @@ void collapse_pure_clades(struct rooted_tree *tree)
 	}
 }
 
+void collapse_by_groups(struct rooted_tree *tree, struct hash *group_map)
+{
+	struct list_elem *el;		
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+		if (is_leaf(current)) {
+			char *group = hash_get(group_map, current->label);
+			if (NULL == group) 
+				current->data = strdup("");
+			else
+				current->data = strdup(group);
+			printf ("node '%s': group %s\n", current->label,
+					current->data);
+		}
+
+		/* attempt collapse only if all children are leaves (any pure
+		 * subtree will have been collapsed to a leaf by now) */
+		if (! all_children_are_leaves(current)) continue;
+		char *group = NULL;
+		if (all_children_in_same_group(current, &group)) {
+			/* set own data (i.e., group) to children's label  - we
+			 * copy it because it will be later passed to free() */
+			current->data = strdup(group);
+			remove_children(current);
+		}
+	}
+}
+
 void destroy_tree(struct rooted_tree *tree)
 {
 	/* The nodes themselves are destroyed using destroy_all_rnodes() */

@@ -189,6 +189,27 @@ bool all_children_have_same_label(struct rnode *node, char **label)
 	return 1;
 }
 
+bool all_children_in_same_group(struct rnode *node, char **group)
+{
+
+	if (is_leaf(node))
+		return false;
+
+	/* get first child's group */
+	struct rnode *curr = node->first_child;
+	char *ref_group = curr->data;
+
+	/* iterate over other children, and compare their group to the first's
+	 * */
+
+	*group = NULL;
+	for (curr = curr->next_sibling; NULL != curr; curr = curr->next_sibling)
+		if (0 != strcmp(ref_group, curr->data))
+			return 0; /* found a different group */
+
+	*group = ref_group;
+	return 1;
+}
 void dump_rnode(void *arg)
 {
 	struct rnode *node = (struct rnode *) arg;
