@@ -133,6 +133,9 @@ void help(char *argv[])
 	);
 }
 
+// TODO: this f() has been duplicated in condense.c. It should be removed from
+// there and from here, and moved to hash.c
+
 struct hash *read_map(const char *filename)
 {
 	const int HASH_SIZE = 1000;	/* most trees will have fewer nodes */

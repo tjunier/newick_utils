@@ -39,11 +39,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rnode.h"
 #include "parser.h"
 #include "to_newick.h"
+#include "readline.h"
 
 enum actions { PURE_CLADES, STAIR_NODES }; /* not sure we'll keep stair nodes */
 
 struct parameters {
-	int action;	/* for now, only condense pure clades */
+	enum actions action;	/* for now, only condense pure clades */
+	char *grp_map_fname;
 };
 
 void help(char *argv[])
@@ -54,7 +56,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-h] <tree|->\n"
+"%s [-hm:] <tree|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -75,6 +77,7 @@ void help(char *argv[])
 "-------\n"
 "\n"
 "   -h: prints this message and exits\n"
+"   -m <map file>: uses a group map [TODO: complete description]\n"
 "\n"
 "Example\n"
 "-------\n"
@@ -94,14 +97,19 @@ struct parameters get_params(int argc, char *argv[])
 	struct parameters params;
 
 	params.action = PURE_CLADES;
+	params.grp_map_fname = NULL;
 
 	/* parse options and switches */
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hs")) != -1) {
+	while ((opt_char = getopt(argc, argv, "hm:s")) != -1) {
 		switch (opt_char) {
 		case 'h':
 			help(argv);
 			exit(EXIT_SUCCESS);
+		case 'm':
+			// TODO: check return values of strdup() (in ALL the code)!
+			params.grp_map_fname = optarg;
+			break;
 		case 's':
 			/* Not implemented yet - not sure if it will be */
 			params.action = STAIR_NODES;
@@ -121,7 +129,7 @@ struct parameters get_params(int argc, char *argv[])
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-h] <filename|->\n",
+		fprintf(stderr, "Usage: %s [-hm:] <filename|->\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -129,12 +137,67 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
+// TODO: this f() has been duplicated from condense.c. It should be removed from
+// there and from here, and moved to hash.c
+
+struct hash *read_map(const char *filename)
+{
+	const int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
+
+	FILE *map_file = fopen(filename, "r");
+	if (NULL == map_file) { perror(NULL); exit(EXIT_FAILURE); }
+
+	struct hash *map = create_hash(HASH_SIZE);
+	if (NULL == map) { perror(NULL); exit(EXIT_FAILURE); }
+
+	char *line;
+	while (NULL != (line = read_line(map_file))) {
+		/* Skip comments and lines that are empty or all whitespace */
+		if ('#' == line[0] || is_all_whitespace(line)) {
+			free(line);
+			continue;
+		}
+
+		char *key, *value;
+		struct word_tokenizer *wtok = create_word_tokenizer(line);
+		if (NULL == wtok) { perror(NULL); exit(EXIT_FAILURE); }
+		key = wt_next(wtok);	/* find first whitespace */
+		if (NULL == key) {
+			fprintf (stderr,
+				"Wrong format in line '%s' - aborting.\n",
+				line);
+			exit(EXIT_FAILURE);
+		}
+		value = wt_next(wtok);
+		if (NULL == value) {
+			/* If 2nd token is NULL, replace label with empty
+			 * string */
+			value = strdup("");
+		}
+		if (! hash_set(map, key, (void *) value)) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+		destroy_word_tokenizer(wtok);
+		free(key); /* copied by hash_set(), so can be free()d now */
+		free(line);
+	}
+
+	return map;
+}
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params;
+	struct hash *group_map = NULL;
 	
 	params = get_params(argc, argv);
+	if (NULL != params.grp_map_fname)
+		group_map = read_map(params.grp_map_fname);
+
+	// debug
+	if (NULL != group_map) dump_hash(group_map, NULL);
 
 	while (true) {
 		tree = parse_tree();

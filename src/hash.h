@@ -64,7 +64,8 @@ int hash_set(struct hash *, const char *key, void *value);
 void *hash_get(struct hash *, const char *key);
 
 /* Dumps a hash on stdout. if 'dump_func' is not NULL, it will be used to
- * display the value of each key-value pair. */
+ * display the value of each key-value pair, otherwise the value is assumed to
+ * be a char* (\0-terminated string) and will be printed with printf(). */
 
 void dump_hash(struct hash *, void (*dump_func)());
 
