@@ -40,8 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "parser.h"
 #include "to_newick.h"
 #include "readline.h"
+#include "hash.h"
+#include "list.h"
 
 enum actions { PURE_CLADES, STAIR_NODES }; /* not sure we'll keep stair nodes */
+
+struct group_data {
+	char *group_name;
+	char *repr_member;	/* the label of a "representative" for the group */
+	int size;
+};
 
 struct parameters {
 	enum actions action;	/* for now, only condense pure clades */
@@ -186,6 +194,65 @@ struct hash *read_map(const char *filename)
 	return map;
 }
 
+/* Like all_children_have_same_label() in rnode.c, but returns true if all
+ * children belong to the same group, as determined by the rnode->data member.
+ * Sets group to the common group, if any, or else to NULL.  */
+
+bool all_children_in_same_group(struct rnode *node, char **group)
+{
+
+	if (is_leaf(node))
+		return false;
+
+	/* get first child's group */
+	struct rnode *curr = node->first_child;
+	char *ref_group = curr->data;
+
+	/* iterate over other children, and compare their group to the first's
+	 * */
+
+	*group = NULL;
+	for (curr = curr->next_sibling; NULL != curr; curr = curr->next_sibling)
+		if (0 != strcmp(ref_group, curr->data))
+			return 0; /* found a different group */
+
+	*group = ref_group;
+	return 1;
+}
+
+/* Same as collapse_pure_clades() (tree.c), but collapses clades of the same
+ * group, usig a label->group map. */
+
+void collapse_by_groups(struct rooted_tree *tree, struct hash *group_map)
+{
+	struct list_elem *el;		
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+		if (is_leaf(current)) {
+			char *group = hash_get(group_map, current->label);
+			if (NULL == group) 
+				current->data = strdup("");
+			else
+				current->data = strdup(group);
+			//printf ("node '%s': group %s\n", current->label, current->data);
+		}
+
+		/* attempt collapse only if all children are leaves (any pure
+		 * subtree will have been collapsed to a leaf by now) */
+		if (! all_children_are_leaves(current)) continue;
+		char *group = NULL;
+		if (all_children_in_same_group(current, &group)) {
+			// fprintf(stderr, "all of %s's children belong to group '%s'\n", current->label, group);
+			/* set own data (i.e., group) to children's label  - we
+			 * copy it because it will be later passed to free() */
+			current->data = strdup(group);
+			remove_children(current);
+		}
+	}
+}
+
+
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
@@ -206,6 +273,7 @@ int main(int argc, char *argv[])
 				collapse_pure_clades(tree);
 			else
 				collapse_by_groups(tree, group_map);
+
 			dump_newick(tree->root);
 			destroy_all_rnodes(NULL);
 			destroy_tree(tree);

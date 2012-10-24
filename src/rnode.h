@@ -113,12 +113,6 @@ bool all_children_are_leaves(struct rnode *);
 
 bool all_children_have_same_label(struct rnode *, char **label);
 
-/* As all_children_have_same_label(), but returns true if all children belong
- * to the same group, as determined by the rnode->data member. Sets group to
- * the common group, if any, or else to NULL. */
-
-bool all_children_in_same_group(struct rnode *, char **group);
-
 /* Writes the node's address and label to stdout. Argument is void* so that
  * this function can be passed to dump_llist(). */
 
