@@ -213,7 +213,7 @@ bool all_children_in_same_group(struct rnode *node, struct group_data *grp_data)
 	 * */
 
 	int status = 1;
-	int size = 0;
+	int size = 1;
 	for (curr = curr->next_sibling; curr; curr = curr->next_sibling) {
 		g_data = curr->data;
 		char *curr_group = g_data->name;
@@ -251,9 +251,7 @@ void collapse_by_groups(struct rooted_tree *tree, struct hash *group_map)
 				grp_data->name = strdup(group);
 			grp_data->repr_member = strdup(current->label);
 			grp_data->size = 1;
-
-
-			//printf ("node '%s': group %s\n", current->label, current->data);
+			
 			continue;
 		}
 
@@ -267,7 +265,13 @@ void collapse_by_groups(struct rooted_tree *tree, struct hash *group_map)
 
 		/* this also sets grp_data */
 		if (all_children_in_same_group(current, grp_data)) {
-			// fprintf(stderr, "all of %s's children belong to group '%s'\n", current->label, group);
+			 fprintf(stderr,
+				"%s and %d other descendants of '%s' "
+				"belong to group '%s'\n",
+				grp_data->repr_member,
+				grp_data->size - 1,
+				current->label,
+				grp_data->name);
 			remove_children(current);
 		}
 	}
