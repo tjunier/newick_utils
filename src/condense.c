@@ -265,6 +265,7 @@ void collapse_by_groups(struct rooted_tree *tree, struct hash *group_map)
 
 		/* this also sets grp_data */
 		if (all_children_in_same_group(current, grp_data)) {
+			/*
 			 fprintf(stderr,
 				"%s and %d other descendants of '%s' "
 				"belong to group '%s'\n",
@@ -272,7 +273,13 @@ void collapse_by_groups(struct rooted_tree *tree, struct hash *group_map)
 				grp_data->size - 1,
 				current->label,
 				grp_data->name);
+				*/
 			remove_children(current);
+			char *new_label = masprintf("%s_%s_%d",
+					grp_data->name, grp_data->repr_member,
+					grp_data->size);
+			free(current->label);
+			current->label = new_label;
 		}
 	}
 }
