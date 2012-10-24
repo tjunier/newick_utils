@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum actions { PURE_CLADES, STAIR_NODES }; /* not sure we'll keep stair nodes */
 
 struct group_data {
-	char *group_name;
+	char *name;
 	char *repr_member;	/* the label of a "representative" for the group */
 	int size;
 };
@@ -198,7 +198,7 @@ struct hash *read_map(const char *filename)
  * children belong to the same group, as determined by the rnode->data member.
  * Sets group to the common group, if any, or else to NULL.  */
 
-bool all_children_in_same_group(struct rnode *node, char **group)
+bool all_children_in_same_group(struct rnode *node, struct group_data *grp_data)
 {
 
 	if (is_leaf(node))
@@ -206,18 +206,27 @@ bool all_children_in_same_group(struct rnode *node, char **group)
 
 	/* get first child's group */
 	struct rnode *curr = node->first_child;
-	char *ref_group = curr->data;
+	struct group_data *g_data = curr->data;
+	char *ref_group = g_data->name;
 
 	/* iterate over other children, and compare their group to the first's
 	 * */
 
-	*group = NULL;
-	for (curr = curr->next_sibling; NULL != curr; curr = curr->next_sibling)
-		if (0 != strcmp(ref_group, curr->data))
-			return 0; /* found a different group */
+	int status = 1;
+	int size = 0;
+	for (curr = curr->next_sibling; curr; curr = curr->next_sibling) {
+		g_data = curr->data;
+		char *curr_group = g_data->name;
+		if (0 != strcmp(ref_group, curr_group))
+			status *= 0; /* found a different group */
+		size += g_data->size;
+	}
 
-	*group = ref_group;
-	return 1;
+	grp_data->name = strdup(g_data->name);
+	grp_data->repr_member = strdup(g_data->repr_member);
+	grp_data->size = size;
+
+	return (bool) status;
 }
 
 /* Same as collapse_pure_clades() (tree.c), but collapses clades of the same
@@ -226,27 +235,39 @@ bool all_children_in_same_group(struct rnode *node, char **group)
 void collapse_by_groups(struct rooted_tree *tree, struct hash *group_map)
 {
 	struct list_elem *el;		
+	struct group_data *grp_data;
 
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		struct rnode *current = el->data;
+		grp_data = malloc(sizeof(grp_data));
+		if (NULL == grp_data) { perror(NULL); exit (EXIT_FAILURE); }
+		current->data = grp_data;
+
 		if (is_leaf(current)) {
 			char *group = hash_get(group_map, current->label);
 			if (NULL == group) 
-				current->data = strdup("");
+				grp_data->name = strdup("");
 			else
-				current->data = strdup(group);
+				grp_data->name = strdup(group);
+			grp_data->repr_member = strdup(current->label);
+			grp_data->size = 1;
+
+
 			//printf ("node '%s': group %s\n", current->label, current->data);
+			continue;
 		}
+
+		grp_data->name = strdup("MIXED");
+		grp_data->repr_member = strdup("");
+		grp_data->size = -1;
 
 		/* attempt collapse only if all children are leaves (any pure
 		 * subtree will have been collapsed to a leaf by now) */
 		if (! all_children_are_leaves(current)) continue;
-		char *group = NULL;
-		if (all_children_in_same_group(current, &group)) {
+
+		/* this also sets grp_data */
+		if (all_children_in_same_group(current, grp_data)) {
 			// fprintf(stderr, "all of %s's children belong to group '%s'\n", current->label, group);
-			/* set own data (i.e., group) to children's label  - we
-			 * copy it because it will be later passed to free() */
-			current->data = strdup(group);
 			remove_children(current);
 		}
 	}
