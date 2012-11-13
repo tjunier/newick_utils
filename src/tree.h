@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode;
 struct llist;
+struct hash;
 
 extern const int FREE_NODE_DATA;
 extern const int DONT_FREE_NODE_DATA;
@@ -55,6 +56,9 @@ struct rooted_tree {
 /* Returns SUCCESS unless there was a problem (malloc()) */
 
 int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
+
+// TODO: it is doubtful that this collapsing f() really belongs here, as
+// it is used only by one program, namely nw_condense. 
 
 /* Collapses pure clades (= clades in which all leaves are of the same label)
  * into a single leaf, also of the same label */

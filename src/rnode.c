@@ -167,6 +167,8 @@ bool all_children_are_leaves(struct rnode *node)
 	return true;
 }
 
+// TODO: this prolly belongs in condense.c, not rnode.c
+
 bool all_children_have_same_label(struct rnode *node, char **label)
 {
 
