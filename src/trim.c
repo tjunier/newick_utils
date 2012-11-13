@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 enum {DEPTH_DISTANCE, DEPTH_ANCESTORS};
 
+const int TRIM_UNDEFINED = -1;
+
 struct node_data {
 	bool trimmed;
 	int ancestry_depth;
@@ -60,19 +62,27 @@ struct parameters {
 void help(char *argv[])
 {
 	printf (
-"Trims a tree at a certain depth.\n"
+"Trims a tree in various ways.\n"
 "\n"
 "Synopsis\n"
 "--------\n"
 "\n"
 "%s [-ah] <newick trees filename|-> <maximum depth>\n"
 "\n"
+"or\n"
+"%s [-h] <newick trees filename|->\n"
+"\n"
 "Input\n"
 "-----\n"
 "\n"
+"Two-argument form:\n"
 "The first argument is the name of a file that contains Newick trees, or '-'\n"
 "(in which case trees are read from standard input). The second argument is\n"
 "the maximum depth: nodes deeper than this will be trimmed.\n"
+"\n"
+"One-argument form:\n"
+"The argument is the name of the trees file, or '-' for standard input. The \n"
+"program trims the tree's root.\n"
 "\n"
 "Output\n"
 "------\n"
@@ -99,6 +109,7 @@ void help(char *argv[])
 "$ %s -a data/catarrhini 3\n",
 	argv[0],
 	argv[0],
+	argv[0],
 	argv[0]
 	);
 }
@@ -107,6 +118,7 @@ struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
 	params.depth_type = DEPTH_DISTANCE;
+	params.threshold = TRIM_UNDEFINED;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "ah")) != -1) {
@@ -139,8 +151,18 @@ struct parameters get_params(int argc, char *argv[])
 		/* A value of n means "n ancestors or less" */
 		if (DEPTH_ANCESTORS == params.depth_type)
 			params.threshold -= 1;
+	} else if ((argc - optind) == 1) {
+		if (0 != strcmp("-", argv[optind])) {
+			FILE *fin = fopen(argv[optind], "r");
+			extern FILE *nwsin;
+			if (NULL == fin) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
+			nwsin = fin;
+		}
 	} else {
-		fprintf(stderr, "Usage: %s [-ah] <filename|-> <depth>\n",
+		fprintf(stderr, "Usage: %s [-ah] <filename|-> [depth]\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -173,6 +195,14 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct list_elem *elem;
 	struct rnode *node;
 
+	/* Simple case: trim root */
+	if (TRIM_UNDEFINED == params.threshold) {
+		free(tree->root->edge_length_as_string);
+		tree->root->edge_length_as_string = strdup("");
+		return;
+	} 
+
+	/* Harder case: trim other nodes */
 	nodes_in_preorder = llist_reverse(tree->nodes_in_order);
 	if (NULL == nodes_in_preorder) { perror(NULL); exit(EXIT_FAILURE); }
 	node = (struct rnode *) nodes_in_preorder->head->data; /* root */

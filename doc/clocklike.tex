@@ -1,0 +1,22 @@
+\section{Making a phylogram clock-like}
+\label{sct_clocklike}
+
+
+\paragraph{Making a tree clock-like}
+
+Phylograms do not generally have aligned leaves, but it is possible to make a
+tree clock-like with \luaed{} and \trim{}. Suppose we want to align all leaves
+of the following tree to a depth of 7.5.
+
+\begin{samepage}
+\verbatiminput{clocklike_1_txt.cmd}
+\verbatiminput{clocklike_1_txt.out}
+\end{samepage}
+
+We can't use only \trim, because some branches are too short. We have to ensure
+that all branches have a depth of \emph{at least} 7.5, then cut at that depth:
+
+\verbatiminput{clocklike_2_txt.cmd}
+\verbatiminput{clocklike_2_txt.out}
+
+

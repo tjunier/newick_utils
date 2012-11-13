@@ -1,0 +1,47 @@
+
+%&context
+
+\setuppagenumbering[state=stop]
+
+\setuplayout[title]
+
+\doctitle{Newick Utilities Manual}
+
+\startalignment[middle]
+Version 1.7.0 -- \currentdate \crlf
+\blank[2*big]
+% for some reason the figure escapes the \startalignment directive
+\midaligned{\externalfigure[title_svg][width=0.8\textwidth]}
+\blank[2*big]
+{\switchtobodyfont[big] Thomas Junier} \crlf
+\email{<thomas.junier@unige.ch>} \crlf
+\from[URL:CEGG-NU] \crlf
+\from[URL:Github]
+\stopalignment
+
+\page
+
+\doctitle{Newick Utilities Manual}
+\startalignment[center]
+Version 1.7.0 -- \currentdate \crlf
+\blank[]
+Thomas Junier \email{thomas.junier@unige.ch} \crlf
+\blank[]
+Swiss Institute of Bioinformatics \crlf
+and \crlf
+University of Neuch\^{a}tel, Switzerland \crlf
+%\symbol[uni][star] \symbol[uni][star] \symbol[uni][star] 
+\blank[]
+developed (2006-2011) at: \crlf
+Computational Evolutionary Genomics Group \crlf
+Department of Genetic Medicine and Development \crlf
+University of Geneva, Switzerland \crlf
+\blank[]
+\from[URL:CEGG-NU]
+\from[URL:Github]
+\stopalignment
+
+\page
+% NOTE: if \setuplayout occurs on the _same_ page as the above (i.e., not after
+% a \page command), then it effects _this_ page, not the next.
+\setuplayout[reset]

@@ -3,11 +3,26 @@
 
 \section{For the impatient}
 
-\verb+./configure && make && sudo make install+
+\verb+$ ./configure && make && sudo make install+
+
+or try \cmake{} (see below).
+
+
 
 \section{From source}
 
-\subsection{Prerequisites}
+\paragraph{New: \cmake{} as an alternative to the Autotools}
+Up to now, the \nutils{} have used the \gnu{} autotools as a build system. Since
+version 1.7 I have experimented with \cmake{} (\url{http://www.cmake.org}), and
+found that I could understand how it works much more easily than I understand
+the Autotools. I could get the whole thing to build in no time and with very
+little fuss. Of course, you need \cmake{} on your system, while for the \gnu{}
+system you only need Make, \texttt{sh}, GCC, \etc{} That said, \cmake{} is freely
+available for Linux, Windows (including Cygwin) and MacOS.
+
+\subsection{\gnu{} Autotools}
+
+\subsubsection{Prerequisites}
 
 I have tested the \nutils{} on various distributions of Linux, as well as on Mac
 OS X and Cygwin\footnote{I use Linux as a main development platform.  Although I
@@ -26,7 +41,7 @@ what stable releases are for, among other things.}
 
 See \ref{sct:versions} for version numbers.
 
-\subsection{Optional Software}
+\subsubsection{Optional Software}
 \label{sct:optional}
 
 \noindent{}If \libxml{} is present on your system, the \nutils{} can use it to
@@ -47,7 +62,7 @@ found and you do not explicitly disable them.
 Note that you need \emph{both} the library \emph{and} the headers for the build
 to succeed.
 
-\subsection{Build Procedure}
+\subsubsection{Build Procedure}
 \noindent{}The package uses the \textsc{gnu} autotools, like many other open source software packages.\footnote{This does \emph{not} mean that you, the user, need to have the autotools installed! In fact the whole point is to be as independent as possible of anything but the plain old Bourne shell.} So all you need to do is the usual
 \begin{verbatim}
 $ tar xzf newick-utils-x.y.z.tar.gz
@@ -77,7 +92,7 @@ $ autoreconf -fi
 
 before launching \texttt{./configure} as above.
 
-\subsubsection{Variants}
+\paragraph{Variants}
 
 To prevent the use of \libxml, pass \texttt{--without-libxml} to
 \texttt{./configure}. Likewise,  pass
@@ -95,6 +110,70 @@ location, use \texttt{LDFLAGS}. The syntax is that of the \texttt{-I} and
 would cause \texttt{/opt/lib} and \texttt{/opt/include} to be searched for
 libraries and headers, respectively. Note that there is no space between the
 \texttt{-I} and the \texttt{/opt/...}, etc.
+
+\subsection{\cmake{}}
+
+From v. 1.7, the \nutils{} can also be built with \cmake{}
+(\url{www.cmake.org}).\footnote{This is not the place for advocacy; suffice it
+to say that I was impressed by the way \cmake{} worked "out of the box" when I
+experimented with it. Some things I never managed to do with
+\texttt{./configure} and friends after several weeks' efforts took around a day
+to figure out with \cmake{}.} 
+
+The \cmake{} team encourages \emph{out-of-source builds}, that is, instead of
+building inside the source tree, you do it outside in another dir. We follow
+that convention here as well, buy building in a directory that is in the same
+directory as the \nutils{} source dir:
+
+\begin{verbatim}
+$ ls
+...
+newick_utils-1.7
+...
+
+$ mkdir build_nw_utils
+$ cd build_nw_utils
+$ cmake ../newick_utils-1.7		# path to the source dir
+-- The C compiler identification is GNU
+-- Check for working C compiler: /usr/bin/gcc
+-- Check for working C compiler: /usr/bin/gcc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Found BISON: /usr/bin/bison (found version "2.4.1")
+-- Found FLEX: /usr/bin/flex (found version "2.5.35")
+-- Found LibXml2: /usr/lib64/libxml2.so 
+-- Found Lua51: /usr/lib64/liblua-5.1.so;/usr/lib64/libm.so 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/tjunier/projects/build_nutils
+\end{verbatim}
+
+Then it's the usual
+\begin{verbatim}
+$ make
+\end{verbatim}
+which in this case produces nice colorized output. This is optionally followed
+by 
+\begin{verbatim}
+$ make test
+\end{verbatim}
+(NOT \texttt{make check}, as with the Autotools). Finally, do
+\begin{verbatim}
+$ sudo make install
+$ sudo /sbin/ldconfig /usr/local/lib
+\end{verbatim}
+The last step is done automatically by the Autotools, but apparently not by
+\cmake.
+
+\cmake{} will automatically look for libxml and Lua, and use them if found (see
+above). If you want to explicitly disable any optional feature, set the
+corresponding \texttt{USE\_} variable to \texttt{OFF}, \eg{} to disable Lua (and
+not build \luaed), do:
+
+%\begin{verbatim}
+%$ cmake -D USE_LUA=OFF ../newick_utilities-1.7
+%\end{verbatim}
+
 
 \section{As binaries}
 

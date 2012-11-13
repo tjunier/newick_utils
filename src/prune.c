@@ -35,19 +35,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "tree.h"
-#include "nodemap.h"
 #include "parser.h"
 #include "to_newick.h"
 #include "rnode.h"
 #include "link.h"
-#include "hash.h"
+#include "set.h"
 #include "list.h"
 
+enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
+
+struct prune_data {
+	bool kept_descendant;
+};
+
 struct parameters {
-	struct llist 	*labels;
-	bool		reverse;
+	set_t 	*cl_labels;
+	enum prune_mode mode;
 };
 
 void help(char *argv[])
@@ -58,7 +64,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hv] <newick trees filename|-> <label> [label+]\n"
+"%s [-hi:v] <newick trees filename|-> <label> [label+]\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -75,13 +81,17 @@ void help(char *argv[])
 "spliced out and the remaining child is attached to its grandparent,\n"
 "preserving length.\n"
 "\n"
+"Only labeled nodes are considered for pruning.\n"
+"\n"
 "Options\n"
 "-------\n"
 "\n"
 "    -h: print this message and exit\n"
 "    -v: reverse: prune nodes whose labels are NOT passed on the command\n"
-"        line. NOTE: this will also drop internal nodes if their labels\n"
-"        are not passed. A future option will modify this.\n"
+"        line. Inner nodes are not pruned, unless -i is also set (see\n"
+"        above). This allows pruning of trees with support values, which\n"
+"        syntactically are node labels, without inner nodes disappearing\n"
+"        because their 'label' was not passed on the command line.\n"
 "\n"
 "Assumptions and Limitations\n"
 "---------------------------\n"
@@ -98,7 +108,16 @@ void help(char *argv[])
 "$ %s data/catarrhini Homo Gorilla Pan\n"
 "\n"
 "# the same, but using the clade's label\n"
+"$ %s data/catarrhini Homininae\n"
+"\n"
+"# keep great apes and Colobines:\n"
+"$ %s -v data/catarrhini Gorilla Pan Homo Pongo Simias Colobus\n"
+"\n"
+"# same, using clade labels:\n"
+"$ %s -v data/catarrhini Hominidae Colobinae\n"
 "$ %s data/catarrhini Homininae\n",
+	argv[0],
+	argv[0],
 	argv[0],
 	argv[0],
 	argv[0],
@@ -109,7 +128,7 @@ void help(char *argv[])
 struct parameters get_params(int argc, char *argv[])
 {
 	struct parameters params;
-	params.reverse = false;
+	params.mode = PRUNE_DIRECT;
 
 	int opt_char;
 	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
@@ -118,7 +137,7 @@ struct parameters get_params(int argc, char *argv[])
 			help(argv);
 			exit (EXIT_SUCCESS);
 		case 'v':
-			params.reverse = true;
+			params.mode = PRUNE_REVERSE;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -137,16 +156,16 @@ struct parameters get_params(int argc, char *argv[])
 			}
 			nwsin = fin;
 		}
-		struct llist *lbl_list = create_llist();
-		if (NULL == lbl_list) { perror(NULL); exit(EXIT_FAILURE); }
+		set_t *cl_labels = create_set();
+		if (NULL == cl_labels) { perror(NULL); exit(EXIT_FAILURE); }
 		optind++;	/* optind is now index of 1st label */
 		for (; optind < argc; optind++) {
-			if (! append_element(lbl_list, argv[optind])) {
+			if (set_add(cl_labels, argv[optind]) < 0) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
 		}
-		params.labels = lbl_list;
+		params.cl_labels = cl_labels;
 	} else {
 		fprintf(stderr, "Usage: %s [-h] <filename|-> <label> [label+]\n",
 				argv[0]);
@@ -156,110 +175,145 @@ struct parameters get_params(int argc, char *argv[])
 	return params;
 }
 
-void process_tree(struct rooted_tree *tree, struct llist *labels)
-{
-	struct hash *lbl2node_map = create_label2node_map(tree->nodes_in_order);
-	struct list_elem *elem;
+/* We buld a hash of the passed labels, and visit the tree, unlinking nodes as
+ * needed. In Direct mode, we traverse in reverse order, unlinking nodes to
+ * prune. In Reverse mode, things are a bit more hairy because we need to keep
+ * not just the nodes passed as argument, but also their ancestors. So we pass
+ * through th etree first in direct order, marking nodes to keep and their
+ * ancestors. Then we go back in reverse order, pruning. */
 
-	for (elem = labels->head; NULL != elem; elem = elem->next) {
-		char *label = elem->data;
-		struct rnode *goner = hash_get(lbl2node_map, label);
-		if (NULL == goner) {
-			fprintf (stderr, "WARNING: label '%s' not found.\n",
-					label);
+static struct rooted_tree * process_tree_direct(
+		struct rooted_tree *tree, set_t *cl_labels)
+{
+	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
+	struct list_elem *el;
+	struct rnode *current;
+	char *label;
+
+	for (el = rev_nodes->head; NULL != el; el = el->next) {
+		current = el->data;
+		label = current->label;
+		/* skip this node iff parent is marked ("seen") */
+		if (!is_root(current) && current->parent->seen) {
+			current->seen = true;	/* inherit mark */
 			continue;
 		}
-		/* parent may have been unlinked already, so let's check */
-		if (NULL == goner->parent)
-			continue;
-		enum unlink_rnode_status result = unlink_rnode(goner);
-		struct rnode *root_child;
-		switch(result) {
-		case UNLINK_RNODE_DONE:
-			break;
-		case UNLINK_RNODE_ROOT_CHILD:
-			root_child = get_unlink_rnode_root_child();
-			root_child->parent = NULL;
-			tree->root = root_child;
-			break;
-		case UNLINK_RNODE_ERROR:
-			fprintf (stderr, "Memory error - exiting.\n");
-			exit(EXIT_FAILURE);
-		default:
-			assert(0); /* programmer error */
+		if (set_has_element(cl_labels, label)) {
+			unlink_rnode(current);
+			current->seen = true;
 		}
 	}
 
-	destroy_hash(lbl2node_map);
+	destroy_llist(rev_nodes);
+	reset_seen(tree);
+	return tree;
 }
 
-/* Produces a new list with all labels in the tree that are NOT in 'labels'. */
+/* Prune predicate: retains the nodes passed on CL, but discards their
+ * children. */
 
-struct llist *reverse_labels(struct rooted_tree *tree, struct llist *labels)
+// TODO: this might be a useful prune predicate, add option to use it.
+
+bool prune_predicate_trim_kids(struct rnode *node, void *param)
 {
-	struct llist *rev_labels = create_llist();
-	/* We use a hash for looking up labels, instead of going over the list
-	 * of labels every time (see below) */
-	struct hash *labels_h = create_hash(labels->count);
-	if (NULL == labels_h) {
-		fprintf(stderr, "Memory error -exiting.\n");
-		exit(EXIT_FAILURE);
+	if (node->seen) {
+		/* ancestor of a passed node */
+		return true;
 	}
+}
 
-	struct list_elem *elem;
+/* Prune predicate: retains the nodes passed on CL and their children. */
 
-	/* fill label hash with the labels */
-	char *PRESENT = "present";
-	for (elem = labels->head; NULL != elem; elem = elem->next) {
-		char *label = elem->data;
-		if (! hash_set(labels_h, label, PRESENT)) {
-			fprintf(stderr, "Memory error -exiting.\n");
-			exit(EXIT_FAILURE);
-		}
+bool prune_predicate_keep_clade(struct rnode *node, void *param)
+{
+	set_t *cl_labels = (set_t *) param;
+
+	if (node->seen) {
+		return true;
 	}
-
-	/* Now iterate over all nodes in the tree and see if their labels are
-	 * found in the labels hash. If not, add them to the 'rev_labels' list.
-	 * */
-	for (elem=tree->nodes_in_order->head; NULL!=elem; elem=elem->next) {
-		char *label = ((struct rnode*) elem->data)->label;
-		if (0 == strcmp("", label)) continue;
-		if (NULL == hash_get(labels_h, label)) {
-			if (! append_element(rev_labels, label)) {
-				fprintf(stderr, "Memory error -exiting.\n");
-				exit(EXIT_FAILURE);
+	/* Node isn't an ancestor of a passed node. Node can be a _descendant_
+	 * of a passed node, though, in which case we must keep it as well. */
+	if (!is_root(node)) {
+		if (NULL != node->parent->data) {
+			struct prune_data *pdata = node->parent->data;
+			if (pdata->kept_descendant) {
+				struct prune_data *pdata =
+					malloc(sizeof(struct prune_data));
+				if (NULL == pdata) {
+					perror(NULL); exit(EXIT_FAILURE);
+				}
+				pdata->kept_descendant = true;
+				node->data = pdata;
+				return true;
 			}
 		}
 	}
-	destroy_hash(labels_h);
+	
+	/* neither an ancestor nor a descendant of a passed node - drop. */
+	return false;
+}
 
-	return rev_labels;
+static struct rooted_tree * process_tree_reverse(
+		struct rooted_tree *tree, set_t *cl_labels)
+{
+	struct list_elem *el = tree->nodes_in_order->head;
+	struct rnode *current;
+	char *label;
+
+	for (; NULL != el; el = el->next) {
+		current = el->data;
+		if (is_root(current)) break;
+		label = current->label;
+		/* mark this node (to keep it) if its label is on the CL */
+		if (set_has_element(cl_labels, label)) {
+			current->seen = true;
+			struct prune_data *pdata =
+				malloc(sizeof(struct prune_data));
+			if (NULL == pdata) {perror(NULL); exit(EXIT_FAILURE); }
+			pdata->kept_descendant = true;
+			current->data = pdata;
+		}
+		/* and propagate 'seen' to parent (kept_descendant is
+		 * propagated to children (not parents), see
+		 * prune_predicate_keep_clade() */
+		if (current->seen) {
+			current->parent->seen = true;	/* inherit mark */
+		}
+	}
+
+	struct rooted_tree *pruned = clone_tree_cond(tree,
+			prune_predicate_keep_clade, cl_labels);	
+	destroy_tree(tree);
+	return pruned;
 }
 
 int main(int argc, char *argv[])
 {
 	struct rooted_tree *tree;	
 	struct parameters params;
+	static struct rooted_tree * (*process_tree)(struct rooted_tree *, set_t *);
 	
 	params = get_params(argc, argv);
 
+	switch (params.mode) {
+	case PRUNE_DIRECT:
+		process_tree = process_tree_direct;
+		break;
+	case PRUNE_REVERSE:
+		process_tree = process_tree_reverse;
+		break;
+	default:
+		assert (0);
+	}
+
 	while (NULL != (tree = parse_tree())) {
-		if (params.reverse) {
-			struct llist *rev_labels = reverse_labels(tree,
-					params.labels);
-			process_tree(tree, rev_labels);
-			destroy_llist(rev_labels);
-		} else {
-			process_tree(tree, params.labels);
-		}
+		tree = process_tree(tree, params.cl_labels);
 		dump_newick(tree->root);
-		/* NOTE: the tree was modified, but no nodes were added so 
-		 * we can use destroy_tree() */
 		destroy_all_rnodes(NULL);
 		destroy_tree(tree);
 	}
 
-	destroy_llist(params.labels);
+	destroy_set(params.cl_labels);
 
 	return 0;
 }

@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 
 struct rnode;
+struct hash;
 
 /** A node in a rooted tree. One of the basic building blocks of the whole
  * package. */
@@ -61,8 +62,10 @@ struct rnode {
 
 	/** Used by rnode_iterator to find next node to visit. */
 	struct rnode *current_child;
-	/** Used by rnode_iterator to mark visited nodes. */
-	bool seen;	
+	/** Used by lua_ed to skip nodes */
+	bool seen;	// TODO: rename to 'marked' (more multi-purpose)'
+	bool linked;
+
 };
 
 /* allocates a rnode and returns a pointer to it, or exits. If 'label' is NULL
@@ -129,6 +132,23 @@ struct rnode** children_array(struct rnode *node);
 /* Returns NULL in case of malloc() problems. */
 
 struct llist *get_nodes_in_order(struct rnode *);
+
+/* CLones a node (and descendants). A new rnode structure is allocated for each
+ * node in the target. */
+
+struct rnode *clone_rnode(struct rnode *target);
+
+/* A variant of clone_rnode() that accepts a predicate function. A _child_ node
+ * is cloned IFF the predicate returns true. This ensures that at least one
+ * node is cloned, which is usually a tree's root. If only one child of a
+ * cloned node gets copied, then this function returns that child instead, with
+ * corrected branch lengths. The predicate takes a struct rnode and a void
+ * pointer to allow passing arbitrary parameters, this is also passed around by
+ * clone_rnode_cond() - this avoids using globals, which are EVIL :-) */
+
+struct rnode *clone_rnode_cond(struct rnode *target,
+		bool (*predicate)(struct rnode *, void * param),
+		void *param);
 
 /* Gets the number of rnodes in rnode_array. These are the rnodes created since
  * the beginning of the run, or since destroy_all_rnodes() was last called.

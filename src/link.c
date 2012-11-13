@@ -59,6 +59,7 @@ void add_child(struct rnode *parent, struct rnode *child)
 
 	parent->child_count++;
 	parent->last_child = child;
+	child->linked = true;
 }
 
 /* Returns half the length passed as a parameter (as char *), or "". */
@@ -83,13 +84,10 @@ char * compute_new_edge_length(char * length_as_string)
 
 int insert_node_above(struct rnode *this, char *label)
 {
-	struct rnode *parent;
 	struct rnode *new;
 	char * new_edge_length;	/* both new edges have 1/2 the length of the
 				   old one */
 
-	/* find parent edge and parent node */
-	parent = this->parent;
 	new_edge_length = compute_new_edge_length(this->edge_length_as_string);
 	if (NULL == new_edge_length) return FAILURE;
 	/* create new node */
@@ -132,6 +130,7 @@ void replace_child (struct rnode *old, struct rnode *new)
 	if (dad->last_child == old)
 		dad->last_child = new;
 	new->parent = dad;
+	new->linked = true;
 }
 
 char *add_len_strings(char *ls1, char *ls2)
@@ -200,19 +199,22 @@ int splice_out_rnode(struct rnode *this)
 	/* Update parent's children count */
 	parent->child_count += this->child_count - 1;
 
+	/* Mark as no longer linked */
+	this->linked = false;
+
 	return SUCCESS;
 }
 
 int remove_child(struct rnode *child)
 {
-	if (is_root(child)) return RM_CHILD_IS_ROOT;;
+	if (is_root(child)) return RM_CHILD_HAS_NO_PARENT;
 
 	struct rnode *parent = child->parent;
 	struct rnode dummy_head;
 	struct rnode *previous;
 	int n;
 
-	child->parent = NULL;
+	child->linked = false;
 
 	/* Easy special case: parent has exactly one child. */
 	if (1 == parent->child_count) {
@@ -222,8 +224,18 @@ int remove_child(struct rnode *child)
 		return 0;
 	}
 
-	/* Find node previous to child */
+	/* Find node previous to child. We need a dummy head node, in case the
+	 * child to remove is the list's head (and there is therefore no real
+	 * previous node) */
+	dummy_head.label = "DUMMY";
+	dummy_head.edge_length_as_string = "-1";
+	dummy_head.edge_length = -1;
+	dummy_head.data = NULL;
+	dummy_head.parent = parent;
+	dummy_head.first_child = dummy_head.last_child = NULL;
+	dummy_head.child_count = 0;
 	dummy_head.next_sibling = parent->first_child;
+
 	for (n = 0, previous = &dummy_head;
 		NULL != previous->next_sibling;
 		n++, previous = previous->next_sibling) 
@@ -236,7 +248,8 @@ int remove_child(struct rnode *child)
 	if (parent->last_child == previous->next_sibling)
 			parent->last_child = previous;
 
-	/* Skip 'child', effectively removing if from children list */
+	// TODO: SEGV around here. GDB: set bp here iff label is 22
+	/* Skip 'child', effectively removing it from children list */
 	previous->next_sibling = previous->next_sibling->next_sibling;
 
 	parent->child_count --;
@@ -261,6 +274,7 @@ int insert_child(struct rnode *parent, struct rnode *insert, int index)
 	insert->next_sibling = current->next_sibling;
 	current->next_sibling = insert;
 	insert->parent = parent;
+	insert->linked = true;
 
 	/* Update parent's child pointers */
 	if (0 == index)
@@ -279,6 +293,7 @@ int swap_nodes(struct rnode *node)
 	struct rnode *parent = node->parent;
 	char *length = strdup(node->edge_length_as_string);
 	if(remove_child(node) < 0) return FAILURE;
+	node->parent = NULL;
 	add_child(node, parent);
 
 	free(node->edge_length_as_string);
@@ -291,9 +306,18 @@ int swap_nodes(struct rnode *node)
 
 int unlink_rnode(struct rnode *node)
 {
+	if (is_root(node)) 
+		return UNLINK_RNODE_ROOT;
+
+	/* Don't unlink a node twice. This is both a waste of time and a risk
+	 * of bugs, because the code assumes that a node to be unlinked is
+	 * still linked. */
+	if (! node->linked) return UNLINK_RNODE_DONE;
+
 	struct rnode *parent = node->parent;
 	/* Remove this node from its parent's list of children.  */
 	remove_child(node);
+	node->linked = false;
 
 	/* If deleting this node results in the parent having only one child,
 	 * we splice the parent out (unless it's the root, in which case we
@@ -307,8 +331,10 @@ int unlink_rnode(struct rnode *node)
 		else {
 			if (! splice_out_rnode(parent))
 				return UNLINK_RNODE_ERROR;
-			else
+			else {
+				node->linked = false;
 				return UNLINK_RNODE_DONE;
+			}
 		}
 	}
 	return UNLINK_RNODE_DONE;
@@ -333,6 +359,10 @@ struct llist *siblings(struct rnode *node)
 
 void remove_children(struct rnode *node)
 {
+	struct rnode *child = node->first_child;
+	for (; NULL != child; child = child->next_sibling) {
+		child->linked = false;
+	}
 	node->first_child = NULL;
 	node->last_child = NULL;
 	node->child_count = 0;

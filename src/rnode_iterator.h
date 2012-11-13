@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The iterator relies on members 'seen' and 'current_child' of struct rnode.
  * This avoids the need for the iterator itself to keep track of the nodes it
  * has already seen, but of course it also means that at any given time only
- * one iterator can be traversing any clade. This seems not to be a problem,
+ * one iterator can be traversing any clade.  This seems not to be a problem,
  * and it is much faster (the first version of rnode_iterator kept track of
  * seen nodes with a hash table, and it was significantly slower. */
 
@@ -92,3 +92,9 @@ struct rnode *rnode_iterator_next(struct rnode_iterator *);
 /* Returns true IFF there are more children to visit on the current node. */
 
 bool more_children_to_visit (struct rnode_iterator *);
+
+/* Returns (and set the iterator's current node to) the node's next sibling. If
+ * there is no such node, returns NULL and does not change the iterator's
+ * state. */
+
+struct rnode *rnode_iterator_next_sibling(struct rnode_iterator *iter);

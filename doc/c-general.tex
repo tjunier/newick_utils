@@ -1,0 +1,78 @@
+\chapter[chap_general]{General Remarks}
+
+The following applies to all programs in the \nutils{} package.
+
+\section[sct_help]{Help}
+
+All programs print a help message if passed option \code{-h}. Here are the
+first 20 lines of \nwindent{}'s help:
+
+\switchtobodyfont[small]
+\typefile{general_1_txt.cmd}
+\page[no]
+\typefile{general_1_txt.out}
+\switchtobodyfont[global]
+
+
+The help page describes the program's purpose, its input and output, and its
+options, in a format reminiscent of \unix{} manpages. It also shows a few
+examples. All examples can be tried out using files in the \filename{data}
+directory.
+
+\section[sct_input]{Input}
+
+Since the \nutils{} are for working with trees, it should be no surprise that
+the main input is a file containing trees. The trees must be in Newick format,
+which is one of the most widely used tree formats. Its complete description can
+be found at \from[URL:newick-format].
+
+The input file is always the first argument to the program (after any options).
+It may be a file stored in a filesystem, or \stdin{}. In the latter case, the
+filename is replaced by a '\code{-}' (dash):
+
+\page[no]
+\starttyping
+$ nw_display mytrees.nw
+\stoptyping
+is the same as
+\starttyping
+$ cat mytrees.nw | nw_display -
+\stoptyping
+or
+\starttyping
+$ nw_display - < mytrees.nw
+\stoptyping
+
+
+\noindent{}Of course the second ("dashed") form is only really useful when chaining several programs into pipelines.
+
+\subsection{Multiple Input Trees}
+
+The input file can contain one or more trees. When there is more than one, I
+prefer to have one tree per line, but this is not a requirement: they can be
+separated by any amount of whitespace, including none at all. The task will be
+performed\footnote{well, attempted\ldots} on each tree in the input. So if you
+need to reroot 1,000 trees on the same outgroup, you can do it all in a single
+step (see \in{}[sct_reroot]). 
+
+\section[sct_output]{Output}
+
+All output is printed on \stdout{} (warnings and error messages go to \stderr).
+The output is either trees or information about trees. In the first case,
+the trees are in \nw{} format, one per line. In the second case, the format
+depends on the program, but it is always text (\cap{ascii} graphics, \svg,
+numeric data, textual data, etc.).
+
+\section[sct_options]{Options}
+
+Options change program behaviour and/or allow extra arguments to be passed.
+They are all passed on the command line, before the mandatory argument(s),
+using a single letter preceded by a dash, in the usual \unix{} way. There are
+no mandatory control files, although some tasks require additional files (\eg{}
+\in{}[sct_display_svg_css]). For example, we saw above that \display{} produces
+graphs. By default the graph is \ascii{} graphics, but with option \code{-s},
+the program produces \svg:
+\starttyping
+$ nw_display -s sometree.nw
+\stoptyping
+All options are described in the program's help page (see \in{}[sct_help]).

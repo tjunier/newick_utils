@@ -1,0 +1,2 @@
+nw_luaed falconiformes 'l' 'N.L = N.L + 2.5' \
+| nw_trim - 7.5 | nw_display -w 60 -

@@ -82,10 +82,7 @@ nwutils_tutorial.pdf: *.tex *.bib \
 	$(text_command_strings) \
 	$(text_command_outputs) \
 	$(homino_pdfs) $(nodes_vs_depth_pdfs) bootscan_1.pdf
-	pdflatex nwutils_tutorial.tex
-	bibtex   nwutils_tutorial.aux
-	pdflatex nwutils_tutorial.tex
-	pdflatex nwutils_tutorial.tex
+	context manual
 
 HRV_3UTR.dna.bscan.eps:
 	bootscan.sh HRV_3UTR.dna HRV-93 CL073908
@@ -106,7 +103,7 @@ $(homino_pdfs) : %.pdf : %.svg
 
 # removes auxiliary and intermediary files (including SVG and EPS)
 clean:
-	$(RM) $(text_command_outputs) $(newick_command_outputs) $(text_command_strings) $(regular_svg_command_strings) $(newick_command_strings) *.aux *.log *.dvi *.toc *.eps *.bbl *.blg *_svg.svg HRV_ingrp.svg
+	$(RM) $(text_command_outputs) $(newick_command_outputs) $(text_command_strings) $(regular_svg_command_strings) $(newick_command_strings) *.aux *.log *.dvi *.toc *.eps *.bbl *.blg *_svg.svg HRV_ingrp.svg *.{plt,cvd} falconiformes_[12].ord.nw
 
 # like clean, plus removes all PDFs except the main target
 clean-images: clean

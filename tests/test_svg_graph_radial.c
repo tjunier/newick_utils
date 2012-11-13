@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "config.h"
-
 #ifdef USE_LIBXML2
 
 char *xml_transform_ornaments(const char *, double, double, double);

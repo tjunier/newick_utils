@@ -1,0 +1,35 @@
+%&context
+
+\startproduct manual
+
+\project numanual
+
+\starttext
+
+%\showlayout
+
+\startfrontmatter
+	\input c-title
+	\setuppagenumbering[state=start]
+	\setupuserpagenumber[numberconversion=romannumerals]
+	\completecontent
+	\component c-intro
+\stopfrontmatter
+
+\startbodymatter
+	\setupuserpagenumber[numberconversion=numbers]
+	\component c-general
+	\component c-simple
+	%\component c-advanced
+	%\component c-python
+	%\component c-appendix
+\stopbodymatter
+
+\startbackmatter
+	\completeindex
+	\completepublications[criterium=all]
+\stopbackmatter
+
+\stoptext
+
+\stopproduct

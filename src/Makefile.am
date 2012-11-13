@@ -19,11 +19,11 @@ HDR = canvas.h concat.h enode.h error.h hash.h lca.h link.h list.h nodemap.h \
 	to_newick.h tree.h tree_editor_rnode_data.h common.h order_tree.h \
 	tree_models.h xml_utils.h graph_common.h svg_graph_common.h \
 	svg_graph_radial.h svg_graph_ortho.h masprintf.h subtree.h \
-	newick_parser.h
+	newick_parser.h set.h
 
 NW_CORE = newick_parser.c newick_scanner.c rnode.c list.c parser.c \
 	link.c tree.c nodemap.c hash.c rnode_iterator.c \
-	masprintf.c to_newick.c concat.c lca.c error.c $(HDR)
+	masprintf.c to_newick.c concat.c lca.c error.c set.c $(HDR)
 
 newick_scanner.c: newick_scanner.l
 	flex -o newick_scanner.c newick_scanner.l
@@ -58,7 +58,7 @@ nw_reroot_LDADD = libnw.la
 nw_rename_SOURCES = rename.c readline.c
 nw_rename_LDADD = libnw.la
 
-nw_condense_SOURCES = condense.c
+nw_condense_SOURCES = condense.c readline.c
 nw_condense_LDADD = libnw.la
 
 nw_support_SOURCES = support.c node_set.c

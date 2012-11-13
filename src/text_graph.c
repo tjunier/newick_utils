@@ -119,6 +119,8 @@ void decorate_edge(struct canvas *canvas, struct rnode *node,
  * attributed a double value in field 'length' (in this case, it is done in
  * set_node_depth()). */
 
+// TODO: refactor this f(), it's way too long
+
 void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		const double scale, int align_leaves, double dmax,
 		enum inner_lbl_pos inner_label_pos, enum text_graph_style style)
@@ -164,6 +166,9 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 		canvas_draw_hline(canvas, mid, parent_h_pos, h_pos);
 		decorate_edge(canvas, node, mid, h_pos, parent_mid, parent_h_pos, style);
 	}
+
+	destroy_llist(rev_nodes);
+
 	/* Then the labels are written. This separation of label-writing from
 	 * graph-drawing allows decorate_edge() to assume that no characters are
 	 * found in the canvas besides those that describe graph structure. */

@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hash.h"
 #include "common.h"
 #include "list.h"
+#include "link.h"
 
 /* These variables are for keeping track of all allocated rnodes, so that we
  * can free them all (one call to free them all :-) */
@@ -77,8 +78,11 @@ struct rnode *create_rnode(char *label, char *length_as_string)
 	 * length_as_string, which will be an empty string ("") if the length
 	 * is not defined (as in cladograms). */
 	node->edge_length = -1;	
+	/* These are used when iterating on the tree structure. See
+	 * rnode_iterator.c */
 	node->current_child = NULL;
-	node->seen = 0;
+	node->seen = false;
+	node->linked = false;
 
 #ifdef SHOW_RNODE_CREATE
 	fprintf(stderr, "creating rnode %p '%s'\n", node, node->label);
@@ -113,7 +117,6 @@ void destroy_rnode(struct rnode *node, void (*free_data)(void *))
 		free(node->data);
 	free(node);
 }
-
 
 void destroy_all_rnodes(void (*free_data)(void *))
 {
@@ -163,6 +166,8 @@ bool all_children_are_leaves(struct rnode *node)
 
 	return true;
 }
+
+// TODO: this prolly belongs in condense.c, not rnode.c
 
 bool all_children_have_same_label(struct rnode *node, char **label)
 {
@@ -268,6 +273,55 @@ struct llist *get_nodes_in_order(struct rnode *root)
 		current->seen = 0;
 	}
 	return nodes_in_order;
+}
+
+/* One could get this one by passing a constantly true predicate to
+ * clone_rnode_cond() - but this will be a bit faster. */
+
+struct rnode *clone_rnode(struct rnode *target)
+{
+	struct rnode *result = create_rnode(target->label,
+			target->edge_length_as_string);
+	if (NULL == result) return NULL;
+	struct rnode *kid = target->first_child;
+	for (; NULL != kid; kid = kid->next_sibling) {
+		struct rnode *kid_clone = clone_rnode(kid);
+		if (NULL == kid_clone) return NULL;
+		add_child(result, kid_clone);
+	}
+
+	return result;
+}
+
+struct rnode *clone_rnode_cond(struct rnode *target,
+		bool (*predicate)(struct rnode *, void *param), void *param)
+{
+	struct rnode *result = create_rnode(target->label,
+			target->edge_length_as_string);
+	if (NULL == result) return NULL;
+
+	struct rnode *kid = target->first_child;
+	for (; NULL != kid; kid = kid->next_sibling) {
+		if (predicate(kid, param)) {
+			struct rnode *kid_clone =
+				clone_rnode_cond(kid, predicate, param);
+			add_child(result, kid_clone);
+		}
+	}
+
+	if (1 == children_count(result) &&
+	    1 != children_count(target))
+	{
+		char *new_edge_len_s = add_len_strings(
+			result->first_child->edge_length_as_string,
+			result->edge_length_as_string);
+		if (NULL == new_edge_len_s) return NULL;
+		free(result->first_child->edge_length_as_string);
+		result->first_child->edge_length_as_string = new_edge_len_s;
+		return result->first_child;
+	}
+
+	return result;
 }
 
 int _get_rnode_count() { return rnode_count; }

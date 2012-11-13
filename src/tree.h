@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct rnode;
 struct llist;
+struct hash;
 
 extern const int FREE_NODE_DATA;
 extern const int DONT_FREE_NODE_DATA;
@@ -55,6 +56,9 @@ struct rooted_tree {
 /* Returns SUCCESS unless there was a problem (malloc()) */
 
 int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
+
+// TODO: it is doubtful that this collapsing f() really belongs here, as
+// it is used only by one program, namely nw_condense. 
 
 /* Collapses pure clades (= clades in which all leaves are of the same label)
  * into a single leaf, also of the same label */
@@ -114,3 +118,18 @@ struct rooted_tree *clone_subtree(struct rnode *);
 
 /* Returns the tree's type (Cladogram, Phylogram, etc) */
 enum tree_type get_tree_type(struct rooted_tree *tree);
+
+/* Resets the "seen" attribute of all nodes in the tree. */
+
+void reset_seen(struct rooted_tree *tree);
+
+/* Clones a tree. All memory is newly allocated. The original tree is untouched
+ * */
+
+struct rooted_tree *clone_tree(struct rooted_tree *tree);
+
+/* A variant of clone_tree() that accepts a predicate function. Calls
+ * clone_rnode_cond() (q.v.) on the tree's root. */
+
+struct rooted_tree *clone_tree_cond(struct rooted_tree *tree,
+		bool (*predicate)(struct rnode *, void * param), void *param);

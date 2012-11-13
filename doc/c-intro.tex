@@ -1,0 +1,84 @@
+\chapter{Introduction}
+
+The \nutils{} are a set of \unix{} (including Mac OS X) and \unix-like (Cygwin) shell programs for working with phylogenetic trees. Their main features are:
+\startitemize
+ \item they require no user interaction\footnote{Why this is a good thing is not the focus of this document: I shall assume that if you are reading this, you already know when a command-line interface is better than an interactive interface.}
+ \item they can work on any number of trees at a time
+ \item they perform well with large trees
+ \item they are implemented as filters\footnote{In \unix{} jargon, a
+ \newconcept{filter} is a program that reads input from standard input and writes
+ output to standard output.}
+ \item they read and write text
+\stopitemize
+They are not tools for {\em making} phylogenies. Rather, they are for
+processing existing ones, by which I mean manipulating the tree or extracting
+information from it: rerooting, simplifying, extracting subtrees, printing
+branch lengths and distances, etc - see \in{table}[tbl_prog_list]; a glance
+at the table of contents should also give you an idea.
+
+Each of the programs performs one task (with some variants). For example, here
+is how you would reroot a series of phylograms contained in file
+\code{mytrees.nw} using node \code{Dmelano} as the outgroup:
+
+\starttyping
+$ nw_reroot mytrees.nw Dmelano
+\stoptyping 
+Now, you might want to make cladograms from the rerooted trees. Program
+\topology{} does the job, and since the utilities are filters, you can do it
+all in a single command:
+\starttyping
+$ nw_reroot mytrees.nw Dmelano | nw_topology -
+\stoptyping
+As you can see, it is straightforward to pipe \nutils{} together, and of course they can be mixed freely with any other shell program (see e.g. \in{}[sct_counting_leaves]).
+
+\subsection{About This Document}
+
+This tutorial is organized as follows: chapter \in{}[chap_general] discusses
+common features of the \nutils, chapter \in{}[chap_simple] shows examples of
+simple tasks, and chapter \in{}[chap_adv] has examples of more advanced tasks. 
+
+It is not necessary to read this material in order: you can pretty much jump to
+any section in chapters \in{}[chap_simple] and \in{}[chap_adv], they do not
+require reading previous sections. I would suggest reading chapter
+\in{}[chap_general], then \in{section}[sct_display] because it explains how all
+the tree graphics were produced.
+
+The files for all the examples in this tutorial can be found in
+subdirectory \code{data}.
+
+All the program outputs are generated on-the-fly just before the document is run
+through \ConTeXt{}, so they represent the actual output of the latest version of
+the utilities.
+
+\placetable[here][tbl_prog_list]{The \nutils{} and their functions}
+\starttabulate[|l|l|]
+\NC {\bf Program} \NC {\bf Function } \MR
+\HL
+\NC \clade		\NC	Extracts subtrees specified by node labels \NC\MR
+\NC \condense	\NC	Condenses (simplifies) trees \MR
+\NC \display	\NC	Shows trees as graphs (\ascii{} graphics or \svg) \MR
+\NC \duration	\NC	Convert node ages into duration \MR
+\NC \distance	\NC	Prints distances between nodes, in various ways \MR
+\NC \ed				\NC	Stream editor (\foreign{\`{a} la} \code{sed} or \code{awk}); see also \luaed{} and \sched \MR
+\NC \gen			\NC	Random tree generator \MR
+\NC \nwindent	\NC	Shows Newick in indented form \MR 
+\NC \labels		\NC	Prints node labels \MR
+\NC \luaed				\NC	Like \ed, but uses Lua\MR
+\NC \match		\NC	Finds matches of a tree in another one \MR
+\NC \order		\NC	Orders tree (preserving topology) \MR
+\NC \prune		\NC	Removes branches based on labels \MR 
+\NC \rename		\NC	Changes node labels according to a mapping \MR
+\NC \reroot		\NC	(Re)roots the tree \MR
+\NC \sched				\NC	Like \luaed, but uses Scheme\MR
+\NC \stats		\NC	Prints tree statistics and properties \MR
+\NC \support	\NC	Computes bootstrap support of a tree given replicate trees \MR
+\NC \topology	\NC	Alters branch properties, preserving topology \MR
+\NC \trim		\NC	Trims a tree at a specified depth \MR
+\stoptabulate
+
+\subsection{Citing the \nutils}
+
+If you use the \nutils{} for published work, please cite \nocite[Junier_2010]:
+\placepublications[criterium=text]
+
+

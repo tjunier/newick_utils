@@ -137,10 +137,12 @@ void dump_hash(struct hash *h, void (*dump_func)())
 		if (NULL == el) continue;
 		printf ("Hash code: %d (%d pairs)\n", i, h->bins[i]->count);
 		for (; NULL != el; el = el->next) {
-			struct key_val_pair *kp;
-			kp = (struct key_val_pair *) el->data;
+			struct key_val_pair *kp =  el->data;
 			printf("key: %s\n", kp->key);
-			if (NULL != dump_func) dump_func(kp->value);
+			if (NULL != dump_func)
+				dump_func(kp->value);
+			else
+				printf("value: %s\n", kp->value);
 		}
 	}	
 
