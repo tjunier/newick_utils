@@ -2,10 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-// TODO: rm when debugged
-#include <sys/time.h>
-#include <sys/resource.h>
-
 #include "rnode.h"
 #include "link.h"
 #include "list.h"
@@ -53,6 +49,34 @@ int test_reroot_2()
 	reroot_tree(&tree, node_f);
 
 	const char *obt = to_newick(tree.root);
+	
+	if (strcmp (exp, obt) != 0) {
+		printf ("%s: expected '%s', got '%s'.\n", test_name, 
+				exp, obt);
+		return 1;
+	}
+
+	printf ("%s: ok.\n", test_name);
+	return 0;
+}
+
+int test_reroot_3()
+{
+	const char *test_name = __func__;
+
+	struct rooted_tree tree = tree_17();	
+	struct hash *map = create_label2node_map(tree.nodes_in_order);	
+	struct rnode *node_C = hash_get(map, "C");
+	const char *exp = "(C,(B,(A,(((D,E)86,F)93,(G,(H,I)100)100)41)61));";
+
+	dump_newick(tree.root);
+	reroot_tree(&tree, node_C);
+	dump_newick(tree.root);
+
+	// TODO not sure if to_newick() is without problems - if I call it like
+	// this, I get a completely wrong Newick, although the tree is Ok
+	// according to dump_newick().
+	// char *obt = to_newick(tree.root);
 	
 	if (strcmp (exp, obt) != 0) {
 		printf ("%s: expected '%s', got '%s'.\n", test_name, 
@@ -738,6 +762,9 @@ int main()
 	printf("Starting tree test...\n");
 	failures += test_reroot();
 	failures += test_reroot_2();
+	// TODO: this f() has a problem, though possibly not in the rerooting
+	// code itself.
+	// failures += test_reroot_3();
 	failures += test_collapse_pure_clades();
 	failures += test_leaf_count();
 	failures += test_get_leaf_labels();
