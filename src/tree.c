@@ -49,7 +49,8 @@ const int DONT_FREE_NODE_DATA = 0;
 
 /* 'outgroup' is the node which will be the outgroup after rerooting. */
 
-int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
+int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup,
+		bool i_node_lbl_as_support)
 {
 	struct rnode *old_root = tree->root;
 	struct rnode *new_root;
@@ -78,7 +79,8 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	/* Now, we swap the nodes in the list. */ 
 	for (elem = swap_list->head; NULL != elem; elem = elem->next) {
 		struct rnode *to_swap = elem->data;
-		if (! swap_nodes(to_swap)) return FAILURE;
+		if (! swap_nodes_wsupport(to_swap, i_node_lbl_as_support))
+			return FAILURE;
 	}
         destroy_llist(swap_list);
 

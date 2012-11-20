@@ -5,3 +5,4 @@ ingroup:-l tetrapoda.nw Bombina Tetrao
 deroot:-d fagales.nw
 nolbl_ingrp:-l nolbl_ingrp.nw a b
 midlen: catarrhini.nw
+bs: -s bs.nw C

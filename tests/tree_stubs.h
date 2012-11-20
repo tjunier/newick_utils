@@ -66,3 +66,7 @@ struct rooted_tree tree_15();
 /* A tree with labels that have spaces, or quotes */
 /* (('Falco peregrinus', Falco_eleonorae),'Falco_rusticolus'); */
 struct rooted_tree tree_16();
+
+/* A tree from a rerooting problem  (namely, with bootstrap values) */
+/* ((((A,(B,C)61)41,((D,E)86,F)93)100,G)100,H,I); */ 
+struct rooted_tree tree_17();
