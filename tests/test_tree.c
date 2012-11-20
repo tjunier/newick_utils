@@ -76,7 +76,7 @@ int test_reroot_3()
 	// TODO not sure if to_newick() is without problems - if I call it like
 	// this, I get a completely wrong Newick, although the tree is Ok
 	// according to dump_newick().
-	// char *obt = to_newick(tree.root);
+	char *obt = to_newick(tree.root);
 	
 	if (strcmp (exp, obt) != 0) {
 		printf ("%s: expected '%s', got '%s'.\n", test_name, 

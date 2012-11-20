@@ -79,8 +79,6 @@ int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup)
 	for (elem = swap_list->head; NULL != elem; elem = elem->next) {
 		struct rnode *to_swap = elem->data;
 		fprintf(stderr, "swapping %p (%s)\n", to_swap, to_swap->label);
-		// TODO: label should be swapped in swap_nodes() as well, at
-		// least when representing bootstrap support values
 		if (! swap_nodes(to_swap)) return FAILURE;
 	}
         destroy_llist(swap_list);

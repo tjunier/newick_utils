@@ -296,6 +296,10 @@ int swap_nodes(struct rnode *node)
 	node->parent = NULL;
 	add_child(node, parent);
 
+	// fprintf(stderr, "replace parent label (%s) with own label (%s)\n", parent->label, node->label);
+	free(parent->label);
+	parent->label = strdup(node->label);
+
 	free(node->edge_length_as_string);
 	node->edge_length_as_string = strdup("");
 	free(parent->edge_length_as_string);
