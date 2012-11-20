@@ -285,7 +285,13 @@ int insert_child(struct rnode *parent, struct rnode *insert, int index)
 	return SUCCESS;
 }
 
-int swap_nodes(struct rnode *node)
+/* I have added the option to treat inner node labels differently when they
+ * represent support values. This meant adding an argument to the swap_node()
+ * function. In order not to break any existing calls to swap_nodes(), this
+ * function has become a wrapper around _swap_nodes(), which it calls with the
+ * second argument set to 'false' to get the original behaviour. */
+
+static int _swap_nodes(struct rnode *node, bool i_node_lbl_as_support)
 {
 	assert(NULL != node->parent);
 	assert(is_root(node->parent));  /* must swap below root */
@@ -296,9 +302,10 @@ int swap_nodes(struct rnode *node)
 	node->parent = NULL;
 	add_child(node, parent);
 
-	// fprintf(stderr, "replace parent label (%s) with own label (%s)\n", parent->label, node->label);
-	free(parent->label);
-	parent->label = strdup(node->label);
+	if (i_node_lbl_as_support) {
+		free(parent->label);
+		parent->label = strdup(node->label);
+	}
 
 	free(node->edge_length_as_string);
 	node->edge_length_as_string = strdup("");
@@ -306,6 +313,16 @@ int swap_nodes(struct rnode *node)
 	parent->edge_length_as_string = length;
 
 	return SUCCESS;
+}
+
+int swap_nodes(struct rnode *node)
+{
+	return _swap_nodes(node, false);
+}
+
+int swap_nodes_wsupport(struct rnode *node, bool i_node_lbl_as_support)
+{
+	return _swap_nodes(node, i_node_lbl_as_support);
 }
 
 int unlink_rnode(struct rnode *node)

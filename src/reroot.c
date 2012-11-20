@@ -53,6 +53,7 @@ struct parameters {
 	struct llist *labels;
 	bool try_ingroup;
 	bool deroot;
+	bool i_node_lbl_as_support;	/* Treat inner node labels as support values */
 };
 
 void help(char *argv[])
@@ -63,7 +64,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-dhl] <newick trees filename|-> [label*]\n"
+"%s [-dhls] <newick trees filename|-> [label*]\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -86,7 +87,8 @@ void help(char *argv[])
 "\n"
 "    -d: deroot - splice out the LCA of the ingroup, attaching its children\n"
 "        to the root. The ingroup is the root's child which has the more\n"
-"        children. The root is expected to have two children.\n"
+"        children. The root is expected to have two children. Other options\n"
+"        have no effect.\n"
 "    -h: print this message and exit\n"
 "    -l: lax - if it is not possible to reroot on the outgroup, try the\n"
 "        ingroup - that is, all nodes whose labels were NOT passed as\n"
@@ -94,6 +96,10 @@ void help(char *argv[])
 "        ingroup have the tree's root as LCA. Note that to use this option\n"
 "        you must make sure that you pass ALL outgroup labels, otherwise the\n"
 "        ingroup will be wrong.\n"
+"    -s: treat inner node labels as bipartition support values. Although they\n""        are attributed to nodes in Newick, these are actually properties of\n"
+"        edges, and are treated differently from clade labels, which are\n"
+"        really properties of nodes. The \"Rerooting\" section of the manual\n"
+"        has more details.\n"
 "\n"
 "Examples\n"
 "--------\n"
@@ -119,9 +125,10 @@ struct parameters get_params(int argc, char *argv[])
 
 	params.try_ingroup = false;
 	params.deroot = false;
+	params.i_node_lbl_as_support = false;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "dhl")) != -1) {
+	while ((opt_char = getopt(argc, argv, "dhls")) != -1) {
 		switch (opt_char) {
 		case '?':
 			// TODO what is this case for?
@@ -134,6 +141,9 @@ struct parameters get_params(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 		case 'l':
 			params.try_ingroup = true;
+			break;
+		case 's':
+			params.i_node_lbl_as_support = true;
 			break;
 		default:
 			fprintf (stderr, "Unknown option '-%c'\n", opt_char);
@@ -235,7 +245,8 @@ struct llist * get_outgroup_nodes(struct rooted_tree *tree, struct llist *labels
  * but may also mean ingroup nodes, if option -l was passed and rerooting on
  * outgroup failed. */
 
-int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
+int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes,
+		bool i_node_lbl_as_support)
 {
 	struct rnode *outgroup_root;
 	if (0 == outgroup_nodes->count) {
@@ -251,7 +262,7 @@ int reroot(struct rooted_tree *tree, struct llist *outgroup_nodes)
 	if (tree->root == outgroup_root) {
 		return LCA_IS_TREE_ROOT;
 	}
-	if (! reroot_tree (tree, outgroup_root)) {
+	if (! reroot_tree (tree, outgroup_root, i_node_lbl_as_support)) {
 		perror(NULL);
 		exit(EXIT_FAILURE);
 	}
@@ -353,7 +364,8 @@ void try_ingroup(struct rooted_tree *tree, struct parameters params)
 	 * (see test case 'nolbl_ingrp' in test_nw_reroot_args) */
 	struct llist *ingroup_leaves;
 	ingroup_leaves = get_ingroup_leaves(tree, params.labels);
-	enum reroot_status result = reroot(tree, ingroup_leaves);
+	enum reroot_status result = reroot(tree, ingroup_leaves,
+			params.i_node_lbl_as_support);
 	switch (result) {
 		case REROOT_OK:
 			dump_newick(tree->root);
@@ -376,7 +388,8 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 	struct llist *outgroup_nodes = get_outgroup_nodes(tree, params.labels);
 	if (! params.deroot) {
 		/* re-root according to outgroup nodes */
-		enum reroot_status result = reroot(tree, outgroup_nodes);
+		enum reroot_status result = reroot(tree, outgroup_nodes, 
+				params.i_node_lbl_as_support);
 		switch (result) {
 		case REROOT_OK:
 			dump_newick(tree->root);

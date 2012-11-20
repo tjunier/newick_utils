@@ -20,7 +20,7 @@ int test_reroot()
 	struct rnode *node_g = hash_get(map, "g");
 	const char *exp = "((D:1,E:1)g:1,(C:1,(A:1,B:1.0)f:5)h:1);";
 
-	reroot_tree(&tree, node_g);
+	reroot_tree(&tree, node_g, false);
 
 	const char *obt = to_newick(tree.root);
 	
@@ -46,7 +46,7 @@ int test_reroot_2()
 	struct rnode *node_f = hash_get(map, "f");
 	const char *exp = "((D:1,E:1)f:0.5,(C:2,(A:3,B:3)h:1)g:0.5);";
 
-	reroot_tree(&tree, node_f);
+	reroot_tree(&tree, node_f, false);
 
 	const char *obt = to_newick(tree.root);
 	
@@ -70,7 +70,7 @@ int test_reroot_3()
 	const char *exp = "(C,(B,(A,(((D,E)86,F)93,(G,(H,I)100)100)41)61));";
 
 	dump_newick(tree.root);
-	reroot_tree(&tree, node_C);
+	reroot_tree(&tree, node_C, true);
 	dump_newick(tree.root);
 
 	// TODO not sure if to_newick() is without problems - if I call it like

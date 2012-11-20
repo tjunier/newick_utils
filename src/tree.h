@@ -52,9 +52,14 @@ struct rooted_tree {
 /* Reroots the tree in such a way that 'outgroup' and descendants are one of
  * the root's children, and the rest of the tree is the other child. The old
  * root node gets spliced out if it has only one child. */
+/* If i_node_lbl_as_support is true, the inner node labels are treated as
+ * branch properties (typically, they denote a frequency of a bipartition among
+ * replicates, and thus apply to both sides of the bipartition) and are treated
+ * accordingly in rerooting. */
 /* Returns SUCCESS unless there was a problem (malloc()) */
 
-int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup);
+int reroot_tree(struct rooted_tree *tree, struct rnode *outgroup,
+		bool i_node_lbl_as_support);
 
 /* Collapses pure clades (= clades in which all leaves are of the same label)
  * into a single leaf, also of the same label */
