@@ -85,7 +85,26 @@ void help(char *argv[])
 "-------\n"
 "\n"
 "   -h: prints this message and exits\n"
-"   -m <map file>: uses a group map [TODO: complete description]\n"
+"   -m <map file>: uses a group map. This is a text file that lists one\n"
+"      label and one group name per line. For example a file with the\n"
+"      following contents\n"
+"            Homo Africa\n"
+"            Hylobates Asia\n"
+"            Gorilla Africa\n"
+"            Pan Africa\n"
+"            Pongo Asia\n"
+"      maps the generic names of some apes to their continent of origin.\n"
+"      That is, it defines the groups 'Asia' and 'Africa'. Labels and group\n"
+"      names are white-separated and should not contain spaces.\n"
+"        Clades consisting entirely of leaves belonging to a single group\n"
+"      will be replaced by a single leaf whose label has the following\n"
+"      structure: <group name>_<sample>_<size>, where <sample> is the label\n"
+"      of one of the members of the clade, and <size> is the number of\n"
+"      members of the clade.\n"
+"        Applied to the Old world primates tree 'data/catarrhini', the above\n"
+"      map would condense all African apes into a single leaf (since they\n"
+"      form a clade) with label 'Africa_Homo_3'. It would not be able to\n"
+"      condense further, however, because Pongo belong to group 'Asia'.\n"
 "\n"
 "Example\n"
 "-------\n"
@@ -93,29 +112,33 @@ void help(char *argv[])
 "# produce a tree of families from a genus tree in which all genus names\n"
 "# have been replaced by family names (see nw_rename) - look at\n"
 "# data/falconiformes\n"
-"$ %s data/falc_families\n",
-	argv[0],
-	argv[0]
-		);
+"$ %s data/falc_families\n"
+"\n"
+"# condense by geographic origin\n"
+"$ %s -m data/catarrhini_geog.map data/catarrhini\n",
+argv[0],
+argv[0],
+argv[0]
+	);
 }
 
 struct parameters get_params(int argc, char *argv[])
 {
 
-	struct parameters params;
+struct parameters params;
 
-	params.action = PURE_CLADES;
-	params.grp_map_fname = NULL;
+params.action = PURE_CLADES;
+params.grp_map_fname = NULL;
 
-	/* parse options and switches */
-	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hm:s")) != -1) {
-		switch (opt_char) {
-		case 'h':
-			help(argv);
-			exit(EXIT_SUCCESS);
-		case 'm':
-			// TODO: check return values of strdup() (in ALL the code)!
+/* parse options and switches */
+int opt_char;
+while ((opt_char = getopt(argc, argv, "hm:s")) != -1) {
+	switch (opt_char) {
+	case 'h':
+		help(argv);
+		exit(EXIT_SUCCESS);
+	case 'm':
+		// TODO: check return values of strdup() (in ALL the code)!
 			params.grp_map_fname = optarg;
 			break;
 		case 's':
