@@ -142,7 +142,7 @@ void dump_hash(struct hash *h, void (*dump_func)())
 			if (NULL != dump_func)
 				dump_func(kp->value);
 			else
-				printf("value: %s\n", kp->value);
+				printf("value: %s\n", (char *) kp->value);
 		}
 	}	
 
