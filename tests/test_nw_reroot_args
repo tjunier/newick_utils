@@ -6,4 +6,5 @@ deroot:-d fagales.nw
 nolbl_ingrp:-l nolbl_ingrp.nw a b
 midlen: catarrhini.nw
 bs: -s bs.nw C
+deroot_nbdesc_simple: -d deroot2.nw
 deroot_nbdesc: -d 2kids.nw

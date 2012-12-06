@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "link.h"
 
 enum reroot_status { REROOT_OK, LCA_IS_TREE_ROOT, NOT_PHYLOGRAM };
-enum deroot_status { DEROOT_OK, BALANCED, NOT_BIFURCATING };
+enum deroot_status { DEROOT_OK, BALANCED, NOT_BIFURCATING, MEM_PROB };
 
 struct parameters {
 	struct llist *labels;
@@ -279,21 +279,46 @@ enum deroot_status deroot(struct rooted_tree *tree)
 		return NOT_BIFURCATING;
 	struct rnode *left_kid = tree->root->first_child;
 	struct rnode *right_kid = tree->root->last_child;
-	/* We splice out the left or right kid of the root, and also free() it. */
-	if (left_kid->child_count < right_kid->child_count) {
-		if (! splice_out_rnode(right_kid)) {
-			perror(NULL); exit(EXIT_FAILURE);
-		}
-		// destroy_rnode(right_kid, NULL);
+
+	struct llist *left_desc = get_nodes_in_order(left_kid);
+	if (NULL == left_desc) return MEM_PROB; 
+	struct llist *right_desc = get_nodes_in_order(right_kid);
+	if (NULL == right_desc) return MEM_PROB; 
+
+	/* We splice out the left or right kid of the root, and also free() it.
+	 * However, a simple splicing-out would result in incorrect branch
+	 * lengths in this case (which is admittedly rather special). For this
+	 * reason, we have to correct them.  */
+
+	struct rnode *ingroup = NULL, *outgroup = NULL;
+	char *ingroup_len = NULL, *outgroup_len = NULL;
+
+	if (left_desc->count < right_desc->count) {
+		ingroup = right_kid;
+		outgroup = left_kid;
 	}
-	else if (left_kid->child_count > right_kid->child_count) {
-		if (! splice_out_rnode(left_kid)) {
-			perror(NULL); exit(EXIT_FAILURE);
-		}
-		// destroy_rnode(left_kid, NULL);
+	else if (left_desc->count > right_desc->count) {
+		ingroup = left_kid;
+		outgroup = right_kid;
 	}
 	else 
 		return BALANCED;
+
+	ingroup_len = ingroup->edge_length_as_string;
+	outgroup_len = outgroup->edge_length_as_string;
+
+	if ( (0 != strcmp("", ingroup_len)) &&
+	     (0 != strcmp("", outgroup_len)) ) {
+		char *og_new_len = add_len_strings(ingroup_len, outgroup_len); 
+		free(ingroup->edge_length_as_string);
+		ingroup->edge_length_as_string = strdup("0");
+		free(outgroup->edge_length_as_string);
+		outgroup->edge_length_as_string = strdup(og_new_len);
+		free(og_new_len);
+	}
+	if (! splice_out_rnode(ingroup)) {
+		perror(NULL); exit(EXIT_FAILURE);
+	}
 
 	return DEROOT_OK;
 }
@@ -428,6 +453,9 @@ void process_tree(struct rooted_tree *tree, struct parameters params)
 			fprintf (stderr,
 				"ERROR: can't decide which of root's "
 				"children is the outgroup.\n");
+			break;
+		case MEM_PROB:
+			perror(NULL);
 			break;
 		default:
 			assert(0);
