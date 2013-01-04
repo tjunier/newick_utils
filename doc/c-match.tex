@@ -1,0 +1,57 @@
+%&context
+
+\section[sct_match]{Finding subtrees in other trees}
+
+
+\match{} tries to match a (typically smaller) "pattern" tree to one or more
+"target" tree(s). If the pattern matches the target, the target tree is
+printed. Intuitively, a pattern matches a target if one can superimpose it onto
+the target without "breaking" either. More accurately, the following happens
+(in both trees):
+\startitemize[n]
+	\item leaves with labels found in both trees are kept, the other ones are
+		pruned
+	\item inner labels are discarded
+	\item both trees are ordered (as done by \order{}, see  \in{}[sct_order])
+	\item branch lengths are discarded
+\stopitemize
+At this point, the modified pattern tree is compared to the modified target, and if the \nw{} strings are identical, the match is successful.
+
+\subsubsection{Example: finding trees with a specified  subtree topology}
+
+File \filename{hominoidea.nw} contains seven trees corresponding to successive
+theories about the phylogeny of apes (these were taken from
+\from[URL:Hominoidea]). Let us see which of them group
+humans and chimpanzees as a sister clade of gorillas (which is the current
+hypothesis).
+
+\page[no]
+Here are small images of each of the trees in \filename{hominoidea.nw}: \\
+
+\startcombination[2*4]
+{\externalfigure[homino_0][scale=700]} {1 (until 1960)}
+{\externalfigure[homino_1][scale=700]} {2 (Goodman, 1964)}
+{\externalfigure[homino_2][scale=700]} {3 (gibbons as outgroup)}
+{\externalfigure[homino_3][scale=700]} {4 (Goodman, 1974: orangs as outgroup)}
+{\externalfigure[homino_4][scale=700]} {5 (resolving trichotomy)}
+{\externalfigure[homino_5][scale=700]} {6 (Goodman, 1990: gorillas as outgroup)}
+{\externalfigure[homino_6][scale=700]} {7 (split of {\em Hylobates})}
+\stopcombination
+
+Trees \#6 and \#7 match our criterion, the rest do not. To look for matching trees in \filename{hominoidea.nw}, we pass the pattern on the command line:
+
+\typefile{match_1_txt.cmd}
+\page[no]
+\typefile{match_1_txt.out}
+
+
+Note that only the pattern tree's topology matters: we would get the
+same results with pattern \code{((Homo,Pan),Gorilla);},
+\code{((Pan,Homo),Gorilla);}, etc., but not with
+\code{((Gorilla,Pan),Homo);} (which would select trees \#1, 2, 3, and 5. In
+future versions I might add an option for strict matching.
+
+The behaviour of \match{} can be reversed by passing option \code{-v} (like
+\code{grep -v}): it will print trees that {\em do not} match the pattern.
+Finally, note that \match{} only works on leaf labels (for now), and assumes
+that labels are unique in both the pattern and the target tree.
