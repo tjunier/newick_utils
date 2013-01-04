@@ -1,6 +1,8 @@
 " takes the label from a \label command, and puts it in the preceding line
 " (which is hopefully a sectioning command, or something) as the label.
 "
-" Run l2c.sed first! Call when cursor is on '\' or in "label" word. 
+" Run l2c.sed first! Call when cursor is in the line that has the \label cmd.
 
-:map ,xl f{wd/}<CR>ddk0f{i[<ESC>"2pa]<ESC>
+map ,xl $x0df{d$k0f{i[<Esc>pa]<Esc>
+
+map ,to :g/typefile.*cmd/s/typefile/txtCmdOutput/<CR>:g/txtCmdOutput.*cmd/s/_txt.cmd//<CR>

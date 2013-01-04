@@ -3,8 +3,8 @@
 
 # NOTES:
 
-# Don't remove labels automatically. There is a map (,xl) in Session.vim for
-# adding # labels to th epreceding command, it may work.
+# Don't remove labels automatically. There is a map (,xl) in l2c.vim for
+# adding labels to the preceding command, it may work.
 
 # \url{} must be changed to\url[], but this takes a name that refers to a URL,
 # which must be defined using \useURL, somewhere before \starttext.
