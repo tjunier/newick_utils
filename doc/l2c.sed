@@ -20,6 +20,8 @@ s/\\subsection\*/\\subsection/
 # Environments
 s/\\begin{itemize}/\\startitemize/
 s/\\end{itemize}/\\stopitemize/
+s/\\begin{enumerate}/\\startitemize[n]/
+s/\\end{enumerate}/\\stopitemize/
 s/\\begin{verbatim}/\\starttyping/
 s/\\end{verbatim}/\\stoptyping/
 s/\\begin{samepage}/\\page[no]/
@@ -35,6 +37,7 @@ s/\\textit{e.g.}/\\eg{}/g
 # Other commands
 s/\\verbatiminput{/\\typefile{/
 s/\\includegraphics{\([A-Za-z0-9_-]\+\)\....}/\\externalfigure[\1]/g
+s/\\includegraphics\[\([A-Za-z0-9_=.-]\+\)]{\([A-Za-z0-9_-]\+\)\....}/\\externalfigure[\2][\1]/g
 s/\\verb+\(.*\)+/\\type{\1}/g
 
 # Formatting, fonts, etc.
