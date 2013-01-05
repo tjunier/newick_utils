@@ -39,6 +39,7 @@ s/\\verbatiminput{/\\typefile{/
 s/\\includegraphics{\([A-Za-z0-9_-]\+\)\....}/\\externalfigure[\1]/g
 s/\\includegraphics\[\([A-Za-z0-9_=.-]\+\)]{\([A-Za-z0-9_-]\+\)\....}/\\externalfigure[\2][\1]/g
 s/\\verb+\(.*\)+/\\type{\1}/g
+s/\\noindent{}//g
 
 # Formatting, fonts, etc.
 s/\\emph{/{\\em /g
