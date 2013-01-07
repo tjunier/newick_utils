@@ -1,46 +1,39 @@
-\section{Pruning}
-\label{sct_prune}
+%&context
+\section[sct_prune]{Pruning}
+
 
 Pruning is simply removing arbitrary nodes. Say you have the following tree (as
 it happens, it contains a glaring error since the sister clade of mammals is the
 amphibian rather than the bird):
 
-\begin{center}
-\includegraphics{prune_1_svg.pdf}
-\end{center}
+\svgFigure{prune_1}
 
-\noindent{}and say you only need a subset of the species, perhaps because you
+and say you only need a subset of the species, perhaps because you
 want to compare this tree to another tree with fewer species. Specifically,
-let's say you don't need to show \textit{Tetraodon}, \textit{Danio},
-\textit{Bombina}, and \textit{Didelphis}. You just pass those labels to
+let's say you don't need to show \sciname{Tetraodon}, \sciname{Danio},
+\sciname{Bombina}, and \sciname{Didelphis}. You just pass those labels to
 \prune:
 
-\verbatiminput{prune_2_svg.cmd}
-\begin{center}
-\includegraphics{prune_2_svg.pdf}
-\end{center}
+\svgCmdOutput{prune_2}
 
-\noindent{}Note that each label is removed individually. The discarding of
-\textit{Didelphis} is the cause of the disappearance of the node labeled
+Note that each label is removed individually. The discarding of
+\sciname{Didelphis} is the cause of the disappearance of the node labeled
 Mammalia. And the embarrassing error is hidden by the removal of
-\textit{Bombina}.
+\sciname{Bombina}.
 
 You can also discard internal nodes, if they are labeled (in future versions
 it will be possible to discard a clade by specifying descendants, just like
 \clade). For example, you can discard the whole mammalian clade like this:
 
-\verbatiminput{prune_3_svg.cmd}
-\begin{center}
-\includegraphics{prune_3_svg.pdf} 
-\end{center}
+\svgCmdOutput{prune_3}
 
-By the way, \textit{Tetrao} and \textit{Tetraodon} are not the same thing, the
+By the way, \sciname{Tetrao} and \sciname{Tetraodon} are not the same thing, the
 first is a bird (grouse), the second is a pufferfish.
 
 \subsection{Keeping selected Nodes}
 
-By passing option \texttt{-v} (think of \texttt{grep -v}), the nodes whose
-labels are passed are \emph{kept}, and the other ones are discarded (except
+By passing option \code{-v} (think of \code{grep -v}), the nodes whose
+labels are passed are {\em kept}, and the other ones are discarded (except
 unlabeled nodes). And I really mean this: if a node's label is not on the
 command line, it goes away, even if it is an inner node - this can have
 surprising results.\footnote{In future versions there will be an option for
@@ -48,15 +41,12 @@ finer control of this behaviour}.
 
 Suppose I think that the tree is unfairly biased towards mammals (and in a
 lesser way, actinopterygians), and want to keep only the following genera:
-\textit{Fugu}, \textit{Tetrao}, \texttt{Bombina}, \textit{Sorex}. I could, of
+\sciname{Fugu}, \sciname{Tetrao}, \sciname{Bombina}, \sciname{Sorex}. I could, of
 course, generate the list of all leaves that must go away, but it is easier to
 do this:
 
-\verbatiminput{prune_4_svg.cmd}
-\begin{center}
-\includegraphics{prune_4_svg.pdf} 
-\end{center}
+\svgCmdOutput{prune_4}
 
-\noindent{}Note that I also passed \texttt{Mammalia}, for the reason discussed
+Note that I also passed \id{Mammalia}, for the reason discussed
 above: the node with this label would go away if I did not, resulting in a
 different tree (try it out).
