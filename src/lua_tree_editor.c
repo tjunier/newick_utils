@@ -616,7 +616,7 @@ static void set_predefined_variables(struct rnode *node, lua_State *L)
 /* Pushes onto the stack the function at index '*phase' in the globals table. */
 // TODO: try lua_getglobal!!!
 
-static SEE_TODO_ABOVE void get_user_hook(lua_State *L, const char *phase)
+static void get_user_hook(lua_State *L, const char *phase)
 {
 		const lua_Number *version = lua_version(L);
 		lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
@@ -676,7 +676,7 @@ static void process_tree(struct rooted_tree *tree, lua_State *L,
 		} 
 
 		set_predefined_variables(current_node, L);
-		get_user_hook(L, NODE);
+		lua_getglobal(L, NODE);
 		lua_call(L, 0, 0);
 	} /* loop over all nodes */
 
@@ -783,7 +783,7 @@ static void load_lua_condition(lua_State * L, char *lua_condition)
 		printf("%s\n", msg);
 		exit(EXIT_FAILURE);
 	}
-	set_user_hook(L, CONDITION);
+	lua_setglobal(L, CONDITION);
 }
 
 static void load_lua_action(lua_State *L, char *lua_action)
@@ -795,7 +795,7 @@ static void load_lua_action(lua_State *L, char *lua_action)
 		printf("%s\n", msg);
 		exit(EXIT_FAILURE);
 	}
-	set_user_hook(L, ACTION);
+	lua_setglobal(L, ACTION);
 }
 
 static void run_user_hooks_file(lua_State * L, char *user_hooks_filename)
@@ -954,7 +954,7 @@ static int lua_cli_process_node(lua_State *L)
 	if (NULL == lnode)
 		luaL_error(L, "N is not a node");
 
-	get_user_hook(L, CONDITION);
+	lua_getglobal(L, CONDITION);
 	lua_call(L, 0, 1);
 	if (lua_isboolean(L, -1) != 1) {
 		fprintf(stderr, "WARNING: condition does not evaluate "
@@ -965,10 +965,10 @@ static int lua_cli_process_node(lua_State *L)
 	int match = lua_toboolean(L, -1);
 	lua_pop(L, 1);
 	if (match) {
-		get_user_hook(L, ACTION);
+		lua_getglobal(L, ACTION);
 		lua_call(L, 0, 0);
 		/* see -o switch */
-		lua_getfield(L, LUA_GLOBALSINDEX, STOP_AT_1ST_MATCH);
+		lua_getglobal(L, STOP_AT_1ST_MATCH);
 		int stop_clade_at_first_match = lua_toboolean(L, -1);
 		lua_pop(L, 1);
 		if (stop_clade_at_first_match)
@@ -980,7 +980,7 @@ static int lua_cli_process_node(lua_State *L)
 // TODO: implement __tostring for lua_rnode
 
 /* Functions for Lua node */
-static const struct luaL_reg lnodelib_f [] = {
+static const struct luaL_Reg lnodelib_f [] = {
 	{"set", lua_node_set},
 	{"get", lua_node_get},
 	{NULL, NULL}
@@ -1009,7 +1009,7 @@ static int luaopen_lnode (lua_State *L)
 
 static void run_user_hook(lua_State *L, const char *phase)
 {
-	lua_getfield(L, LUA_GLOBALSINDEX, phase);
+	lua_getglobal(L, phase);
 	// TODO: this lua_isfunction() check should be done once and for all,
 	// before the tree is processed, like for the NODE function (see main(),
 	// around l. 956
@@ -1025,7 +1025,7 @@ int main(int argc, char* argv[])
 	struct rooted_tree *tree;
 
 	/* Initializes Lua */
-	lua_State *L = lua_open();   
+	lua_State *L = luaL_newstate();   
 	luaL_openlibs(L);
 
 	lua_pushcfunction(L, lua_print_subclade);
@@ -1047,7 +1047,7 @@ int main(int argc, char* argv[])
 	if (NULL != params.user_hooks_filename) {
 		/* Get the node() function defined by the user */
 		run_user_hooks_file(L, params.user_hooks_filename);
-		lua_getfield(L, LUA_GLOBALSINDEX, NODE);
+		lua_getglobal(L, NODE);
 		int NODE_type = lua_type(L, -1);
 		switch(NODE_type) {
 		case LUA_TFUNCTION:
