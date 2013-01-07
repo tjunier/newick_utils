@@ -96,6 +96,12 @@ int insert_child(struct rnode *parent, struct rnode *insert, int index);
 
 int swap_nodes(struct rnode *node);
 
+/* As above, but if 'i_node_lbl_as_support' is true, then inner node labels are
+ * treated as branch properties and swapped as well (i.e., migrate from child
+ * to parent). This is used e.g. when rerooting bootstrapped trees. */
+
+int swap_nodes_wsupport(struct rnode *node, bool i_node_lbl_as_support);
+
 /* Removes a node from its parent's children list. The node is not freed. There
  * are the following cases: If the removed node had more than one sibling, the
  * tree is in a normal state and the function stops here (case 1). If not, the
