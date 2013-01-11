@@ -129,6 +129,15 @@
 \bigskip
 \stopsamepage}
 
+% ... and for Newick (rare, but does occur - e.g., nw_indent)
+\define[1] \nwCmdOutput{%
+\bigskip%
+\startsamepage%
+\typefile{#1_nw.cmd}%
+\typefile{#1_nw.out}%
+\stopsamepage%
+\bigskip}
+
 % For SVGs without command line
 \define[1] \svgFigure{%
 \bigskip

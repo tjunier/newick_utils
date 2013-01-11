@@ -6,4 +6,5 @@
 map ,xl $x0df{d$k0f{i[<Esc>pa]<Esc>
 
 map ,to :g/typefile.*txt\.cmd/s/typefile/txtCmdOutput/<CR>:g/txtCmdOutput.*cmd/s/_txt.cmd//<CR>
+map ,no :g/typefile.*nw\.cmd/s/typefile/nwCmdOutput/<CR>:g/nwCmdOutput.*cmd/s/_nw.cmd//<CR>
 map ,so :g/typefile.*svg\.cmd/s/typefile/svgCmdOutput/<CR>:g/svgCmdOutput.*cmd/s/_svg.cmd//<CR>
