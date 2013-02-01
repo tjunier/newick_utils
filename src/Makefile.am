@@ -58,7 +58,7 @@ nw_reroot_LDADD = libnw.la
 nw_rename_SOURCES = rename.c readline.c
 nw_rename_LDADD = libnw.la
 
-nw_condense_SOURCES = condense.c
+nw_condense_SOURCES = condense.c readline.c
 nw_condense_LDADD = libnw.la
 
 nw_support_SOURCES = support.c node_set.c

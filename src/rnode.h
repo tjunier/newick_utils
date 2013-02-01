@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 
 struct rnode;
+struct hash;
 
 /** A node in a rooted tree. One of the basic building blocks of the whole
  * package. */

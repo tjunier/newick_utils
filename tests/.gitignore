@@ -1,7 +1,9 @@
-.deps
-.*.sw?
+*.log
 *.o
 *.out
+*.trs
+.*.sw?
+.deps
 test_canvas
 test_concat
 test_enode
@@ -20,9 +22,9 @@ test_order_tree
 test_readline
 test_rnode
 test_rnode_iterator
+test_subtree
+test_svg_graph_radial
 test_to_newick
 test_tree
 test_tree_models
 test_xml_utils
-test_svg_graph_radial
-test_subtree

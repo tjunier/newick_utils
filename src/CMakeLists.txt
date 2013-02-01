@@ -45,7 +45,6 @@ add_library(nutils
 # simple cases 
 
 set(NUTILS_APPS
-	condense
 	duration
 	labels
 	prune
@@ -92,6 +91,11 @@ target_link_libraries(nw_display m nutils)
 if(LIBXML2_FOUND)
 	target_link_libraries(nw_display ${LIBXML2_LIBRARIES})
 endif(LIBXML2_FOUND)
+
+# nw_condense: other object files
+
+add_executable(nw_condense condense.c readline.c)
+target_link_libraries(nw_condense nutils)
 
 # nw_distance: other object files
 

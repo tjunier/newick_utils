@@ -1,3 +1,6 @@
+handle Lua 5.1 and 5.1
+
+BUG: echo '(A,B);' | nw_prune - B returns 'B;' - should give error.
 
 doc: ad example of huge tree (mail from mid-march)
 
