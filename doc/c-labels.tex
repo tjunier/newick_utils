@@ -1,0 +1,35 @@
+%&context
+
+\section[sct_labels]{Extracting Labels}
+
+
+To get a list of all labels in a tree, use \labels:
+
+\txtCmdOutput{labels_1}
+
+The labels are printed out in \no. To get rid of internal labels,
+use \code{-I}:
+
+\txtCmdOutput{labels_2}
+
+Likewise, you can use \code{-L} to get rid of leaf labels, and
+with \code{-t} the labels are printed on a single line, separated by tabs
+(here the line is folded due to lack of space).
+
+\txtCmdOutput{labels_3}
+
+If you just want the root's label, pass \code{-r}. In conjunction
+with \clade{} (see \in{}[sct_subtrees]), this is handy to get support values of
+nodes defined by their descendants. For example, the following shows the
+support value of the clade defined by \id{HRV39} and \id{HRV85} in a
+virus tree similar to that of \in{}[sct_display_ornament_xpl_gc]:
+
+\txtCmdOutput{labels_5}
+
+\subsection[sct_counting_leaves]{Counting Leaves in a Tree}
+
+A simple application of \labels{} is a leaf count (assuming each leaf is
+labeled - \nw{} does not require labels):
+
+\txtCmdOutput{labels_4}
+
