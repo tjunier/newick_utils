@@ -1,0 +1,77 @@
+%&context
+
+\section[sct_order]{Ordering Nodes}
+
+
+Two trees that differ only by the order of children nodes within the parent
+convey the same biological information, even if the text (\nw) and graphical
+representations differ.  For example, files \filename{falconiformes\_1} and
+\filename{falconiformes\_2} are different, and they yield different images:
+
+\svgCmdOutput{order_1}
+
+\svgCmdOutput{order_2}
+
+But do they represent different phylogenies? In other words, do they
+differ by more than just the ordering of nodes? To check this, we pass them to
+\order{} and use \progname{diff} to compare the results\footnote{One could also compute a checksum using \progname{md5sum}, etc}:
+
+\txtCmdOutput{order_3}
+\typefile{order_3_txt.out}
+
+So, after ordering, the trees are the same: they tell the same biological
+story. Note that these trees are cladograms. If you have trees with branch
+lengths, this approach will only work if the lengths are identical, which may or
+may not be what you want. You can get rid of the branch lengths using
+\topology{} (see \in{}[sct_topology]).
+
+\subsection{Variants}
+
+Other ordering criteria are available through option \code{-c}. To order a
+tree by number of descendants (\ie, "light" nodes before "heavy"
+nodes), pass \code{-c n}. This has the effect of "ladderizing" trees which are
+heavily imbalanced. Consider this tree:
+
+\midaligned{\externalfigure[order_4_svg]}
+
+Here is the same tree, reordered by number of descendants: light
+nodes appear before (clockwise) heavy nodes:
+
+\svgCmdOutput{order_5}
+
+\subsubsection{De-ladderizing}
+
+Incidentally, "ladderizing" a tree may not be a good idea, because it lends
+itself to misinterpretations. For example, the following tree leads some people
+(including professional biologists, apparently \cite{Baum_2005}) to the
+following mistakes:
+
+\startalignment[center]
+\externalfigure[order_6_svg]
+\stopalignment
+\startitemize
+	\item there is a "chain of being" with "higher" and "lower" organisms,
+	with (surprise!) humans at the top; "higher" can be interpreted in
+	various ways, including "more perfect", or "more evolved" or even
+	morally superior. This is known as the \foreign{scala natur\ae} fallacy.
+	\item there is a "main line" that progressively leads to (surprise!)
+	humans, with "offshoots" along the way -- lowly lampreys branching out
+	first, then sharks, etc. 
+	\item early-branching species (this is itself an error) are
+	"primitive": in our case, it would mean that the last common ancestor
+	of lampreys and humans was a lamprey (or very like one); that the
+	\lca{} of humans and sharks was
+	very much like a modern shark, etc.
+\stopitemize
+For a comprehensive discussion of errors in tree-thinking, see
+\cite{Gregory_2008}.  Now, to prevent these errors, one can reorder the tree in
+such a way as to remove the ladder. This is done by passing \code{-c d}. The
+tree is topologically identical, so it tells the same biological story:
+
+\svgCmdOutput{order_7}
+
+It is less easy now to construe that there is a chain of being, or
+that evolution is progressive, etc. Unfortunately, some folks take the new tree
+to mean that humans are more closely related to amphibians (\sciname{Xenopus})
+than to birds (\sciname{Columba}). There is no substitute to actually learn how
+to interpret trees, I'm afraid. 
