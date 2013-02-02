@@ -114,8 +114,7 @@ void help(char *argv[])
 "$ %s -v data/catarrhini Gorilla Pan Homo Pongo Simias Colobus\n"
 "\n"
 "# same, using clade labels:\n"
-"$ %s -v data/catarrhini Hominidae Colobinae\n"
-"$ %s data/catarrhini Homininae\n",
+"$ %s -v data/catarrhini Hominidae Colobinae\n",
 	argv[0],
 	argv[0],
 	argv[0],
