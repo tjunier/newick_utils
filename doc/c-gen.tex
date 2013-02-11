@@ -1,0 +1,16 @@
+\section[sct_gen]{Generating Random Trees}
+
+
+\gen{} generates clock-like random trees, with exponentially distributed branch
+lengths. Nodes are sequentially labeled.
+
+\svgCmdOutput{gen_1}
+
+Here I pass option \code{-s}, whose argument is the pseudo-random
+number generator's seed, so that I get the same tree every time I produce this
+document. Normally, you will not use it if you want a different tree every time.
+Other options are \code{-d}, which specifies the tree's depth, and
+\code{-l}, which sets the average branch length.
+
+I use random trees to test the other applications, and also as a kind of null
+model to test to what extent a real tree departs from the null hypothesis.
