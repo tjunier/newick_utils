@@ -14,11 +14,13 @@ offer a solution.
 As an analogy, consider the task of finding lines in a text that match a
 given pattern. This can be done, for example, in the following ways, from the
 general to the specific:
+
 \startitemize
 	\item a Perl program
 	\item a \progname{sed} one-liner
 	\item a \progname{grep} command
 \stopitemize
+
 Perl is a general-purpose language, it just happens to be rather good at
 processing text.\footnote{Ok, Perl was {\em initially} designed for processing
 text -- it's the Practical Extraction and Report Language, after all -- but it
@@ -56,21 +58,20 @@ understand that Scheme is not the only solution as an embedded language, and
 that many people (myself included) find learning it a bit of a challenge.
 Therefore, I tried the same approach with Lua\footnote{In case you're curious,
 the reason I tried Scheme before Lua is simply that I heard about them in that
-order.} (\url{http://www.lua.org}), which is designed as an embeddable
-language, is even smaller than Guile, and by most accounts easier to
-learn.\footnote{And, in my experience, easier to embed in a C program, but your
-experience may differ. In particular, I could provide all of \luaed's
-functionality without writing a single line of Lua code, whereas \sched{}
-relies on a few dozen lines of embedded Scheme code that have to be parsed and
-interpreted on each run. But that may very possibly just reflect my poor
-Scheme/Guile skills. Furthermore, I can apparently run \luaed{} through
-Valgrind's (\url{http://www.valgrind.org}) memcheck utility without problems (I
-do this with all the programs in the utils), but with \sched{} I get tons of
-error messages. But it may be that I don't get how to manage memory with
-Guile}. The result, \luaed, is probably the best so far: as powerful as \sched,
-while smaller, faster and easier to use. For this reason, I will probably not
-develop \sched{} much more, but I won't drop it altogether either, not soon at
-any rate. 
+order.} (\from[URL:Lua]), which is designed as an embeddable language, is even
+smaller than Guile, and by most accounts easier to learn.\footnote{And, in my
+experience, easier to embed in a C program, but your experience may differ. In
+particular, I could provide all of \luaed's functionality without writing a
+single line of Lua code, whereas \sched{} relies on a few dozen lines of
+embedded Scheme code that have to be parsed and interpreted on each run. But
+that may very possibly just reflect my poor Scheme/Guile skills. Furthermore, I
+can apparently run \luaed{} through Valgrind's (\from[URL:Valgrind])
+memcheck utility without problems (I do this with all the programs in the
+utils), but with \sched{} I get tons of error messages. But it may be that I
+don't get how to manage memory with Guile}. The result, \luaed, is probably the
+best so far: as powerful as \sched, while smaller, faster and easier to use.
+For this reason, I will probably not develop \sched{} much more, but I won't
+drop it altogether either, not soon at any rate. 
 
 \subsection{The General Idea}
 
@@ -86,22 +87,22 @@ perform actions at the start or end of the run, or of each input tree. These are
 summarized in the table below.
 
 \startalignment[center]
-	\begin{minipage}{0.8\textwidth}
+	% TODO: ConTeXtify the commented-out stuff below
+	%\begin{minipage}{0.8\textwidth}
 		% see http://ostraya.livejournal.com/250833.html for the "multiple refs to
 		% same footnote in a minipage" trick
-		\renewcommand{\thefootnote}{\thempfootnote}
-		\begin{tabular}{llll}
-		& \ed & \sched & \luaed \\
-		\hline
-		language & own & Scheme & Lua \\
-		programming constructs & no & Scheme's & Lua's \\
-		functions & fixed & arbitrary\footnote{\ie, user can define their own} &
-		arbitrary\footnotemark[\value{mpfootnote}] \\
-		depends on & nothing & \gnu{} Guile & Lua library \\
-		pre- \& post-tree code & no & yes & yes \\
-		pre- \& post-run code & no & yes & yes
-		\end{tabular}
-	\end{minipage}
+		%\renewcommand{\thefootnote}{\thempfootnote}
+		\starttabulate[|l|l|l|l|]]
+		\NC \NC \ed \NC \sched \NC \luaed \NC\NR
+		\HL
+		\NC language 								\NC own 		\NC Scheme 		\NC Lua \NC\NR
+		\NC programming constructs 	\NC no 			\NC Scheme's 	\NC Lua's \NC\NR
+		\NC functions 							\NC fixed		\NC arbitrary (\ie, user can define their own) \NC arbitrary \NC\NR
+		\NC depends on 							\NC nothing \NC \gnu{} Guile \NC Lua library \NC\NR
+		\NC pre- \& post-tree code 	\NC no 			\NC yes 			\NC yes \NC\NR
+		\NC pre- \& post-run code 	\NC no 			\NC yes 			\NC yes \NC\NR
+		\stoptabulate
+	%\end{minipage}
 \stopalignment
 
 \subsection[sct:luaed]{\luaed}
@@ -158,32 +159,29 @@ the variables are set to the current node's properties.  These predefined
 variables have short names, to keep expressions concise. They are shown in table
 \in{}[tbl:luaedPredefVar].
 
-\begin{table}
-	\centering
-	\begin{tabular}{cll}
-		name & (Lua) type & meaning (refers to the current node)\\
-		\hline
-		\code{a} & integer & number of ancestors  \\
-		\code{b} & number & support value (or \code{nil}) \\
-		\code{c} & integer & number of children (direct descendants) \\
-		\code{D} & integer & total number of descendants (includes children) \\
-		\code{d} & number & depth (distance to root) \\
-		\code{i} & Boolean & true iff node is strictly internal (i.e., not root!) \\
-		\code{lbl} & string & label \\
-		\code{l} (ell) & Boolean & true iff node is a leaf \\
-		\code{L} & number & parent edge length \\
-		\code{N} & node & the current node itself \\
-		\code{r} & Boolean & true iff node is the root
-	\end{tabular}
-	\caption{%
-		\label{tbl:luaedPredefVar}
+\placetable[][tbl:luaedPredefVar]{%
 		Predefined variables in \luaed. Variables \code{b} and \code{lbl} are
 		both derived from the label, but \code{b} is interpreted as a number, and
 		is undefined if the conversion to a number fails, or if the node is a leaf.
 		Edge length and depth (\code{L} and \code{d}) are undefined (not zero!)
 		if not specified in the Newick tree, as in cladograms.
-	}
-\end{table}
+}{%
+	\starttabulate[|c|l|l|]
+		name \NC (Lua) type \NC meaning (refers to the current node)\NC\NR
+		\HL
+		\code{a} \NC integer \NC number of ancestors  \NC\NR
+		\code{b} \NC number \NC support value (or \code{nil}) \NC\NR
+		\code{c} \NC integer \NC number of children (direct descendants) \NC\NR
+		\code{D} \NC integer \NC total number of descendants (includes children) \NC\NR
+		\code{d} \NC number \NC depth (distance to root) \NC\NR
+		\code{i} \NC Boolean \NC true iff node is strictly internal (i.e., not root!) \NC\NR
+		\code{lbl} \NC string \NC label \NC\NR
+		\code{l} (ell) \NC Boolean \NC true iff node is a leaf \NC\NR
+		\code{L} \NC number \NC parent edge length \NC\NR
+		\code{N} \NC node \NC the current node itself \NC\NR
+		\code{r} \NC Boolean \NC true iff node is the root
+	\stoptabulate
+}
 
 The condition being just a Boolean expression written in Lua, all the logical
 operators of the Lua language can be used (indeed, any valid Lua snippet can be
@@ -193,16 +191,16 @@ override operator precedence or for clarity.
 Here are some examples of \luaed{} conditions:
 
 \startalignment[center]
-\begin{tabular}{cl}
-expression & selects: \\
-\hline
-\code{l} (lowercase ell) & all leaves \\
-\code{l and a <= 3} & leaves with 3 ancestors or less \\
-\code{i and (b \~{ }= nil) and (b >= 95)} & internal nodes with support $\geq$ 95\% \\ 
-\code{i and (b \~{ }= nil) and (b < 50)} & unsupported nodes (less than 50\%) \\
-\code{not r} & all nodes except the root \\
-\code{c > 2} & multifurcating nodes
-\end{tabular}
+\starttabulate[cl]
+expression \NC selects: \NC\NR
+\HL
+\code{l} (lowercase ell) \NC all leaves \NC\NR
+\code{l and a <= 3} \NC leaves with 3 ancestors or less \NC\NR
+\code{i and (b \~{ }= nil) and (b >= 95)} \NC internal nodes with support $\geq$ 95\% \NC\NR 
+\code{i and (b \~{ }= nil) and (b < 50)} \NC unsupported nodes (less than 50\%) \NC\NR
+\code{not r} \NC all nodes except the root \NC\NR
+\code{c > 2} \NC multifurcating nodes
+\stoptabulate
 \stopalignment
 
 Notes:
@@ -220,55 +218,51 @@ few functions for such purposes (\in{table}[tbl:luaedPredefFunc]), and you can
 of course write your own (unless the function is very short, this is easier if
 you pass the Lua code in a file, see \in{}[sct:lua_file_input]).
 
-\begin{table}
-	\centering
-	\begin{tabular}{clc}
-		code & effect & modifies tree?\\
-		\hline
-		\code{o}	& splice out the node 									& yes \\
-		\code{s}	& print the subtree rooted at the node 	& no \\
-		\code{u} 	& delete ("unlink") the node (and all descendants) & yes
-	\end{tabular}
-	\caption{%
-		\label{tbl:luaedPredefFunc}
+\placetable[][tbl:luaedPredefFunc]{%
 		Predefined actions in \luaed. The names are one letter long for convenience
 		when passing the action on the command line. When called without an
 		argument, these functions operate on the current node (\ie, \code{s()} is
 		the same as \code{s(N)} (where \code{N} means the current node -- see
 		\in{table}[tbl:luaedPredefVar]).
-	}
-\end{table}
+}{%
+	%\centering
+	\starttabulate[|c|l|c|]
+		code \NC effect \NC modifies tree?\NC\NR
+		\HL
+		\code{o}	\NC splice out the node 									\NC yes \NC\NR
+		\code{s}	\NC print the subtree rooted at the node 	\NC no \NC\NR
+		\code{u} 	\NC delete ("unlink") the node (and all descendants) \NC yes
+	\stoptabulate
+}
 
 \sched{} defines a "node" type, and the current node is always accessible as
 variable \code{N} (other nodes can be obtained through node properties, see
 below).  Node properties can be accessed as fields in a Lua table. Table \in{}[tbl:luaedNodeProp] lists the available node
 fields.
 
-\begin{table}
-	\center
-	\begin{tabular}{llcl}
-		name & type & mode & meaning \\
-		\hline
-		\code{len}, \code{L} 	& number 	& rw & parent edge's length \\
-		\code{lbl}							& string 	& rw & label \\
-		\code{b}								& number	& ro & support value \\
-		\code{par}							& node		& ro & parent \\
-		\code{first\_child}, \code{fc}  & node & ro & first child \\
-		\code{last\_child}, \code{lc} 	& node & ro & last child \\
-		\code{children\_count}, \code{c} 	& integer & ro & number of children \\
-		\code{kids}							& table		& ro & list of children nodes
-	\end{tabular}
-	\caption{%
-		\label{tbl:luaedNodeProp}
-		Node properties accessible from Lua. rw: read-write, ro: read only. Some
-		fields have both a short and a long name, the former is intended for use on
-		the command line (where space is at a premium), the latter is for use in
-		scripts (but both can be used anywhere). Note that when referring to the
-		{\em current} node, the predefined variables (see table
-		\in{}[tbl:luaedPredefVar]) are even more concise, \eg{} \code{N.len} or
+\placetable[][tbl:luaedNodeProp]{%
+	Node properties accessible from Lua. rw: read-write, ro: read only. Some
+	fields have both a short and a long name, the former is intended for use on
+	the command line (where space is at a premium), the latter is for use in
+	scripts (but both can be used anywhere). Note that when referring to the
+	{\em current} node, the predefined variables (see table
+	\in{}[tbl:luaedPredefVar]) are even more concise, \eg{} \code{N.len} or
 		\code{N.L} can be written just \code{L}, but they are read-only.
-	}
-\end{table}
+}{%
+	%\center
+	\starttabulate[llcl]
+		name \NC type \NC mode \NC meaning \NC\NR
+		\HL
+		\code{len}, \code{L} 	\NC number 	\NC rw \NC parent edge's length \NC\NR
+		\code{lbl}							\NC string 	\NC rw \NC label \NC\NR
+		\code{b}								\NC number	\NC ro \NC support value \NC\NR
+		\code{par}							\NC node		\NC ro \NC parent \NC\NR
+		\code{first\_child}, \code{fc}  \NC node \NC ro \NC first child \NC\NR
+		\code{last\_child}, \code{lc} 	\NC node \NC ro \NC last child \NC\NR
+		\code{children\_count}, \code{c} 	\NC integer \NC ro \NC number of children \NC\NR
+		\code{kids}							\NC table		\NC ro \NC list of children nodes
+	\stoptabulate
+}
 
 So for example the parent of the current node is expressed by
 \code{N.par}; doubling its length could be \code{N.par.len = N.par.len * 2}.
@@ -283,34 +277,31 @@ function names are special: they function as "hooks", that is, they are called
 on predefined occasions. Table \in{}[tbl:luaedHooks] shows the hook names and
 when they are called.
 
-\begin{table}
-	\centering
-	\begin{tabular}{ll}
-		hook name & called\ldots \\
-		\hline
-		\code{start\_run} 	& before processing any tree \\
-		\code{start\_tree}	& for each tree, before processing \\
-		\code{node}					& for each node \\
-		\code{stop\_tree}		& for each tree, after processing \\
-		\code{stop\_run}			& after processing all trees
-	\end{tabular}
-	\caption{%
-		\label{tbl:luaedHooks}
-		Hooks defined by \luaed. If a function named \code{start\_tree} is
-		defined, it will be called once per tree, before the tree is processed; etc.
-		If a hook is not defined, no action is performed on the corresponding
-		occasion. Strictly speaking, \code{start\_run} is not really necessary, as
-		the file is evaluated before the run anyway, but it seems cleaner to provide
-		a start-of-the-run hook as well.
-	}
-\end{table}
+\placetable[][tbl:luaedHooks]{%
+	Hooks defined by \luaed. If a function named \code{start\_tree} is
+	defined, it will be called once per tree, before the tree is processed; etc.
+	If a hook is not defined, no action is performed on the corresponding
+	occasion. Strictly speaking, \code{start\_run} is not really necessary, as
+	the file is evaluated before the run anyway, but it seems cleaner to provide
+	a start-of-the-run hook as well.
+}{
+	\starttabulate[|l|l|]
+		hook name \NC called\ldots \NC\NR
+		\HL
+		\code{start\_run} 	\NC before processing any tree \NC\NR
+		\code{start\_tree}	\NC for each tree, before processing \NC\NR
+		\code{node}					\NC for each node \NC\NR
+		\code{stop\_tree}		\NC for each tree, after processing \NC\NR
+		\code{stop\_run}			\NC after processing all trees
+	\stoptabulate
+}
 
 See "tree counter" and "numbering nodes" below for examples of use of
 \code{-f}.
 
 \subsubsection{Examples}
 
-\paragraph[sct:ed_ed]{Opening Poorly-supported Nodes}
+\subsubsubsection[sct:ed_ed]{Opening Poorly-supported Nodes}
 
 
 When a node has low support, it may be better to splice it out from the tree,
@@ -344,7 +335,7 @@ perfectly supported (100\%) node, none of whose descendants has less than 80\%
 support.
 
 
-\paragraph{Formatting Lengths} 
+\subsubsubsection{Formatting Lengths} 
 
 Some phylogeny programs return \nw{} trees with an unrealistic number
 of decimal places. For example, the \filename{HRV.nw} tree has six:
@@ -366,7 +357,7 @@ the lengths to two decimal places, do the following:
 
 
 \page[no]
-\paragraph{Multiplying lengths by a constant}
+\subsubsubsection{Multiplying lengths by a constant}
 
 It may be necessary to have two trees which only differ by a constant multiple
 of the branch lengths. This can be used, for example, to test competing
@@ -386,7 +377,7 @@ To multiply all its branch lengths by (say) 3.5, do the following:
 \externalfigure[ed_12_svg]
 \stopalignment
 
-\paragraph{Implementing other \nutils}
+\subsubsubsection{Implementing other \nutils}
 
 \luaed{} can emulate other programs in the package, when these
 iterate on every node and perform some action. There is no real reason to use
@@ -395,14 +386,14 @@ has to start the Lua interpreter, parse the Lua expressions, etc.). But these
 "equivalents" can serve as illustration.
 
 \startalignment[center]
-\begin{tabular}{ll}
-program & \luaed{} equivalent \\
-\hline
-\labels{} 						& {\tt 'lbl \~{}= ""' 'print(lbl)'}  \\
-\labels{} {\tt -I} 		& {\tt 'l and lbl \~{}= ""' 'print(lbl)'} \\
-\topology{}						& {\tt true 'N.len = ""'} \\
-\topology{} {\tt -I} 	& {\tt true 'N.len = ""; if not l then N.lbl = "" end'}
-\end{tabular}
+\starttabulate[|l|l|]
+program \NC \luaed{} equivalent \NC\NR
+\HL
+\labels{} 						\NC {\tt 'lbl \~{}= ""' 'print(lbl)'}  \NC\NR
+\labels{} {\tt -I} 		\NC {\tt 'l and lbl \~{}= ""' 'print(lbl)'} \NC\NR
+\topology{}						\NC {\tt true 'N.len = ""'} \NC\NR
+\topology{} {\tt -I} 	\NC {\tt true 'N.len = ""; if not l then N.lbl = "" end'}
+\stoptabulate
 \stopalignment
 
 The {\tt lbl \~{}= ""} condition in the \labels{} replacements is checked
@@ -411,7 +402,7 @@ replacement, the check for node type (\code{l}) is done in the action rather
 than the condition, because there is some code that is performed for every node
 and some additional code only for non-leaves. 
 
-\paragraph{A tree counter}
+\subsubsubsection{A tree counter}
 
 As you know by now, the \nutils{} are able to process files that contain any
 number of trees. But just how many trees are there in a file? If you're certain
@@ -463,7 +454,7 @@ There's no confusing our tree counter, it seems. Note that in future versions I
 might well make this unnecessary by supplying a predefined variable which counts
 the input trees, akin to Awk's \code{NR}.
 
-\paragraph{Numbering inner nodes}
+\subsubsubsection{Numbering inner nodes}
 
 I was once handed a tree with the task of numbering the inner nodes, starting
 close to the leaves and ending at the root.\footnote{Thanks to Beno\^{i}t
@@ -486,7 +477,7 @@ A solution is the following \luaed{} script:
 \externalfigure[ed_21_svg]
 \stopalignment 
 
-\paragraph{Extracting deep, well-supported clades}
+\subsubsubsection{Extracting deep, well-supported clades}
 
 In the first example of this section (\in{}[sct:luaed]), we extracted
 well-supported clades, but there was an overlap because one well-supported clade
@@ -513,7 +504,7 @@ structure-altering functions, etc).
 
 \subsection{\ed}
 
-\textbf{Note}: it is likely that \luaed{} (\in{}[sct:luaed]) will be more useful
+{\bf Note}: it is likely that \luaed{} (\in{}[sct:luaed]) will be more useful
 than \ed. See also \in{section}[sct_ed] for a general intro to the stream
 editing programs. This section gives a minimal description of \ed, without
 
@@ -528,18 +519,18 @@ one-letter names, to keep expressions short (after all, they are passed on the
 command line). There are two types, numeric and Boolean.
 
 \startalignment[center]
-\begin{tabular}{cll}
-name & type & meaning \\
-\hline
-\code{a} & numeric & number of ancestors of node	 \\
-\code{b} & numeric & node's support value (or zero) \\
-\code{c} & numeric & node's number of children (direct) \\
-\code{D} & numeric & node's number of descendants (includes children) \\
-\code{d} & numeric & node's depth (distance to root) \\
-\code{i} & Boolean & true iff node is strictly internal (i.e., not root!) \\
-\code{l} (ell) & Boolean & true iff node is a leaf \\
-\code{r} & Boolean & true iff node is the root
-\end{tabular}
+\starttabulate[|c|l|l|]
+name \NC type \NC meaning \NC\NR
+\HL
+\code{a} \NC numeric \NC number of ancestors of node	 \NC\NR
+\code{b} \NC numeric \NC node's support value (or zero) \NC\NR
+\code{c} \NC numeric \NC node's number of children (direct) \NC\NR
+\code{D} \NC numeric \NC node's number of descendants (includes children) \NC\NR
+\code{d} \NC numeric \NC node's depth (distance to root) \NC\NR
+\code{i} \NC Boolean \NC true iff node is strictly internal (i.e., not root!) \NC\NR
+\code{l} (ell) \NC Boolean \NC true iff node is a leaf \NC\NR
+\code{r} \NC Boolean \NC true iff node is the root
+\stoptabulate
 \stopalignment
 
 The logical and relational operators work as expected, here is the list, in
@@ -547,37 +538,37 @@ order of precedence, from tightest to loosest-binding.  Anyway, you can use
 parentheses to override precedence, so don't worry.
 
 \startalignment[center]
-\begin{tabular}{cl}
-symbol & operator \\
-\hline
-\code{!} & logical negation \\
-\hline
-\code{==} & equality \\
-\code{!=} & inequality \\
-\code{<} & greater than \\
-\code{>} & lesser than \\
-\code{>=} & greater than or equal to \\
-\code{<=} & lesser than or equal to \\
-\hline
-\code{\&} & logical and \\
-\hline
-\code{|} & logical or
-\end{tabular}
+\starttabulate[|c|l|]
+\NC symbol 		\NC operator \NC\NR
+\HL
+\NC \code{!} 	\NC logical negation \NC\NR
+\HL
+\NC \code{==}	\NC equality \NC\NR
+\NC \code{!=} \NC inequality \NC\NR
+\NC \code{<} 	\NC greater than \NC\NR
+\NC \code{>} 	\NC lesser than \NC\NR
+\NC \code{>=} \NC greater than or equal to \NC\NR
+\NC \code{<=} \NC lesser than or equal to \NC\NR
+%\HL
+%\NC \code{\&} \NC logical {\em and} \NC\NR
+%\HL
+%\NC \code{|} 	\NC logical {\em or} \NC\NR
+\stoptabulate
 \stopalignment
 
 Here are a few examples:
 
 \startalignment[center]
-\begin{tabular}{cl}
-expression & selects: \\
-\hline
-\code{l} & all leaves \\
-\code{l \& a <= 3} & leaves with 3 ancestors or less \\
-\code{i \& (b >= 95)} & internal nodes with support greater than 95\% \\ 
-\code{i \& (b < 50)} & unsupported nodes (less than 50\%) \\
-\code{!r} & all nodes except the root \\
-\code{c > 2} & multifurcating nodes
-\end{tabular}
+\starttabulate[|c|l|]
+\NC expression \NC selects: \NC\NR
+\HL
+\NC \code{l} \NC all leaves \NC\NR
+\NC \code{l \& a <= 3} \NC leaves with 3 ancestors or less \NC\NR
+\NC \code{i \& (b >= 95)} \NC internal nodes with support greater than 95\% \NC\NR 
+\NC \code{i \& (b < 50)} \NC unsupported nodes (less than 50\%) \NC\NR
+\NC \code{!r} \NC all nodes except the root \NC\NR
+\NC \code{c > 2} \NC multifurcating nodes
+\stoptabulate
 \stopalignment
 
 \subsubsection{Actions}
@@ -585,14 +576,14 @@ expression & selects: \\
 The actions are also coded by a single letter, for the same reason. The following are implemented:
 
 \startalignment[center]
-\begin{tabular}{clc}
-code & effect & modifies tree?\\
-\hline
-\code{d} & delete the node (and all descendants) & yes \\
-\code{l} & print the node's label & no \\
-\code{o} & splice out the node & yes \\
-\code{s} & print the subtree rooted at the node & no \\
-\end{tabular}
+\starttabulate[|c|l|c|]
+code \NC effect \NC modifies tree?\NC\NR
+\HL
+\code{d} \NC delete the node (and all descendants) \NC yes \NC\NR
+\code{l} \NC print the node's label \NC no \NC\NR
+\code{o} \NC splice out the node \NC yes \NC\NR
+\code{s} \NC print the subtree rooted at the node \NC no \NC\NR
+\stoptabulate
 \stopalignment
 
 I have no plans to implement any other actions, as this can be done easily
@@ -600,7 +591,7 @@ with \luaed{} (or \sched).
 
 \subsection{\sched}
 
-\textbf{Note}: it is likely that \luaed{} (\in{}[sct:luaed]) will be more
+\bf{Note}: it is likely that \luaed{} (\in{}[sct:luaed]) will be more
 convenient than \sched. See also \in{section}[sct_ed] for a general intro to the
 stream editing programs. This section gives a minimal description of \sched,
 with no motivation and only a few examples (see \in{}[sct:luaed] for more).
@@ -650,20 +641,20 @@ node's properties. As in \ed{}, the variables have short names, to keep
 expressions concise. The predefined variables are shown in the table below.
 
 \startalignment[center]
-\begin{tabular}{cll}
-name & type & meaning \\
-\hline
-\code{a} & integer & number of ancestors  \\
-\code{b} & rational & support value \\
-\code{c} & integer & number of children (direct descendants) \\
-\code{D} & integer & total number of descendants (includes children) \\
-\code{d} & numeric & depth (distance to root) \\
-\code{i} & Boolean & true iff node is strictly internal (i.e., not root!) \\
-\code{lbl} & string & label \\
-\code{l} (ell) & Boolean & true iff node is a leaf \\
-\code{L} & rational & parent edge length \\
-\code{r} & Boolean & true iff node is the root
-\end{tabular}
+\begin{tabular}{|c|l|l|}
+name \NC type \NC meaning \NC\NR
+\HL
+\code{a} \NC integer \NC number of ancestors  \NC\NR
+\code{b} \NC rational \NC support value \NC\NR
+\code{c} \NC integer \NC number of children (direct descendants) \NC\NR
+\code{D} \NC integer \NC total number of descendants (includes children) \NC\NR
+\code{d} \NC numeric \NC depth (distance to root) \NC\NR
+\code{i} \NC Boolean \NC true iff node is strictly internal (i.e., not root!) \NC\NR
+\code{lbl} \NC string \NC label \NC\NR
+\code{l} (ell) \NC Boolean \NC true iff node is a leaf \NC\NR
+\code{L} \NC rational \NC parent edge length \NC\NR
+\code{r} \NC Boolean \NC true iff node is the root
+\stoptabulate
 \stopalignment
 
 Variables \code{b} and \code{lbl} are both derived from the
@@ -677,29 +668,29 @@ of the Scheme language. It just defines a few shorter names to help keep command
 lines compact:
 
 \startalignment[center]
-\begin{tabular}{lcl}
-Scheme & \sched{} short form & meaning \\
-\hline
-\code{not} 	& \code{!} 				& logical negation \\
-\code{and} 	& \code{\&} 			& logical and \\
-\code{or}  	& \code{|} 				& logical or \\
-\code{defined?}	& \code{def?}	& checks if arg is defined
-\end{tabular}
+\begin{tabular}{|l|c|l|}
+Scheme \NC \sched{} short form \NC meaning \NC\NR
+\HL
+\code{not} 	\NC \code{!} 				\NC logical negation \NC\NR
+\code{and} 	\NC \code{\NC\NRNC} 			\NC logical and \\
+\code{or}  	\NC \code{|} 				\NC logical or \NC\NR
+\code{defined?}	\NC \code{def?}	\NC checks if arg is defined
+\stoptabulate
 \stopalignment
 
 Here are a the same examples as above, but for \sched:
 
 \startalignment[center]
-\begin{tabular}{cl}
-expression & selects: \\
-\hline
-\code{l} (lowercase ell) & all leaves \\
-\code{(\& l (<= a 3))} & leaves with 3 ancestors or less \\
-\code{(\& i (def? 'b) (>= b 95))} & internal nodes with support greater than 95\% \\ 
-\code{(\& i (def? 'b) (< b 50)} & unsupported nodes (less than 50\%) \\
-\code{(! r)} & all nodes except the root \\
-\code{(> c 2)} & multifurcating nodes
-\end{tabular}
+\begin{tabular}{|c|l|}
+expression \NC selects: \NC\NR
+\HL
+\code{l} (lowercase ell) \NC all leaves \NC\NR
+\code{(\NC\NRNC l (<= a 3))} \NC leaves with 3 ancestors or less \\
+\code{(\NC\NRNC i (def? 'b) (>= b 95))} \NC internal nodes with support greater than 95\% \\ 
+\code{(\NC\NRNC i (def? 'b) (< b 50)} \NC unsupported nodes (less than 50\%) \\
+\code{(! r)} \NC all nodes except the root \NC\NR
+\code{(> c 2)} \NC multifurcating nodes
+\stoptabulate
 \stopalignment
 
 When it is clear that all inner nodes will have a defined support
@@ -712,16 +703,16 @@ the fixed actions defined by \ed. \sched{} defines most of them, as well as a
 few new ones, as Scheme functions\footnote{Note that you must use Scheme's function call syntax to call the function, \ie, \code{(function [args...])}.}:
 
 \startalignment[center]
-\begin{tabular}{clc}
-code & effect & modifies tree?\\
-\hline
-\code{L! <len>}	& sets the node's parent-edge length to \code{len}	& yes \\
-\code{lbl! <lbl>}	& sets the node's label to \code{lbl}	& yes \\
-\code{o} 				& splice out the node 									& yes \\
-\code{p <arg>} 	& print \code{arg}, then a newline 		& no \\
-\code{s} 				& print the subtree rooted at the node 	& no \\
-\code{u} 				& delete ("unlink") the node (and all descendants) & yes \\
-\end{tabular}
+\begin{tabular}{|c|l|c|}
+code \NC effect \NC modifies tree?\NC\NR
+\HL
+\code{L! <len>}	\NC sets the node's parent-edge length to \code{len}	\NC yes \NC\NR
+\code{lbl! <lbl>}	\NC sets the node's label to \code{lbl}	\NC yes \NC\NR
+\code{o} 				\NC splice out the node 									\NC yes \NC\NR
+\code{p <arg>} 	\NC print \code{arg}, then a newline 		\NC no \NC\NR
+\code{s} 				\NC print the subtree rooted at the node 	\NC no \NC\NR
+\code{u} 				\NC delete ("unlink") the node (and all descendants) \NC yes \NC\NR
+\stoptabulate
 \stopalignment
 
 The \code{l} action of \ed{}, which prints the current node's

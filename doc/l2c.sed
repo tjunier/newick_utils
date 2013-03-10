@@ -44,6 +44,7 @@ s/\\noindent{}//g
 # Formatting, fonts, etc.
 s/\\emph{/{\\em /g
 s/\\textsc/\\cap/g
+s/\\textbf{\([^}]\+\)}/{\\bf \1}/g
 s/\\footnotesize/\\tfx/g
 
 # Cross-references
