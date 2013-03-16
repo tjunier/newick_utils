@@ -86,24 +86,24 @@ well as the expressive power of the languages used; some of them can also
 perform actions at the start or end of the run, or of each input tree. These are
 summarized in the table below.
 
-\startalignment[center]
-	% TODO: ConTeXtify the commented-out stuff below
-	%\begin{minipage}{0.8\textwidth}
-		% see http://ostraya.livejournal.com/250833.html for the "multiple refs to
-		% same footnote in a minipage" trick
-		%\renewcommand{\thefootnote}{\thempfootnote}
-		\starttabulate[|l|l|l|l|]]
-		\NC \NC \ed \NC \sched \NC \luaed \NC\NR
-		\HL
-		\NC language 								\NC own 		\NC Scheme 		\NC Lua \NC\NR
-		\NC programming constructs 	\NC no 			\NC Scheme's 	\NC Lua's \NC\NR
-		\NC functions 							\NC fixed		\NC arbitrary (\ie, user can define their own) \NC arbitrary \NC\NR
-		\NC depends on 							\NC nothing \NC \gnu{} Guile \NC Lua library \NC\NR
-		\NC pre- \& post-tree code 	\NC no 			\NC yes 			\NC yes \NC\NR
-		\NC pre- \& post-run code 	\NC no 			\NC yes 			\NC yes \NC\NR
+\startplacesilenttable
+  \startlocalfootnotes
+
+		\starttabulate[|l|l|l|l|]
+			\NC \NC \ed \NC \sched \NC \luaed \NC\NR
+			\HL
+			\NC language 								\NC own 		\NC Scheme 		\NC Lua \NC\NR
+			\NC programming constructs 	\NC no 			\NC Scheme's 	\NC Lua's \NC\NR
+			\NC functions 							\NC fixed		\NC arbitrary \footnote{(\ie, user can define their own)} \NC arbitrary \NC\NR
+			\NC depends on 							\NC nothing \NC \gnu{} Guile \NC Lua library \NC\NR
+			\NC pre- \& post-tree code 	\NC no 			\NC yes 			\NC yes \NC\NR
+			\NC pre- \& post-run code 	\NC no 			\NC yes 			\NC yes \NC\NR
 		\stoptabulate
-	%\end{minipage}
-\stopalignment
+
+		\placelocalfootnotes
+
+  \stoplocalfootnotes
+\stopplacesilenttable
 
 \subsection[sct:luaed]{\luaed}
 
@@ -641,7 +641,7 @@ node's properties. As in \ed{}, the variables have short names, to keep
 expressions concise. The predefined variables are shown in the table below.
 
 \startalignment[center]
-\begin{tabular}{|c|l|l|}
+\starttabulate[|c|l|l|]
 name \NC type \NC meaning \NC\NR
 \HL
 \code{a} \NC integer \NC number of ancestors  \NC\NR
@@ -668,26 +668,26 @@ of the Scheme language. It just defines a few shorter names to help keep command
 lines compact:
 
 \startalignment[center]
-\begin{tabular}{|l|c|l|}
-Scheme \NC \sched{} short form \NC meaning \NC\NR
+\starttabulate[|l|c|l|]
+\NC Scheme \NC \sched{} short form \NC meaning \NC\NR
 \HL
-\code{not} 	\NC \code{!} 				\NC logical negation \NC\NR
-\code{and} 	\NC \code{\NC\NRNC} 			\NC logical and \\
-\code{or}  	\NC \code{|} 				\NC logical or \NC\NR
-\code{defined?}	\NC \code{def?}	\NC checks if arg is defined
+\NC \code{not} 	\NC \code{!} 	\NC logical negation \NC\NR
+\NC \code{and} 	\NC \code{\&} 	\NC logical and \NC\NR
+\NC \code{or}  	\NC \code{\|} 	\NC logical or \NC\NR
+\NC \code{defined?} \NC \code{def?}	\NC checks if arg is defined  \NC\NR
 \stoptabulate
 \stopalignment
 
 Here are a the same examples as above, but for \sched:
 
 \startalignment[center]
-\begin{tabular}{|c|l|}
+\starttabulate[|c|l|]
 expression \NC selects: \NC\NR
 \HL
 \code{l} (lowercase ell) \NC all leaves \NC\NR
-\code{(\NC\NRNC l (<= a 3))} \NC leaves with 3 ancestors or less \\
-\code{(\NC\NRNC i (def? 'b) (>= b 95))} \NC internal nodes with support greater than 95\% \\ 
-\code{(\NC\NRNC i (def? 'b) (< b 50)} \NC unsupported nodes (less than 50\%) \\
+\code{(\& l (<= a 3))} \NC leaves with 3 ancestors or less \NC\NR
+\code{(\& i (def? 'b) (>= b 95))} \NC internal nodes with support greater than 95\% \NC\NR
+\code{(\& i (def? 'b) (< b 50)} \NC unsupported nodes (less than 50\%) \NC\NR
 \code{(! r)} \NC all nodes except the root \NC\NR
 \code{(> c 2)} \NC multifurcating nodes
 \stoptabulate
@@ -703,7 +703,7 @@ the fixed actions defined by \ed. \sched{} defines most of them, as well as a
 few new ones, as Scheme functions\footnote{Note that you must use Scheme's function call syntax to call the function, \ie, \code{(function [args...])}.}:
 
 \startalignment[center]
-\begin{tabular}{|c|l|c|}
+\starttabulate[|c|l|c|]
 code \NC effect \NC modifies tree?\NC\NR
 \HL
 \code{L! <len>}	\NC sets the node's parent-edge length to \code{len}	\NC yes \NC\NR

@@ -288,6 +288,11 @@ rscale=1.1]
 \setupfloat[remark][strut=yes,frame=off,bottomframe=on,leftframe=on,rightframe=on,framecorner=round,background=screen]
 \setupcaption[remark][frame=on,location=top]
 
+% For "silent" tables, i.e. w/o caption. This is useful when I don't want to
+% number the table, but still want to use \placetable, e.g. to use in-float
+% footnotes.
+\definefloat[silenttable][silenttables][table]
+\setupcaption[silenttable][location=none]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Lists
 
