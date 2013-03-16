@@ -167,19 +167,19 @@ variables have short names, to keep expressions concise. They are shown in table
 		if not specified in the Newick tree, as in cladograms.
 }{%
 	\starttabulate[|c|l|l|]
-		name \NC (Lua) type \NC meaning (refers to the current node)\NC\NR
+		\NC name \NC (Lua) type \NC meaning (refers to the current node)\NC\NR
 		\HL
-		\code{a} \NC integer \NC number of ancestors  \NC\NR
-		\code{b} \NC number \NC support value (or \code{nil}) \NC\NR
-		\code{c} \NC integer \NC number of children (direct descendants) \NC\NR
-		\code{D} \NC integer \NC total number of descendants (includes children) \NC\NR
-		\code{d} \NC number \NC depth (distance to root) \NC\NR
-		\code{i} \NC Boolean \NC true iff node is strictly internal (i.e., not root!) \NC\NR
-		\code{lbl} \NC string \NC label \NC\NR
-		\code{l} (ell) \NC Boolean \NC true iff node is a leaf \NC\NR
-		\code{L} \NC number \NC parent edge length \NC\NR
-		\code{N} \NC node \NC the current node itself \NC\NR
-		\code{r} \NC Boolean \NC true iff node is the root
+		\NC \code{a} \NC integer \NC number of ancestors  \NC\NR
+		\NC \code{b} \NC number \NC support value (or \code{nil}) \NC\NR
+		\NC \code{c} \NC integer \NC number of children (direct descendants) \NC\NR
+		\NC \code{D} \NC integer \NC total number of descendants (includes children) \NC\NR
+		\NC \code{d} \NC number \NC depth (distance to root) \NC\NR
+		\NC \code{i} \NC Boolean \NC true iff node is strictly internal (i.e., not root!) \NC\NR
+		\NC \code{lbl} \NC string \NC label \NC\NR
+		\NC \code{l} (ell) \NC Boolean \NC true iff node is a leaf \NC\NR
+		\NC \code{L} \NC number \NC parent edge length \NC\NR
+		\NC \code{N} \NC node \NC the current node itself \NC\NR
+		\NC \code{r} \NC Boolean \NC true iff node is the root \NC\NR
 	\stoptabulate
 }
 
@@ -190,18 +190,16 @@ override operator precedence or for clarity.
 
 Here are some examples of \luaed{} conditions:
 
-\startalignment[center]
-\starttabulate[cl]
-expression \NC selects: \NC\NR
-\HL
-\code{l} (lowercase ell) \NC all leaves \NC\NR
-\code{l and a <= 3} \NC leaves with 3 ancestors or less \NC\NR
-\code{i and (b \~{ }= nil) and (b >= 95)} \NC internal nodes with support $\geq$ 95\% \NC\NR 
-\code{i and (b \~{ }= nil) and (b < 50)} \NC unsupported nodes (less than 50\%) \NC\NR
-\code{not r} \NC all nodes except the root \NC\NR
-\code{c > 2} \NC multifurcating nodes
+\starttabulate[|c|l|]
+	\NC expression \NC selects: \NC\NR
+	\HL
+	\NC \code{l} (lowercase ell) \NC all leaves \NC\NR
+	\NC \code{l and a <= 3} \NC leaves with 3 ancestors or less \NC\NR
+	\NC \code{i and (b \~{ }= nil) and (b >= 95)} \NC internal nodes with support $\geq$ 95\% \NC\NR 
+	\NC \code{i and (b \~{ }= nil) and (b < 50)} \NC unsupported nodes (less than 50\%) \NC\NR
+	\NC \code{not r} \NC all nodes except the root \NC\NR
+	\NC \code{c > 2} \NC multifurcating nodes \NC\NR
 \stoptabulate
-\stopalignment
 
 Notes:
 \startitemize
@@ -225,17 +223,17 @@ you pass the Lua code in a file, see \in{}[sct:lua_file_input]).
 		the same as \code{s(N)} (where \code{N} means the current node -- see
 		\in{table}[tbl:luaedPredefVar]).
 }{%
-	%\centering
 	\starttabulate[|c|l|c|]
-		code \NC effect \NC modifies tree?\NC\NR
+		\NC code \NC effect \NC modifies tree?\NC\NR
 		\HL
-		\code{o}	\NC splice out the node 									\NC yes \NC\NR
-		\code{s}	\NC print the subtree rooted at the node 	\NC no \NC\NR
-		\code{u} 	\NC delete ("unlink") the node (and all descendants) \NC yes
+		\NC \code{o}	\NC splice out the node 									\NC yes \NC\NR
+		\NC \code{s}	\NC print the subtree rooted at the node 	\NC no \NC\NR
+		\NC \code{u} 	\NC delete ("unlink") the node (and all descendants) \NC yes
+		\NC\NR
 	\stoptabulate
 }
 
-\sched{} defines a "node" type, and the current node is always accessible as
+\luaed{} defines a "node" type, and the current node is always accessible as
 variable \code{N} (other nodes can be obtained through node properties, see
 below).  Node properties can be accessed as fields in a Lua table. Table \in{}[tbl:luaedNodeProp] lists the available node
 fields.
@@ -250,17 +248,18 @@ fields.
 		\code{N.L} can be written just \code{L}, but they are read-only.
 }{%
 	%\center
-	\starttabulate[llcl]
-		name \NC type \NC mode \NC meaning \NC\NR
+	\starttabulate[|l|l|c|l|]
+		\NC name \NC type \NC mode \NC meaning \NC\NR
 		\HL
-		\code{len}, \code{L} 	\NC number 	\NC rw \NC parent edge's length \NC\NR
-		\code{lbl}							\NC string 	\NC rw \NC label \NC\NR
-		\code{b}								\NC number	\NC ro \NC support value \NC\NR
-		\code{par}							\NC node		\NC ro \NC parent \NC\NR
-		\code{first\_child}, \code{fc}  \NC node \NC ro \NC first child \NC\NR
-		\code{last\_child}, \code{lc} 	\NC node \NC ro \NC last child \NC\NR
-		\code{children\_count}, \code{c} 	\NC integer \NC ro \NC number of children \NC\NR
-		\code{kids}							\NC table		\NC ro \NC list of children nodes
+		\NC \code{len}, \code{L} 	\NC number 	\NC rw \NC parent edge's length \NC\NR
+		\NC \code{lbl}							\NC string 	\NC rw \NC label \NC\NR
+		\NC \code{b}								\NC number	\NC ro \NC support value \NC\NR
+		\NC \code{par}							\NC node		\NC ro \NC parent \NC\NR
+		\NC \code{first\_child}, \code{fc}  \NC node \NC ro \NC first child \NC\NR
+		\NC \code{last\_child}, \code{lc} 	\NC node \NC ro \NC last child \NC\NR
+		\NC \code{children\_count}, \code{c} 	\NC integer \NC ro \NC number of children \NC\NR
+		\NC \code{kids}							\NC table		\NC ro \NC list of children nodes
+		\NC\NR
 	\stoptabulate
 }
 
@@ -286,13 +285,13 @@ when they are called.
 	a start-of-the-run hook as well.
 }{
 	\starttabulate[|l|l|]
-		hook name \NC called\ldots \NC\NR
+		\NC hook name \NC called\ldots \NC\NR
 		\HL
-		\code{start\_run} 	\NC before processing any tree \NC\NR
-		\code{start\_tree}	\NC for each tree, before processing \NC\NR
-		\code{node}					\NC for each node \NC\NR
-		\code{stop\_tree}		\NC for each tree, after processing \NC\NR
-		\code{stop\_run}			\NC after processing all trees
+		\NC \code{start\_run} 	\NC before processing any tree \NC\NR
+		\NC \code{start\_tree}	\NC for each tree, before processing \NC\NR
+		\NC \code{node}					\NC for each node \NC\NR
+		\NC \code{stop\_tree}		\NC for each tree, after processing \NC\NR
+		\NC \code{stop\_run}			\NC after processing all trees \NC\NR
 	\stoptabulate
 }
 
@@ -308,9 +307,7 @@ When a node has low support, it may be better to splice it out from the tree,
 reflecting uncertainty about the true topology. Consider the following tree, 
 \filename{HRV\_cg.nw}:
 
-\startalignment[center]
-\externalfigure[ed_3_svg]
-\stopalignment
+\svgFigure{ed_3}
 
 The inner node labels represent bootstrap support, as a percentage of
 replicates. As we can see, some nodes are much better supported than others.
@@ -320,10 +317,7 @@ poorer support. Let's use \luaed's \code{o} function to "open" the nodes with
 less than 50\% support. This means that those nodes will be spliced out, and
 their children attached to their "grandparent":
 
-\typefile{ed_4_svg.cmd}
-\startalignment[center]
-\externalfigure[ed_4_svg]
-\stopalignment
+\svgCmdOutput{ed_4}
 
 Now \id{COXB2} and \id{ECHO6} are siblings of
 \id{ECHO1}, forming a node with 90\% support. What this means is that the
@@ -340,10 +334,7 @@ support.
 Some phylogeny programs return \nw{} trees with an unrealistic number
 of decimal places. For example, the \filename{HRV.nw} tree has six:
 
-\typefile{ed_6_txt.cmd}
-\page[no]
-\typefile{ed_6_txt.out}
-
+\txtCmdOutput{ed_6}
 
 Here I use \nwindent{} to show each node on a line for clarity, and
 show only the last ten.\footnote{the {\em first} ten lines contain only
@@ -351,10 +342,7 @@ opening parentheses.} To format\footnote{\sched{} automatically loads the {\tt
 format} module so that the full-fledged {\tt format} function is available.}
 the lengths to two decimal places, do the following:
 
-\typefile{ed_11_txt.cmd}
-\page[no]
-\typefile{ed_11_txt.out}
-
+\txtCmdOutput{ed_11}
 
 \page[no]
 \subsubsubsection{Multiplying lengths by a constant}
@@ -365,17 +353,11 @@ hypotheses about evolution rates.
 
 Here is our good friend the Catarrhinine tree again:
 
-\typefile{ed_8_svg.cmd}
-\startalignment[center]
-\externalfigure[ed_8_svg]
-\stopalignment
+\svgCmdOutput{ed_8}
 
 To multiply all its branch lengths by (say) 3.5, do the following:
 
-\typefile{ed_12_svg.cmd}
-\startalignment[center]
-\externalfigure[ed_12_svg]
-\stopalignment
+\svgCmdOutput{ed_12}
 
 \subsubsubsection{Implementing other \nutils}
 
@@ -387,12 +369,12 @@ has to start the Lua interpreter, parse the Lua expressions, etc.). But these
 
 \startalignment[center]
 \starttabulate[|l|l|]
-program \NC \luaed{} equivalent \NC\NR
+\NC	program \NC \luaed{} equivalent \NC\NR
 \HL
-\labels{} 						\NC {\tt 'lbl \~{}= ""' 'print(lbl)'}  \NC\NR
-\labels{} {\tt -I} 		\NC {\tt 'l and lbl \~{}= ""' 'print(lbl)'} \NC\NR
-\topology{}						\NC {\tt true 'N.len = ""'} \NC\NR
-\topology{} {\tt -I} 	\NC {\tt true 'N.len = ""; if not l then N.lbl = "" end'}
+\NC \labels{} 						\NC {\tt 'lbl \~{}= ""' 'print(lbl)'}  \NC\NR
+\NC \labels{} {\tt -I} 		\NC {\tt 'l and lbl \~{}= ""' 'print(lbl)'} \NC\NR
+\NC \topology{}						\NC {\tt true 'N.len = ""'} \NC\NR
+\NC \topology{} {\tt -I} 	\NC {\tt true 'N.len = ""; if not l then N.lbl = "" end'} \NC\NR
 \stoptabulate
 \stopalignment
 
@@ -412,10 +394,7 @@ more than one tree per line; moreover there may be blank lines. All these
 conspire to yield wrong tree counts. To solve this, we write a tree counter in
 Lua, and pass it to \luaed. Here is the counter:
 
-\page[no]
-\typefile{ed_13_txt.cmd}
-\typefile{ed_13_txt.out}
-
+\txtCmdOutput{ed_13}
 
 As you can see, I've defined three of the five possible hooks. Before any tree
 is processed, \code{start\_run} is called, which defines variable
@@ -427,12 +406,14 @@ just prints out the count.
 
 Here it is in action. First, the simple case of one tree per line:
 
-\typefile{ed_14_txt.cmd}
-\typefile{ed_14_txt.out}
+\txtCmdOutput{ed_14}
 
-\typefile{ed_15_txt.cmd}
-\typefile{ed_15_txt.out}
+\txtCmdOutput{ed_15}
 
+%TODO: go on calling \txtCmdOutput instead of \typefile below, etc. - replacing
+% bunches of lower-level calls with the higher-level commands defined in
+% nuenv.tex.
+%
 Right. Now how about this one: these are the same trees as in
 \filename{forest}, but all on a single line:
 

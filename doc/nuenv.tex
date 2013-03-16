@@ -144,6 +144,7 @@
 \midaligned{\externalfigure[#1_svg]}%
 \bigskip}
 
+
 % and for text outputs without command line
 \define[1] \txtFigure{%
 \bigskip
@@ -290,7 +291,7 @@ rscale=1.1]
 
 % For "silent" tables, i.e. w/o caption. This is useful when I don't want to
 % number the table, but still want to use \placetable, e.g. to use in-float
-% footnotes.
+% footnotes. But then, maybe I should number tables anyway...
 \definefloat[silenttable][silenttables][table]
 \setupcaption[silenttable][location=none]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
