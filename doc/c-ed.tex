@@ -113,10 +113,7 @@ if this one does what you need it's unlikely you'll need the others.  Let's look
 at an example before we jump into the details. Here is a tree of vertebrate
 genera, showing support values:
 
-\typefile{ed_1_svg.cmd}
-\startalignment[center]
-\externalfigure[ed_1_svg]
-\stopalignment
+\svgCmdOutput{ed_1}
 
 Let's extract all well-supported clades, using a support value of
 95\% or more as the criterion for being well-supported. In our jargon, the
@@ -125,10 +122,7 @@ Let's extract all well-supported clades, using a support value of
 that this value be no less than 95. The {\em action} would simply be to print
 out the tree rooted at the current node.
 
-\typefile{ed_10_txt.cmd}
-\page[no]
-\typefile{ed_10_txt.out}
-
+\txtCmdOutput{ed_10}
 
 Note that the \id{(Papio,(Hylobates,Homo))} clade appears twice -- once on
 its own, and once within a larger clades (the tetrapods). This is because both
@@ -410,26 +404,18 @@ Here it is in action. First, the simple case of one tree per line:
 
 \txtCmdOutput{ed_15}
 
-%TODO: go on calling \txtCmdOutput instead of \typefile below, etc. - replacing
-% bunches of lower-level calls with the higher-level commands defined in
-% nuenv.tex.
-%
 Right. Now how about this one: these are the same trees as in
 \filename{forest}, but all on a single line:
 
-\typefile{ed_16_txt.cmd}
-\typefile{ed_16_txt.out}
+\txtCmdOutput{ed_16}
 
-\typefile{ed_17_txt.cmd}
-\typefile{ed_17_txt.out}
+\txtCmdOutput{ed_17}
 
 \luaed{} is not fooled! And this is the opposite case -- an indented tree, which has one {\em node} per line:
 
-\typefile{ed_18_txt.cmd}
-\typefile{ed_18_txt.out}
+\txtCmdOutput{ed_18}
 
-\typefile{ed_19_txt.cmd}
-\typefile{ed_19_txt.out}
+\txtCmdOutput{ed_19}
 
 There's no confusing our tree counter, it seems. Note that in future versions I
 might well make this unnecessary by supplying a predefined variable which counts
@@ -443,20 +429,13 @@ Defaucheux for this example.} Here is a tree with unlabeled inner nodes (I hide
 the branch lengths lest they obscure the inner node labels, which will also be
 numeric):
 
-\typefile{ed_22_svg.cmd}
-\startalignment[center]
-\externalfigure[ed_22_svg]
-\stopalignment
+\svgCmdOutput{ed_22}
 
 A solution is the following \luaed{} script:
 
-\typefile{ed_20_txt.cmd}
-\typefile{ed_20_txt.out}
+\txtCmdOutput{ed_20}
 
-\typefile{ed_21_svg.cmd}
-\startalignment[center]
-\externalfigure[ed_21_svg]
-\stopalignment 
+\svgCmdOutput{ed_21}
 
 \subsubsubsection{Extracting deep, well-supported clades}
 
@@ -469,10 +448,7 @@ For this option to be useful, though, the tree must be processed from the root
 to the leaves, which is the opposite of the default (namely, \no). To override
 this, we pass option \code{-r} ("reverse"):
 
-\typefile{ed_23_txt.cmd}
-\page[no]
-\typefile{ed_23_txt.out}
-
+\txtCmdOutput{ed_23}
 
 All overlap has now disappeared: the
 \id{(Papio,(Hylobates,Homo))} clade is no longer printed on its own. 
@@ -483,14 +459,18 @@ I intend to develop \luaed{} further. Among the items in my TODO list are a few
 new predefined variables (number of records, root of the tree, more powerful
 structure-altering functions, etc).
 
+%%%% nw_ed
+%
+
 \subsection{\ed}
 
 {\bf Note}: it is likely that \luaed{} (\in{}[sct:luaed]) will be more useful
 than \ed. See also \in{section}[sct_ed] for a general intro to the stream
 editing programs. This section gives a minimal description of \ed, without
+delving further in examples.
 
-The two parameters of \ed{} (besides the input file) are the
-condition and the action. 
+As in \luaed, the two parameters of \ed{} (besides the input file) are the
+{\it condition} and the {\it action}. 
 
 \subsubsection{Conditions}
 
@@ -500,18 +480,18 @@ one-letter names, to keep expressions short (after all, they are passed on the
 command line). There are two types, numeric and Boolean.
 
 \startalignment[center]
-\starttabulate[|c|l|l|]
-name \NC type \NC meaning \NC\NR
-\HL
-\code{a} \NC numeric \NC number of ancestors of node	 \NC\NR
-\code{b} \NC numeric \NC node's support value (or zero) \NC\NR
-\code{c} \NC numeric \NC node's number of children (direct) \NC\NR
-\code{D} \NC numeric \NC node's number of descendants (includes children) \NC\NR
-\code{d} \NC numeric \NC node's depth (distance to root) \NC\NR
-\code{i} \NC Boolean \NC true iff node is strictly internal (i.e., not root!) \NC\NR
-\code{l} (ell) \NC Boolean \NC true iff node is a leaf \NC\NR
-\code{r} \NC Boolean \NC true iff node is the root
-\stoptabulate
+	\starttabulate[|c|l|l|]
+		\NC name \NC type \NC meaning \NC\NR
+		\HL
+		\NC \code{a} \NC numeric \NC number of ancestors of node	 \NC\NR
+		\NC \code{b} \NC numeric \NC node's support value (or zero) \NC\NR
+		\NC \code{c} \NC numeric \NC node's number of children (direct) \NC\NR
+		\NC \code{D} \NC numeric \NC node's number of descendants (includes children) \NC\NR
+		\NC \code{d} \NC numeric \NC node's depth (distance to root) \NC\NR
+		\NC \code{i} \NC Boolean \NC true iff node is strictly internal (i.e., not root!) \NC\NR
+		\NC \code{l} (ell) \NC Boolean \NC true iff node is a leaf \NC\NR
+		\NC \code{r} \NC Boolean \NC true iff node is the root \NC\NR
+	\stoptabulate
 \stopalignment
 
 The logical and relational operators work as expected, here is the list, in
@@ -519,52 +499,53 @@ order of precedence, from tightest to loosest-binding.  Anyway, you can use
 parentheses to override precedence, so don't worry.
 
 \startalignment[center]
-\starttabulate[|c|l|]
-\NC symbol 		\NC operator \NC\NR
-\HL
-\NC \code{!} 	\NC logical negation \NC\NR
-\HL
-\NC \code{==}	\NC equality \NC\NR
-\NC \code{!=} \NC inequality \NC\NR
-\NC \code{<} 	\NC greater than \NC\NR
-\NC \code{>} 	\NC lesser than \NC\NR
-\NC \code{>=} \NC greater than or equal to \NC\NR
-\NC \code{<=} \NC lesser than or equal to \NC\NR
-%\HL
-%\NC \code{\&} \NC logical {\em and} \NC\NR
-%\HL
-%\NC \code{|} 	\NC logical {\em or} \NC\NR
-\stoptabulate
+	\starttabulate[|c|l|]
+		\NC symbol 		\NC operator \NC\NR
+		\HL
+		\NC \code{!} 	\NC logical negation \NC\NR
+		\HL
+		\NC \code{==}	\NC equality \NC\NR
+		\NC \code{!=} \NC inequality \NC\NR
+		\NC \code{<} 	\NC greater than \NC\NR
+		\NC \code{>} 	\NC lesser than \NC\NR
+		\NC \code{>=} \NC greater than or equal to \NC\NR
+		\NC \code{<=} \NC lesser than or equal to \NC\NR
+		\HL
+		\NC \code{\&} \NC logical {\em and} \NC\NR
+		\HL
+		\NC \code{\|} 	\NC logical {\em or} \NC\NR
+	\stoptabulate
 \stopalignment
 
 Here are a few examples:
 
 \startalignment[center]
-\starttabulate[|c|l|]
-\NC expression \NC selects: \NC\NR
-\HL
-\NC \code{l} \NC all leaves \NC\NR
-\NC \code{l \& a <= 3} \NC leaves with 3 ancestors or less \NC\NR
-\NC \code{i \& (b >= 95)} \NC internal nodes with support greater than 95\% \NC\NR 
-\NC \code{i \& (b < 50)} \NC unsupported nodes (less than 50\%) \NC\NR
-\NC \code{!r} \NC all nodes except the root \NC\NR
-\NC \code{c > 2} \NC multifurcating nodes
-\stoptabulate
+	\starttabulate[|c|l|]
+		\NC expression \NC selects: \NC\NR
+		\HL
+		\NC \code{l} \NC all leaves \NC\NR
+		\NC \code{l \& a <= 3} \NC leaves with 3 ancestors or less \NC\NR
+		\NC \code{i \& (b >= 95)} \NC internal nodes with support greater than 95\% \NC\NR 
+		\NC \code{i \& (b < 50)} \NC unsupported nodes (less than 50\%) \NC\NR
+		\NC \code{!r} \NC all nodes except the root \NC\NR
+		\NC \code{c > 2} \NC multifurcating nodes \NC\NR
+	\stoptabulate
 \stopalignment
 
 \subsubsection{Actions}
 
-The actions are also coded by a single letter, for the same reason. The following are implemented:
+The actions are also coded by a single letter, again for brevity's sake. The
+following are implemented:
 
 \startalignment[center]
-\starttabulate[|c|l|c|]
-code \NC effect \NC modifies tree?\NC\NR
-\HL
-\code{d} \NC delete the node (and all descendants) \NC yes \NC\NR
-\code{l} \NC print the node's label \NC no \NC\NR
-\code{o} \NC splice out the node \NC yes \NC\NR
-\code{s} \NC print the subtree rooted at the node \NC no \NC\NR
-\stoptabulate
+	\starttabulate[|c|l|c|]
+		\NC code \NC effect \NC modifies tree?\NC\NR
+		\HL
+		\NC \code{d} \NC delete the node (and all descendants) \NC yes \NC\NR
+		\NC \code{l} \NC print the node's label \NC no \NC\NR
+		\NC \code{o} \NC splice out the node \NC yes \NC\NR
+		\NC \code{s} \NC print the subtree rooted at the node \NC no \NC\NR
+	\stoptabulate
 \stopalignment
 
 I have no plans to implement any other actions, as this can be done easily
@@ -572,7 +553,7 @@ with \luaed{} (or \sched).
 
 \subsection{\sched}
 
-\bf{Note}: it is likely that \luaed{} (\in{}[sct:luaed]) will be more
+{\bf Note}: it is likely that \luaed{} (\in{}[sct:luaed]) will be more
 convenient than \sched. See also \in{section}[sct_ed] for a general intro to the
 stream editing programs. This section gives a minimal description of \sched,
 with no motivation and only a few examples (see \in{}[sct:luaed] for more).
@@ -588,10 +569,7 @@ is \code{(sin x)}, \code{(< 3 2)} is false, etc.
 As a first example, let's again extract all
 well-supported clades from the tree of vertebrate genera, as we did with \luaed.
 
-\typefile{ed_5_txt.cmd}
-\page[no]
-\typefile{ed_5_txt.out}
-
+\txtCmdOutput{ed_5}
 
 The expression \code{((\& (def? 'b) (>= 95 b)) (s))} parses as follows:
 \startitemize
