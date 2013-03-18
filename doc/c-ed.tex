@@ -551,6 +551,10 @@ following are implemented:
 I have no plans to implement any other actions, as this can be done easily
 with \luaed{} (or \sched).
 
+
+%%%%% nw_sched
+
+
 \subsection{\sched}
 
 {\bf Note}: it is likely that \luaed{} (\in{}[sct:luaed]) will be more
@@ -566,29 +570,28 @@ need to know that operators {\em precede} their arguments, as do function
 names, so that the sum of 2 and 2 is written \code{(+ 2 2)}, the sine of $x$
 is \code{(sin x)}, \code{(< 3 2)} is false, etc.
 
-As a first example, let's again extract all
-well-supported clades from the tree of vertebrate genera, as we did with \luaed.
+As a first example, let's again extract all well-supported clades from the tree
+of vertebrate genera, as we did with \luaed.
 
 \txtCmdOutput{ed_5}
 
 The expression \code{((\& (def? 'b) (>= 95 b)) (s))} parses as follows:
 \startitemize
-	\item the first element (or \code{car}, in Scheme parlance),
-	\code{(\& (def? 'b) (>= 95 b))}, is the selector.  It is a Boolean
-	expression, namely a conjunction (\code{\&})\footnote{\code{\&} is
-	a short name for the Scheme form \code{and}, which is defined by
-	\sched{} to allow for shorter expressions on the command line.} of the
-	expressions \code{(def? 'b)} and \code{(>= 95 b)}.  The former
-	checks that variable \code{b} (bootstrap support) is
-	defined\footnote{In \ed, \code{b} was zero if the support was not
-	defined. \sched{} distinguishes between undefined and zero, which is
-	why one has to check that \code{b} is defined before using it.
-	\code{def?} is just a shorter name for \code{defined?}.}, and the
-	latter is true iff \code{b} is not smaller than 95.
-	\item the second element (\code{cadr} in Scheme jargon),
-	\code{(s)}, is the action -- in this case, a call to function
-	\code{s}, which has the same meaning as action \code{s} in \ed,
-	namely to print out the subclade rooted at the current node.
+	\item the first element (or \code{car}, in Scheme parlance), \code{(\& (def?
+	'b) (>= 95 b))}, is the condition.  It is a Boolean expression, namely a
+	conjunction (\code{\&})\footnote{\code{\&} is a short name for the Scheme form
+	\code{and}, which is defined by \sched{} to allow for shorter expressions on
+	the command line.} of the expressions \code{(def? 'b)} and \code{(>= 95 b)}.
+	The former checks that variable \code{b} (bootstrap support) is
+	defined\footnote{In \ed, \code{b} was zero if the support was not defined.
+	\sched{} distinguishes between undefined and zero, which is why one has to
+	check that \code{b} is defined before using it.  \code{def?} is just a shorter
+	name for \code{defined?}.}, and the latter is true iff \code{b} is not smaller
+	than 95.
+	\item the second element (\code{cadr} in Scheme jargon), \code{(s)}, is the
+	action -- in this case, a call to function \code{s}, which has the same
+	meaning as action \code{s} in \ed, namely to print out the subclade rooted at
+	the current node.
 \stopitemize
 
 \subsubsection{Selectors}
@@ -601,18 +604,18 @@ expressions concise. The predefined variables are shown in the table below.
 
 \startalignment[center]
 \starttabulate[|c|l|l|]
-name \NC type \NC meaning \NC\NR
+\NC name \NC type \NC meaning \NC\NR
 \HL
-\code{a} \NC integer \NC number of ancestors  \NC\NR
-\code{b} \NC rational \NC support value \NC\NR
-\code{c} \NC integer \NC number of children (direct descendants) \NC\NR
-\code{D} \NC integer \NC total number of descendants (includes children) \NC\NR
-\code{d} \NC numeric \NC depth (distance to root) \NC\NR
-\code{i} \NC Boolean \NC true iff node is strictly internal (i.e., not root!) \NC\NR
-\code{lbl} \NC string \NC label \NC\NR
-\code{l} (ell) \NC Boolean \NC true iff node is a leaf \NC\NR
-\code{L} \NC rational \NC parent edge length \NC\NR
-\code{r} \NC Boolean \NC true iff node is the root
+\NC \code{a} \NC integer \NC number of ancestors  \NC\NR
+\NC \code{b} \NC rational \NC support value \NC\NR
+\NC \code{c} \NC integer \NC number of children (direct descendants) \NC\NR
+\NC \code{D} \NC integer \NC total number of descendants (includes children) \NC\NR
+\NC \code{d} \NC numeric \NC depth (distance to root) \NC\NR
+\NC \code{i} \NC Boolean \NC true iff node is strictly internal (i.e., not root!) \NC\NR
+\NC \code{lbl} \NC string \NC label \NC\NR
+\NC \code{l} (ell) \NC Boolean \NC true iff node is a leaf \NC\NR
+\NC \code{L} \NC rational \NC parent edge length \NC\NR
+\NC \code{r} \NC Boolean \NC true iff node is the root \NC\NR
 \stoptabulate
 \stopalignment
 
