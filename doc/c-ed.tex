@@ -660,28 +660,28 @@ value, one can leave out the \code{(def? 'b)} clause.
 
 \subsubsection{Actions}
 
-Actions are arbitrary Scheme expressions, so they are much more flexible than
+Actions are arbitrary scheme expressions, so they are much more flexible than
 the fixed actions defined by \ed. \sched{} defines most of them, as well as a
-few new ones, as Scheme functions\footnote{Note that you must use Scheme's function call syntax to call the function, \ie, \code{(function [args...])}.}:
+few new ones, as scheme functions\footnote{note that you must use scheme's function call syntax to call the function, \ie, \code{(function [args...])}.}:
 
 \startalignment[center]
-\starttabulate[|c|l|c|]
-code \NC effect \NC modifies tree?\NC\NR
-\HL
-\code{L! <len>}	\NC sets the node's parent-edge length to \code{len}	\NC yes \NC\NR
-\code{lbl! <lbl>}	\NC sets the node's label to \code{lbl}	\NC yes \NC\NR
-\code{o} 				\NC splice out the node 									\NC yes \NC\NR
-\code{p <arg>} 	\NC print \code{arg}, then a newline 		\NC no \NC\NR
-\code{s} 				\NC print the subtree rooted at the node 	\NC no \NC\NR
-\code{u} 				\NC delete ("unlink") the node (and all descendants) \NC yes \NC\NR
-\stoptabulate
+	\starttabulate[|c|l|c|]
+		\NC code \NC effect \NC modifies tree?\NC\NR
+		\HL
+		\NC \code{l! <len>}	\NC sets the node's parent-edge length to \code{len}	\NC yes \NC\NR
+		\NC \code{lbl! <lbl>}	\NC sets the node's label to \code{lbl}	\NC yes \NC\NR
+		\NC \code{o} 				\NC splice out the node 									\NC yes \NC\NR
+		\NC \code{p <arg>} 	\NC print \code{arg}, then a newline 		\NC no \NC\NR
+		\NC \code{s} 				\NC print the subtree rooted at the node 	\NC no \NC\NR
+		\NC \code{u} 				\NC delete ("unlink") the node (and all descendants) \NC yes \NC\NR
+	\stoptabulate
 \stopalignment
 
 The \code{l} action of \ed{}, which prints the current node's
 label, can be achieved in \sched{} with the more general \code{p} function:
 \code{(p lbl)}.
 
-The \code{L!} function sets the current node's parent-edge length. It accepts
+The \code{l!} function sets the current node's parent-edge length. It accepts
 a string or a number. If the argument is a string, it attempts to convert it to
 a number. If this fails, the edge length is undefined. The \code{lbl!}
 function sets the current node's label. Its argument is a string.
