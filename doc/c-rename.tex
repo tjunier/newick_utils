@@ -1,0 +1,91 @@
+%&context
+
+\section[sct_rename]{Renaming nodes}
+
+
+Renaming nodes is the rather boring operation of changing a node's label. It
+can be done \eg{} for the following reasons:
+\startitemize
+	\item building a higher-level tree (\ie, a families tree from a tree of genera, etc)
+	\item mapping one namespace into another (see \in{}[sct_10_char_limit])
+	\item correcting wrong names
+\stopitemize
+
+\noindent{}Renaming is done with \rename. This takes a {\em renaming map},
+which is just a text file with the old and new names on the same line.
+
+\subsection[sct_10_char_limit]{Breaking the 10-character limit in \phylip{} alignments}
+
+
+A technical hurdle with phylogenies is that some programs do not accept names
+longer than, say, 10 characters in the \phylip{} alignment. But of
+course, many scientific names or sequence \cap{ID}s are longer than that.
+One solution is to rename the sequences, before constructing the tree, using a
+numerical scheme, \eg{}, \sciname{Strongylocentrotus purpuratus} $\rightarrow$
+\id{ID\_01}, etc. This means we have an alignment of the following form:
+\starttyping
+ 154 259
+ID_01     PTTSNSAPAL DAAETGHTSG ...
+ID_02     SVSSHSVPAL DAAETGHTSS ...
+...
+\stoptyping
+together with a renaming map, \filename{id2longname.map}:
+\starttyping
+ID_01	Strongylocentrotus_purpuratus
+ID_02	Harpagofututor_volsellorhinus
+...
+\stoptyping
+The alignment's \cap{ID}s are now sufficiently short, and we can use it to
+make a tree. It will look something like this:
+
+\svgCmdOutput{rename_1}
+
+\noindent{}Not very informative, huh? But we can put back the original, long
+names :
+
+\svgCmdOutput{rename_2}
+(option \code{-W} specifies the mean width of label characters, in
+pixels -- use it when the default is wrong, as in this case with very long
+labels and small characters)
+
+\noindent{}Now that's better\ldots although exactly what these critters are
+might not be evident. Not to worry, I've made another map and I can rename the
+tree a second time on the fly:
+
+\svgCmdOutput{rename_3}
+
+\subsection[sct_higher_rank]{Higher-rank trees}
+
+
+Here is a tree of a few dozen enterovirus and rhinovirus isolates. I show it as
+a cladogram (using \topology, see \in{}[sct_topology]) because branch lengths do
+not matter here. I know that these isolates belong to three species in two
+genera: human rhinovirus A (\id{hrv-a}), human rhinovirus B
+(\id{hrv-b}, and enterovirus (\id{hev}). 
+
+\svgCmdOutput{rename_4}
+
+\noindent{}I want to see if the tree correctly groups isolates of the same
+species together. So I use a renaming map that maps an isolate name to its
+species (note by the way that the map file can have comment, whitespace-only
+and empty lines (which are all ignored), just like \cap{css} maps (see
+\in{}[sct_display_svg_css]):
+\starttyping
+# These species belong to HRV-A
+HRV16 HRV-A
+HRV1B HRV-A
+...
+# HRV-B
+HRV37 HRV-B
+HRV14 HRV-B
+...
+# Enterovirus
+POLIO1A HEV
+COXA17 HEV
+\stoptyping
+
+\svgCmdOutput{rename_5}
+
+\noindent{}As we can see, it does. This would be even better if we could
+somehow simplify the tree so that clades of the same species were reduced to a
+single leaf. And, that's exactly what \condense{} does (see below).

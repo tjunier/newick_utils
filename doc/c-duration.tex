@@ -1,0 +1,65 @@
+%&context
+
+\section[sct_duration]{Converting Node Ages to Durations}
+
+Sometimes you have information about the \emph{age} of a node rather than the
+length of its branch. Consider the following phylogeny of major chordate groups:
+
+\startalignment[center]
+ \externalfigure[duration_1_svg]
+\stopalignment
+
+Suppose we have the following information about the age of certain events (not
+that it matters, I found it in Wikipedia and the Palaeos website (\from[URL:palaeos]).
+
+\smallskip
+
+\starttabulate[|l|r|]
+\NC {\bf event} \NC {\bf age} [million years ago]\NC\NR
+\HL
+\NC split of vertebrates into gnathostomes and conodonts \NC 530 \NC\NR
+\NC extinction of conodonts \NC 200 \NC\NR
+\NC split of chordates into vertebrates and urochordates \NC 540 \NC\NR
+\stoptabulate
+
+\smallskip
+
+We can use the "branch length" field of Newick to specify ages, like
+this:
+
+\nwCmdOutput{duration_2}
+
+The "branch length" of \id{Vertebrata} becomes \code{530},
+because the vertebrate lineage split into conodonts and gnathostomes at that
+date\footnote{Of course there are other branches in the vertebrate lineage, but
+they are not shown in this tree}. Note that the \code{Gnathostomata} leaf has
+no age: this means that there are still living gnathostomes (such as you and
+I\footnote{Well, at least \emph{I} am one}); the same goes for urochordates.
+In other words, a leaf with no age has an implicit age of zero. This also
+ensures that the leaves of the extant taxa are aligned.  The \id{Conodonta},
+on the other hand, has an age although it is a leaf: this is because the
+conodonts went extinct, around \code{200} Mya.
+
+Now, if we were to display this tree without further ado, it would be nonsense.
+We have to convert the ages into durations, and this is the function of
+\duration{}:
+
+\svgCmdOutput{duration_3}
+
+We can improve the graph by supplying option \code{-t} to
+\display{}: this aligns the origin of the scale bar with the leaves and counts
+backwards. To top it off, we'll specify the units as million years ago:
+
+\svgCmdOutput{duration_4}
+
+
+Since you're curious, here is what the \filename{age.nw} tree looks like if we
+"forget" to run it through \duration:
+
+\svgCmdOutput{duration_5}
+
+Now it looks as though only the conodonts are still alive, while the
+gnathostomes and urochordates each had brief flashes of existence 200 and 730
+million years ago, respectively. Don't show this to a palaeontologist.
+
+

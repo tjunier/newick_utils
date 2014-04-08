@@ -1,3 +1,5 @@
+%&context
+
 \startenvironment nuenv
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -19,6 +21,7 @@
 \define[1] \progname{{\tt #1}}
 \define[1] \sciname{{\em #1}}	% Scientific name in italics
 \define[1] \email{{\tt #1}}
+\define[1] \id{{\tt #1}}
 %\define[1] \degC{$#1\,^{\circ}{\rm C}$}
 
 % frequent acronyms, abbreviations, aliases, etc.
@@ -67,6 +70,7 @@
 \define \pdf{\cap{pdf}}
 %\define \pecan{Pecan}
 \define \phylip{\cap{phylip}}
+\define \phyml{Phy\cap{ml}}
 \define \picornaviridae{\sciname{Picornaviridae}} % apparently virus familiy names take italics
 \define \rna{\cap{rna}}
 %\define \scone{\cap{scone}}
@@ -110,18 +114,52 @@
 
 % This puts the command and its output, which normally end in _txt.cmd and
 % _txt.out, respectively, on the same page.
-\define[1] \txtoutput{%
+\define[1] \txtCmdOutput{%
+\bigskip%
 \startsamepage%
 \typefile{#1_txt.cmd}%
 \typefile{#1_txt.out}%
-\stopsamepage}
+\stopsamepage%
+\bigskip}
 
-% Save for SVGs
-\define[1] \svgoutput{%
+% Same for SVGs
+\define[1] \svgCmdOutput{%
 \startsamepage%
+\bigskip
 \typefile{#1_svg.cmd}%
 \midaligned{\externalfigure[#1_svg]}%
+\bigskip
 \stopsamepage}
+
+% ... and for Newick (rare, but does occur - e.g., nw_indent)
+\define[1] \nwCmdOutput{%
+\bigskip%
+\startsamepage%
+\typefile{#1_nw.cmd}%
+\typefile{#1_nw.out}%
+\stopsamepage%
+\bigskip}
+
+% For SVGs without command line
+\define[1] \svgFigure{%
+\bigskip
+\midaligned{\externalfigure[#1_svg]}%
+\bigskip}
+
+
+% and for text outputs without command line
+\define[1] \txtFigure{%
+\bigskip
+\startsamepage
+\typefile{#1}%
+\stopsamepage
+\bigskip
+\bigskip}
+
+% for TODO items
+\define[1] \toDo{%
+\color[red]{[TODO: #1]}%
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Environments
@@ -206,8 +244,6 @@ rscale=1.1]
 	after={\stopdoctitleframe \blank[4*big]},
 ]
 
-%\startframedtext[align=center,width=\textwidth]
-
 \setuphead[subsubsubsection][number=no,style={\switchtobodyfont[14pt]\bf}]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -223,26 +259,18 @@ rscale=1.1]
 % URLs
 %
 % \setupurl[style=type]
-% \useURL[ensembl][http://www.ensembl.org/index.html]
-% \useURL[viralzone][http://expasy.org/viralzone]
-% \useURL[ictvdb][http://www.ictvdb.org]
-% \useURL[cdc-non-polio][http://www.cdc.gov/ncidod/dvrd/revb/enterovirus/non-polio_entero.htm]
 \useURL[URL:newick-format][http://evolution.genetics.washington.edu/phylip/newicktree.html]
 \useURL[URL:Inkscape][http://www.inkscape.org]
 \useURL[URL:CSS][www.w3.org/Style/CSS]
 \useURL[URL:CEGG-NU][http://cegg.unige.ch/newick_utils]
 \useURL[URL:Github][https://github.com/tjunier/newick_utils/wiki]
+\useURL[URL:Hominoidea][http://en.wikipedia.org/wiki/Hominoidea]
+\useURL[URL:palaeos][www.palaeos.com]
+\useURL[URL:Scheme][http://www.r6rs.org]
+\useURL[URL:Guile][http://www.gnu.org/software/guile]
+\useURL[URL:Lua][http://www.lua.org]
+\useURL[URL:Valgrind][http://www.valgrind.org]
 
-% \useURL[ToL][http://www.tolweb.org]
-% \useURL[GOLD][http://genomesonline.org/gold\_statistics.htm]
-% \useURL[unit-tests][http://www.extremeprogramming.org/rules/unittests.html]
-% \useURL[XP][http://www.extremeprogramming.org/index.html]
-% \useURL[vista][http://genome.lbl.gov/vista/index.shtml]
-% \useURL[ecr][http://ecrbrowser.dcode.org/]
-% \useURL[ucsc][http://genome.ucsc.edu/]
-% \useURL[GOTM][http://bioinfo.vanderbilt.edu/webgestalt/]
-
-	
 % NOTE: I use this to wrap URLs (using '||' to mark breakpoints at slashes). On
 % my Fedora box it works (i.e., it inserts a '/' when needed), but it seems to
 % fail under Ubuntu.
@@ -263,6 +291,11 @@ rscale=1.1]
 \setupfloat[remark][strut=yes,frame=off,bottomframe=on,leftframe=on,rightframe=on,framecorner=round,background=screen]
 \setupcaption[remark][frame=on,location=top]
 
+% For "silent" tables, i.e. w/o caption. This is useful when I don't want to
+% number the table, but still want to use \placetable, e.g. to use in-float
+% footnotes. But then, maybe I should number tables anyway...
+\definefloat[silenttable][silenttables][table]
+\setupcaption[silenttable][location=none]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Lists
 

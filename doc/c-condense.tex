@@ -1,0 +1,37 @@
+%&context
+
+\section[sct_condense]{Condensing}
+
+
+Condensing a tree means reducing its size in a systematic, meaningful way
+(compare this to {\em pruning} (\in{}[sct_prune]) which arbitrarily removes
+branches, and to {\em trimming} (\in{}[sct_trim]) which cuts a tree at a
+specified depth). Currently the only condensing method available is
+simplifying clades in which all leaves have the same label - for example
+because they belong to the same taxon, etc. Consider this tree:
+
+\svgFigure{condense_1}
+
+it has a clade that consists only of A, another of only C, plus a B
+leaf.  Condensing will replace those clades by an A and a C leaf,
+respectively:
+
+\svgCmdOutput{condense_2}
+
+Now the A and B leaves stand for whole clades. The tree is simpler,
+but the information about the relationships of A, B and C is conserved, while
+the details of the A and C clades is not.  A typical use of this is producing
+genus trees from species trees (or any higher-level tree from a lower-level
+one), or checking consistency with other data: For example condensing the virus
+tree of \in{section}[sct_higher_rank] gives this:
+
+\svgFigure{condense_3}
+
+The relationships between the species is now evident -- as is the
+fact that the various isolates do cluster within species in the first place.
+This need not be the case, and renaming-then-condensing is a useful technique
+for checking this kind of consistency in a tree (see
+\in{}[sct_check_consistency] for more examples).
+
+\subsection[sct:condense:map]{Condensing with a map}
+\toDo{add stuff about option \code{-m} (on branch \code{master})}

@@ -7,7 +7,9 @@
 .PHONY: install
 .PHONY: check
 
-all: nwutils_tutorial.pdf
+NW_DISPLAY_TEXT_STYLE := slashes
+
+all: manual.pdf
 	
 ################################################################
 # Implicit rules 
@@ -73,8 +75,9 @@ check:
 # to show the value of variables (debugging)
 show:
 	echo $(PATH)
+	echo $(NW_DISPLAY_TEXT_STYLE)
 
-nwutils_tutorial.pdf: *.tex *.bib \
+manual.pdf: *.tex *.bib \
 	$(regular_pdfs) css.map \
 	$(regular_svg_command_strings) \
 	$(newick_command_outputs) \
@@ -111,4 +114,4 @@ clean-images: clean
 
 # leaves a blank slate to start from scratch
 distclean: clean-images
-	$(RM) nwutils_tutorial.pdf
+	$(RM) manual.pdf

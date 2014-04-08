@@ -1,0 +1,118 @@
+\section[sct:distance]{Extracting Distances}
+
+\distance{} prints distances between nodes, in various ways.  By default, it
+prints the distance from the root of the tree to each labeled leaf, in \nw{}
+order. Let's look at distances in the catarrhinian tree:
+
+\svgFigure{display_3}
+
+\txtCmdOutput{dist_1}
+
+\noindent{}This means that the distance from the root to \id{Gorilla} is
+56, etc. The distances are in the same units as the tree's branch lengths --
+usually substitutions per site, but this is not specified in the tree itself.
+If the tree is a cladogram, the distances are expressed in numbers of
+ancestors.  Option \code{-n} shows the labels:
+
+\txtCmdOutput{dist_2}
+
+There are two main parameters to \distance: the {\em method} and the
+{\em selection}. The method determines how to compute the distance (from what
+node to what node), and the selection determines for which nodes the program is
+to compute distances. Let's look at examples.
+
+\subsection{Selection}
+
+In this section we will show the different selection types, using the default
+distance method (\ie{}, from the tree's root -- see below). The selection type
+is the argument to option \code{-s}.  The nodes appear in the same order as
+in the Newick tree, except when they are specified on the command line (see
+below).
+
+To illustrate the selection types, we need a tree that has both labeled and
+unlabeled leaves and inner nodes. Here it is:
+
+\svgCmdOutput{dist_3}
+
+We will use option \code{-n} to see the node labels.
+
+\subsubsection{All labeled leaves}
+
+The selection consists of all leaves with a label. This is the default, as
+leaves will mostly be labeled and we're generally more interested in leaves
+than inner nodes.
+\txtCmdOutput{dist_4}
+
+\subsubsection{All labeled nodes}
+
+Option \code{-s l}. This takes all labeled nodes into account, whether they are leaves or inner nodes.
+\txtCmdOutput{dist_5}
+
+\subsubsection{All leaves}
+
+Option \code{-s f}. Selects all leaves, whether they are
+labeled or not.
+\txtCmdOutput{dist_6}
+
+\subsubsection{All inner nodes}
+
+Option \code{-s i}. Selects the inner nodes, labeled or not.
+\txtCmdOutput{dist_9}
+
+\subsubsection{All nodes}
+
+Option \code{-s a}. All nodes are selected.
+\txtCmdOutput{dist_7}
+
+\subsubsection{Command line selection}
+
+The selection consists of the nodes whose labels are passed as arguments on the
+command line (after the file name). The distances are printed in the same
+order.
+
+\txtCmdOutput{dist_8}
+
+\subsection{Methods}
+
+In this section we will take the default selection and vary the method. The
+method is passed as argument to option \code{-m}. I will also use an
+\adhoc{} tree to illustrate the methods:
+
+\svgCmdOutput{dist_11}
+
+\noindent{}As explained above, the default selection consists of all labeled
+leaves -- in our case, nodes \id{A}, \id{B} and \id{C}. 
+
+\subsubsection{Distance from the tree's root}
+
+This is the default method: for each node in the selection, the program prints
+the distance from the tree's root to the node. This was shown above, so I
+won't repeat it here.
+
+\subsubsection{Distance from the last common ancestor}
+Option \code{-m l}. The program computes the \lca{} of all nodes in the
+selection (in our case, node \id{e}), and prints out the distance from
+that node to all nodes in the selection.
+\txtCmdOutput{dist_10}
+
+\subsubsection{Distance from the parent}
+Option \code{-m p}. The program prints the length of each selected node's
+parent branch.
+\txtCmdOutput{dist_12}
+
+\subsubsection{Matrix}
+Option \code{-m m}. Computes the pairwise distances between all nodes in the
+selection, and prints it out as a matrix.
+\txtCmdOutput{dist_13}
+
+\subsection{Alternative formats}
+
+Option \code{-t} changes the output format. For matrix output, (\code{-m
+m}), the matrix is triangular. 
+\txtCmdOutput{dist_16}
+When labels are printed (option \code{-n}), the diagonal is shown
+\txtCmdOutput{dist_14}
+
+For all other formats, the values are printed in a line, separated by
+\cap{tab}s.
+\txtCmdOutput{dist_15}
