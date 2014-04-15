@@ -29,7 +29,6 @@ function stop_tree()
 		nd.num = num
 		num = num - 1
 		if not is_leaf[id] then 
-			nd.node.lbl = num	-- deleatur
 			nd.pruning_level = i - 1
 		else
 			nd.pruning_level = num_leaves - 1
@@ -41,7 +40,7 @@ function stop_tree()
 		local id = nd.node.id
 		nodes_by_id[id] = nd
 	end
-	table.sort(node_data, function (a,b) return (tonumber(a.node.lbl) > tonumber(b.node.lbl)) end)
+	table.sort(node_data, function (a,b) return (a.num > b.num) end)
 	for i = #node_data, 1, -1 do
 		local nd = node_data[i]
 		local plev = nd.pruning_level
@@ -54,8 +53,8 @@ function stop_tree()
 			pnum = pnd.num
 		end
 		local leaf_order = ""
-		if 0.0 == nd.height then leaf_order = nd.node.lbl end
+		if 0.0 == nd.height then leaf_order = nd.num end
 		print(nd.num, pnum, plev, string.format("%.2f", nd.height),
-			leaf_order)
+			leaf_order,nd.node.lbl)
 	end
 end
