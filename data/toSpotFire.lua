@@ -26,9 +26,10 @@ function stop_tree()
 		local nd = node_data[i]
 		local id = nd.node.id
 		nd.height = max_depth - nd.depth
+		nd.num = num
+		num = num - 1
 		if not is_leaf[id] then 
-			nd.node.lbl = num
-			num = num - 1
+			nd.node.lbl = num	-- deleatur
 			nd.pruning_level = i - 1
 		else
 			nd.pruning_level = num_leaves - 1
@@ -50,11 +51,11 @@ function stop_tree()
 			pnum = -1
 		else
 			local pnd = nodes_by_id[pid]
-			pnum = pnd.node.lbl
+			pnum = pnd.num
 		end
 		local leaf_order = ""
 		if 0.0 == nd.height then leaf_order = nd.node.lbl end
-		print(nd.node.lbl, pnum, plev, string.format("%.2f", nd.height),
+		print(nd.num, pnum, plev, string.format("%.2f", nd.height),
 			leaf_order)
 	end
 end
