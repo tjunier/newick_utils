@@ -5,7 +5,7 @@ Perhaps the simplest and most common operation on a \nw{} tree is just to look
 at it. But \nw{} trees are not very intuitive for us humans, as we can quickly
 see by looking \eg{} at a tree of Old World primates:
 
-\txtoutput{display_12}
+\txtCmdOutput{display_12}
 
 \noindent{}So we want to make a graphical representation from it. This is the
 purpose of the \display{} program. 
@@ -34,7 +34,7 @@ use that many columns when drawing the tree. If the output is not a terminal
 is not defined, then the program uses a default of 80 characters. You can use
 option \code{-w} to override the defaults.
 
-\txtoutput{display_2}
+\txtCmdOutput{display_2}
 
 \subsubsection{Fixing Scale}
 
@@ -44,7 +44,7 @@ impossible to specify both width and scale, which would be absurd as one is
 always derived from the other.}. For example, to use half a column per unit
 length, do:
 
-\txtoutput{display_20}
+\txtCmdOutput{display_20}
 
 \noindent{} So a branch of length\footnote{To know the length of an edge, you
 can use \distance{} \code{-m p -n} -- see \in{}[sct:distance].  } 10 (such as
@@ -167,7 +167,7 @@ columns; \code{-I} controls the placement of inner node labels.
 
 You can make radial trees by passing the \code{-r} switch:
 
-\svgoutput{display_4}
+\svgCmdOutput{display_4}
 
 \subsubsection[sct_display_svg_css]{Using CSS}
 
@@ -181,7 +181,7 @@ For example, if file \filename{css.map} contains the following
 the tree above by passing \code{-c}, which takes the name of the \css{} file
 as argument:
 
-\svgoutput{display_5}
+\svgCmdOutput{display_5}
 
 The syntax of the \css{} map file is as follows:
 \startitemize
@@ -245,13 +245,13 @@ specifies the leaf label style, option \code{-i} the inner node label style,
 and option \code{-b} the branch length style. For example, the following tree,
 which was produced using defaults, could be improved a bit:
 
-\svgoutput{display_6}
+\svgCmdOutput{display_6}
 
 \noindent{}Let's remove the branch length labels, reduce
 the vertical spacing, reduce the size of inner node labels (bootstrap values),
 and write the leaf labels in italics, using a font with serifs:
 
-\svgoutput{display_7}
+\svgCmdOutput{display_7}
 
 \noindent{}Still not perfect, but much better. Option \code{-v} specifies the
 vertical spacing, in pixels, between two successive leaves (the default is 40).
@@ -265,7 +265,7 @@ Instead, we set their \css{} style to \code{opacity:0}
 What if we want to change the default style? Say we want the branches in blue,
 and two pixels wide? That's option \code{-d}:
 
-\svgoutput{display_13}
+\svgCmdOutput{display_13}
 
 \subsection{Ornaments}
 
@@ -292,17 +292,12 @@ specified with option \code{-o}:
 \startnarrower
  \typefile{ornament.map}
 \stopnarrower
-\typefile{display_8_svg.cmd}
-\startalignment[center]
- \externalfigure[display_8_svg]
-\stopalignment
+
+\svgCmdOutput{display_8}
 
 \noindent{}Ornaments and \css{} can be combined:
 
-\typefile{display_9_svg.cmd}
-\startalignment[center]
- \externalfigure[display_9_svg]
-\stopalignment
+\svgCmdOutput{display_9}
 
 \subsubsection[sct:display:libxml]{\libxml}
 
@@ -336,10 +331,7 @@ values are perpendicular to the $x$ axis.
 
 This gives the following:
 
-\typefile{display_18_svg.cmd}
-\startalignment[center]
-\externalfigure[display_18_svg]
-\stopalignment
+\svgCmdOutput{display_18}
 
 As hinted above, \libxml{} also allows handling of images:
 
@@ -347,10 +339,7 @@ As hinted above, \libxml{} also allows handling of images:
 
 This gives the following (credits: all images are from Wikipedia):
 
-\typefile{display_19_svg.cmd}
-\startalignment[center]
-\externalfigure[display_19_svg]
-\stopalignment
+\svgCmdOutput{display_19}
 
 \subsubsection[sct_display_ornament_xpl_gc]{Example: Mapping GC Content}
 
@@ -360,16 +349,13 @@ This gives the following (credits: all images are from Wikipedia):
 \color[red]{red} (44.5\%). I used this gradient to produce a \css{} map,
 \filename{b2r.map}:
 
-\typefile{display_11_txt.cmd}
-\typefile{display_11_txt.out}
+\txtCmdOutput{display_11}
 
 \noindent{}in which the \code{fill} values are hexadecimal color codes along
 the gradient. Then:
 
-\typefile{display_10_svg.cmd}
-\startalignment[center]
-\externalfigure[display_10_svg]
-\stopalignment
+\svgCmdOutput{display_10}
+
 \bigskip{}
 
 \noindent{}As we can see, the high-\gc{} sequences are all found in the same
@@ -399,8 +385,7 @@ When run in \svg{} mode, \display{} "remembers" its arguments, that is, it puts
 them in an \xml{} comment with the keyword \code{arguments}. It is then
 trivial to retrieve them:
 
-\typefile{display_15_txt.cmd}
-\typefile{display_15_txt.out}
+\txtCmdOutput{display_15}
 
 \noindent{}This is handy when one wants to re-use a set of options on another
 tree, especially after a while when one doesn't remember the exact values of the

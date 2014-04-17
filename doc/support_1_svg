@@ -1,2 +1,2 @@
-nw_support HRV.nw HRV_20reps.nw \
-| nw_display -sr -S -w 500 -i 'font-size:small;fill:red' -
+nw_support HRV.nw HRV_20reps.nw | nw_display -sr -S -w 500 \
+    -i 'font-size:small;fill:red' -b 'opacity:0' -

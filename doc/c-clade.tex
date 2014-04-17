@@ -1,0 +1,74 @@
+
+\section[sct_subtrees]{Extracting Subtrees}
+
+You can extract a clade (\cap{aka} subtree) from a tree with \clade. As
+usual, a clade is specified by a number of node labels, of which the program
+finds the last common ancestor, which unequivocally determines the clade (see
+Appendix \in{}[sct_def_clades]).  We'll use the catarrhinian tree again for
+these examples:
+
+\svgCmdOutput{clade_2}
+
+In the simplest case, the clade you want to extract has its own, unique label.
+This is the case of \id{Cercopithecidae}, so you can extract the whole
+cercopithecid subtree (Old World monkeys) using just that label:
+
+\svgCmdOutput{clade_1}
+
+Now suppose I want to extract the apes subtree. These are the Hominidae
+("great apes") plus the gibbons (\sciname{Hylobates}). But the corresponding
+node is unlabeled in our tree (it would be \id{Hominoidea}), so we need to specify (at least) two descendants:
+
+\svgCmdOutput{clade_3}
+
+\noindent{}The descendants do not have to be leaves: here I use \id{Hominidae}, an inner node, and the result is the same.
+
+\svgCmdOutput{clade_4}
+
+\subsection{Monophyly}
+
+You can check if a set of leaves\footnote{In future versions I may extend this
+to inner nodes} form a monophyletic group by passing option \code{-m}:
+\clade{} will report the subtree only if the \lca{} has no descendant leaf
+other than those specified.  For example, we can ask if the African apes
+(humans, chimp, gorilla) form a monophyletic group:
+
+\svgCmdOutput{clade_7}
+
+\noindent{}Yes, they do -- it's subfamily Homininae. On the other hand, the Asian apes (orangutan and gibbon) do not:
+
+\typefile{clade_8_txt.cmd}
+\type{[no output]} \\
+
+\noindent{}Maybe early hominines split from orangs in South Asia before moving to Africa.
+
+\subsection{Context}
+
+You can ask for $n$ levels above the clade root by passing option \code{-c}: 
+
+\svgCmdOutput{clade_5}
+
+\noindent{}In this case, \clade{} computed the \lca{} of \id{Gorilla} and
+\id{Homo}, "climbed up" two levels, and output the subtree at that point.
+This is useful when you want to extract a clade with its nearest neighbor(s). I
+use this when I have several trees in a file and my clade's nearest neighbors
+aren't always the same.
+
+\subsection{Siblings}
+
+You can also ask for the siblings of the specified clade. What, for example, is
+the sister clade of the cercopithecids? Ask for \id{Cercopithecidae} and
+pass option \code{-s}:
+
+\svgCmdOutput{clade_6}
+
+\noindent{}Why, it's the good old apes, of course. I use this a lot when I
+want to get rid of the outgroup: specify the outgroup and pass \code{-s} --
+behold!, you have the ingroup.
+
+Finally, although we are usually dealing with bifurcating trees, \code{-s}
+also applies to multifurcations: if a node has more than one sibling, \clade{} reports them all, in \nw{} order.
+
+\subsection{Limits}
+
+\clade{} assumes that node labels are unique. This should change in the future.

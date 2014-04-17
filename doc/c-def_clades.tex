@@ -1,0 +1,33 @@
+%&context
+
+\chapter[sct_def_clades]{Defining Clades by their Descendants}
+
+When you need to specify a clade using the \nutils{}, you either give the label
+of the clade's root, or the labels of (some of) its descendants. Since inner
+nodes rarely have labels (or worse, have unusable labels like bootstrap
+support values), you will often need to specify clades by their descendants.
+Consider the following tree:
+
+\startalignment[center]
+\externalfigure[clade_2_svg] 
+\stopalignment
+
+Suppose we want to specify the Hominoidea clade - the apes. It is
+the clade that contains \id{Homo}, \id{Pan} (chimps), \id{Gorilla},
+\id{Pongo} (orangutan), and \id{Hylobates} (gibbons). The clade is not
+labeled in this tree, but this list of labels defines it without ambiguity. In
+fact, we can define it unambiguously using just \id{Hylobates} and
+\id{Homo} - or \id{Hylobates} and any other label. The point is that
+{\em you never need more than two labels to unambiguously define a clade}.
+
+You cannot choose any two nodes, however: the condition is that the last
+common ancestor of the two nodes be the root of the desired clade. For
+instance, if you used \id{Pongo} instead of \id{Hylobates}, you would
+define the Hominidae clade, leaving out the gibbons.
+
+\section{Why not just use node numbers?}
+
+Some applications attribute numbers to all inner nodes and allow users to
+specify clades by referring to this number. Such a scheme is not workable when
+one has many input trees, however, because there is no guarantee that the same
+clade (assuming it is present) will have the same number in different trees.
