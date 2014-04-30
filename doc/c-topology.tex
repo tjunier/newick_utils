@@ -1,0 +1,47 @@
+\section[sct_topology]{Retaining Topology}
+
+There are cases when one is more interested in the tree's structure than in the
+branch lengths, maybe because lengths are irrelevant or just because they are
+so short that they obscure the branching order. Consider the following tree,
+\filename{vrt1.nw}:
+
+\txtFigure{topol_1_txt.out}
+
+Its structure is not evident, particularly in the upper half. This is because
+many branches are short in relation to the depth of the tree, so they are not
+well resolved. A better-resolved tree can be obtained by discarding branch
+lengths altogether:
+
+\txtCmdOutput{topol_2}
+
+This effectively produces a {\em cladogram}, that is, a tree that represents
+ancestry relationships but not amounts of evolutionary change. The inner nodes
+are evenly spaced over the depth of the tree, and the leaves are aligned, so
+the branching order is more apparent.
+
+Of course, \ascii{} trees have low resolution in the first place, so I'll show
+both trees look in \svg. First the original: 
+
+\svgCmdOutput{topol_3}
+
+And now as a cladogram:
+
+\svgCmdOutput{topol_4}
+
+As you can see, even with \svg{}'s much better resolution, it can be useful to
+display the tree as a cladogram.
+
+\topology{} has the following options: \code{-b} keeps the branch lengths
+(obviously, using this option alone has no effect); \code{-I} discards inner
+node labels, and \code{-L} discards leaf labels. An extreme example is the
+following, which discards everything {\em but} topology:
+
+\txtFigure{topol_5_txt.cmd}
+
+This produces the following tree, which is still valid Newick:
+
+\txtFigure{topol_5_txt.out}
+
+Let's look at it as a radial tree, for a change:
+
+\svgCmdOutput{topol_6}

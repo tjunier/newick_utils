@@ -3,11 +3,14 @@
 
 # NOTES:
 
-# Don't remove labels automatically. There is a map (,xl) in Session.vim for
-# adding # labels to th epreceding command, it may work.
+# Don't remove labels automatically. There is a map (,xl) in l2c.vim for
+# adding labels to the preceding command, it may work.
 
 # \url{} must be changed to\url[], but this takes a name that refers to a URL,
 # which must be defined using \useURL, somewhere before \starttext.
+
+# We don't convert \textit to \it, because it's better to use semantic
+# formatting (see nuenv.tex).
 
 # Sectioning 
 s/\\chapter\*/\\chapter/
@@ -17,6 +20,8 @@ s/\\subsection\*/\\subsection/
 # Environments
 s/\\begin{itemize}/\\startitemize/
 s/\\end{itemize}/\\stopitemize/
+s/\\begin{enumerate}/\\startitemize[n]/
+s/\\end{enumerate}/\\stopitemize/
 s/\\begin{verbatim}/\\starttyping/
 s/\\end{verbatim}/\\stoptyping/
 s/\\begin{samepage}/\\page[no]/
@@ -32,11 +37,14 @@ s/\\textit{e.g.}/\\eg{}/g
 # Other commands
 s/\\verbatiminput{/\\typefile{/
 s/\\includegraphics{\([A-Za-z0-9_-]\+\)\....}/\\externalfigure[\1]/g
+s/\\includegraphics\[\([A-Za-z0-9_=.-]\+\)]{\([A-Za-z0-9_-]\+\)\....}/\\externalfigure[\2][\1]/g
 s/\\verb+\(.*\)+/\\type{\1}/g
+s/\\noindent{}//g
 
 # Formatting, fonts, etc.
 s/\\emph{/{\\em /g
 s/\\textsc/\\cap/g
+s/\\textbf{\([^}]\+\)}/{\\bf \1}/g
 s/\\footnotesize/\\tfx/g
 
 # Cross-references

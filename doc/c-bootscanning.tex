@@ -1,0 +1,40 @@
+\section[sct_bootscanning]{Finding Recombination Breakpoints}
+
+
+Bootscanning is a technique for finding recombination breakpoints in a
+sequence. The original procedure \cite{Salminen_1995} uses the bootstrap value
+of competing topologies as a criterion, the procedure shown below uses the
+patristic distance (\ie, distance along the tree) according to the most likely
+tree, and is thus not strictly speaking a bootscan but a distance
+plot.\footnote{Thanks to Heiko Schmidt for pointing this out.} It involves
+aligning the sequence of interest (called {\em query} or {\em reference})
+with related sequences (including the putative recombinant's parents) and
+computing phylogenies locally over the alignment.  Recombination is expected to
+cause changes in topology.  The tasks involved are shown below:
+\startitemize[n]
+\item align the sequences $\rightarrow$ multiple alignment
+\item slice the multiple alignment $\rightarrow$ slices
+\item build a tree for each slice $\rightarrow$ trees
+\item extract distance from query to other sequences (each tree) $\rightarrow$ tabular data
+\item plot data $\rightarrow$ graphics
+\stopitemize
+The distribution contains a script, \filename{src/bootscan.sh}, that performs the whole process. Here is an example run:
+\starttyping
+$ bootscan.sh HRV_3UTR.dna HRV-93 CL073908
+\stoptyping
+where \filename{HRV\_3UTR.dna} is a FastA file of (unaligned) sequences,
+\id{HRV-93} is the outgroup, and \id{CL073908} is the query.  Here is the result:
+
+\startalignment[center]
+\externalfigure[width=\textwidth]{bootscan_1.pdf}
+\stopalignment
+
+until position 450 or so, the query sequence's nearest relatives (in
+terms of substitutions/site) are \id{HRV-36} and \id{HRV-89}. After
+that point, it is \id{HRV-67}. This suggests that there is a recombination
+breakpoint near position 450.
+
+The script uses \reroot{} to reroot the trees on the outgroup, \clade{} and
+\labels{} to get the labels of the ingroup, \distance{} to extract the distance
+between the query and the other sequences, as well as the usual \progname{sed},
+\progname{grep}, etc. The plot is done with gnuplot.

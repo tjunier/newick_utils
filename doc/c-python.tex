@@ -1,0 +1,75 @@
+%&context
+
+% TODO find a way of syntax-highlighting te Python code
+%\lstset{
+%	language=Python,
+%	basicstyle=\ttfamily,
+%	keywordstyle=\color{NavyBlue},
+%	stringstyle=\color{OliveGreen},
+%	commentstyle=\color{red},
+%	frame=single,
+%	frameround=tttt,
+%	framexleftmargin=8mm,
+%	numbers=left
+%}
+
+\chapter[chap_python_lib]{Python Bindings}
+
+
+Although the \nutils{} are primarily designed for shell use, it is also possible
+to use their functions from Python programs: all the core functionality of the
+utilities is bundled in a C library, \filename{libnw}, which can be accessed
+through Python's \filename{ctypes} module. The distribution contains a file,
+\filename{newick\_utils.py}, that provides the Python to C mappings; it also
+builds an object-oriented interface over it.
+
+Let's say we want to add a utility that prints simple statistics about trees,
+like the number of nodes, the depth, whether it is a cladogram or a phylogram,
+etc (in other words, a Python version of \stats). We will call it
+\progname{nw\_info.py}, and we'll pass it a \nw{} file on standard input, so the
+usage will be something like:
+
+\starttyping
+$ nw_info.py < data/catarrhini
+\stoptyping
+
+The overall structure of this program is simple: iteratively read
+all the input trees, and do something with each of them:
+
+[TODO: syntax highlighting]
+\starttyping
+from newick_utils import *
+
+for tree in Tree.parse_newick_input():
+    pass # process tree here!
+\stoptyping
+
+Line 1 imports definitions from the \filename{newick\_utils.py}
+module. Line 3 is the main loop: the \code{Tree.parse\_newick\_input}
+reads standard input and yields an instance of class \code{Tree} for each
+Newick string. We can now work with it, using methods of class \code{Tree} or adding our own:
+
+[TODO: syntax highlighting]
+\typefile{../src/nw_info.py}
+
+When we run the program, we get:
+
+\txtCmdOutput{python_1}
+
+As you can see, most of the work is done by methods called on the \code{tree}
+object, such as \code{get\_leaf\_count} which (surprise!) returns the number
+of leaves of a tree. But since there is no method for counting polytomies, we
+added our own function, \code{count\_polytomies}, which takes a \code{Tree}
+object as argument.
+
+As another example, a simple implementation of \reroot{} is found in
+\progname{src/nw\_reroot.py}. It demonstrates two approaches: a heavily
+object-oriented one, in which the user mainly calls methods on Python objects,
+and a "thin" one, in which the calls are essentially to C functions through
+\filename{libnw}. While not as fast as \reroot{}, its performance is still quite
+acceptable, especially in "thin" mode.
+
+\section{API Documentation}
+
+Detailed information about all classes and methods available for accessing the
+\nutils{} library from Python is found in file \filename{newick\_utils.py}. Note that the library must be installed on your system, which means that you must compile from source.
