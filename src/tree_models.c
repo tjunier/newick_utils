@@ -204,7 +204,7 @@ struct rnode *create_child_with_time_limit(double time_limit)
 }
 
 void free_data(struct llist *leaves_queue,
-		struct rnode *root, struct llist *all_children)
+		 struct llist *all_children)
 {
 	struct rnode *kid;
 
@@ -281,7 +281,7 @@ int time_limited_tree(double branch_termination_rate, double duration)
 
 	dump_newick(root);
 
-	free_data(leaves_queue, root, all_children);
+	free_data(leaves_queue, all_children);
 
 	return SUCCESS;
 }

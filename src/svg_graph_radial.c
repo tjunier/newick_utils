@@ -717,6 +717,7 @@ static void draw_text_radial (struct rooted_tree *tree, const double r_scale,
 /* Prints an SVG comment block with some run parameters. Useful for debugging */
 // TODO: is this f() ever used, with/without LibXML?
 
+/*
 static void params_as_svg_comment (struct h_data hd, double node_area_width,
 		double r_scale)
 {
@@ -745,6 +746,7 @@ static void params_as_svg_comment (struct h_data hd, double node_area_width,
 		node_area_width,
 		r_scale);
 }
+*/
 
 /* Draws a radial SVG tree. Returns SUCCESS iff there was no problem. */
 
