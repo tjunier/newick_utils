@@ -211,6 +211,9 @@ static struct rooted_tree * process_tree_direct(
 /* Prune predicate: retains the nodes passed on CL, but discards their
  * children. */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 // TODO: this might be a useful prune predicate, add option to use it.
 
 bool prune_predicate_trim_kids(struct rnode *node, void *param)
@@ -219,13 +222,16 @@ bool prune_predicate_trim_kids(struct rnode *node, void *param)
 		/* ancestor of a passed node */
 		return true;
 	}
+
+	return false;
 }
 
 /* Prune predicate: retains the nodes passed on CL and their children. */
 
 bool prune_predicate_keep_clade(struct rnode *node, void *param)
 {
-	set_t *cl_labels = (set_t *) param;
+	// TODO: is this used?
+	// set_t *cl_labels = (set_t *) param;
 
 	if (node->seen) {
 		return true;
@@ -316,3 +322,5 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
+#pragma GCC diagnostic pop

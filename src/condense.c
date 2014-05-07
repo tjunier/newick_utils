@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "readline.h"
 #include "hash.h"
 #include "list.h"
+#include "link.h"
+#include "masprintf.h"
 
 enum actions { PURE_CLADES, STAIR_NODES }; /* not sure we'll keep stair nodes */
 

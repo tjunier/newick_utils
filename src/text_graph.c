@@ -184,8 +184,9 @@ void draw_tree(struct canvas *canvas, struct rooted_tree *tree,
 			pos->depth = dmax;
 
 		int h_pos = rint(ROOT_SPACE + (scale * pos->depth));
-		int top = rint(2*pos->top);
-		int bottom = rint(2*pos->bottom);
+		// // TODO: are these used?
+		// int top = rint(2*pos->top);
+		// int bottom = rint(2*pos->bottom);
 		mid = rint(pos->top+pos->bottom);	/* (2*top + 2*bottom) / 2 */
 
 		/* Don't bother printing label if it is "" */
