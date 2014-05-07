@@ -138,6 +138,11 @@ int test_make_hash_key()
 	return 0;
 }
 
+int test_resize()
+{
+	return 1;
+}
+
 int main()
 {
 	int failures = 0;
@@ -146,6 +151,7 @@ int main()
 	failures += test_keys();
 	failures += test_destroy();
 	failures += test_make_hash_key();
+	failures += test_resize();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
