@@ -87,7 +87,7 @@ double resize_hash(struct hash *h, unsigned int new_size)
 	struct llist** new_bins; 
 	unsigned int i;
 
-	if (NULL != h) return -1;
+	if (NULL == h) return -1;
 
 	/* allocate storage for new bins */
 
@@ -98,7 +98,6 @@ double resize_hash(struct hash *h, unsigned int new_size)
 		(new_bins)[i] = create_llist();
 		if (NULL == (new_bins)[i]) return -1;
 	}
-	h->size = new_size;
 
 	/* Now copy key-value pairs to the new bins */
 	for (i = 0; i < h->size; i++) {
@@ -122,6 +121,7 @@ double resize_hash(struct hash *h, unsigned int new_size)
 
 	/* Now install new bins */
 	h->bins = new_bins;
+	h->size = new_size;
 	
 	return load_factor(h);
 }
