@@ -143,6 +143,7 @@ int test_resize()
 	const char *test_name = __func__;
 
 	struct hash *h = create_hash(4);
+	double load;
 
 	hash_set(h, "one", "uno");
 	hash_set(h, "two", "dos");
@@ -182,15 +183,54 @@ int test_resize()
 		return 1;
 	}
 
+	load = load_factor(h);
+	if (1.25 != load) {
+		printf ("%s: load factor should be 1.2, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
 	/* Now, resize the hash */
 
-	double load_factor = resize_hash(h, 10);
-	if (0.5 != load_factor) {
+	load = resize_hash(h, 10);
+	if (0.5 != load) {
 		printf ("%s: load factor should be 0.5, but is %.2f\n",
-				test_name, load_factor);
+				test_name, load);
 		return 1;
 	}
 
+	/* Same tests on the resized list */
+
+	keys = hash_keys(h);
+
+	if (h->count != keys->count) {
+		printf ("%s: hash count and hash key count do not match.\n",
+				test_name);
+		return 1;
+	}
+	if (5 != keys->count) {
+		printf ("%s: expected 5 keys, got %d.\n", test_name, keys->count);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "one")) {
+		printf ("%s: 'one' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "two")) {
+		printf ("%s: 'two' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "three")) {
+		printf ("%s: 'three' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "four")) {
+		printf ("%s: 'four' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "five")) {
+		printf ("%s: 'five' should be among the keys.\n", test_name);
+		return 1;
+	}
 
 	printf ("%s ok.\n", test_name);
 	return 0;

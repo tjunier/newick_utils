@@ -70,7 +70,7 @@ struct hash *create_hash(unsigned int n)
 	return h;
 }
 
-double load_factor(struct hash *h) { return h->count / h->size; }
+double load_factor(struct hash *h) { return ((double) h->count) / h->size; }
 
 /* Bernstein's hash function. See e.g.
  * http://www.eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx */
