@@ -138,12 +138,16 @@ void help(char *argv[])
 
 struct hash *read_map(const char *filename)
 {
-	const int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
+	const unsigned int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
+	const double LOAD_THRESHOLD = 0.8;
+	const unsigned RESIZE_FACTOR = 10;
 
 	FILE *map_file = fopen(filename, "r");
 	if (NULL == map_file) { perror(NULL); exit(EXIT_FAILURE); }
 
-	struct hash *map = create_hash(HASH_SIZE);
+	//struct hash *map = create_hash(HASH_SIZE);
+	struct hash *map = create_dynamic_hash(HASH_SIZE,
+			LOAD_THRESHOLD, RESIZE_FACTOR);
 	if (NULL == map) { perror(NULL); exit(EXIT_FAILURE); }
 
 	char *line;

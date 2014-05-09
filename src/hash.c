@@ -67,6 +67,23 @@ struct hash *create_hash(unsigned int n)
 		if (NULL == (h->bins)[i]) return NULL;
 	}
 	h->count = 0; 	/* no key-value paits yet */
+
+	h->type = HASH_FIXED;
+
+	return h;
+}
+
+struct hash *create_dynamic_hash(unsigned int init_size,
+		double load_threshold, unsigned int resize_factor)
+{
+	struct hash *h = create_hash(init_size);
+	if (NULL == h) return NULL;
+
+	h->type = HASH_DYNAMIC;
+
+	h->load_threshold = load_threshold;
+	h->resize_factor = resize_factor;
+
 	return h;
 }
 
@@ -131,6 +148,12 @@ int hash_set(struct hash *h, const char *key, void *value)
 	int hash_code = hash_func(key) % h->size;
 	struct llist *bin;
 	struct key_val_pair *kvp;
+
+	if (HASH_DYNAMIC == h->type) {
+		if (load_factor(h) >= h->load_threshold) {
+			resize_hash(h, h->resize_factor * h->size);
+		}
+	}
 
 	bin = (h->bins)[hash_code];
 

@@ -44,15 +44,26 @@ struct llist;
 /** A simple hash table. The initial number of bins is set at the time the
  * structure is created. */
 
+enum hash_type { HASH_FIXED, HASH_DYNAMIC };
+
 struct hash {
+	enum hash_type type;
 	struct llist **bins;	/**< the bins */
 	unsigned int size;	/**< the number of bins */
 	unsigned int count;	/**< the number of data elements - initially 0 */
+	double load_threshold;	/**< dynamic hashes grow if the load exceeds this */
+	unsigned int resize_factor; /** dynamic hashes grow by this factor */
 };
 
 /* Creates a hash with n bins. If memory allocation fails, returns NULL . */
 
 struct hash * create_hash(unsigned int n);
+
+/* Create a dynamic hash - one that resizes by a factor of 'resize_factor' when
+ * the load factor would exceed 'load_threshold'. */
+
+struct hash * create_dynamic_hash(unsigned int init_size,
+		double load_threshold, unsigned int resize_factor);
 
 /* A convenience function that returns the hash's load factor. */
 

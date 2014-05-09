@@ -237,6 +237,59 @@ int test_resize()
 
 }
 
+int test_self_resizing()
+{
+	const char *test_name = __func__;
+
+	struct hash *h = create_dynamic_hash(4, 0.75, 2);
+	double load;
+
+	load = load_factor(h);
+	if (0.0 != load) {
+		printf ("%s: load factor should be 0.0, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+
+	hash_set(h, "one", "uno");
+	hash_set(h, "two", "dos");
+	hash_set(h, "three", "tres");
+
+	load = load_factor(h);
+	if (0.75 != load) {
+		printf ("%s: load factor should be 0.75, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+
+	hash_set(h, "four", "cuatro");
+
+	load = load_factor(h);
+	if (0.5 != load) {
+		printf ("%s: load factor should be 0.5, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+
+	hash_set(h, "five", "cinco");
+	hash_set(h, "six", "seis");
+
+	load = load_factor(h);
+	if (0.75 != load) {
+		printf ("%s: load factor should be 0.75, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+
+	/*
+	 * now check keys & values*/
+
+
+	printf ("%s ok.\n", test_name);
+	return 0;
+
+}
+
 int main()
 {
 	int failures = 0;
@@ -246,6 +299,7 @@ int main()
 	failures += test_destroy();
 	failures += test_make_hash_key();
 	failures += test_resize();
+	failures += test_self_resizing();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {
