@@ -22,7 +22,7 @@
 # percent identity. If the sequence with smallest distance changes drastically,
 # you may have a breakpoint.
 
-# Requires Muscle [1], EMBOSS [2], PhyML 3.0 [3], and GNUPlot [5]; as
+# Requires Mafft [1], EMBOSS [2], PhyML 3.0 [3], and GNUPlot [5]; as
 # well as the GNU core utilities [4] (which you probably already have if you're
 # running Linux). The PATH should be set so that these programs are found, as
 # the script cannot use absolute pathnames (for portability).
@@ -31,7 +31,7 @@
 # file is found (temporary files will be cleaned up).
 
 # References
-# [1] http://www.drive5.com/muscle
+# [1] http://mafft.cbrc.jp/alignment/software
 # [2] http://emboss.sourceforge.net 
 # [3] http://atgc.lirmm.fr/phyml or apt-get in Ubuntu
 # [4] http://www.gnu.org/software/coreutils
@@ -164,7 +164,7 @@ declare -ri LINE_WIDTH=2
 export EMBOSS_FILTER=true
 
 echo "Aligning"
-muscle -quiet -in $INPUT_FILE -out $MUSCLE_OUT
+mafft $INPUT_FILE > $MUSCLE_OUT
 echo "Slicing alignment"
 slice_alignment
 echo "Computing trees"
