@@ -27,7 +27,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-/* Simple hash table. Arbitrary data, keyed by strings. Fixed number of bins, does not grow. */
+/* Simple hash table. Arbitrary data, keyed by strings. */
 
 /* NOTE: All functions except the most simple ones can fail, in which case the
  * return value indicates failure or success. Functions that return pointers
@@ -41,18 +41,38 @@ struct llist;
 
 /**  \todo this might be made private. */
 
-/** A simple hash table. The number of bins is fixed at the time the structure
- * is created. */
+/** A simple hash table. The initial number of bins is set at the time the
+ * structure is created. */
+
+enum hash_type { HASH_FIXED, HASH_DYNAMIC };
 
 struct hash {
+	enum hash_type type;
 	struct llist **bins;	/**< the bins */
-	int size;	/**< the number of bins */
-	int count;	/**< the number of data elements - initially 0 */
+	unsigned int size;	/**< the number of bins */
+	unsigned int count;	/**< the number of data elements - initially 0 */
+	double load_threshold;	/**< dynamic hashes grow if the load exceeds this */
+	unsigned int resize_factor; /** dynamic hashes grow by this factor */
 };
 
 /* Creates a hash with n bins. If memory allocation fails, returns NULL . */
 
-struct hash * create_hash(int n);
+struct hash * create_hash(unsigned int n);
+
+/* Create a dynamic hash - one that resizes by a factor of 'resize_factor' when
+ * the load factor would exceed 'load_threshold'. */
+
+struct hash * create_dynamic_hash(unsigned int init_size,
+		double load_threshold, unsigned int resize_factor);
+
+/* A convenience function that returns the hash's load factor. */
+
+double load_factor(struct hash*);
+
+/* Resizes a hash in-place (address does not change) Returns the new load
+ * factor, or -1 in case of error. */
+
+double resize_hash(struct hash *, unsigned int new_size);
 
 /* Inserts a (key, value) pair into a hash. Increments count. The 'key' will be
  * duplicated. */

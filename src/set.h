@@ -3,7 +3,7 @@
 #include "hash.h"
 
 const int SET_ADD_ERROR;
-const int MEMBER;
+int MEMBER;
 
 typedef struct hash set_t;
 
@@ -13,7 +13,7 @@ set_t* create_set();
 
 /* Adds an element to a set; returns number of objects in set. */
 
-int set_add(set_t *s, const char *key);
+int set_add(set_t *s, char *key);
 
 /* Returns the cardinal of a set - i.e., the number of elements */
 

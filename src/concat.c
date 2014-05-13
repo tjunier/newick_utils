@@ -63,10 +63,8 @@ char *append_to(char *s1, char *s2)
 	return result;
 }
 
-char *str_splice(char *src, char *ins, int pos, int len)
+char *str_splice(char *src, char *ins, unsigned int pos, unsigned int len)
 {
-	assert (pos >= 0);
-	// TODO: use unsigned ints, so gcc stops flagging error
 	assert (pos + len <=  strlen(src));
 
 	int insert_len = strlen(ins);

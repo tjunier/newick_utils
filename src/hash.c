@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "hash.h"
 #include "list.h"
@@ -47,10 +48,10 @@ struct key_val_pair {
 	void *value;
 };
 
-struct hash *create_hash(int n)
+struct hash *create_hash(unsigned int n)
 {
 	struct hash *h;
-	int i;
+	unsigned int i;
 
 	/* allocate storage for struct hash */
 	h = (struct hash *) malloc (sizeof(struct hash));
@@ -66,17 +67,80 @@ struct hash *create_hash(int n)
 		if (NULL == (h->bins)[i]) return NULL;
 	}
 	h->count = 0; 	/* no key-value paits yet */
+
+	h->type = HASH_FIXED;
+
 	return h;
 }
+
+struct hash *create_dynamic_hash(unsigned int init_size,
+		double load_threshold, unsigned int resize_factor)
+{
+	struct hash *h = create_hash(init_size);
+	if (NULL == h) return NULL;
+
+	h->type = HASH_DYNAMIC;
+
+	h->load_threshold = load_threshold;
+	h->resize_factor = resize_factor;
+
+	return h;
+}
+
+double load_factor(struct hash *h) { return ((double) h->count) / h->size; }
 
 /* Bernstein's hash function. See e.g.
  * http://www.eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx */
 
-unsigned int hash_func (const char *key)
+static unsigned int hash_func (const char *key)
 {
 	int h=0;
 	while(*key) h=33*h + *key++;
 	return h;
+}
+
+double resize_hash(struct hash *h, unsigned int new_size)
+{
+	struct llist** new_bins; 
+	unsigned int i;
+
+	if (NULL == h) return -1;
+
+	/* allocate storage for new bins */
+
+	new_bins = (struct llist **) malloc (new_size * sizeof(struct llist *));
+	if (NULL == new_bins) return -1;
+	/* create a llist at each position */
+	for (i = 0; i < new_size; i++) {
+		(new_bins)[i] = create_llist();
+		if (NULL == (new_bins)[i]) return -1;
+	}
+
+	/* Now copy key-value pairs to the new bins */
+	for (i = 0; i < h->size; i++) {
+	       struct llist *bin = h->bins[i];	
+	       struct list_elem *el;
+	       for (el = bin->head; NULL != el; el = el->next) {
+		       	struct key_val_pair *kvp = el->data;
+		       	unsigned int new_hash_code = hash_func(kvp->key) % new_size;
+			struct llist *new_bin = new_bins[new_hash_code];
+			if (! append_element(new_bin, kvp)) return -1;
+	       }
+	}
+
+	/* Release old bins (but don't free the key-val pairs, as the new bins
+	 * contain pointers to them). */
+	for (i = 0; i < h->size; i++) {
+	       struct llist *bin = h->bins[i];	
+	       destroy_llist(bin);
+	}
+	free(h->bins);
+
+	/* Now install new bins */
+	h->bins = new_bins;
+	h->size = new_size;
+	
+	return load_factor(h);
 }
 
 int hash_set(struct hash *h, const char *key, void *value)
@@ -84,6 +148,12 @@ int hash_set(struct hash *h, const char *key, void *value)
 	int hash_code = hash_func(key) % h->size;
 	struct llist *bin;
 	struct key_val_pair *kvp;
+
+	if (HASH_DYNAMIC == h->type) {
+		if (load_factor(h) >= h->load_threshold) {
+			resize_hash(h, h->resize_factor * h->size);
+		}
+	}
 
 	bin = (h->bins)[hash_code];
 
@@ -128,7 +198,7 @@ void *hash_get(struct hash *h, const char *key)
 
 void dump_hash(struct hash *h, void (*dump_func)())
 {
-	int i;
+	unsigned int i;
 
 	printf ("Dump of hash at %p: (%d bins, %d pairs):\n", h, h->size,
 			h->count);
@@ -153,7 +223,7 @@ struct llist *hash_keys(struct hash *h)
 {
 	struct llist *list = create_llist();
 	if (NULL == list) return NULL;
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < h->size; i++) {
 	       struct llist *bin = h->bins[i];	
@@ -170,7 +240,7 @@ struct llist *hash_keys(struct hash *h)
 
 void destroy_hash(struct hash *h)
 {
-	int i;
+	unsigned int i;
 
 	/* free internal structure */
 	for (i = 0; i < h->size; i++) {

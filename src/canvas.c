@@ -80,6 +80,16 @@ static void vt100_canvas_dump(struct canvas *canvasp);
  * irrespective of the canvas' type (i.e., the interface is the same).
  * */
 
+/* This means that the signature a fucntion is the same across different canvas,
+ * e.g. we have raw_canvas_draw_hline() and vt100_canvas_draw_hline(), but in
+ * some cases a parameter is used in one canvas but not in the other (e.g.,
+ * vt100_canvas_draw_upper_corner() ignores the 'symbol' argument). For this
+ * reason, in this file I suppress GCC's warnings about unused parameters:
+ */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 struct canvas {
 	enum canvas_type type;
 	int width;
@@ -525,3 +535,5 @@ void destroy_canvas(struct canvas *canvasp)
 	free(canvasp->lines);
 	free(canvasp);
 }
+
+#pragma GCC diagnostic pop

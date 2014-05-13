@@ -78,6 +78,14 @@ int test_lca2()
 	return 0;
 }
 
+/* Many tests involve creating nodes which are not "used" later (according to
+ * GCC), although of course they contribute to tree structure and will cause
+ * tests to fail if they are wrong. For this reason, I suppress GCC's
+ * "unused" warnings: */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+
 int test_lca_from_labels()
 {
 	const char *test_name = "test_lca_from_labels";
@@ -259,6 +267,8 @@ int test_lca_from_labels_multi()
 	printf("%s ok.\n", test_name);
 	return 0;
 }
+
+#pragma GCC diagnostic pop
 
 int main()
 {

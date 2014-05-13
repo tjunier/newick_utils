@@ -138,6 +138,158 @@ int test_make_hash_key()
 	return 0;
 }
 
+int test_resize()
+{
+	const char *test_name = __func__;
+
+	struct hash *h = create_hash(4);
+	double load;
+
+	hash_set(h, "one", "uno");
+	hash_set(h, "two", "dos");
+	hash_set(h, "three", "tres");
+	hash_set(h, "four", "cuatro");
+	hash_set(h, "five", "cinco"); 	/* one more elem than hash size - forces clash */
+
+	struct llist *keys = hash_keys(h);
+
+	if (h->count != keys->count) {
+		printf ("%s: hash count and hash key count do not match.\n",
+				test_name);
+		return 1;
+	}
+	if (5 != keys->count) {
+		printf ("%s: expected 5 keys, got %d.\n", test_name, keys->count);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "one")) {
+		printf ("%s: 'one' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "two")) {
+		printf ("%s: 'two' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "three")) {
+		printf ("%s: 'three' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "four")) {
+		printf ("%s: 'four' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "five")) {
+		printf ("%s: 'five' should be among the keys.\n", test_name);
+		return 1;
+	}
+
+	load = load_factor(h);
+	if (1.25 != load) {
+		printf ("%s: load factor should be 1.2, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+	/* Now, resize the hash */
+
+	load = resize_hash(h, 10);
+	if (0.5 != load) {
+		printf ("%s: load factor should be 0.5, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+
+	/* Same tests on the resized list */
+
+	keys = hash_keys(h);
+
+	if (h->count != keys->count) {
+		printf ("%s: hash count and hash key count do not match.\n",
+				test_name);
+		return 1;
+	}
+	if (5 != keys->count) {
+		printf ("%s: expected 5 keys, got %d.\n", test_name, keys->count);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "one")) {
+		printf ("%s: 'one' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "two")) {
+		printf ("%s: 'two' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "three")) {
+		printf ("%s: 'three' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "four")) {
+		printf ("%s: 'four' should be among the keys.\n", test_name);
+		return 1;
+	}
+	if (-1 == llist_index_of_f(keys, llist_find_string, "five")) {
+		printf ("%s: 'five' should be among the keys.\n", test_name);
+		return 1;
+	}
+
+	printf ("%s ok.\n", test_name);
+	return 0;
+
+}
+
+int test_self_resizing()
+{
+	const char *test_name = __func__;
+
+	struct hash *h = create_dynamic_hash(4, 0.75, 2);
+	double load;
+
+	load = load_factor(h);
+	if (0.0 != load) {
+		printf ("%s: load factor should be 0.0, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+
+	hash_set(h, "one", "uno");
+	hash_set(h, "two", "dos");
+	hash_set(h, "three", "tres");
+
+	load = load_factor(h);
+	if (0.75 != load) {
+		printf ("%s: load factor should be 0.75, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+
+	hash_set(h, "four", "cuatro");
+
+	load = load_factor(h);
+	if (0.5 != load) {
+		printf ("%s: load factor should be 0.5, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+
+	hash_set(h, "five", "cinco");
+	hash_set(h, "six", "seis");
+
+	load = load_factor(h);
+	if (0.75 != load) {
+		printf ("%s: load factor should be 0.75, but is %.2f\n",
+				test_name, load);
+		return 1;
+	}
+
+	/*
+	 * now check keys & values*/
+
+
+	printf ("%s ok.\n", test_name);
+	return 0;
+
+}
+
 int main()
 {
 	int failures = 0;
@@ -146,6 +298,8 @@ int main()
 	failures += test_keys();
 	failures += test_destroy();
 	failures += test_make_hash_key();
+	failures += test_resize();
+	failures += test_self_resizing();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

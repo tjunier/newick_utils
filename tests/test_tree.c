@@ -11,6 +11,13 @@
 #include "to_newick.h"
 #include "hash.h"
 
+/* Many tests involve creating trees or nodes which are not "used" (in the GCC
+ * sense, i.e. in a statement), causing compiler warnings. However, they affect
+ * the tests differently, i.e. by contributing to tree structure, so I want to
+ * keep them that way. For this reason, I disable the warnings in this file. */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 
 int test_reroot()
 {
@@ -521,7 +528,7 @@ int test_clone_tree_result()
 
 	el = el->next;
 	if (NULL != el) {
-		printf ("%s: expecting end of list.\n");
+		printf ("%s: expecting end of list.\n", test_name);
 		return 1;
 	}
 
@@ -670,7 +677,7 @@ int test_clone_tree_original()
 
 	el = el->next;
 	if (NULL != el) {
-		printf ("%s: expecting end of list.\n");
+		printf ("%s: expecting end of list.\n", test_name);
 		return 1;
 	}
 
@@ -747,7 +754,7 @@ int test_clone_tree_cond()
 
 	el = el->next;
 	if (NULL != el) {
-		printf ("%s: expecting end of list.\n");
+		printf ("%s: expecting end of list.\n", test_name);
 		return 1;
 	}
 
@@ -786,3 +793,4 @@ int main()
 	return 0;
 }
 
+#pragma GCC diagnostic pop

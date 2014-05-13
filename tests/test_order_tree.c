@@ -9,6 +9,14 @@
 #include "hash.h"
 #include "rnode.h"
 
+/* Many tests involve creating trees or nodes which are not "used" (in the GCC
+ * sense, i.e. in a statement), causing compiler warnings. However, they affect
+ * the tests differently, i.e. by contributing to tree structure, so I want to
+ * keep them that way. For this reason, I disable the warnings in this file. */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+
 int test_order()
 {
 	const char *test_name = __func__;
@@ -23,7 +31,6 @@ int test_order()
 	/* These nodes have no label, so we address them indirectly */
 	struct rnode *node_insects = tree.root->first_child;
 	struct rnode *node_vertebrates = tree.root->last_child;
-	struct rnode *node_carnivores = node_vertebrates->last_child;
 
 	order_tree(&tree, lbl_comparator, set_sort_field_label);
 	
@@ -131,3 +138,5 @@ int main()
 
 	return 0;
 }
+
+#pragma GCC diagnostic pop

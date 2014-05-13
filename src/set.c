@@ -12,7 +12,7 @@ set_t* create_set()
 
 int set_cardinal(set_t *s) { return s->count; }
 
-int set_add(set_t *s, const char *key)
+int set_add(set_t *s, char *key)
 {
 	if (hash_set(s, key, &MEMBER))
 		return set_cardinal(s);

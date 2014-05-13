@@ -384,11 +384,11 @@ int test_replace_child()
 		return 1;
 	}
 	if (!new_child->linked) {
-		printf("%s: new child should be linked.\n");
+		printf("%s: new child should be linked.\n", test_name);
 		return 1;
 	}
 	if (child_3->linked) {
-		printf("%s: child_3 should not be linked.\n");
+		printf("%s: child_3 should not be linked.\n", test_name);
 		return 1;
 	}
 
