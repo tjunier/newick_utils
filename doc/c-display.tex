@@ -371,11 +371,8 @@ to impose tiling or some other arrangement), or one can just output one \svg{}
 document after another. This is what we do (this may change in the future). So
 if you have many trees in document \filename{forest.nw}, you can say:
 \startnarrower
-\type{$ nw_display -s forest.nw > forest_svg}
-\stopnarrower
-But \filename{forest\_svg} isn't valid \svg{} -- it is a concatenation of many \svg{} documents. You can just extract them into individual files with \code{csplit}:
-\startnarrower
-\type{$ csplit -sz -f tree_ -b '%02d.svg' forest_svg '/<?xml/' {*}}
+\type{$ nw_display -s forest.nw | csplit -sz -f tree_ -b "%02d.svg" - '/<?xml/'
+'{*}'}
 \stopnarrower
 This will produce one \svg{} file per tree in \filename{forest.nw}, named \filename{tree\_01.svg}, \filename{tree\_02.svg}, etc.
 
