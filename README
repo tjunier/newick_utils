@@ -29,6 +29,7 @@ Source
 If you have a source-only distribution, or if you want to build the binaries
 yourself, it's the familiar
 
+$ autoreconf -fi
 $ ./configure
 $ make
 $ make check	# optional but recommended
