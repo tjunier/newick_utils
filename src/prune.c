@@ -44,16 +44,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "link.h"
 #include "set.h"
 #include "list.h"
+#include "readline.h"
 
 enum prune_mode { PRUNE_DIRECT, PRUNE_REVERSE };
+enum label_source { COMMAND_LINE, IN_FILE }; /* can't use FILE... */
 
 struct prune_data {
 	bool kept_descendant;
 };
 
 struct parameters {
-	set_t 	*cl_labels;
+	set_t 	*prune_labels;
 	enum prune_mode mode;
+	enum label_source lbl_src;
 };
 
 void help(char *argv[])
@@ -64,7 +67,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hi:v] <newick trees filename|-> <label> [label+]\n"
+"%s [-f:hv] <newick trees filename|-> <label> [label+]\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -86,12 +89,14 @@ void help(char *argv[])
 "Options\n"
 "-------\n"
 "\n"
+"    -f <filename>: node labels are in a file named <filename>, not on the\n"
+"        command line. There should be one label per line.\n"
 "    -h: print this message and exit\n"
 "    -v: reverse: prune nodes whose labels are NOT passed on the command\n"
-"        line. Inner nodes are not pruned, unless -i is also set (see\n"
-"        above). This allows pruning of trees with support values, which\n"
-"        syntactically are node labels, without inner nodes disappearing\n"
-"        because their 'label' was not passed on the command line.\n"
+"        line. Inner nodes are not pruned. This allows pruning of trees\n"
+"        with support values, which syntactically are node labels, withouti\n"
+"        inner nodes disappearing because their 'label' was not passed on\n"
+"        the command line.\n"
 "\n"
 "Assumptions and Limitations\n"
 "---------------------------\n"
@@ -126,12 +131,19 @@ void help(char *argv[])
 
 struct parameters get_params(int argc, char *argv[])
 {
+	const char *USAGE =
+"Usage: nw_prune [-hv] <filename|-> <label> [label+]\n"
+"or     nw_prune [-hv] -f <filename|-> <label_filename>";
 	struct parameters params;
 	params.mode = PRUNE_DIRECT;
+	params.lbl_src = COMMAND_LINE;
 
 	int opt_char;
-	while ((opt_char = getopt(argc, argv, "hv")) != -1) {
+	while ((opt_char = getopt(argc, argv, "fhv")) != -1) {
 		switch (opt_char) {
+		case 'f':
+			params.lbl_src = IN_FILE;
+			break;
 		case 'h':
 			help(argv);
 			exit (EXIT_SUCCESS);
@@ -144,8 +156,11 @@ struct parameters get_params(int argc, char *argv[])
 		}
 	}
 
-	/* check arguments */
-	if ((argc - optind) >= 2)	{
+	/* check and get arguments */
+
+	/* get Newick input */
+
+	if ((argc - optind) >= 1)	{
 		if (0 != strcmp("-", argv[optind])) {
 			FILE *fin = fopen(argv[optind], "r");
 			extern FILE *nwsin;
@@ -155,22 +170,64 @@ struct parameters get_params(int argc, char *argv[])
 			}
 			nwsin = fin;
 		}
-		set_t *cl_labels = create_set();
-		if (NULL == cl_labels) { perror(NULL); exit(EXIT_FAILURE); }
-		optind++;	/* optind is now index of 1st label */
+	}
+
+	/* Get prune labels */
+
+	set_t *prune_labels = create_set();
+	if (NULL == prune_labels) { perror(NULL); exit(EXIT_FAILURE); }
+
+	optind++;	
+	if (COMMAND_LINE == params.lbl_src) {
+		/* optind is now index of 1st label */
+		if ((argc - optind) < 1) {
+			fprintf(stderr, USAGE);
+			exit(EXIT_FAILURE);
+		}
 		for (; optind < argc; optind++) {
-			if (set_add(cl_labels, argv[optind]) < 0) {
+			if (set_add(prune_labels, argv[optind]) < 0) {
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
 		}
-		params.cl_labels = cl_labels;
+	} else if (IN_FILE == params.lbl_src) {
+		/* optind is now index of label file name */
+		if ((argc - optind) < 1) {
+			fprintf(stderr, USAGE);
+			exit(EXIT_FAILURE);
+		} else if ((argc - optind) > 1) {
+			fprintf (stderr, "WARNING: expecting two arguments, extra arguments will be ignored.\n");
+		}
+		FILE* lbl_src = fopen(argv[optind], "r");
+		if (NULL == lbl_src) {
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+		char *label = NULL;
+		while (NULL != (label = read_line(lbl_src))) {
+			if (set_add(prune_labels, label) < 0) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
+		}
+		switch(read_line_status) {
+		case READLINE_EOF:
+			break;
+		case READLINE_ERROR:
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		default:
+			// Should never get here...
+			assert(0);
+		}
+
+
 	} else {
-		fprintf(stderr, "Usage: %s [-h] <filename|-> <label> [label+]\n",
-				argv[0]);
-		exit(EXIT_FAILURE);
+		// Should never get here (programmer error...)
+		assert(0);
 	}
 
+	params.prune_labels = prune_labels;
 	return params;
 }
 
@@ -182,7 +239,7 @@ struct parameters get_params(int argc, char *argv[])
  * ancestors. Then we go back in reverse order, pruning. */
 
 static struct rooted_tree * process_tree_direct(
-		struct rooted_tree *tree, set_t *cl_labels)
+		struct rooted_tree *tree, set_t *prune_labels)
 {
 	struct llist *rev_nodes = llist_reverse(tree->nodes_in_order);
 	struct list_elem *el;
@@ -197,7 +254,7 @@ static struct rooted_tree * process_tree_direct(
 			current->seen = true;	/* inherit mark */
 			continue;
 		}
-		if (set_has_element(cl_labels, label)) {
+		if (set_has_element(prune_labels, label)) {
 			unlink_rnode(current);
 			current->seen = true;
 		}
@@ -231,7 +288,7 @@ bool prune_predicate_trim_kids(struct rnode *node, void *param)
 bool prune_predicate_keep_clade(struct rnode *node, void *param)
 {
 	// TODO: is this used?
-	// set_t *cl_labels = (set_t *) param;
+	// set_t *prune_labels = (set_t *) param;
 
 	if (node->seen) {
 		return true;
@@ -259,7 +316,7 @@ bool prune_predicate_keep_clade(struct rnode *node, void *param)
 }
 
 static struct rooted_tree * process_tree_reverse(
-		struct rooted_tree *tree, set_t *cl_labels)
+		struct rooted_tree *tree, set_t *prune_labels)
 {
 	struct list_elem *el = tree->nodes_in_order->head;
 	struct rnode *current;
@@ -270,7 +327,7 @@ static struct rooted_tree * process_tree_reverse(
 		if (is_root(current)) break;
 		label = current->label;
 		/* mark this node (to keep it) if its label is on the CL */
-		if (set_has_element(cl_labels, label)) {
+		if (set_has_element(prune_labels, label)) {
 			current->seen = true;
 			struct prune_data *pdata =
 				malloc(sizeof(struct prune_data));
@@ -287,7 +344,7 @@ static struct rooted_tree * process_tree_reverse(
 	}
 
 	struct rooted_tree *pruned = clone_tree_cond(tree,
-			prune_predicate_keep_clade, cl_labels);	
+			prune_predicate_keep_clade, prune_labels);	
 	destroy_tree(tree);
 	return pruned;
 }
@@ -312,13 +369,13 @@ int main(int argc, char *argv[])
 	}
 
 	while (NULL != (tree = parse_tree())) {
-		tree = process_tree(tree, params.cl_labels);
+		tree = process_tree(tree, params.prune_labels);
 		dump_newick(tree->root);
 		destroy_all_rnodes(NULL);
 		destroy_tree(tree);
 	}
 
-	destroy_set(params.cl_labels);
+	destroy_set(params.prune_labels);
 
 	return 0;
 }

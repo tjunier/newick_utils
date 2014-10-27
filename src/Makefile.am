@@ -78,7 +78,7 @@ nw_distance_LDADD = libnw.la
 nw_labels_SOURCES = labels.c 
 nw_labels_LDADD = libnw.la
 
-nw_prune_SOURCES = prune.c 
+nw_prune_SOURCES = prune.c readline.c
 nw_prune_LDADD = libnw.la
 
 nw_order_SOURCES = order.c order_tree.c
