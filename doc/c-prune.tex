@@ -50,3 +50,21 @@ do this:
 Note that I also passed \id{Mammalia}, for the reason discussed
 above: the node with this label would go away if I did not, resulting in a
 different tree (try it out).
+
+\subsection{Passing Labels in a File}
+
+If the list of labels is too long for the command line (that depends on your
+shell), you can put the labels, one per line, without leading or trailing
+spaces, in a file. Pass option \code{-f}, and the name of the file as second
+argument. For example, the same results as in the above example can be achieved
+by the following command:
+
+\svgCmdOutput{prune_5}
+
+where \filename{fprune} contains:
+
+\startnarrower
+\typefile{fprune.txt}
+\stopnarrower
+
+
