@@ -7,7 +7,7 @@ bug1: -v prune_segv.nw COXA18
 bug2: -v HRV_FMDV.nw HRV37 HRV3 HRV14 HRV52 HRV17 HRV93 HRV27 POLIO3 POLIO2 POLIO1A COXA18 COXA17 COXA1
 rev_ilbl: -v prune_rev.nw POLIO1A POLIO2 POLIO3
 rev_iname: -v catarrhini.nw Homininae Colobinae
-fdef1 -f pruned_def1 catarrhini.nw
-fdef2 -f pruned_def2 catarrhini.nw
-fdef3 -f pruned_def3 catarrhini.nw
-frev  -f pruned_rev fagales
+fdef1: -f catarrhini.nw pruned_def1
+fdef2: -f catarrhini.nw pruned_def2
+fdef3: -f catarrhini.nw pruned_def3
+frev: -vf fagales.nw pruned_rev

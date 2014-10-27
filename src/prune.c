@@ -165,6 +165,7 @@ struct parameters get_params(int argc, char *argv[])
 			FILE *fin = fopen(argv[optind], "r");
 			extern FILE *nwsin;
 			if (NULL == fin) {
+				fprintf(stderr, "%s: ", argv[optind]);
 				perror(NULL);
 				exit(EXIT_FAILURE);
 			}
@@ -194,12 +195,14 @@ struct parameters get_params(int argc, char *argv[])
 		/* optind is now index of label file name */
 		if ((argc - optind) < 1) {
 			fprintf(stderr, USAGE);
+			fprintf(stderr, "optind = %d (should be >= 1)\n");
 			exit(EXIT_FAILURE);
 		} else if ((argc - optind) > 1) {
 			fprintf (stderr, "WARNING: expecting two arguments, extra arguments will be ignored.\n");
 		}
 		FILE* lbl_src = fopen(argv[optind], "r");
 		if (NULL == lbl_src) {
+			fprintf(stderr, "%s: ", argv[optind]);
 			perror(NULL);
 			exit(EXIT_FAILURE);
 		}
