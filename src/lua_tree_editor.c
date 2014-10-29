@@ -72,7 +72,7 @@ const char *STOP = "stop_run";
 enum order { POST_ORDER, PRE_ORDER };
 
 enum node_field { UNKNOWN_FIELD, NODE_ADDRESS, NODE_LABEL, NODE_SUPPORT,
-	NODE_LENGTH, NODE_IS_LEAF, NODE_IS_INNER, NOIDE_IS_ROOT, NODE_PARENT,
+	NODE_LENGTH, NODE_IS_LEAF, NODE_IS_INNER, NODE_IS_ROOT, NODE_PARENT,
 	NODE_FIRST_CHILD, NODE_CHILDREN, NODE_LAST_CHILD, NODE_CHILD_COUNT};
 
 struct parameters {
@@ -234,17 +234,18 @@ static void help(char *argv[])
 "are used in the usual Lua table syntax, e.g. N['lbl'] or N.lbl.\n"
 "The accessors are:\n"
 "\n"
-"	Name			Arg type	Meaning\n"
-"	---------------------------------------------------------\n"
-"       id                      hex number	unique id\n"
-"    	lbl			string		label\n"
-"    	b			number		support value\n"
-"    	len,L			number		parent edge length\n"
-"    	par			node		parent node\n"
-"    	first_child, fc		node		first child\n"
-"    	last_child, lc		node		last child\n"
-"    	children_count, c	node		last child\n"
-"    	kids			table		node's children\n"
+"       Name                 Type        R/W?    Meaning\n"
+"       -------------------------------------------------------\n"
+"       id                   hex number  ro      unique id\n"
+"       is_root, r           boolean     ro      true iff arg is root\n"
+"       lbl                  string      rw      label\n"
+"       b                    number      ro      support value\n"
+"       len,L                number      rw      parent edge length\n"
+"       par                  node        ro      parent node\n"
+"       first_child, fc      node        ro      first child\n"
+"       last_child, lc       node        ro      last child\n"
+"       children_count, c    node        ro      last child\n"
+"       kids                 table       ro      node's children\n"
 "\n"
 "Note: the label and edge length of a node can also be set, by using\n"
 "the accessor in a lvalue, e.g. N.len = 0.12.\n"
@@ -823,6 +824,8 @@ static enum node_field field_string2code (const char *fld_str)
 	if (strcmp("c", fld_str) == 0) return NODE_CHILD_COUNT;
 	if (strcmp("children_count", fld_str) == 0) return NODE_CHILD_COUNT;
 	if (strcmp("kids", fld_str) == 0) return NODE_CHILDREN;
+	if (strcmp("is_root", fld_str) == 0) return NODE_IS_ROOT;
+	if (strcmp("r", fld_str) == 0) return NODE_IS_ROOT;
 
 	return UNKNOWN_FIELD;
 }
@@ -930,6 +933,9 @@ static int lua_node_get(lua_State *L)
 		return 1;
 	case NODE_CHILDREN:
 		push_kids(L, orig);
+		return 1;
+	case NODE_IS_ROOT:
+		lua_pushboolean(L, (int) is_root(orig)); 
 		return 1;
 	case UNKNOWN_FIELD:
 		lua_pushnil(L);
