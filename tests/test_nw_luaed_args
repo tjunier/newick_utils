@@ -28,3 +28,4 @@ kids1: -n pecora.nw 'not l' 'print(N.lbl); for i,v in ipairs(N.kids) do print(v.
 file_1: -n -f edges.lua catarrhini.nw
 file_2: -n -f edges_num.lua catarrhini.nw
 ben: -f ben_prob.lua falconiformes.nw
+rootq: -n completely_labeled.nw true 'print(N.is_root)' 
