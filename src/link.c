@@ -393,7 +393,35 @@ int dichotomize(struct rnode *node)
 {
 }
 
-void _dichotomize_next_two_siblings(struct rnode *node)
+struct rnode*  _dichotomize_next_two_siblings(struct rnode *node)
 {
-}
+	struct rnode *parent, *next_sib, *next_next_sib, *new_sib;
 
+	next_sib = node->next_sibling;
+	assert(NULL != next_sib);
+	next_next_sib = next_sib->next_sibling;
+	assert(NULL != next_next_sib);
+	assert(NULL != node->parent);
+	parent = node->parent;
+
+	new_sib = create_rnode("", "");
+	if (NULL == new_sib) { return NULL; }
+
+	/* this just clears pointers, it doesn't free structures */
+	remove_child(next_next_sib);		
+	remove_child(next_sib);		
+
+	parent->last_child = node;
+
+	/* now the argument node is the last kid, unless the function was called
+	 * improperly. */
+
+	add_child(new_sib, next_sib);
+	add_child(new_sib, next_next_sib);
+
+	/* the two orphans have found a new parent! */
+	
+	add_child(parent, new_sib);
+
+	return new_sib;
+}

@@ -1298,7 +1298,12 @@ int test__dichotomize_next_two_siblings()
 	}
 	/* The new sib's first child should be kid2 */
 	if (kid2 != new_sib->first_child) {
-		printf("%s: new sib's 1st child should be kid1 (%p), but is %p\n", test_name, kid1, kid1->first_child);
+		printf("%s: new sib's 1st child should be kid2 (%p), but is %p\n", test_name, kid1, kid1->first_child);
+		return 1;
+	}
+	/* The new sib's last child should be kid3 */
+	if (kid3 != new_sib->last_child) {
+		printf("%s: new sib's last child should be kid3 (%p), but is %p\n", test_name, kid1, kid1->first_child);
 		return 1;
 	}
 	/* kid2's parent should now be the new sib */
@@ -1311,9 +1316,9 @@ int test__dichotomize_next_two_siblings()
 		printf("%s: kid2's next sib is %p, should be kid3 (%p)\n", test_name, kid2->next_sibling, kid3);
 		return 1;
 	}
-	/* kid3's parent should be parent */
-	if (parent != kid3->parent) {
-		printf("%s: kid3's parent is %p, should be parent (%p)\n", test_name, kid3->parent, parent);
+	/* kid3's parent should be the new sib */
+	if (new_sib != kid3->parent) {
+		printf("%s: kid3's parent is %p, should be the new sib (%p)\n", test_name, kid3->parent, new_sib);
 		return 1;
 	}
 	/* kid3 should have no next sibling */

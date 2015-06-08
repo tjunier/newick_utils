@@ -151,4 +151,4 @@ int dichotomize(struct rnode *);
  * is :-) child. Example: given (A,B,C,D,E), call on C and get (A,B,C,(D,E)).
  * Further calls on B then A yield (A,(B,(C,(D,E)))). */
 
-void _dichotomize_next_two_siblings(struct rnode*);
+struct rnode* _dichotomize_next_two_siblings(struct rnode*);
