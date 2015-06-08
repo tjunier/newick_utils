@@ -1250,6 +1250,82 @@ int test_dichotomize()
 	return 0;
 }
 
+int test__dichotomize_next_two_siblings()
+{
+	const char *test_name = __func__;
+
+	struct rnode *parent, *kid1, *kid2, *kid3;
+
+	parent = create_rnode("parent", "");	
+	kid1 = create_rnode("kid1", "");	
+	kid2 = create_rnode("kid2", "");	
+	kid3 = create_rnode("kid3", "");	
+
+	add_child(parent, kid1);
+	add_child(parent, kid2);
+	add_child(parent, kid3);
+
+	/* Testing would be pointless unless these are true. But these aren't
+	 * what we're testing, so we check with assert() */
+	assert(kid1 == parent->first_child);
+	assert(kid3 == parent->last_child);
+	assert(kid2 == kid1->next_sibling);
+	assert(kid3 == kid2->next_sibling);
+	assert(NULL == kid3->next_sibling);
+	assert(parent == kid1->parent);
+	assert(parent == kid2->parent);
+	assert(parent == kid3->parent);
+
+	/* dichotimize kid1's two next siblings (i.e., kid2 and kid3) */
+	_dichotomize_next_two_siblings(kid1);
+
+	/* now, kid2 and kid3 go as children of a new sibling of kid1. Get that
+	 * kid: */
+	struct rnode *new_sib = kid1->next_sibling;
+	if (NULL == new_sib) {
+		printf ("%s: kid1 should have a next sibling\n", test_name);
+		return 1;
+	}
+	/* The new sibling should NOT have a next sibling */
+	if (NULL != new_sib->next_sibling) {
+		printf("%s: new sib should NOT have a next sib\n", test_name);
+		return 1;
+	}
+	/* The new sib's parent should be 'parent' */
+	if (parent != new_sib->parent) {
+		printf ("%s: new_kid (%p)'s parent is %p, should be parent (%p).\n", test_name, new_sib, new_sib->parent, parent);
+		return 1;
+	}
+	/* The new sib's first child should be kid2 */
+	if (kid2 != new_sib->first_child) {
+		printf("%s: new sib's 1st child should be kid1 (%p), but is %p\n", test_name, kid1, kid1->first_child);
+		return 1;
+	}
+	/* kid2's parent should now be the new sib */
+	if (new_sib != kid2->parent) {
+		printf("%s: kid2's parent is %p, should be the new sib (%p)\n", test_name, kid2->parent, new_sib);
+		return 1;
+	}
+	/* kid2's next sib should be kid3 */
+	if (kid3 != kid2->next_sibling) {
+		printf("%s: kid2's next sib is %p, should be kid3 (%p)\n", test_name, kid2->next_sibling, kid3);
+		return 1;
+	}
+	/* kid3's parent should be parent */
+	if (parent != kid3->parent) {
+		printf("%s: kid3's parent is %p, should be parent (%p)\n", test_name, kid3->parent, parent);
+		return 1;
+	}
+	/* kid3 should have no next sibling */
+	if (NULL != kid3->next_sibling) {
+		printf("%s: kid3 should have no next sib, but has %p.\n", test_name, kid3->next_sibling);
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -1276,6 +1352,7 @@ int main()
 	failures += test_insert_remove_child_tail();
 	failures += test_swap_nodes();
 	failures += test_dichotomize();
+	failures += test__dichotomize_next_two_siblings();
 	// failures += test_is_stair();
 	if (0 == failures) {
 		printf("All tests ok.\n");

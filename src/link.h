@@ -142,3 +142,13 @@ char *add_len_strings(char *ls1, char *ls2);
  * their "left" sibling, e.g.  (A,B,C,D) -> (A,(B,(C,D))) */
 
 int dichotomize(struct rnode *);
+
+/* does an elementary dichotomization operation: takes the next and second-next
+ * siblings of the argument node, makes a new node with these two as children,
+ * and adds that new node as sibling to the argument node. Not meant to be
+ * called outside dichotomize() (hence the leading _), but visible so it can be
+ * tested. Meant to be called on the antepenultimate (next-to-next-to-last, that
+ * is :-) child. Example: given (A,B,C,D,E), call on C and get (A,B,C,(D,E)).
+ * Further calls on B then A yield (A,(B,(C,(D,E)))). */
+
+void _dichotomize_next_two_siblings(struct rnode*);

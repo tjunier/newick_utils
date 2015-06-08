@@ -392,3 +392,8 @@ void remove_children(struct rnode *node)
 int dichotomize(struct rnode *node)
 {
 }
+
+void _dichotomize_next_two_siblings(struct rnode *node)
+{
+}
+
