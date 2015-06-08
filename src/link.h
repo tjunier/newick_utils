@@ -137,3 +137,8 @@ void remove_children(struct rnode *);
 /* takes 2 lengths (as strings), and return their sum (as a string) */
 
 char *add_len_strings(char *ls1, char *ls2);
+
+/* dichotomizes a polytomous rnode (in place) - siblings become children of
+ * their "left" sibling, e.g.  (A,B,C,D) -> (A,(B,(C,D))) */
+
+int dichotomize(struct rnode *);

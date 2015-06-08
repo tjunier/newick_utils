@@ -388,3 +388,7 @@ void remove_children(struct rnode *node)
 	node->last_child = NULL;
 	node->child_count = 0;
 }
+
+int dichotomize(struct rnode *node)
+{
+}
