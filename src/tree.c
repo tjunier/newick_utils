@@ -280,3 +280,8 @@ struct rooted_tree *clone_tree_cond(struct rooted_tree *target,
 
 	return result;
 }
+
+int dichotomize(struct rooted_tree *tree)
+{
+	return 0;
+}

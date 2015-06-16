@@ -138,11 +138,6 @@ void remove_children(struct rnode *);
 
 char *add_len_strings(char *ls1, char *ls2);
 
-/* dichotomizes a polytomous rnode (in place) - siblings become children of
- * their "left" sibling, e.g.  (A,B,C,D) -> (A,(B,(C,D))) */
-
-int dichotomize(struct rnode *);
-
 /* does an elementary dichotomization operation: takes the next and second-next
  * siblings of the argument node, makes a new node with these two as children,
  * and adds that new node as sibling to the argument node. Not meant to be

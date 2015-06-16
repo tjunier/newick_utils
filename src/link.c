@@ -389,10 +389,6 @@ void remove_children(struct rnode *node)
 	node->child_count = 0;
 }
 
-int dichotomize(struct rnode *node)
-{
-}
-
 struct rnode*  _dichotomize_next_two_siblings(struct rnode *node)
 {
 	struct rnode *parent, *next_sib, *next_next_sib, *new_sib;

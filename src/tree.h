@@ -138,3 +138,8 @@ struct rooted_tree *clone_tree(struct rooted_tree *tree);
 
 struct rooted_tree *clone_tree_cond(struct rooted_tree *tree,
 		bool (*predicate)(struct rnode *, void * param), void *param);
+
+/* dichotomizes a polytomous rnode (in place) - siblings become children of
+ * their "left" sibling, e.g.  (A,B,C,D) -> (A,(B,(C,D))) */
+
+int dichotomize(struct rooted_tree  *);

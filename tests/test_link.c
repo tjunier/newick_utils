@@ -1223,33 +1223,6 @@ int test_swap_nodes()
 	return 0;
 }
 
-int test_dichotomize()
-{
-	const char *test_name = __func__;
-
-	struct rooted_tree tree;
-	struct rnode *polytomous, *root;
-	struct hash *map;
-	char *exp = "((A,(B,C))e,D)f;";
-
-	tree = tree_6();	//  ((A:1,B:1,C:1)e:1,D:2)f 
-	map = create_label2node_map(tree.nodes_in_order);
-	polytomous = hash_get(map, "e");
-	root = hash_get(map, "f");
-
-	dichotomize(polytomous);
-
-	char *obt = to_newick(root);
-	if (0 != strcmp(exp, obt)) {
-		printf ("%s: expected tree '%s', got '%s'.\n",
-				test_name, exp, to_newick(root));
-		return 1;
-	}
-
-	printf("%s ok.\n", test_name);
-	return 0;
-}
-
 int test__dichotomize_next_two_siblings()
 {
 	const char *test_name = __func__;
@@ -1275,6 +1248,7 @@ int test__dichotomize_next_two_siblings()
 	assert(parent == kid1->parent);
 	assert(parent == kid2->parent);
 	assert(parent == kid3->parent);
+	assert(3 == parent->child_count);
 
 	/* dichotimize kid1's two next siblings (i.e., kid2 and kid3) */
 	_dichotomize_next_two_siblings(kid1);
@@ -1326,6 +1300,16 @@ int test__dichotomize_next_two_siblings()
 		printf("%s: kid3 should have no next sib, but has %p.\n", test_name, kid3->next_sibling);
 		return 1;
 	}
+	/* new sib should have a child count of 2 */
+	if (2 != new_sib->child_count) {
+		printf("%s: new sib should have a child count of 2, has %d\n", test_name, new_sib->child_count);
+		return 1;
+	}
+	/* parent should have a child count of 2 */
+	if (2 != parent->child_count) {
+		printf("%s: parent should have a child count of 2, has %d\n", test_name, parent->child_count);
+		return 1;
+	}
 
 	printf("%s ok.\n", test_name);
 	return 0;
@@ -1356,7 +1340,6 @@ int main()
 	failures += test_insert_remove_child_middle();
 	failures += test_insert_remove_child_tail();
 	failures += test_swap_nodes();
-	failures += test_dichotomize();
 	failures += test__dichotomize_next_two_siblings();
 	// failures += test_is_stair();
 	if (0 == failures) {
