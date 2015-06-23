@@ -283,5 +283,15 @@ struct rooted_tree *clone_tree_cond(struct rooted_tree *target,
 
 int dichotomize(struct rooted_tree *tree)
 {
+	struct list_elem *el;
+	struct rnode *current;
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		current = el->data;
+		if (current->child_count > 2) {
+		}
+	}
+			
+
 	return 0;
 }

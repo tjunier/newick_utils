@@ -39,6 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "masprintf.h"
 #include "common.h"
 
+const static int DICHOT_NO_OP = 0;
+const static int DICHOT_NO_MEM = -1;
+
 /* Avoid global variables by making external vars static and using a getter. */
 
 static struct rnode *unlink_rnode_root_child;
@@ -420,4 +423,38 @@ struct rnode*  _dichotomize_next_two_siblings(struct rnode *node)
 	add_child(parent, new_sib);
 
 	return new_sib;
+}
+
+int dichotomize_children(struct rnode *node)
+{
+	if (2 >= node->child_count) return DICHOT_NO_OP;
+
+	/* get the first n - 2 children, where n is the child count, *prepend*
+	 * them to a list */
+
+	struct llist *kids_to_dichotomize = create_llist();
+	if (NULL == kids_to_dichotomize) return DICHOT_NO_MEM; 
+
+	struct rnode *kid;
+	int i;
+	for (	i = 0, kid = node->first_child; 
+		i + 2 < node->child_count;
+		i++, kid = kid->next_sibling) {
+
+		prepend_element(kids_to_dichotomize, kid);
+	}
+
+	/* now traverse the list normally: this will start with the furtheset
+	 * sibling (n-2) down to the first. To each of these, apply
+	 * _dichotomize_next_two_siblings(). */
+
+	struct list_elem *el;
+	int count = 0;
+	for (el = kids_to_dichotomize->head; NULL != el; el = el->next) {
+		kid = el->data;
+		_dichotomize_next_two_siblings(kid);
+		count++;
+	}
+
+	return count;
 }

@@ -1315,6 +1315,49 @@ int test__dichotomize_next_two_siblings()
 	return 0;
 }
 
+int test_dichotomize_children()
+{
+	const char *test_name = __func__;
+
+	struct rnode *parent, *kid1, *kid2, *kid3, *kid4, *kid5;
+
+	parent = create_rnode("P", "");	
+	kid1 = create_rnode("A", "");	
+	kid2 = create_rnode("B", "");	
+	kid3 = create_rnode("C", "");	
+	kid4 = create_rnode("D", "");
+	kid5 = create_rnode("E", "");
+
+	add_child(parent, kid1);
+	add_child(parent, kid2);
+	add_child(parent, kid3);
+	add_child(parent, kid4);
+	add_child(parent, kid5);
+
+	char *pre_nw = to_newick(parent);
+	assert(0 == strcmp(pre_nw, "(A,B,C,D,E)P;"));
+
+	int count = dichotomize_children(parent);
+
+	if (3 != count) {
+		printf ("%s: expected 3 dichotomized kids, got %d.\n",
+				test_name, count);
+		return 1;
+	}
+
+	char *post_nw_exp = "(A,(B,(C,(D,E))))P;";
+	char *post_nw = to_newick(parent);
+	if (0 != strcmp(post_nw_exp, post_nw)) {
+		printf ("%s: node structure should be %s, but is %s.\n", 
+				test_name, post_nw_exp, post_nw);
+		return 1;
+	}
+
+	// TODO: is this line ever reached?
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -1341,6 +1384,7 @@ int main()
 	failures += test_insert_remove_child_tail();
 	failures += test_swap_nodes();
 	failures += test__dichotomize_next_two_siblings();
+	failures += test_dichotomize_children();
 	// failures += test_is_stair();
 	if (0 == failures) {
 		printf("All tests ok.\n");

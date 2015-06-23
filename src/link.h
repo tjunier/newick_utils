@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * at -10, that should allow for enough kinds of errors... */
 enum remove_child_status {  RM_CHILD_HAS_NO_PARENT = -10, RM_CHILD_MEM_ERROR };
 
+const static int DICHOT_NO_OP;
+const static int DICHOT_NO_MEM;
+
 /* NOTE: Tree properties such as 'nodes_in_order' will generally be invalidated
  * by these methods. You will need either to recompute them, or to avoid
  * relying on them after the call. For example, it is safe to splice out a node
@@ -147,3 +150,9 @@ char *add_len_strings(char *ls1, char *ls2);
  * Further calls on B then A yield (A,(B,(C,(D,E)))). */
 
 struct rnode* _dichotomize_next_two_siblings(struct rnode*);
+
+/* apply the above primitive to the children of a node, so that they are
+ * entirely dichotomized: called on (A,B,C,D,E), this yields (A,(B,(C,(D,E)))).
+ * */
+
+int dichotomize_children(struct rnode*);
