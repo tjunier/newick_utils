@@ -772,7 +772,7 @@ int test_dichotomize()
 	struct hash *map;
 	char *exp = "((A,(B,C))e,D)f;";
 
-	tree = tree_6();	//  ((A:1,B:1,C:1)e:1,D:2)f 
+	tree = tree_18();	//  ((A,B,C)e,D)f 
 	map = create_label2node_map(tree.nodes_in_order);
 	root = hash_get(map, "f");
 

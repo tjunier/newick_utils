@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sys/types.h>
 #include <regex.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #include "tree.h"
 #include "link.h"
@@ -286,12 +287,16 @@ int dichotomize(struct rooted_tree *tree)
 	struct list_elem *el;
 	struct rnode *current;
 
+	int result;
+
 	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
 		current = el->data;
 		if (current->child_count > 2) {
+			result = dichotomize_children(current);
+			if (-1 == result) 
+				return -1; // Memory error
 		}
 	}
-			
 
 	return 0;
 }

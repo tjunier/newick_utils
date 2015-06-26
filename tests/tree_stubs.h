@@ -70,3 +70,7 @@ struct rooted_tree tree_16();
 /* A tree from a rerooting problem  (namely, with bootstrap values) */
 /* ((((A,(B,C)61)41,((D,E)86,F)93)100,G)100,H,I); */ 
 struct rooted_tree tree_17();
+
+/* Like tree #6, but without branch lengths. */
+/*  ((A:1,B:1,C:1)e:1,D:2)f */
+struct rooted_tree tree_18();
