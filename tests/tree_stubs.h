@@ -74,3 +74,7 @@ struct rooted_tree tree_17();
 /* Like tree #6, but without branch lengths. */
 /*  ((A:1,B:1,C:1)e:1,D:2)f */
 struct rooted_tree tree_18();
+
+/* A tree with several polytomous nodes */
+/* ((A,B,C)j,(D,E,F)k,(G,H,I)l)m; */
+struct rooted_tree tree_19();

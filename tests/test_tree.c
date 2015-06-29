@@ -789,6 +789,32 @@ int test_dichotomize()
 	return 0;
 }
 
+int test_dichotomize_2()
+{
+	const char *test_name = __func__;
+
+	struct rooted_tree tree;
+	struct rnode *polytomous, *root;
+	struct hash *map;
+	char *exp = "((A,(B,C))j,((D,(E,F))k,(G,(H,I))l))m;";
+
+	tree = tree_19();	// ((A,B,C)j,(D,E,F)k,(G,H,I)l)m; 
+	map = create_label2node_map(tree.nodes_in_order);
+	root = hash_get(map, "m");
+
+	dichotomize(&tree);
+
+	char *obt = to_newick(root);
+	if (0 != strcmp(exp, obt)) {
+		printf ("%s: expected tree '%s', got '%s'.\n",
+				test_name, exp, to_newick(root));
+		return 1;
+	}
+
+	printf("%s ok.\n", test_name);
+	return 0;
+}
+
 int main()
 {
 	int failures = 0;
@@ -810,6 +836,7 @@ int main()
 	failures += test_clone_tree_original();
 	failures += test_clone_tree_cond();
 	failures += test_dichotomize();
+	failures += test_dichotomize_2();
 	if (0 == failures) {
 		printf("All tests ok.\n");
 	} else {

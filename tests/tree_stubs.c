@@ -778,3 +778,62 @@ struct rooted_tree tree_18()
 
 	return result;
 }
+
+/* A tree with several polytomous nodes */
+/* ((A,B,C)j,(D,E,F)k,(G,H,I)l)m; */
+struct rooted_tree tree_19()
+{
+	struct rnode *node_A, *node_B, *node_C, *node_D;
+	struct rnode *node_E, *node_F, *node_G, *node_H, *node_I;
+	struct rnode *node_j, *node_k, *node_l, *node_m;
+	struct llist *nodes_in_order;
+	struct rooted_tree result;
+	
+	node_A = create_rnode("A", "");
+	node_B = create_rnode("B", "");
+	node_C = create_rnode("C", "");
+	node_D = create_rnode("D", "");
+	node_E = create_rnode("E", "");
+	node_F = create_rnode("F", "");
+	node_G = create_rnode("G", "");
+	node_H = create_rnode("H", "");
+	node_I = create_rnode("I", "");
+	node_j = create_rnode("j", "");
+	node_k = create_rnode("k", "");
+	node_l = create_rnode("l", "");
+	node_m = create_rnode("m", "");
+
+	add_child(node_j, node_A);
+	add_child(node_j, node_B);
+	add_child(node_j, node_C);
+	add_child(node_k, node_D);
+	add_child(node_k, node_E);
+	add_child(node_k, node_F);
+	add_child(node_l, node_G);
+	add_child(node_l, node_H);
+	add_child(node_l, node_I);
+	add_child(node_m, node_j);
+	add_child(node_m, node_k);
+	add_child(node_m, node_l);
+
+	nodes_in_order = create_llist();
+	append_element(nodes_in_order, node_A);
+	append_element(nodes_in_order, node_B);
+	append_element(nodes_in_order, node_C);
+	append_element(nodes_in_order, node_j);
+	append_element(nodes_in_order, node_D);
+	append_element(nodes_in_order, node_E);
+	append_element(nodes_in_order, node_F);
+	append_element(nodes_in_order, node_k);
+	append_element(nodes_in_order, node_G);
+	append_element(nodes_in_order, node_H);
+	append_element(nodes_in_order, node_I);
+	append_element(nodes_in_order, node_l);
+	append_element(nodes_in_order, node_m);
+
+	result.root = node_m;
+	result.nodes_in_order = nodes_in_order;
+	result.type = TREE_TYPE_UNKNOWN;
+
+	return result;
+}
