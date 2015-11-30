@@ -3,7 +3,8 @@
 
 AC_PREREQ(2.61)
 AC_INIT([Newick Utils],[1.6],[thomas.junier@.unige.ch])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
+LT_INIT
 
 AC_CONFIG_SRCDIR([src/display.c])
 
