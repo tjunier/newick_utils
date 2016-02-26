@@ -87,7 +87,7 @@ void help(char *argv[])
 "\n"
 "    -d: deroot - splice out the LCA of the ingroup, attaching its children\n"
 "        to the root. The ingroup is the root's child which has the more\n"
-"        children. The root is expected to have two children. Other options\n"
+"        descendants. The root is expected to have two children. Other options\n"
 "        have no effect.\n"
 "    -h: print this message and exit\n"
 "    -l: lax - if it is not possible to reroot on the outgroup, try the\n"
