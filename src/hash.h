@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* NOTE: All functions except the most simple ones can fail, in which case the
  * return value indicates failure or success. Functions that return pointers
  * will return NULL in case of error (most probably a malloc() problem due to
- * insufficient memory. Functions that just perform an action (i.e., who could
+ * insufficient memory. Functions that just perform an action (i.e., that could
  * return void) return SUCCESS or FAILURE. FAILURE will often be caused by
  * insufficient memory in a called function. 
  */
