@@ -339,11 +339,11 @@ void unicify_tree_leaves(struct rooted_tree *tree)
 		if (! is_leaf(current)) continue;
 		char *label = current->label;
 		if(NULL == hash_get(seen_labels, label)) {
-			printf("%s not seen yet\n", label);
 			hash_set(seen_labels, label, SEEN);
 		}
-		else
-			printf("%s already seen\n", label);
+		else {
+			unlink_rnode(current);
+		}
 	}
 
 	destroy_hash(seen_labels);
