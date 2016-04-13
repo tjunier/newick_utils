@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "link.h"
 #include "masprintf.h"
 
-enum actions { PURE_CLADES, STAIR_NODES }; /* not sure we'll keep stair nodes */
+enum actions { PURE_CLADES, STAIR_NODES , UNIQUE }; /* not sure we'll keep stair nodes */
 
 struct group_data {
 	char *name;
@@ -309,6 +309,11 @@ void collapse_by_groups(struct rooted_tree *tree, struct hash *group_map)
 	}
 }
 
+/* Unicify a tree: keeps only one leaf node per label. That is, traverses the
+ * tree in Newick order, doing either of the following at each leaf:  
+*/
+
+void unicify_leaves(struct rooted_tree *tree) {}
 
 int main(int argc, char *argv[])
 {
@@ -326,10 +331,21 @@ int main(int argc, char *argv[])
 	while (true) {
 		tree = parse_tree();
 		if (NULL != tree) {
-			if (NULL == group_map)
-				collapse_pure_clades(tree);
-			else
-				collapse_by_groups(tree, group_map);
+			switch (params.action) {
+			case PURE_CLADES: 
+				if (NULL == group_map)
+					collapse_pure_clades(tree);
+				else
+					collapse_by_groups(tree, group_map);
+				break;
+			case UNIQUE:
+				unicify_tree(tree);
+				break;
+			case STAIR_NODES:
+				break; /* not implemented yet */
+			default:
+				assert(0); /* programmer error */
+			}
 
 			dump_newick(tree->root);
 			destroy_all_rnodes(NULL);
