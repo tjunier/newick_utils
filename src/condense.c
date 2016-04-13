@@ -66,7 +66,7 @@ void help(char *argv[])
 "Synopsis\n"
 "--------\n"
 "\n"
-"%s [-hm:] <tree|->\n"
+"%s [-hm:u] <tree|->\n"
 "\n"
 "Input\n"
 "-----\n"
@@ -82,6 +82,7 @@ void help(char *argv[])
 "label: (A,(B,(B,B))); has a pure clade of B, and will be replaced by\n"
 "(A,B);. The collapsed clade's support value (if any) is preserved, as is\n"
 "its parent edge's length (if specified).\n"
+"(see Options below for variants)\n"
 "\n"
 "Options\n"
 "-------\n"
@@ -107,6 +108,8 @@ void help(char *argv[])
 "      map would condense all African apes into a single leaf (since they\n"
 "      form a clade) with label 'Africa_Homo_3'. It would not be able to\n"
 "      condense further, however, because Pongo belong to group 'Asia'.\n"
+"   -u: unicifies leaf labels by visiting the tree in Newick order and\n"
+"      removing any leaf node whose label was already seen.\n"
 "\n"
 "Example\n"
 "-------\n"
@@ -134,19 +137,23 @@ params.grp_map_fname = NULL;
 
 /* parse options and switches */
 int opt_char;
-while ((opt_char = getopt(argc, argv, "hm:s")) != -1) {
+while ((opt_char = getopt(argc, argv, "hm:u")) != -1) {
 	switch (opt_char) {
 	case 'h':
 		help(argv);
 		exit(EXIT_SUCCESS);
 	case 'm':
 		// TODO: check return values of strdup() (in ALL the code)!
-			params.grp_map_fname = optarg;
-			break;
-		case 's':
-			/* Not implemented yet - not sure if it will be */
-			params.action = STAIR_NODES;
-			break;
+		params.grp_map_fname = optarg;
+		break;
+	case 's':
+		/* Not implemented yet - not sure if it will be */
+		params.action = STAIR_NODES;
+		break;
+	case 'u':
+		/* Not implemented yet - not sure if it will be */
+		params.action = UNIQUE;
+		break;
 		}
 	}
 
@@ -162,7 +169,7 @@ while ((opt_char = getopt(argc, argv, "hm:s")) != -1) {
 			nwsin = fin;
 		}
 	} else {
-		fprintf(stderr, "Usage: %s [-hm:] <filename|->\n",
+		fprintf(stderr, "Usage: %s [-hm:u] <filename|->\n",
 				argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -313,7 +320,35 @@ void collapse_by_groups(struct rooted_tree *tree, struct hash *group_map)
  * tree in Newick order, doing either of the following at each leaf:  
 */
 
-void unicify_leaves(struct rooted_tree *tree) {}
+void unicify_tree_leaves(struct rooted_tree *tree)
+{
+	struct list_elem *el = NULL;			
+	const unsigned int HASH_SIZE = 1000;	/* most trees will have fewer nodes */
+	const double LOAD_THRESHOLD = 0.8;
+	const unsigned RESIZE_FACTOR = 10;
+	/* Actually I only need a set (not a full-blown hash), but my set_t type
+	 * is not dynamic (yet...), and sets are implemented with hashes
+	 * anyway... */
+	struct hash *seen_labels = create_dynamic_hash(HASH_SIZE,
+			LOAD_THRESHOLD, RESIZE_FACTOR);
+	if (NULL == seen_labels) return; // TODO: return a status code
+	char *SEEN = "seen";
+
+	for (el = tree->nodes_in_order->head; NULL != el; el = el->next) {
+		struct rnode *current = el->data;
+		if (! is_leaf(current)) continue;
+		char *label = current->label;
+		if(NULL == hash_get(seen_labels, label)) {
+			printf("%s not seen yet\n", label);
+			hash_set(seen_labels, label, SEEN);
+		}
+		else
+			printf("%s already seen\n", label);
+	}
+
+	destroy_hash(seen_labels);
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -328,6 +363,9 @@ int main(int argc, char *argv[])
 	// debug
 	// if (NULL != group_map) dump_hash(group_map, NULL);
 
+	// TODO: the tree-processing functions below (collapse_pure_clades(),
+	// etc.) should return a value for success or failure. main() should
+	// then output warnings or abort, as appropriate.
 	while (true) {
 		tree = parse_tree();
 		if (NULL != tree) {
@@ -339,7 +377,7 @@ int main(int argc, char *argv[])
 					collapse_by_groups(tree, group_map);
 				break;
 			case UNIQUE:
-				unicify_tree(tree);
+				unicify_tree_leaves(tree);
 				break;
 			case STAIR_NODES:
 				break; /* not implemented yet */
