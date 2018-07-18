@@ -184,7 +184,7 @@ struct parameters get_params(int argc, char *argv[])
 	if (COMMAND_LINE == params.lbl_src) {
 		/* optind is now index of 1st label */
 		if ((argc - optind) < 1) {
-			fprintf(stderr, USAGE);
+			fprintf(stderr, "%s", USAGE);
 			exit(EXIT_FAILURE);
 		}
 		for (; optind < argc; optind++) {
@@ -196,8 +196,8 @@ struct parameters get_params(int argc, char *argv[])
 	} else if (IN_FILE == params.lbl_src) {
 		/* optind is now index of label file name */
 		if ((argc - optind) < 1) {
-			fprintf(stderr, USAGE);
-			fprintf(stderr, "optind = %d (should be >= 1)\n");
+			fprintf(stderr, "%s", USAGE);
+			fprintf(stderr, "optind = %d (should be >= 1)\n", optind);
 			exit(EXIT_FAILURE);
 		} else if ((argc - optind) > 1) {
 			fprintf (stderr, "WARNING: expecting two arguments, extra arguments will be ignored.\n");
