@@ -13,4 +13,4 @@ enum address_parser_status_type {
  * returns either \c NULL or the top-level enode of the address, so we need to
  * use an extern variable to convey its status. */
 
-enum address_parser_status_type address_parser_status;
+extern enum address_parser_status_type address_parser_status;
