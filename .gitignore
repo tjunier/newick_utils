@@ -28,3 +28,7 @@ tags
 test-driver
 ylwrap
 compile
+CMakeFiles
+CMakeCache.txt
+*.cmake
+*.so

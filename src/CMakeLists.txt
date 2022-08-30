@@ -40,6 +40,7 @@ add_library(nutils
 	set.c
 	to_newick.c
 	concat.c
+	readline.c
 	)
 
 # simple cases 
